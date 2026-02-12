@@ -1,0 +1,158 @@
+# File Upload
+
+<Subtitle>
+  A headless, unstyled file upload component for React with drag-and-drop support.
+</Subtitle>
+
+<Meta
+  name="description"
+  content="A high-quality, unstyled React file upload component with drag-and-drop support, file validation, and accessibility features."
+/>
+
+import { DemoFileUploadHero } from './demos/hero';
+import { DemoFileUploadMinimal } from './demos/minimal';
+
+<DemoFileUploadHero />
+
+## Minimal
+
+<DemoFileUploadMinimal />
+
+## Anatomy
+
+File Upload is composed of several smaller parts. Import the components:
+
+```jsx title="Anatomy"
+import { FileUpload } from '@base-ui/react/file-upload';
+
+<FileUpload.Root>
+  <FileUpload.Input />
+  <FileUpload.Dropzone>Drag files here or click</FileUpload.Dropzone>
+  <FileUpload.Trigger>Upload</FileUpload.Trigger>
+  <FileUpload.PreviewList>
+    <FileUpload.PreviewItem>{/* preview content */}</FileUpload.PreviewItem>
+  </FileUpload.PreviewList>
+</FileUpload.Root>;
+```
+
+## Usage
+
+### Basic setup
+
+`FileUpload.Root` manages all file state and provides context to child components. It accepts files through drag-and-drop, click-to-select, or the hidden input.
+
+```jsx title="Basic file upload" "FileUpload.Root"
+import { FileUpload } from '@base-ui/react/file-upload';
+
+function FileList() {
+  const { files, removeFile } = FileUpload.useFileUploadContext();
+  return files.map((file) => (
+    <div key={file.id}>
+      {file.name}
+      <button onClick={() => removeFile(file.id)}>Remove</button>
+    </div>
+  ));
+}
+
+export default function App() {
+  return (
+    <FileUpload.Root maxFiles={5}>
+      <FileUpload.Input />
+      <FileUpload.Dropzone>Upload files</FileUpload.Dropzone>
+      <FileList />
+    </FileUpload.Root>
+  );
+}
+```
+
+### File validation
+
+Control which files are accepted using `accept`, `maxSize`, `minSize`, and `maxFiles` props. By default, `maxSize` is unlimited—set it to enforce a cap:
+
+```jsx title="File validation" "accept" "maxSize" "maxFiles"
+<FileUpload.Root
+  accept="image/png, image/jpeg, .pdf"
+  maxSize={10 * 1024 * 1024}
+  minSize={1024}
+  maxFiles={5}
+  onFileReject={(file, reason) => console.log(`Rejected: ${reason}`)}
+>
+  {/* children */}
+</FileUpload.Root>
+```
+
+**Notes**
+
+- `accept` mirrors the native file input: use MIME types (for example `image/png`) or extensions with a leading dot (for example `.png`).
+- If you render previews with images, provide meaningful `alt` text so screen readers can announce the file content.
+
+### Handling file changes
+
+Listen to file changes with the `onFilesChange` callback:
+
+```jsx title="File changes" "onFilesChange"
+<FileUpload.Root
+  onFilesChange={(files) => {
+    console.log('Files changed:', files);
+  }}
+>
+  {/* children */}
+</FileUpload.Root>
+```
+
+### Drag and drop state
+
+Access the dragging state in the `FileUploadDropzone` using a function as children:
+
+```jsx title="Dragging state" "isDragging"
+<FileUpload.Dropzone>
+  {({ isDragging }) => (
+    <div style={{ opacity: isDragging ? 0.5 : 1 }}>
+      {isDragging ? 'Drop files here' : 'Drag files or click'}
+    </div>
+  )}
+</FileUpload.Dropzone>
+```
+
+### File preview items
+
+Use `FileUploadPreviewItem` and `useFileUploadPreviewItem` to display file information:
+
+```jsx title="File preview" "useFileUploadPreviewItem"
+import { FileUpload } from '@base-ui/react/file-upload';
+
+function CustomPreviewItem({ file }) {
+  const { onRemove } = FileUpload.useFileUploadPreviewItem();
+
+  return (
+    <div>
+      <img src={file.preview} alt={file.name} />
+      <span>{file.name}</span>
+      <button onClick={onRemove}>Remove</button>
+    </div>
+  );
+}
+```
+
+## API reference
+
+<Reference
+  component="FileUpload"
+  parts="Root, Input, Trigger, Dropzone, PreviewList, PreviewItem"
+/>
+
+export const metadata = {
+  keywords: [
+    'React File Upload',
+    'File Upload Component',
+    'Drag and Drop Upload',
+    'File Validation',
+    'File Preview',
+    'Headless React Components',
+    'Unstyled Components',
+    'Accessible File Upload',
+    'Base UI',
+    'File Input',
+    'Multiple File Upload',
+  ],
+};

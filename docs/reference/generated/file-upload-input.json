@@ -1,0 +1,7 @@
+{
+  "name": "FileUploadInput",
+  "description": "Hidden file input element for triggering file selection.",
+  "props": {},
+  "dataAttributes": {},
+  "cssVariables": {}
+}

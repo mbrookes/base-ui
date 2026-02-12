@@ -1,0 +1,18 @@
+{
+  "name": "FileUploadPreviewItem",
+  "description": "Individual preview item for an uploaded file.",
+  "props": {
+    "file": {
+      "type": "FileUpload.Root.ExtendedFile",
+      "required": true,
+      "detailedType": "  id: string\n  preview: string\n  status: FileUpload.Root.FileStatus\n  progress: number\n  error?: string\n}"
+    },
+    "children": {
+      "type": "ReactNode",
+      "required": true,
+      "detailedType": "React.ReactNode"
+    }
+  },
+  "dataAttributes": {},
+  "cssVariables": {}
+}

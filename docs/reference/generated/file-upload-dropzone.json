@@ -1,0 +1,12 @@
+{
+  "name": "FileUploadDropzone",
+  "description": "Interactive dropzone area for dragging and dropping files or clicking to select.",
+  "props": {
+    "children": {
+      "type": "ReactNode | ((state: { isDragging: boolean }) => ReactNode)",
+      "detailedType": "| React.ReactNode\n| ((state: { isDragging: boolean }) => ReactNode)"
+    }
+  },
+  "dataAttributes": {},
+  "cssVariables": {}
+}

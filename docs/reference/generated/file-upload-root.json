@@ -1,0 +1,54 @@
+{
+  "name": "FileUploadRoot",
+  "description": "Groups all parts of the file upload and manages its state.\nRenders a `<div>` element.",
+  "props": {
+    "maxFiles": {
+      "type": "number",
+      "default": "10",
+      "description": "Maximum number of files allowed.",
+      "detailedType": "number | undefined"
+    },
+    "maxSize": {
+      "type": "number",
+      "default": "Infinity",
+      "description": "Maximum file size in bytes. Defaults to unlimited.",
+      "detailedType": "number | undefined"
+    },
+    "minSize": {
+      "type": "number",
+      "default": "0",
+      "description": "Minimum file size in bytes.",
+      "detailedType": "number | undefined"
+    },
+    "accept": {
+      "type": "string",
+      "default": "",
+      "description": "Accepted file types (for example: `image/*`, `.pdf`, or a comma-separated list).",
+      "detailedType": "string | undefined"
+    },
+    "multiple": {
+      "type": "boolean",
+      "default": "true",
+      "description": "Allow selecting multiple files.",
+      "detailedType": "boolean | undefined"
+    },
+    "disabled": {
+      "type": "boolean",
+      "default": "false",
+      "description": "Whether the component should ignore user interaction.",
+      "detailedType": "boolean | undefined"
+    },
+    "onFilesChange": {
+      "type": "(files: FileUploadRoot.ExtendedFile[]) => void",
+      "description": "Callback fired when the file list changes.",
+      "detailedType": "| ((files: FileUploadRoot.ExtendedFile[]) => void)\n| undefined"
+    },
+    "onFileReject": {
+      "type": "(file: File, reason: string) => void",
+      "description": "Callback fired when a file is rejected during validation.",
+      "detailedType": "| ((file: File, reason: string) => void)\n| undefined"
+    }
+  },
+  "dataAttributes": {},
+  "cssVariables": {}
+}

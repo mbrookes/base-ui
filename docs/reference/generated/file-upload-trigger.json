@@ -1,0 +1,7 @@
+{
+  "name": "FileUploadTrigger",
+  "description": "Button component for triggering the file selection dialog.",
+  "props": {},
+  "dataAttributes": {},
+  "cssVariables": {}
+}

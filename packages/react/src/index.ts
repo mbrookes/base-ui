@@ -14,6 +14,7 @@ export * from './direction-provider';
 export * from './drawer';
 export * from './field';
 export * from './fieldset';
+export * from './file-upload';
 export * from './form';
 export * from './input';
 export * from './menu';

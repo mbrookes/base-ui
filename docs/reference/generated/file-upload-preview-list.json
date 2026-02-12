@@ -1,0 +1,7 @@
+{
+  "name": "FileUploadPreviewList",
+  "description": "Container for displaying the list of uploaded files.",
+  "props": {},
+  "dataAttributes": {},
+  "cssVariables": {}
+}
