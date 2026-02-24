@@ -21,14 +21,18 @@ A comprehensive file upload component has been added to the Base UI React librar
 - **useFileUploadRoot.ts** - Core logic hook for file validation and management
 - **index.ts** - Component exports and type exports
 
-### Testing & Documentation
+### Testing
 
-- **FileUpload.test.tsx** - Comprehensive test suite
-- **README.md** - Component documentation with usage examples
+- **FileUpload.test.tsx** - Comprehensive test suite (6 component tests + 2 hook tests)
+
+### Documentation
+
+- Component documentation located at `docs/src/app/(docs)/react/components/file-upload/page.mdx`
+- Demo components in `docs/src/app/(docs)/react/components/file-upload/demos/`
 
 ### Utilities
 
-- **composeEventHandlers.ts** - Event handler composition utility
+- **composeEventHandlers.ts** - Event handler composition utility (used in FileUploadDropzone)
 
 ## Key Features
 
@@ -54,8 +58,8 @@ The component follows Base UI's pattern of separating logic from UI:
 
 - `@base-ui/utils/useStableCallback` - For stable event handlers
 - `@base-ui/utils/useId` - For unique ID generation
-- `@base-ui/utils/visuallyHidden` - For accessible hidden elements
-- `@base-ui/utils/useRefWithInit` - For ref initialization patterns
+- `@base-ui/utils/visuallyHidden` - For accessible live region announcements
+- `@base-ui/utils/resolveClassName` - For resolving className callbacks to strings
 
 ## API Surface
 
@@ -94,34 +98,48 @@ The component follows Base UI's pattern of separating logic from UI:
 
 ## Integration
 
-The component is properly exported from:
+The component is properly exported and integrated:
 
-- `packages/react/src/file-upload/index.ts` - Component exports
-- `packages/react/src/index.ts` - Main library barrel export
+- `packages/react/src/file-upload/index.ts` - Component and hook exports
+- `packages/react/src/file-upload/index.parts.ts` - Namespace exports (Root, Input, Trigger, etc.)
+- `packages/react/src/index.ts` - Main library barrel export includes `export * from './file-upload'`
+- Documentation: `docs/src/app/(docs)/react/components/file-upload/page.mdx`
+- Documentation automatically appears in the component index at `docs/src/app/(docs)/react/components/page.mdx`
 
 Users can import as:
 
 ```tsx
 import { FileUpload } from '@base-ui/react';
+
+// Or directly from the component
+import { FileUpload } from '@base-ui/react/file-upload';
 ```
 
 ## Testing
 
 A comprehensive test suite is included covering:
 
-- Component rendering
-- File input interactions
-- Drag and drop functionality
-- Disabled state
-- File validation
-- Event callbacks
-- Accessibility attributes
+- Component rendering and mounting
+- File input interactions via native file dialog
+- Drag and drop functionality (dragenter, dragover, drop events)
+- Disabled state behavior
+- File validation (size, type, count limits)
+- Event callbacks (onFilesChange, onFileReject)
+- Accessibility attributes (aria-labels, aria-disabled, roles)
+- Preview item removal functionality
+- Dynamic className resolution for styling based on state
 
 Run tests with:
 
 ```bash
-pnpm test FileUpload --no-watch
+# JSDOM environment (default)
+pnpm test:jsdom FileUpload --no-watch
+
+# Chromium environment (for layout-dependent tests)
+pnpm test:chromium FileUpload --no-watch
 ```
+
+All 68 tests pass in both JSDOM and Chromium environments.
 
 ## Code Quality
 
