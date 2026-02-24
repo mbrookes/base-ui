@@ -153,4 +153,47 @@ describe('FileUpload.Trigger', () => {
     expect(screen.getByTestId('icon')).toBeInTheDocument();
     expect(screen.getByRole('button')).toHaveTextContent('📁Upload Files');
   });
+
+  it('resolves className callback with disabled state', () => {
+    render(
+      <FileUpload.Root disabled>
+        <FileUpload.Trigger
+          className={(state) => (state.disabled ? 'disabled' : 'enabled')}
+        >
+          Upload
+        </FileUpload.Trigger>
+      </FileUpload.Root>,
+    );
+
+    const button = screen.getByRole('button');
+    expect(button).toHaveClass('disabled');
+  });
+
+  it('resolves className callback when disabled state changes', () => {
+    const { rerender } = render(
+      <FileUpload.Root disabled={false}>
+        <FileUpload.Trigger
+          className={(state) => (state.disabled ? 'disabled' : 'enabled')}
+        >
+          Upload
+        </FileUpload.Trigger>
+      </FileUpload.Root>,
+    );
+
+    let button = screen.getByRole('button');
+    expect(button).toHaveClass('enabled');
+
+    rerender(
+      <FileUpload.Root disabled>
+        <FileUpload.Trigger
+          className={(state) => (state.disabled ? 'disabled' : 'enabled')}
+        >
+          Upload
+        </FileUpload.Trigger>
+      </FileUpload.Root>,
+    );
+
+    button = screen.getByRole('button');
+    expect(button).toHaveClass('disabled');
+  });
 });

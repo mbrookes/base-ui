@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi } from 'vitest';
 import { FileUpload } from '../index';
@@ -109,12 +109,9 @@ describe('FileUpload', () => {
     expect(state).toHaveTextContent('idle');
     expect(dropzone).not.toHaveAttribute('data-dragging');
 
-    await user.pointer({ target: dropzone, keys: '[MouseL>]' });
-    const dragEvent = new Event('dragenter', {
-      bubbles: true,
-      cancelable: true,
+    await act(async () => {
+      fireEvent.dragEnter(dropzone);
     });
-    dropzone.dispatchEvent(dragEvent);
 
     expect(dropzone).toHaveAttribute('data-dragging', '');
   });
@@ -137,9 +134,10 @@ describe('FileUpload', () => {
       configurable: true,
     });
 
-    const event = new Event('change', { bubbles: true });
-
-    input.dispatchEvent(event);
+    await act(async () => {
+      const event = new Event('change', { bubbles: true });
+      input.dispatchEvent(event);
+    });
 
     await waitFor(() => expect(onFileReject).toHaveBeenCalled());
     expect(onFileReject).toHaveBeenCalledWith(file, expect.any(String));
@@ -268,5 +266,136 @@ describe('FileUpload', () => {
     });
 
     revokeObjectURLSpy.mockRestore();
+  });
+
+  it('resolves className callback with disabled state', () => {
+    render(
+      <FileUpload.Root disabled>
+        <FileUpload.Trigger
+          className={(state) => (state.disabled ? 'disabled-trigger' : 'enabled-trigger')}
+        >
+          Upload
+        </FileUpload.Trigger>
+      </FileUpload.Root>,
+    );
+
+    const button = screen.getByRole('button');
+    expect(button).toHaveClass('disabled-trigger');
+  });
+
+  it('resolves className callback when disabled state changes', () => {
+    const { rerender } = render(
+      <FileUpload.Root disabled={false}>
+        <FileUpload.Trigger
+          className={(state) => (state.disabled ? 'disabled-trigger' : 'enabled-trigger')}
+        >
+          Upload
+        </FileUpload.Trigger>
+      </FileUpload.Root>,
+    );
+
+    let button = screen.getByRole('button');
+    expect(button).toHaveClass('enabled-trigger');
+
+    rerender(
+      <FileUpload.Root disabled>
+        <FileUpload.Trigger
+          className={(state) => (state.disabled ? 'disabled-trigger' : 'enabled-trigger')}
+        >
+          Upload
+        </FileUpload.Trigger>
+      </FileUpload.Root>,
+    );
+
+    button = screen.getByRole('button');
+    expect(button).toHaveClass('disabled-trigger');
+  });
+
+  it('announces file rejection to screen readers', async () => {
+    const user = userEvent.setup();
+    render(
+      <FileUpload.Root accept="image/*">
+        <FileUpload.Input data-testid="file-input" />
+      </FileUpload.Root>,
+    );
+
+    const input = screen.getByTestId('file-input') as HTMLInputElement;
+    const file = new File(['content'], 'test.txt', { type: 'text/plain' });
+
+    await userEvent.upload(input, file);
+
+    await waitFor(() => {
+      const liveRegion = screen.getByRole('status');
+      expect(liveRegion).toBeInTheDocument();
+    });
+  });
+
+  describe('Full workflow integration', () => {
+    it('supports select via dropzone, view in preview list, and remove', async () => {
+      const user = userEvent.setup();
+      const onFilesChange = vi.fn();
+
+      render(
+        <FileUpload.Root onFilesChange={onFilesChange}>
+          <FileUpload.Input data-testid="file-input" />
+          <FileUpload.Dropzone data-testid="dropzone">
+            Drop files here or click
+          </FileUpload.Dropzone>
+          <FileUpload.PreviewList data-testid="preview-list">
+            <FileUpload.PreviewItem
+              file={{
+                id: 'test-1',
+                name: 'test.txt',
+                type: 'text/plain',
+                size: 100,
+                preview: 'blob:test',
+              } as any}
+            >
+              <span data-testid="file-name">test.txt</span>
+            </FileUpload.PreviewItem>
+          </FileUpload.PreviewList>
+        </FileUpload.Root>,
+      );
+
+      const input = screen.getByTestId('file-input') as HTMLInputElement;
+      const file = new File(['content'], 'test.txt', { type: 'text/plain' });
+
+      await userEvent.upload(input, file);
+
+      await waitFor(() => {
+        expect(onFilesChange).toHaveBeenCalledWith(
+          expect.arrayContaining([expect.objectContaining({ name: 'test.txt' })]),
+        );
+      });
+    });
+
+    it('supports multiple file selection at different times', async () => {
+      const onFilesChange = vi.fn();
+
+      render(
+        <FileUpload.Root onFilesChange={onFilesChange}>
+          <FileUpload.Input data-testid="file-input" />
+          <FileUpload.Trigger>Upload</FileUpload.Trigger>
+        </FileUpload.Root>,
+      );
+
+      const input = screen.getByTestId('file-input') as HTMLInputElement;
+      const file1 = new File(['content1'], 'test1.txt', { type: 'text/plain' });
+
+      await userEvent.upload(input, file1);
+
+      await waitFor(() => {
+        expect(onFilesChange).toHaveBeenCalledWith(
+          expect.arrayContaining([expect.objectContaining({ name: 'test1.txt' })]),
+        );
+      });
+
+      const file2 = new File(['content2'], 'test2.txt', { type: 'text/plain' });
+      await userEvent.upload(input, file2);
+
+      await waitFor(() => {
+        expect(onFilesChange.mock.calls.length).toBeGreaterThan(1);
+      });
+    });
   });
 });

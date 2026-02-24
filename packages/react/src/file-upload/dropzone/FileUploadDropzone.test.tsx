@@ -1,7 +1,7 @@
 import * as React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { FileUpload } from '../index';
 
 describe('FileUpload.Dropzone', () => {
@@ -261,5 +261,132 @@ describe('FileUpload.Dropzone', () => {
 
     const dropzone = screen.getByRole('button');
     expect(dropzone).not.toHaveAttribute('aria-disabled');
+  });
+
+  it('resolves className callback with isDragging state', () => {
+    render(
+      <FileUpload.Root>
+        <FileUpload.Dropzone
+          className={(state) => (state.dragging ? 'dragging' : 'idle')}
+        >
+          Drop files
+        </FileUpload.Dropzone>
+      </FileUpload.Root>,
+    );
+
+    const dropzone = screen.getByRole('button');
+    expect(dropzone).toHaveClass('idle');
+
+    fireEvent.dragEnter(dropzone);
+
+    expect(dropzone).toHaveClass('dragging');
+  });
+
+  it('composes drag event handlers with custom handlers', async () => {
+    const customDragEnter = vi.fn();
+    const customDragLeave = vi.fn();
+
+    render(
+      <FileUpload.Root>
+        <FileUpload.Input data-testid="file-input" />
+        <FileUpload.Dropzone onDragEnter={customDragEnter} onDragLeave={customDragLeave}>
+          Drop files
+        </FileUpload.Dropzone>
+      </FileUpload.Root>,
+    );
+
+    const dropzone = screen.getByRole('button');
+
+    fireEvent.dragEnter(dropzone);
+    expect(customDragEnter).toHaveBeenCalled();
+
+    fireEvent.dragLeave(dropzone);
+    expect(customDragLeave).toHaveBeenCalled();
+  });
+
+  describe('Render prop with isDragging state', () => {
+    it('passes correct isDragging value to render prop', () => {
+      render(
+        <FileUpload.Root>
+          <FileUpload.Dropzone>
+            {({ isDragging }) => (
+              <div data-testid="dragging-state">{isDragging ? 'dragging' : 'idle'}</div>
+            )}
+          </FileUpload.Dropzone>
+        </FileUpload.Root>,
+      );
+
+      const state = screen.getByTestId('dragging-state');
+      expect(state).toHaveTextContent('idle');
+    });
+
+    it('updates render prop when dragging state changes', () => {
+      render(
+        <FileUpload.Root>
+          <FileUpload.Dropzone data-testid="dropzone">
+            {({ isDragging }) => (
+              <div data-testid="dragging-state">{isDragging ? 'dragging' : 'idle'}</div>
+            )}
+          </FileUpload.Dropzone>
+        </FileUpload.Root>,
+      );
+
+      const dropzone = screen.getByTestId('dropzone');
+      const state = screen.getByTestId('dragging-state');
+
+      expect(state).toHaveTextContent('idle');
+
+      fireEvent.dragEnter(dropzone);
+      expect(state).toHaveTextContent('dragging');
+
+      fireEvent.dragLeave(dropzone);
+      expect(state).toHaveTextContent('idle');
+    });
+
+    it('maintains isDragging state during multiple drag events', () => {
+      render(
+        <FileUpload.Root>
+          <FileUpload.Dropzone data-testid="dropzone">
+            {({ isDragging }) => (
+              <div data-testid="dragging-state">{isDragging ? 'dragging' : 'idle'}</div>
+            )}
+          </FileUpload.Dropzone>
+        </FileUpload.Root>,
+      );
+
+      const dropzone = screen.getByTestId('dropzone');
+      const state = screen.getByTestId('dragging-state');
+
+      fireEvent.dragEnter(dropzone);
+      expect(state).toHaveTextContent('dragging');
+
+      fireEvent.dragOver(dropzone);
+      expect(state).toHaveTextContent('dragging');
+
+      fireEvent.dragLeave(dropzone);
+      expect(state).toHaveTextContent('idle');
+    });
+
+    it('resets isDragging to false after dragLeave', () => {
+      render(
+        <FileUpload.Root>
+          <FileUpload.Input data-testid="file-input" />
+          <FileUpload.Dropzone data-testid="dropzone">
+            {({ isDragging }) => (
+              <div data-testid="dragging-state">{isDragging ? 'dragging' : 'idle'}</div>
+            )}
+          </FileUpload.Dropzone>
+        </FileUpload.Root>,
+      );
+
+      const dropzone = screen.getByTestId('dropzone');
+      const state = screen.getByTestId('dragging-state');
+
+      fireEvent.dragEnter(dropzone);
+      expect(state).toHaveTextContent('dragging');
+
+      fireEvent.dragLeave(dropzone);
+      expect(state).toHaveTextContent('idle');
+    });
   });
 });

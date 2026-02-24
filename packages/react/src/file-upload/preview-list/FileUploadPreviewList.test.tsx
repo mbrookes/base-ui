@@ -174,4 +174,26 @@ describe('FileUpload.PreviewList', () => {
       expect(screen.getByTestId('preview-list')).toBeInTheDocument();
     });
   });
+
+  it('resolves className callback', async () => {
+    render(
+      <FileUpload.Root>
+        <FileUpload.Input data-testid="file-input" />
+        <FileUpload.PreviewList
+          data-testid="preview-list"
+          className={() => 'preview-list-class'}
+        >
+          <li>Item</li>
+        </FileUpload.PreviewList>
+      </FileUpload.Root>,
+    );
+
+    const input = screen.getByTestId('file-input') as HTMLInputElement;
+    const file = new File(['content'], 'test.txt', { type: 'text/plain' });
+
+    await userEvent.upload(input, file);
+
+    const list = await screen.findByTestId('preview-list');
+    expect(list?.className).toContain('preview-list-class');
+  });
 });

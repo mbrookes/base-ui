@@ -150,4 +150,45 @@ describe('FileUpload.Input', () => {
       );
     });
   });
+
+  it('resolves className callback with disabled state', () => {
+    render(
+      <FileUpload.Root disabled>
+        <FileUpload.Input
+          data-testid="file-input"
+          className={(state) => (state.disabled ? 'disabled-input' : 'enabled-input')}
+        />
+      </FileUpload.Root>,
+    );
+
+    const input = screen.getByTestId('file-input');
+    expect(input).toHaveClass('disabled-input');
+  });
+
+  it('resolves className callback when disabled state changes', () => {
+    const { rerender } = render(
+      <FileUpload.Root disabled={false}>
+        <FileUpload.Input
+          data-testid="file-input"
+          className={(state) => (state.disabled ? 'disabled-input' : 'enabled-input')}
+        />
+      </FileUpload.Root>,
+    );
+
+    let input = screen.getByTestId('file-input');
+    expect(input).toHaveClass('enabled-input');
+
+    rerender(
+      <FileUpload.Root disabled>
+        <FileUpload.Input
+          data-testid="file-input"
+          className={(state) => (state.disabled ? 'disabled-input' : 'enabled-input')}
+        />
+      </FileUpload.Root>,
+    );
+
+    input = screen.getByTestId('file-input');
+    expect(input).toHaveClass('disabled-input');
+  });
+
 });

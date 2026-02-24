@@ -238,4 +238,30 @@ describe('FileUpload.PreviewItem', () => {
       expect(screen.getByTestId('preview')).toHaveTextContent('blob:test.txt');
     });
   });
+
+  it('resolves className callback', async () => {
+    render(
+      <FileUpload.Root>
+        <FileUpload.Input data-testid="file-input" />
+        <FileUpload.PreviewList>
+          <FileUpload.PreviewItem
+            file={createMockFile('test.txt', 'text/plain')}
+            className={() => 'preview-item-class'}
+            data-testid="preview-item"
+          >
+            Item content
+          </FileUpload.PreviewItem>
+        </FileUpload.PreviewList>
+      </FileUpload.Root>,
+    );
+
+    const input = screen.getByTestId('file-input') as HTMLInputElement;
+    const uploadFile = new File(['content'], 'test.txt', { type: 'text/plain' });
+    await userEvent.upload(input, uploadFile);
+
+    await waitFor(() => {
+      const item = screen.getByTestId('preview-item');
+      expect(item?.className).toContain('preview-item-class');
+    });
+  });
 });
