@@ -392,4 +392,84 @@ describe('FileUpload', () => {
       });
     });
   });
+
+  describe('Error scenarios', () => {
+    it('handles file rejection with error message', async () => {
+      const onFileReject = vi.fn();
+
+      render(
+        <FileUpload.Root accept="image/*" onFileReject={onFileReject}>
+          <FileUpload.Input data-testid="file-input" />
+        </FileUpload.Root>,
+      );
+
+      const input = screen.getByTestId('file-input') as HTMLInputElement;
+      const textFile = new File(['data'], 'test.txt', { type: 'text/plain' });
+
+      Object.defineProperty(input, 'files', {
+        value: [textFile],
+        configurable: true,
+      });
+
+      await act(async () => {
+        const event = new Event('change', { bubbles: true });
+        input.dispatchEvent(event);
+      });
+
+      await waitFor(() => expect(onFileReject).toHaveBeenCalled());
+      expect(onFileReject.mock.calls[0][0]).toBe(textFile);
+    });
+
+    it('respects maxSize constraint', async () => {
+      const onFileReject = vi.fn();
+
+      render(
+        <FileUpload.Root maxSize={100} onFileReject={onFileReject}>
+          <FileUpload.Input data-testid="file-input" />
+        </FileUpload.Root>,
+      );
+
+      const input = screen.getByTestId('file-input') as HTMLInputElement;
+      const largeFile = new File([new Uint8Array(200)], 'large.txt', {
+        type: 'text/plain',
+      });
+
+      Object.defineProperty(input, 'files', {
+        value: [largeFile],
+        configurable: true,
+      });
+
+      await act(async () => {
+        const event = new Event('change', { bubbles: true });
+        input.dispatchEvent(event);
+      });
+
+      await waitFor(() => expect(onFileReject).toHaveBeenCalled());
+    });
+
+    it('respects minSize constraint', async () => {
+      const onFileReject = vi.fn();
+
+      render(
+        <FileUpload.Root minSize={100} onFileReject={onFileReject}>
+          <FileUpload.Input data-testid="file-input" />
+        </FileUpload.Root>,
+      );
+
+      const input = screen.getByTestId('file-input') as HTMLInputElement;
+      const smallFile = new File(['x'], 'small.txt', { type: 'text/plain' });
+
+      Object.defineProperty(input, 'files', {
+        value: [smallFile],
+        configurable: true,
+      });
+
+      await act(async () => {
+        const event = new Event('change', { bubbles: true });
+        input.dispatchEvent(event);
+      });
+
+      await waitFor(() => expect(onFileReject).toHaveBeenCalled());
+    });
+  });
 });
