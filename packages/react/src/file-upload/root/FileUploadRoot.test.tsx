@@ -91,8 +91,6 @@ describe('FileUpload', () => {
   });
 
   it('sets dragging state on drag events', async () => {
-    const user = userEvent.setup();
-
     render(
       <FileUpload.Root>
         <FileUpload.Dropzone data-testid="dropzone">
@@ -109,9 +107,7 @@ describe('FileUpload', () => {
     expect(state).toHaveTextContent('idle');
     expect(dropzone).not.toHaveAttribute('data-dragging');
 
-    await act(async () => {
-      fireEvent.dragEnter(dropzone);
-    });
+    fireEvent.dragEnter(dropzone);
 
     expect(dropzone).toHaveAttribute('data-dragging', '');
   });
@@ -312,7 +308,6 @@ describe('FileUpload', () => {
   });
 
   it('announces file rejection to screen readers', async () => {
-    const user = userEvent.setup();
     render(
       <FileUpload.Root accept="image/*">
         <FileUpload.Input data-testid="file-input" />
@@ -332,7 +327,6 @@ describe('FileUpload', () => {
 
   describe('Full workflow integration', () => {
     it('supports select via dropzone, view in preview list, and remove', async () => {
-      const user = userEvent.setup();
       const onFilesChange = vi.fn();
 
       render(
