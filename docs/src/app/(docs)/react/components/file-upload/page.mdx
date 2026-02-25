@@ -122,6 +122,17 @@ Use `onCancel` to react when the native file dialog closes without selecting fil
 </FileUpload.Root>
 ```
 
+### Folder upload
+
+Enable directory selection with the `directory` prop. This uses `webkitdirectory` under the hood, so support varies by browser.
+
+```jsx title="Folder upload" "directory"
+<FileUpload.Root directory>
+  <FileUpload.Input />
+  <FileUpload.Trigger>Select folder</FileUpload.Trigger>
+</FileUpload.Root>
+```
+
 ### Drag and drop state
 
 Access the dragging state in the `FileUploadDropzone` using a function as children:

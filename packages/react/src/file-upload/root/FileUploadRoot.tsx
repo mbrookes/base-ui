@@ -52,6 +52,11 @@ export namespace FileUploadRoot {
      */
     multiple?: boolean | undefined;
     /**
+     * Allow selecting directories (webkitdirectory).
+     * @default false
+     */
+    directory?: boolean | undefined;
+    /**
      * Disable file upload.
      * @default false
      */
@@ -126,6 +131,7 @@ export interface FileUploadRootProps extends FileUploadRoot.Props {}
  * @param minSize - Minimum file size in bytes (default: 0)
  * @param accept - Accepted file types (e.g., "image/*", ".pdf")
  * @param multiple - Allow multiple file selection (default: true)
+ * @param directory - Allow selecting directories (default: false)
  * @param disabled - Disable file upload (default: false)
  * @param onFilesChange - Callback when files are added/removed
  * @param onFileReject - Callback when a file is rejected
@@ -144,6 +150,7 @@ export const FileUploadRoot = React.forwardRef<HTMLDivElement, FileUploadRootPro
       minSize,
       accept,
       multiple,
+      directory,
       disabled,
       onFilesChange,
       onFileReject,
@@ -164,6 +171,7 @@ export const FileUploadRoot = React.forwardRef<HTMLDivElement, FileUploadRootPro
       minSize,
       accept,
       multiple,
+      directory,
       disabled,
       onFilesChange,
       onFileReject,

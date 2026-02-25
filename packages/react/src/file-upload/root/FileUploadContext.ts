@@ -23,6 +23,8 @@ export interface FileUploadContextValue {
   accept: string;
   /** Whether multiple files can be selected */
   multiple: boolean;
+  /** Whether directories can be selected */
+  directory: boolean;
   /** Whether the component is disabled */
   disabled: boolean;
   /** Unique identifier for the hidden input element */

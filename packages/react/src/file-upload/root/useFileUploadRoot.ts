@@ -12,6 +12,7 @@ interface UseFileUploadRootParameters {
   minSize?: number | undefined;
   accept?: string | undefined;
   multiple?: boolean | undefined;
+  directory?: boolean | undefined;
   disabled?: boolean | undefined;
   onFilesChange?: ((files: FileUploadRoot.ExtendedFile[]) => void) | undefined;
   onFileReject?: ((file: File, reason: string) => void) | undefined;
@@ -38,6 +39,7 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
     minSize = 0,
     accept = '',
     multiple = true,
+    directory = false,
     disabled = false,
     onFilesChange,
     onFileReject,
@@ -191,6 +193,7 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
       minSize,
       accept,
       multiple,
+      directory,
       disabled,
       inputId: inputId ?? '',
       removeFile,
@@ -209,6 +212,7 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
       minSize,
       accept,
       multiple,
+      directory,
       disabled,
       inputId,
       removeFile,

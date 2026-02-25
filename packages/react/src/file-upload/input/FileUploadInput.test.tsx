@@ -39,6 +39,19 @@ describe('FileUpload.Input', () => {
     expect(input).toHaveAttribute('multiple');
   });
 
+  it('applies directory attributes when directory is true', () => {
+    render(
+      <FileUpload.Root directory>
+        <FileUpload.Input data-testid="file-input" />
+      </FileUpload.Root>,
+    );
+
+    const input = screen.getByTestId('file-input');
+    expect(input).toHaveAttribute('webkitdirectory');
+    expect(input).toHaveAttribute('directory');
+    expect(input).toHaveAttribute('multiple');
+  });
+
   it('does not apply multiple attribute when multiple is false', () => {
     render(
       <FileUpload.Root multiple={false}>

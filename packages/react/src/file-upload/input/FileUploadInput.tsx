@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import { useStableCallback } from '@base-ui/utils/useStableCallback';
+import { useIsoLayoutEffect } from '@base-ui/utils/useIsoLayoutEffect';
 import type { BaseUIComponentProps } from '../../utils/types';
 import { resolveClassName } from '../../utils/resolveClassName';
 import { composeEventHandlers } from '../../utils/composeEventHandlers';
@@ -41,7 +42,7 @@ export type FileUploadInputProps = FileUploadInput.Props;
 export const FileUploadInput = React.forwardRef<HTMLInputElement, FileUploadInputProps>(
   function FileUploadInputComponent(props, ref) {
     const { className, ...other } = props;
-    const { accept, multiple, disabled, registerInput, inputId, addFiles, onCancel } =
+    const { accept, multiple, directory, disabled, registerInput, inputId, addFiles, onCancel } =
       useFileUploadContext();
 
     const state: FileUploadInput.State = React.useMemo(
@@ -66,6 +67,21 @@ export const FileUploadInput = React.forwardRef<HTMLInputElement, FileUploadInpu
       }
     });
 
+    useIsoLayoutEffect(() => {
+      const node = internalRef.current;
+      if (!node) {
+        return;
+      }
+
+      if (directory) {
+        node.setAttribute('webkitdirectory', '');
+        node.setAttribute('directory', '');
+      } else {
+        node.removeAttribute('webkitdirectory');
+        node.removeAttribute('directory');
+      }
+    }, [directory]);
+
     const handleChange = useStableCallback((event: React.ChangeEvent<HTMLInputElement>) => {
       if (event.target.files && event.target.files.length > 0) {
         addFiles(Array.from(event.target.files));
@@ -85,7 +101,7 @@ export const FileUploadInput = React.forwardRef<HTMLInputElement, FileUploadInpu
         id={inputId}
         type="file"
         accept={accept}
-        multiple={multiple}
+        multiple={directory || multiple}
         disabled={disabled}
         data-disabled={disabled ? '' : undefined}
         className={resolvedClassName}
