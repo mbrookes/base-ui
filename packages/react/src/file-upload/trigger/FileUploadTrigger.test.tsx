@@ -157,9 +157,7 @@ describe('FileUpload.Trigger', () => {
   it('resolves className callback with disabled state', () => {
     render(
       <FileUpload.Root disabled>
-        <FileUpload.Trigger
-          className={(state) => (state.disabled ? 'disabled' : 'enabled')}
-        >
+        <FileUpload.Trigger className={(state) => (state.disabled ? 'disabled' : 'enabled')}>
           Upload
         </FileUpload.Trigger>
       </FileUpload.Root>,
@@ -172,9 +170,7 @@ describe('FileUpload.Trigger', () => {
   it('resolves className callback when disabled state changes', () => {
     const { rerender } = render(
       <FileUpload.Root disabled={false}>
-        <FileUpload.Trigger
-          className={(state) => (state.disabled ? 'disabled' : 'enabled')}
-        >
+        <FileUpload.Trigger className={(state) => (state.disabled ? 'disabled' : 'enabled')}>
           Upload
         </FileUpload.Trigger>
       </FileUpload.Root>,
@@ -185,9 +181,7 @@ describe('FileUpload.Trigger', () => {
 
     rerender(
       <FileUpload.Root disabled>
-        <FileUpload.Trigger
-          className={(state) => (state.disabled ? 'disabled' : 'enabled')}
-        >
+        <FileUpload.Trigger className={(state) => (state.disabled ? 'disabled' : 'enabled')}>
           Upload
         </FileUpload.Trigger>
       </FileUpload.Root>,

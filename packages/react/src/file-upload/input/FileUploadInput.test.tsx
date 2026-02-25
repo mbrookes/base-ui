@@ -190,5 +190,4 @@ describe('FileUpload.Input', () => {
     input = screen.getByTestId('file-input');
     expect(input).toHaveClass('disabled-input');
   });
-
 });

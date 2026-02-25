@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi } from 'vitest';
 import { FileUpload } from '../index';
 import { useFileUploadPreviewItem } from './FileUploadPreviewItem';
+import { useFileUploadContext } from '../root/FileUploadContext';
 
 describe('FileUpload.PreviewItem', () => {
   const createMockFile = (name: string, type: string) =>
@@ -76,14 +77,23 @@ describe('FileUpload.PreviewItem', () => {
       );
     }
 
+    function PreviewListWithFiles() {
+      const { files } = useFileUploadContext();
+      return (
+        <FileUpload.PreviewList>
+          {files.map((file) => (
+            <FileUpload.PreviewItem key={file.id} file={file}>
+              <TestChild />
+            </FileUpload.PreviewItem>
+          ))}
+        </FileUpload.PreviewList>
+      );
+    }
+
     render(
       <FileUpload.Root onFilesChange={onFilesChange}>
         <FileUpload.Input data-testid="file-input" />
-        <FileUpload.PreviewList>
-          <FileUpload.PreviewItem file={createMockFile('test.txt', 'text/plain')}>
-            <TestChild />
-          </FileUpload.PreviewItem>
-        </FileUpload.PreviewList>
+        <PreviewListWithFiles />
       </FileUpload.Root>,
     );
 
@@ -95,12 +105,20 @@ describe('FileUpload.PreviewItem', () => {
       expect(screen.getByRole('button', { name: /Remove test.txt/ })).toBeInTheDocument();
     });
 
+    // onFilesChange should have been called once with the uploaded file
+    expect(onFilesChange).toHaveBeenCalledTimes(1);
+    const firstCall = onFilesChange.mock.calls[0][0];
+    expect(firstCall).toHaveLength(1);
+    expect(firstCall[0].name).toBe('test.txt');
+
     const removeButton = screen.getByRole('button', { name: /Remove test.txt/ });
     await userEvent.click(removeButton);
 
     await waitFor(() => {
       // After removal, onFilesChange should be called with empty array
-      expect(onFilesChange).toHaveBeenCalledWith([]);
+      expect(onFilesChange).toHaveBeenCalledTimes(2);
+      const secondCall = onFilesChange.mock.calls[1][0];
+      expect(secondCall).toHaveLength(0);
     });
   });
 

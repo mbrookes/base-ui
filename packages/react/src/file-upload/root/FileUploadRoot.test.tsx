@@ -332,18 +332,18 @@ describe('FileUpload', () => {
       render(
         <FileUpload.Root onFilesChange={onFilesChange}>
           <FileUpload.Input data-testid="file-input" />
-          <FileUpload.Dropzone data-testid="dropzone">
-            Drop files here or click
-          </FileUpload.Dropzone>
+          <FileUpload.Dropzone data-testid="dropzone">Drop files here or click</FileUpload.Dropzone>
           <FileUpload.PreviewList data-testid="preview-list">
             <FileUpload.PreviewItem
-              file={{
-                id: 'test-1',
-                name: 'test.txt',
-                type: 'text/plain',
-                size: 100,
-                preview: 'blob:test',
-              } as any}
+              file={
+                {
+                  id: 'test-1',
+                  name: 'test.txt',
+                  type: 'text/plain',
+                  size: 100,
+                  preview: 'blob:test',
+                } as any
+              }
             >
               <span data-testid="file-name">test.txt</span>
             </FileUpload.PreviewItem>

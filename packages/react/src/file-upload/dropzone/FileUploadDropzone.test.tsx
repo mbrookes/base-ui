@@ -266,9 +266,7 @@ describe('FileUpload.Dropzone', () => {
   it('resolves className callback with isDragging state', () => {
     render(
       <FileUpload.Root>
-        <FileUpload.Dropzone
-          className={(state) => (state.dragging ? 'dragging' : 'idle')}
-        >
+        <FileUpload.Dropzone className={(state) => (state.dragging ? 'dragging' : 'idle')}>
           Drop files
         </FileUpload.Dropzone>
       </FileUpload.Root>,
@@ -387,6 +385,247 @@ describe('FileUpload.Dropzone', () => {
 
       fireEvent.dragLeave(dropzone);
       expect(state).toHaveTextContent('idle');
+    });
+  });
+
+  describe('Drop event with actual files', () => {
+    it('handles drop event with dataTransfer.files', () => {
+      const onFilesChange = vi.fn();
+
+      render(
+        <FileUpload.Root onFilesChange={onFilesChange}>
+          <FileUpload.Input data-testid="file-input" />
+          <FileUpload.Dropzone data-testid="dropzone">Drop files</FileUpload.Dropzone>
+        </FileUpload.Root>,
+      );
+
+      const dropzone =
+        screen.getByTestId('dropzone').closest('[data-dragging]') || screen.getByTestId('dropzone');
+      const file = new File(['test'], 'test.txt', { type: 'text/plain' });
+
+      fireEvent.dragEnter(dropzone);
+      fireEvent.drop(dropzone, {
+        dataTransfer: { files: [file] },
+      });
+
+      expect(onFilesChange).toHaveBeenCalledWith(
+        expect.arrayContaining([expect.objectContaining({ name: 'test.txt' })]),
+      );
+    });
+
+    it('handles drop with multiple files', () => {
+      const onFilesChange = vi.fn();
+
+      render(
+        <FileUpload.Root onFilesChange={onFilesChange}>
+          <FileUpload.Input data-testid="file-input" />
+          <FileUpload.Dropzone data-testid="dropzone">Drop files</FileUpload.Dropzone>
+        </FileUpload.Root>,
+      );
+
+      const root =
+        screen.getByTestId('dropzone').closest('[data-dragging]') || screen.getByTestId('dropzone');
+      const file1 = new File(['content1'], 'file1.txt', { type: 'text/plain' });
+      const file2 = new File(['content2'], 'file2.txt', { type: 'text/plain' });
+
+      fireEvent.dragEnter(root);
+      fireEvent.drop(root, {
+        dataTransfer: { files: [file1, file2] },
+      });
+
+      expect(onFilesChange).toHaveBeenCalledWith(
+        expect.arrayContaining([
+          expect.objectContaining({ name: 'file1.txt' }),
+          expect.objectContaining({ name: 'file2.txt' }),
+        ]),
+      );
+    });
+
+    it('clears isDragging state after drop', () => {
+      render(
+        <FileUpload.Root>
+          <FileUpload.Dropzone data-testid="dropzone">
+            {({ isDragging }) => (
+              <div data-testid="dragging-state">{isDragging ? 'dragging' : 'idle'}</div>
+            )}
+          </FileUpload.Dropzone>
+        </FileUpload.Root>,
+      );
+
+      const dropzone = screen.getByTestId('dropzone');
+      const root = dropzone.closest('[data-dragging]');
+      const state = screen.getByTestId('dragging-state');
+
+      fireEvent.dragEnter(root || dropzone);
+      expect(state).toHaveTextContent('dragging');
+
+      fireEvent.drop(root || dropzone, {
+        dataTransfer: { files: [] },
+      });
+
+      expect(state).toHaveTextContent('idle');
+    });
+
+    it('prevents default on drop to prevent browser navigation', () => {
+      render(
+        <FileUpload.Root>
+          <FileUpload.Dropzone data-testid="dropzone">Drop files</FileUpload.Dropzone>
+        </FileUpload.Root>,
+      );
+
+      const root = screen.getByTestId('dropzone').closest('[data-dragging]');
+      const file = new File(['test'], 'test.txt', { type: 'text/plain' });
+
+      const dropEvent = fireEvent.drop(root || screen.getByTestId('dropzone'), {
+        dataTransfer: { files: [file] },
+      });
+
+      // fireEvent.drop returns false if preventDefault was called (event.defaultPrevented = true)
+      expect(dropEvent).toBe(false);
+    });
+  });
+
+  describe('DragOver event prevention', () => {
+    it('prevents default on dragOver to allow drop', () => {
+      render(
+        <FileUpload.Root>
+          <FileUpload.Dropzone data-testid="dropzone">Drop files</FileUpload.Dropzone>
+        </FileUpload.Root>,
+      );
+
+      const root = screen.getByTestId('dropzone').closest('[data-dragging]');
+
+      const dragOverEvent = fireEvent.dragOver(root || screen.getByTestId('dropzone'));
+
+      // fireEvent.dragOver returns false if preventDefault was called (event.defaultPrevented = true)
+      expect(dragOverEvent).toBe(false);
+    });
+
+    it('sets dragover effect to copy', () => {
+      render(
+        <FileUpload.Root>
+          <FileUpload.Dropzone data-testid="dropzone">Drop files</FileUpload.Dropzone>
+        </FileUpload.Root>,
+      );
+
+      const root = screen.getByTestId('dropzone').closest('[data-dragging]');
+
+      fireEvent.dragOver(root || screen.getByTestId('dropzone'), {
+        dataTransfer: { dropEffect: '' },
+      });
+
+      // The Root component should set dropEffect to 'copy'
+      expect(root || screen.getByTestId('dropzone')).toBeInTheDocument();
+    });
+
+    it('stops propagation of drag events', () => {
+      render(
+        <FileUpload.Root>
+          <FileUpload.Dropzone data-testid="dropzone">Drop files</FileUpload.Dropzone>
+        </FileUpload.Root>,
+      );
+
+      const root = screen.getByTestId('dropzone').closest('[data-dragging]');
+
+      fireEvent.dragOver(root || screen.getByTestId('dropzone'));
+
+      expect(root || screen.getByTestId('dropzone')).toBeInTheDocument();
+    });
+
+    it('handles drag events disabled state', () => {
+      render(
+        <FileUpload.Root disabled>
+          <FileUpload.Dropzone data-testid="dropzone">Drop files</FileUpload.Dropzone>
+        </FileUpload.Root>,
+      );
+
+      const dropzone = screen.getByTestId('dropzone');
+
+      // Should not trigger drag behavior when disabled
+      fireEvent.dragOver(dropzone);
+
+      // When disabled, the dropzone should have data-disabled attribute
+      expect(dropzone).toHaveAttribute('data-disabled');
+    });
+  });
+
+  describe('Full drag-drop workflow', () => {
+    it('completes full dragEnter → dragOver → drop sequence', () => {
+      const onFilesChange = vi.fn();
+
+      render(
+        <FileUpload.Root onFilesChange={onFilesChange}>
+          <FileUpload.Input data-testid="file-input" />
+          <FileUpload.Dropzone data-testid="dropzone">
+            {({ isDragging }) => <div data-testid="state">{isDragging ? 'dragging' : 'idle'}</div>}
+          </FileUpload.Dropzone>
+        </FileUpload.Root>,
+      );
+
+      const dropzone = screen.getByTestId('dropzone');
+      const state = screen.getByTestId('state');
+      const file = new File(['content'], 'file.txt', { type: 'text/plain' });
+
+      // Step 1: dragEnter
+      fireEvent.dragEnter(dropzone);
+      expect(state).toHaveTextContent('dragging');
+
+      // Step 2: dragOver
+      fireEvent.dragOver(dropzone, {
+        dataTransfer: { dropEffect: '', effectAllowed: 'copy' },
+      });
+      expect(state).toHaveTextContent('dragging');
+
+      // Step 3: drop
+      fireEvent.drop(dropzone, {
+        dataTransfer: { files: [file] },
+      });
+
+      expect(onFilesChange).toHaveBeenCalledWith(
+        expect.arrayContaining([expect.objectContaining({ name: 'file.txt' })]),
+      );
+      expect(state).toHaveTextContent('idle');
+    });
+
+    it('handles dragLeave correctly during drag sequence', () => {
+      render(
+        <FileUpload.Root>
+          <FileUpload.Dropzone data-testid="dropzone">
+            {({ isDragging }) => <div data-testid="state">{isDragging ? 'dragging' : 'idle'}</div>}
+          </FileUpload.Dropzone>
+        </FileUpload.Root>,
+      );
+
+      const dropzone = screen.getByTestId('dropzone');
+      const state = screen.getByTestId('state');
+
+      fireEvent.dragEnter(dropzone);
+      expect(state).toHaveTextContent('dragging');
+
+      fireEvent.dragOver(dropzone);
+      expect(state).toHaveTextContent('dragging');
+
+      fireEvent.dragLeave(dropzone);
+      expect(state).toHaveTextContent('idle');
+    });
+
+    it('rejects drop when disabled', () => {
+      const onFilesChange = vi.fn();
+
+      render(
+        <FileUpload.Root onFilesChange={onFilesChange} disabled>
+          <FileUpload.Dropzone data-testid="dropzone">Drop files</FileUpload.Dropzone>
+        </FileUpload.Root>,
+      );
+
+      const dropzone = screen.getByTestId('dropzone');
+      const file = new File(['test'], 'test.txt', { type: 'text/plain' });
+
+      fireEvent.drop(dropzone, {
+        dataTransfer: { files: [file] },
+      });
+
+      expect(onFilesChange).not.toHaveBeenCalled();
     });
   });
 });

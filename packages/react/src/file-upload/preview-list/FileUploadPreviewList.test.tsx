@@ -179,10 +179,7 @@ describe('FileUpload.PreviewList', () => {
     render(
       <FileUpload.Root>
         <FileUpload.Input data-testid="file-input" />
-        <FileUpload.PreviewList
-          data-testid="preview-list"
-          className={() => 'preview-list-class'}
-        >
+        <FileUpload.PreviewList data-testid="preview-list" className={() => 'preview-list-class'}>
           <li>Item</li>
         </FileUpload.PreviewList>
       </FileUpload.Root>,
