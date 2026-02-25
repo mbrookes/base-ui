@@ -4,6 +4,22 @@ import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi } from 'vitest';
 import { FileUpload } from '../index';
 
+const createClipboardData = (files: File[]) => {
+  if (typeof DataTransfer === 'undefined') {
+    return { files } as DataTransfer;
+  }
+
+  const dataTransfer = new DataTransfer();
+  files.forEach((file) => {
+    dataTransfer.items.add(file);
+  });
+  Object.defineProperty(dataTransfer, 'files', {
+    value: files,
+    configurable: true,
+  });
+  return dataTransfer;
+};
+
 describe('FileUpload', () => {
   it('renders the component', () => {
     render(
@@ -123,11 +139,10 @@ describe('FileUpload', () => {
 
     const root = screen.getByTestId('root');
     const file = new File(['content'], 'paste.txt', { type: 'text/plain' });
+    const clipboardData = createClipboardData([file]);
 
     fireEvent.paste(root, {
-      clipboardData: {
-        files: [file],
-      },
+      clipboardData,
     });
 
     await waitFor(() => expect(onFilesChange).toHaveBeenCalled());

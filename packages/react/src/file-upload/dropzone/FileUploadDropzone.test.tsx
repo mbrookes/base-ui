@@ -4,6 +4,22 @@ import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi } from 'vitest';
 import { FileUpload } from '../index';
 
+const createDataTransfer = (files: File[]) => {
+  if (typeof DataTransfer === 'undefined') {
+    return { files } as DataTransfer;
+  }
+
+  const dataTransfer = new DataTransfer();
+  files.forEach((file) => {
+    dataTransfer.items.add(file);
+  });
+  Object.defineProperty(dataTransfer, 'files', {
+    value: files,
+    configurable: true,
+  });
+  return dataTransfer;
+};
+
 describe('FileUpload.Dropzone', () => {
   it('renders a div with role="button"', () => {
     render(
@@ -402,10 +418,11 @@ describe('FileUpload.Dropzone', () => {
       const dropzone =
         screen.getByTestId('dropzone').closest('[data-dragging]') || screen.getByTestId('dropzone');
       const file = new File(['test'], 'test.txt', { type: 'text/plain' });
+      const dataTransfer = createDataTransfer([file]);
 
       fireEvent.dragEnter(dropzone);
       fireEvent.drop(dropzone, {
-        dataTransfer: { files: [file] },
+        dataTransfer,
       });
 
       expect(onFilesChange).toHaveBeenCalledWith(
@@ -427,10 +444,11 @@ describe('FileUpload.Dropzone', () => {
         screen.getByTestId('dropzone').closest('[data-dragging]') || screen.getByTestId('dropzone');
       const file1 = new File(['content1'], 'file1.txt', { type: 'text/plain' });
       const file2 = new File(['content2'], 'file2.txt', { type: 'text/plain' });
+      const dataTransfer = createDataTransfer([file1, file2]);
 
       fireEvent.dragEnter(root);
       fireEvent.drop(root, {
-        dataTransfer: { files: [file1, file2] },
+        dataTransfer,
       });
 
       expect(onFilesChange).toHaveBeenCalledWith(
@@ -455,12 +473,13 @@ describe('FileUpload.Dropzone', () => {
       const dropzone = screen.getByTestId('dropzone');
       const root = dropzone.closest('[data-dragging]');
       const state = screen.getByTestId('dragging-state');
+      const dataTransfer = createDataTransfer([]);
 
       fireEvent.dragEnter(root || dropzone);
       expect(state).toHaveTextContent('dragging');
 
       fireEvent.drop(root || dropzone, {
-        dataTransfer: { files: [] },
+        dataTransfer,
       });
 
       expect(state).toHaveTextContent('idle');
@@ -475,9 +494,10 @@ describe('FileUpload.Dropzone', () => {
 
       const root = screen.getByTestId('dropzone').closest('[data-dragging]');
       const file = new File(['test'], 'test.txt', { type: 'text/plain' });
+      const dataTransfer = createDataTransfer([file]);
 
       const dropEvent = fireEvent.drop(root || screen.getByTestId('dropzone'), {
-        dataTransfer: { files: [file] },
+        dataTransfer,
       });
 
       // fireEvent.drop returns false if preventDefault was called (event.defaultPrevented = true)
@@ -510,8 +530,10 @@ describe('FileUpload.Dropzone', () => {
 
       const root = screen.getByTestId('dropzone').closest('[data-dragging]');
 
+      const dataTransfer = createDataTransfer([]);
+
       fireEvent.dragOver(root || screen.getByTestId('dropzone'), {
-        dataTransfer: { dropEffect: '' },
+        dataTransfer,
       });
 
       // The Root component should set dropEffect to 'copy'
@@ -565,6 +587,8 @@ describe('FileUpload.Dropzone', () => {
       const dropzone = screen.getByTestId('dropzone');
       const state = screen.getByTestId('state');
       const file = new File(['content'], 'file.txt', { type: 'text/plain' });
+      const dataTransfer = createDataTransfer([file]);
+      const dragOverTransfer = createDataTransfer([]);
 
       // Step 1: dragEnter
       fireEvent.dragEnter(dropzone);
@@ -572,13 +596,13 @@ describe('FileUpload.Dropzone', () => {
 
       // Step 2: dragOver
       fireEvent.dragOver(dropzone, {
-        dataTransfer: { dropEffect: '', effectAllowed: 'copy' },
+        dataTransfer: dragOverTransfer,
       });
       expect(state).toHaveTextContent('dragging');
 
       // Step 3: drop
       fireEvent.drop(dropzone, {
-        dataTransfer: { files: [file] },
+        dataTransfer,
       });
 
       expect(onFilesChange).toHaveBeenCalledWith(
@@ -620,9 +644,10 @@ describe('FileUpload.Dropzone', () => {
 
       const dropzone = screen.getByTestId('dropzone');
       const file = new File(['test'], 'test.txt', { type: 'text/plain' });
+      const dataTransfer = createDataTransfer([file]);
 
       fireEvent.drop(dropzone, {
-        dataTransfer: { files: [file] },
+        dataTransfer,
       });
 
       expect(onFilesChange).not.toHaveBeenCalled();
