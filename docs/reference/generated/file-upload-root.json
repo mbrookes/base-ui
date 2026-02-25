@@ -1,7 +1,19 @@
 {
   "name": "FileUploadRoot",
-  "description": "Groups all parts of the file upload and manages its state.\nRenders a `<div>` element.",
+  "description": "Manages file upload state and provides context for child components.\n\nThis is the root component that should wrap all other FileUpload components.\nIt handles file validation, drag-and-drop, and state management for the entire\nfile upload workflow.",
   "props": {
+    "accept": {
+      "type": "string",
+      "default": "''",
+      "description": "Accepted file types (e.g., \"image/*\", \".pdf\", \"image/png,image/jpeg\").",
+      "detailedType": "string | undefined"
+    },
+    "directory": {
+      "type": "boolean",
+      "default": "false",
+      "description": "Allow selecting directories (webkitdirectory).",
+      "detailedType": "boolean | undefined"
+    },
     "maxFiles": {
       "type": "number",
       "default": "10",
@@ -11,7 +23,7 @@
     "maxSize": {
       "type": "number",
       "default": "Infinity",
-      "description": "Maximum file size in bytes. Defaults to unlimited.",
+      "description": "Maximum file size in bytes.",
       "detailedType": "number | undefined"
     },
     "minSize": {
@@ -20,35 +32,65 @@
       "description": "Minimum file size in bytes.",
       "detailedType": "number | undefined"
     },
-    "accept": {
-      "type": "string",
-      "default": "",
-      "description": "Accepted file types (for example: `image/*`, `.pdf`, or a comma-separated list).",
-      "detailedType": "string | undefined"
-    },
     "multiple": {
       "type": "boolean",
       "default": "true",
-      "description": "Allow selecting multiple files.",
+      "description": "Allow multiple file selection.",
       "detailedType": "boolean | undefined"
+    },
+    "onCancel": {
+      "type": "(() => void)",
+      "description": "Callback when the file dialog is canceled.",
+      "detailedType": "(() => void) | undefined"
+    },
+    "onDuplicateFile": {
+      "type": "((file: File) => void)",
+      "description": "Callback when a duplicate file is selected.",
+      "detailedType": "((file: File) => void) | undefined"
+    },
+    "onFileReject": {
+      "type": "((file: File, reason: string) => void)",
+      "description": "Callback when a file is rejected.",
+      "detailedType": "((file: File, reason: string) => void) | undefined"
+    },
+    "onFilesChange": {
+      "type": "((files: FileUpload.Root.ExtendedFile[]) => void)",
+      "description": "Callback when files are added.",
+      "detailedType": "| ((files: FileUpload.Root.ExtendedFile[]) => void)\n| undefined"
     },
     "disabled": {
       "type": "boolean",
       "default": "false",
-      "description": "Whether the component should ignore user interaction.",
+      "description": "Disable file upload.",
       "detailedType": "boolean | undefined"
     },
-    "onFilesChange": {
-      "type": "(files: FileUploadRoot.ExtendedFile[]) => void",
-      "description": "Callback fired when the file list changes.",
-      "detailedType": "| ((files: FileUploadRoot.ExtendedFile[]) => void)\n| undefined"
+    "children": {
+      "type": "ReactNode",
+      "required": true,
+      "detailedType": "React.ReactNode"
     },
-    "onFileReject": {
-      "type": "(file: File, reason: string) => void",
-      "description": "Callback fired when a file is rejected during validation.",
-      "detailedType": "| ((file: File, reason: string) => void)\n| undefined"
+    "className": {
+      "type": "string | ((state: FileUpload.Root.State) => string | undefined)",
+      "description": "CSS class applied to the element, or a function that\nreturns a class based on the component’s state.",
+      "detailedType": "| string\n| ((state: FileUpload.Root.State) => string | undefined)"
+    },
+    "style": {
+      "type": "CSSProperties | ((state: FileUpload.Root.State) => CSSProperties | undefined)",
+      "detailedType": "| React.CSSProperties\n| ((\n    state: FileUpload.Root.State,\n  ) => CSSProperties | undefined)\n| undefined"
+    },
+    "render": {
+      "type": "ReactElement | ((props: HTMLProps, state: FileUpload.Root.State) => ReactElement)",
+      "description": "Allows you to replace the component’s HTML element\nwith a different tag, or compose it with another component.\n\nAccepts a `ReactElement` or a function that returns the element to render.",
+      "detailedType": "| ReactElement\n| ((\n    props: HTMLProps,\n    state: FileUpload.Root.State,\n  ) => ReactElement)"
     }
   },
-  "dataAttributes": {},
+  "dataAttributes": {
+    "data-dragging": {
+      "description": "Present when files are being dragged over the dropzone."
+    },
+    "data-disabled": {
+      "description": "Present when the component is disabled."
+    }
+  },
   "cssVariables": {}
 }

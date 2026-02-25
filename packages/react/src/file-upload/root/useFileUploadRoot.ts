@@ -3,22 +3,14 @@
 import * as React from 'react';
 import { useId as useBaseUIId } from '@base-ui/utils/useId';
 import { useStableCallback } from '@base-ui/utils/useStableCallback';
-import type { FileUploadRoot } from './FileUploadRoot';
+import type {
+  FileUploadRootExtendedFile,
+  FileUploadRootParameters,
+  FileUploadRootFileStatus,
+} from './FileUploadRoot';
 import type { FileUploadContextValue } from './FileUploadContext';
 
-interface UseFileUploadRootParameters {
-  maxFiles?: number | undefined;
-  maxSize?: number | undefined;
-  minSize?: number | undefined;
-  accept?: string | undefined;
-  multiple?: boolean | undefined;
-  directory?: boolean | undefined;
-  disabled?: boolean | undefined;
-  onFilesChange?: ((files: FileUploadRoot.ExtendedFile[]) => void) | undefined;
-  onFileReject?: ((file: File, reason: string) => void) | undefined;
-  onCancel?: (() => void) | undefined;
-  onDuplicateFile?: ((file: File) => void) | undefined;
-}
+type UseFileUploadRootParameters = FileUploadRootParameters;
 
 const generateId = () => Math.random().toString(36).substr(2, 9);
 
@@ -47,7 +39,7 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
     onDuplicateFile,
   } = params;
 
-  const [files, setFiles] = React.useState<FileUploadRoot.ExtendedFile[]>([]);
+  const [files, setFiles] = React.useState<FileUploadRootExtendedFile[]>([]);
   const [isDragging, setIsDragging] = React.useState(false);
   const [announcement, setAnnouncement] = React.useState('');
   const inputRef = React.useRef<HTMLInputElement | null>(null);
@@ -115,7 +107,7 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
       }
 
       const candidates = multiple ? newFiles.slice(0, remainingSlots) : [newFiles[0]];
-      const validFiles: FileUploadRoot.ExtendedFile[] = [];
+      const validFiles: FileUploadRootExtendedFile[] = [];
       const errors: string[] = [];
 
       const existingKeys = new Set(
@@ -140,7 +132,7 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
             Object.assign(file, {
               id: generateId(),
               preview: URL.createObjectURL(file),
-              status: 'idle' as FileUploadRoot.FileStatus,
+              status: 'idle' as FileUploadRootFileStatus,
               progress: 0,
             }),
           );

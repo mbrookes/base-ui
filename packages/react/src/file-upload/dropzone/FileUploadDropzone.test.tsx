@@ -6,7 +6,7 @@ import { FileUpload } from '../index';
 
 const createDataTransfer = (files: File[]) => {
   if (typeof DataTransfer === 'undefined') {
-    return { files } as DataTransfer;
+    return { files } as unknown as DataTransfer;
   }
 
   const dataTransfer = new DataTransfer();

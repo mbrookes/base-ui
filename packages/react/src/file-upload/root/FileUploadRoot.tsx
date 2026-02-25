@@ -9,103 +9,101 @@ import { composeEventHandlers } from '../../utils/composeEventHandlers';
 import { FileUploadContext } from './FileUploadContext';
 import { useFileUploadRoot } from './useFileUploadRoot';
 
-export namespace FileUploadRoot {
-  export interface State {
-    /**
-     * Whether files are currently being dragged over the dropzone.
-     */
-    dragging: boolean;
-    /**
-     * Whether the file upload is disabled.
-     */
-    disabled: boolean;
-  }
-
-  export interface Props extends BaseUIComponentProps<'div', State>, FileUploadRoot.Parameters {
-    children: React.ReactNode;
-  }
-
-  export interface Parameters {
-    /**
-     * Maximum number of files allowed.
-     * @default 10
-     */
-    maxFiles?: number | undefined;
-    /**
-     * Maximum file size in bytes.
-     * @default Infinity
-     */
-    maxSize?: number | undefined;
-    /**
-     * Minimum file size in bytes.
-     * @default 0
-     */
-    minSize?: number | undefined;
-    /**
-     * Accepted file types (e.g., "image/*", ".pdf", "image/png,image/jpeg").
-     * @default ''
-     */
-    accept?: string | undefined;
-    /**
-     * Allow multiple file selection.
-     * @default true
-     */
-    multiple?: boolean | undefined;
-    /**
-     * Allow selecting directories (webkitdirectory).
-     * @default false
-     */
-    directory?: boolean | undefined;
-    /**
-     * Disable file upload.
-     * @default false
-     */
-    disabled?: boolean | undefined;
-    /**
-     * Callback when files are added.
-     */
-    onFilesChange?: ((files: FileUploadRoot.ExtendedFile[]) => void) | undefined;
-    /**
-     * Callback when a file is rejected.
-     */
-    onFileReject?: ((file: File, reason: string) => void) | undefined;
-    /**
-     * Callback when the file dialog is canceled.
-     */
-    onCancel?: (() => void) | undefined;
-    /**
-     * Callback when a duplicate file is selected.
-     */
-    onDuplicateFile?: ((file: File) => void) | undefined;
-  }
-
-  export interface ExtendedFile extends File {
-    /**
-     * Unique identifier for the file.
-     */
-    id: string;
-    /**
-     * URL for previewing the file.
-     */
-    preview: string;
-    /**
-     * Current status of the file.
-     */
-    status: FileStatus;
-    /**
-     * Upload progress (0-100).
-     */
-    progress: number;
-    /**
-     * Error message if the file failed to upload.
-     */
-    error?: string | undefined;
-  }
-
-  export type FileStatus = 'idle' | 'uploading' | 'success' | 'error';
+export interface FileUploadRootState {
+  /**
+   * Whether files are currently being dragged over the dropzone.
+   */
+  dragging: boolean;
+  /**
+   * Whether the file upload is disabled.
+   */
+  disabled: boolean;
 }
 
-export interface FileUploadRootProps extends FileUploadRoot.Props {}
+export interface FileUploadRootParameters {
+  /**
+   * Maximum number of files allowed.
+   * @default 10
+   */
+  maxFiles?: number | undefined;
+  /**
+   * Maximum file size in bytes.
+   * @default Infinity
+   */
+  maxSize?: number | undefined;
+  /**
+   * Minimum file size in bytes.
+   * @default 0
+   */
+  minSize?: number | undefined;
+  /**
+   * Accepted file types (e.g., "image/*", ".pdf", "image/png,image/jpeg").
+   * @default ''
+   */
+  accept?: string | undefined;
+  /**
+   * Allow multiple file selection.
+   * @default true
+   */
+  multiple?: boolean | undefined;
+  /**
+   * Allow selecting directories (webkitdirectory).
+   * @default false
+   */
+  directory?: boolean | undefined;
+  /**
+   * Disable file upload.
+   * @default false
+   */
+  disabled?: boolean | undefined;
+  /**
+   * Callback when files are added.
+   */
+  onFilesChange?: ((files: FileUploadRootExtendedFile[]) => void) | undefined;
+  /**
+   * Callback when a file is rejected.
+   */
+  onFileReject?: ((file: File, reason: string) => void) | undefined;
+  /**
+   * Callback when the file dialog is canceled.
+   */
+  onCancel?: (() => void) | undefined;
+  /**
+   * Callback when a duplicate file is selected.
+   */
+  onDuplicateFile?: ((file: File) => void) | undefined;
+}
+
+export interface FileUploadRootExtendedFile extends File {
+  /**
+   * Unique identifier for the file.
+   */
+  id: string;
+  /**
+   * URL for previewing the file.
+   */
+  preview: string;
+  /**
+   * Current status of the file.
+   */
+  status: FileUploadRootFileStatus;
+  /**
+   * Upload progress (0-100).
+   */
+  progress: number;
+  /**
+   * Error message if the file failed to upload.
+   */
+  error?: string | undefined;
+}
+
+export type FileUploadRootFileStatus = 'idle' | 'uploading' | 'success' | 'error';
+
+export interface FileUploadRootProps
+  extends BaseUIComponentProps<'div', FileUploadRootState>,
+    FileUploadRootParameters {
+  children: React.ReactNode;
+}
 
 /**
  * Manages file upload state and provides context for child components.
@@ -179,7 +177,7 @@ export const FileUploadRoot = React.forwardRef<HTMLDivElement, FileUploadRootPro
       onDuplicateFile,
     });
 
-    const state: FileUploadRoot.State = React.useMemo(
+    const state: FileUploadRootState = React.useMemo(
       () => ({
         dragging: contextValue.isDragging,
         disabled: contextValue.disabled,
@@ -295,3 +293,11 @@ export const FileUploadRoot = React.forwardRef<HTMLDivElement, FileUploadRootPro
     );
   },
 );
+
+export namespace FileUploadRoot {
+  export type State = FileUploadRootState;
+  export type Props = FileUploadRootProps;
+  export type Parameters = FileUploadRootParameters;
+  export type ExtendedFile = FileUploadRootExtendedFile;
+  export type FileStatus = FileUploadRootFileStatus;
+}
