@@ -8,15 +8,17 @@ This document provides a detailed analysis of the top file upload React componen
 
 ## 1. React Dropzone
 
-**Repository**: https://github.com/react-dropzone/react-dropzone  
-**NPM**: `react-dropzone`  
-**Latest Version**: v14+  
+**Repository**: https://github.com/react-dropzone/react-dropzone
+**NPM**: `react-dropzone`
+**Latest Version**: v14+
 **License**: MIT
 
 ### Overview
+
 React Dropzone is a lightweight React hook library that creates HTML5-compliant drag-and-drop zones for files. It is **not a complete file uploader** but rather provides the file input/selection layer with drag-drop capabilities. Users must implement their own upload logic.
 
 ### Core File Handling Features
+
 - **Drag-and-drop**: ✅ Full drag-and-drop support with visual state feedback
 - **Click-to-select**: ✅ Built-in file dialog trigger
 - **Paste files**: ✅ Supported
@@ -27,6 +29,7 @@ React Dropzone is a lightweight React hook library that creates HTML5-compliant 
 - **Global drag detection**: ✅ `isDragGlobal` state for full-page overlays
 
 ### Validation Features
+
 - **File type filtering**: ✅ Via `accept` prop (MIME types and extensions)
 - **File size limits**: ✅ `minSize` and `maxSize` options
 - **Max file count**: ✅ `maxFiles` option
@@ -34,6 +37,7 @@ React Dropzone is a lightweight React hook library that creates HTML5-compliant 
 - **File rejection handling**: ✅ `onDropRejected` callback with error details
 
 ### Upload Handling
+
 - **Chunking**: ❌ Not built-in (must implement separately)
 - **Resumable uploads**: ❌ Not built-in
 - **Progress tracking**: ❌ Not built-in (user responsible)
@@ -41,6 +45,7 @@ React Dropzone is a lightweight React hook library that creates HTML5-compliant 
 - **Built-in upload**: ❌ No - users must implement HTTP requests
 
 ### State & Callbacks
+
 - `getRootProps()` and `getInputProps()`: Prop getters for DOM binding
 - `acceptedFiles`: Array of accepted files
 - `fileRejections`: Array of rejected files with error codes
@@ -50,16 +55,19 @@ React Dropzone is a lightweight React hook library that creates HTML5-compliant 
 - Event callbacks: `onDrop`, `onDropAccepted`, `onDropRejected`, `onDragEnter`, `onDragLeave`, `onFileDialogOpen`, `onFileDialogCancel`
 
 ### Accessibility Features
+
 - ✅ Fully keyboard accessible (SPACE/ENTER)
 - ✅ WAI-ARIA compliant
 - ✅ Supports `noKeyboard` to disable keyboard events if needed
 - ✅ Works with screen readers
 
 ### Internationalization
+
 - ❌ Not built-in
 - Error messages must be handled by user
 
 ### API & Customization
+
 - ✅ Headless hook-based API - complete control over UI
 - ✅ Minimal styling applied
 - ✅ Works with any CSS-in-JS or CSS framework
@@ -67,15 +75,18 @@ React Dropzone is a lightweight React hook library that creates HTML5-compliant 
 - ✅ Can combine with Material-UI, styled-components, etc.
 
 ### UI Components Provided
+
 - ❌ None - purely a hook utility
 - User must build entire UI
 
 ### Browser Support
+
 - Modern browsers (Chrome, Firefox, Safari)
 - IE11 with polyfills
 - Optional File System Access API support (`useFsAccessApi`)
 
 ### Pros
+
 - Ultra-lightweight (~8KB minified)
 - Perfect for headless/custom UI implementations
 - Excellent TypeScript support
@@ -83,6 +94,7 @@ React Dropzone is a lightweight React hook library that creates HTML5-compliant 
 - Well-maintained and widely used
 
 ### Cons
+
 - Not a complete solution (no upload handling)
 - Requires significant setup for full file upload workflow
 - No built-in progress tracking, retry logic, or chunking
@@ -92,15 +104,17 @@ React Dropzone is a lightweight React hook library that creates HTML5-compliant 
 
 ## 2. Uppy (by Transloadit)
 
-**Repository**: https://github.com/transloadit/uppy  
-**NPM**: `@uppy/core`, `@uppy/dashboard`, etc. (modular)  
-**Latest Version**: v5+  
+**Repository**: https://github.com/transloadit/uppy
+**NPM**: `@uppy/core`, `@uppy/dashboard`, etc. (modular)
+**Latest Version**: v5+
 **License**: MIT
 
 ### Overview
+
 Uppy is a **complete, modular, feature-rich JavaScript file uploader** with a plugin architecture. It's framework-agnostic but has excellent React support. Designed by Transloadit for enterprise-grade file uploading.
 
 ### Core File Handling Features
+
 - **Drag-and-drop**: ✅ Full support via `@uppy/drag-drop` plugin
 - **Click-to-select**: ✅ Via `@uppy/file-input` plugin
 - **Paste files**: ✅ Supported
@@ -112,6 +126,7 @@ Uppy is a **complete, modular, feature-rich JavaScript file uploader** with a pl
 - **URL import**: ✅ Via `@uppy/url` plugin
 
 ### Validation Features
+
 - **File type filtering**: ✅ `allowedFileTypes` in restrictions
 - **File size limits**: ✅ `maxFileSize`, `minFileSize`, `maxTotalFileSize`
 - **Max file count**: ✅ `maxNumberOfFiles`, `minNumberOfFiles`
@@ -119,6 +134,7 @@ Uppy is a **complete, modular, feature-rich JavaScript file uploader** with a pl
 - **Comprehensive error handling**: ✅ Detailed error codes and messages
 
 ### Upload Handling
+
 - **Chunking**: ✅ Full support via Tus protocol and AWS S3 multipart
 - **Resumable uploads**: ✅ Tus standard protocol for reliable resumable uploads
 - **Progress tracking**: ✅ Per-file and total progress events
@@ -130,17 +146,20 @@ Uppy is a **complete, modular, feature-rich JavaScript file uploader** with a pl
 - **Network recovery**: ✅ Golden Retriever plugin for browser crash recovery
 
 ### Uploaders Supported
+
 - **Tus (resumable)**: ✅ Production-ready
 - **XHR (regular HTTP POST/PUT)**: ✅ Standard multipart uploads
 - **AWS S3**: ✅ Direct uploads with presigned URLs
 - **Transloadit**: ✅ File processing/encoding backend
 
 ### State Management
+
 - **Event-driven**: Comprehensive event system (`file-added`, `upload-success`, `upload-error`, `progress`, etc.)
 - **State management**: Can integrate with Redux or custom stores
 - **File metadata**: Per-file metadata support
 
 ### Accessibility Features
+
 - ✅ Built with accessibility in mind
 - ✅ WCAG compliant Dashboard component
 - ✅ Keyboard navigation throughout
@@ -148,6 +167,7 @@ Uppy is a **complete, modular, feature-rich JavaScript file uploader** with a pl
 - ✅ ARIA labels and roles
 
 ### Internationalization
+
 - ✅ 30+ language locales built-in
 - ✅ Easy to add custom locales
 - ✅ Pluralization support
@@ -156,11 +176,13 @@ Uppy is a **complete, modular, feature-rich JavaScript file uploader** with a pl
 ### API & Customization
 
 #### Three UI Approaches:
+
 1. **Dashboard (pre-built)**: Complete, feature-rich UI component
 2. **Headless components** (v5+): Smaller, composable components (React, Svelte, Vue)
 3. **Hooks** (v5+): Attach logic to custom components, maximum flexibility
 
 #### Core Methods:
+
 - `addFile()`, `removeFile()`, `clear()`: File management
 - `upload()`, `pauseAll()`, `resumeAll()`, `retryAll()`: Upload control
 - `getFiles()`, `getFile()`: File access
@@ -169,6 +191,7 @@ Uppy is a **complete, modular, feature-rich JavaScript file uploader** with a pl
 - `on()`, `once()`, `off()`: Event handling
 
 ### UI Components Provided
+
 - ✅ **Dashboard**: Full-featured UI component
 - ✅ **Headless components**: `<Dropzone />`, `<FilesList />`, `<UploadButton />` (v5+)
 - ✅ **DragDrop**: Simple drag-drop UI
@@ -177,6 +200,7 @@ Uppy is a **complete, modular, feature-rich JavaScript file uploader** with a pl
 - ✅ **ProgressBar**: Upload progress visualization
 
 ### Plugins Ecosystem
+
 - **UI**: Dashboard, DragDrop, FileInput, ImageEditor, Webcam, Informer
 - **Sources**: GoogleDrive, Dropbox, Box, Instagram, Facebook, OneDrive, URL, Zoom, WebDAV
 - **Processors**: Compressor, ImageEditor, ThumbnailGenerator
@@ -185,11 +209,13 @@ Uppy is a **complete, modular, feature-rich JavaScript file uploader** with a pl
 - **Framework wrappers**: React, Vue, Svelte, Angular
 
 ### Browser Support
+
 - All modern browsers
 - IE11+ with polyfills
 - Mobile support optimized
 
 ### Framework Integration
+
 - ✅ React: `@uppy/react` with components and hooks
 - ✅ Vue: Full support
 - ✅ Svelte: Full support
@@ -197,6 +223,7 @@ Uppy is a **complete, modular, feature-rich JavaScript file uploader** with a pl
 - ✅ Plain JavaScript: Complete core library
 
 ### Server Component
+
 - **Companion**: Server-side orchestrator for remote sources
 - Handles OAuth authentication (no credentials exposed to client)
 - Downloads files from remote sources and streams to destination
@@ -204,6 +231,7 @@ Uppy is a **complete, modular, feature-rich JavaScript file uploader** with a pl
 - Supports streaming uploads (file downloaded and uploaded simultaneously)
 
 ### Pros
+
 - Enterprise-grade, production-tested (30.7k GitHub stars)
 - Extremely modular and extensible
 - Excellent documentation
@@ -217,6 +245,7 @@ Uppy is a **complete, modular, feature-rich JavaScript file uploader** with a pl
 - File encoding/processing integration with Transloadit
 
 ### Cons
+
 - More complex setup than simple drag-drop libraries
 - Dashboard has pre-built styling (limited theming)
 - Companion requires server setup for remote sources
@@ -227,15 +256,17 @@ Uppy is a **complete, modular, feature-rich JavaScript file uploader** with a pl
 
 ## 3. FilePond
 
-**Repository**: https://github.com/pqina/filepond  
-**NPM**: `filepond`  
-**Latest Version**: 4.x  
+**Repository**: https://github.com/pqina/filepond
+**NPM**: `filepond`
+**Latest Version**: 4.x
 **License**: MIT
 
 ### Overview
+
 FilePond is a **flexible, lightweight JavaScript file upload library** with great UX. It focuses on image optimization, client-side processing, and a polished user experience. Available as vanilla JavaScript or via framework adapters.
 
 ### Core File Handling Features
+
 - **Drag-and-drop**: ✅ Full support
 - **Click-to-select**: ✅ Built-in file picker
 - **Paste files**: ✅ Copy-paste support
@@ -246,6 +277,7 @@ FilePond is a **flexible, lightweight JavaScript file upload library** with grea
 - **Drop overlay**: ✅ Drag anywhere on page
 
 ### Validation Features
+
 - **File type filtering**: ✅ Via `acceptedFileTypes` option
 - **File size limits**: ✅ `maxFileSize`, `minFileSize`
 - **Max file count**: ✅ `maxFiles` option
@@ -254,6 +286,7 @@ FilePond is a **flexible, lightweight JavaScript file upload library** with grea
 - **Type validation plugin**: ✅ `filepond-plugin-file-validate-type`
 
 ### Upload Handling
+
 - **Chunking**: ✅ Supported (can be configured)
 - **Resumable uploads**: ⚠️ Partial - chunk-based but not standard resumable protocol
 - **Progress tracking**: ✅ Per-file and detailed progress
@@ -262,6 +295,7 @@ FilePond is a **flexible, lightweight JavaScript file upload library** with grea
 - **Form submission**: ✅ Can submit with form or independently
 
 ### Image Optimization
+
 - **Automatic resizing**: ✅ `filepond-plugin-image-resize`
 - **Image cropping**: ✅ `filepond-plugin-image-crop`
 - **Image compression**: ✅ JPEG compression support
@@ -272,6 +306,7 @@ FilePond is a **flexible, lightweight JavaScript file upload library** with grea
 - **Image encoding**: ✅ Base64 encoding via `filepond-plugin-file-encode`
 
 ### State & Callbacks
+
 - `registerPlugin()`: Register plugins
 - `create()`: Create pond instance
 - `addFile()`, `removeFile()`, `removeFiles()`: File management
@@ -279,6 +314,7 @@ FilePond is a **flexible, lightweight JavaScript file upload library** with grea
 - Event callbacks: `onaddfile`, `onremovefile`, `onprocessfile`, `onprocessfiles`, `onerror`
 
 ### Accessibility Features
+
 - ✅ Tested with VoiceOver and JAWS
 - ✅ Fully keyboard navigable
 - ✅ ARIA compliant
@@ -286,17 +322,20 @@ FilePond is a **flexible, lightweight JavaScript file upload library** with grea
 - ✅ Mobile-friendly
 
 ### Internationalization
+
 - ✅ Multi-language support (locale folder with language files)
 - ✅ Easy to add custom locales
 - ✅ Portuguese-Brazilian, French, German, etc. included
 
 ### API & Customization
+
 - ✅ Modular plugin system
 - ✅ CSS customizable (or use Pintura for advanced styling)
 - ✅ Can modify labels and icons
 - ✅ Event-driven architecture
 
 ### UI Components Provided
+
 - ✅ Self-contained drop zone with preview
 - ✅ Image preview thumbnails
 - ✅ File list with action buttons
@@ -304,13 +343,16 @@ FilePond is a **flexible, lightweight JavaScript file upload library** with grea
 - ✅ Error messages
 
 ### Plugin System
+
 **Official plugins**:
+
 - File encode, rename, size validation, type validation, metadata
 - Image preview, crop, resize, filter, transform, EXIF orientation
 - Image editor (commercial - Pintura)
 - Media preview, PDF preview, watermarks
 
 ### Framework Support
+
 - ✅ **React**: `react-filepond` adapter
 - ✅ **Vue**: `vue-filepond` adapter
 - ✅ **Svelte**: `svelte-filepond` adapter
@@ -319,13 +361,16 @@ FilePond is a **flexible, lightweight JavaScript file upload library** with grea
 - ✅ **Blazor**: Community adapter
 
 ### Backend Support
+
 - PHP, Django, Laravel, Ruby on Rails boilerplate examples available
 
 ### Browser Support
+
 - Wide range including IE11 with polyfills
 - Uses BrowserStack for compatibility testing
 
 ### Pros
+
 - Great user experience with image optimization
 - Lightweight and responsive
 - Easy to use with minimal configuration
@@ -336,6 +381,7 @@ FilePond is a **flexible, lightweight JavaScript file upload library** with grea
 - Active community
 
 ### Cons
+
 - Not true resumable uploads (standard Tus protocol)
 - Limited remote source support
 - No built-in server-side integration like Companion
@@ -347,14 +393,16 @@ FilePond is a **flexible, lightweight JavaScript file upload library** with grea
 
 ## 4. React Fine Uploader
 
-**Website**: http://fineuploader.com/  
-**Repository**: No longer actively developed  
+**Website**: http://fineuploader.com/
+**Repository**: No longer actively developed
 **Status**: ⚠️ Legacy library - not recommended for new projects
 
 ### Overview
+
 Fine Uploader was a comprehensive file upload library, but development has largely ceased. The website appears to be under new ownership and no longer represents the original project.
 
 ### Current Status
+
 - ⚠️ Not actively maintained
 - Legacy codebase
 - Limited modern framework support
@@ -365,10 +413,12 @@ Fine Uploader was a comprehensive file upload library, but development has large
 ## 5. Other Notable Libraries
 
 ### TanStack Upload
-**Status**: In development/early preview  
+
+**Status**: In development/early preview
 **Note**: TanStack appears to be developing a new upload library, but it's not yet mature for production use.
 
 ### Dropzone.js (Not React)
+
 - Original vanilla JS library (not React-specific)
 - Similar to React Dropzone but for vanilla JS
 - No longer the recommended approach for React projects
@@ -377,81 +427,82 @@ Fine Uploader was a comprehensive file upload library, but development has large
 
 ## Comprehensive Feature Comparison Matrix
 
-| Feature | React Dropzone | Uppy | FilePond | React Fine Uploader |
-|---------|---|---|---|---|
-| **CORE FILE HANDLING** |
-| Drag-and-drop | ✅ | ✅ | ✅ | ✅ |
-| Click-to-select | ✅ | ✅ | ✅ | ✅ |
-| Paste files | ✅ | ✅ | ✅ | ✅ |
-| Keyboard navigation | ✅ | ✅ | ✅ | ✅ |
-| Folder drag-drop | ✅ | ✅ | ✅ | ⚠️ Limited |
-| Multiple file selection | ✅ | ✅ | ✅ | ✅ |
-| **VALIDATION** |
-| File type filtering | ✅ | ✅ | ✅ | ✅ |
-| File size limits | ✅ | ✅ | ✅ | ✅ |
-| Max file count | ✅ | ✅ | ✅ | ✅ |
-| Custom validation | ✅ | ✅ | ✅ Plugins | ✅ |
-| Comprehensive error codes | ✅ Limited | ✅ Extensive | ✅ | ⚠️ Basic |
-| **UPLOAD HANDLING** |
-| Chunking | ❌ | ✅ | ✅ | ✅ |
-| Resumable uploads (Tus standard) | ❌ | ✅ | ❌ | ⚠️ Proprietary |
-| Progress tracking | ❌ | ✅ | ✅ | ✅ |
-| Retry logic | ❌ | ✅ Automatic | ✅ | ✅ |
-| Pause/Resume | ❌ | ✅ | ⚠️ Limited | ✅ |
-| Built-in upload | ❌ | ✅ | ✅ | ✅ |
-| **IMAGE OPTIMIZATION** |
-| Automatic resizing | ❌ | ✅ | ✅ | ❌ |
-| Image cropping | ❌ | ✅ | ✅ | ❌ |
-| Image compression | ❌ | ✅ | ✅ | ❌ |
-| Preview generation | ❌ | ✅ | ✅ | ✅ |
-| EXIF orientation fix | ❌ | ✅ | ✅ | ❌ |
-| **ACCESSIBILITY** |
-| WCAG compliant | ✅ | ✅ | ✅ | ⚠️ |
-| Keyboard accessible | ✅ | ✅ | ✅ | ✅ |
-| Screen reader support | ✅ | ✅ | ✅ | ⚠️ |
-| ARIA labels | ✅ | ✅ | ✅ | ⚠️ |
-| **INTERNATIONALIZATION** |
-| Built-in i18n | ❌ | ✅ 30+ | ✅ | ❌ |
-| Easy to customize locale | ✅ User built | ✅ Easy | ✅ Easy | ⚠️ Limited |
-| **API & CUSTOMIZATION** |
-| Headless component | ✅ | ✅ | ❌ | ⚠️ |
-| Pre-built UI | ❌ | ✅ Dashboard | ✅ | ✅ |
-| Hooks/React integration | ✅ Hooks | ✅ React v5 | ❌ | ⚠️ |
-| Plugin system | ❌ | ✅ Extensive | ✅ | ⚠️ |
-| Theme customization | ✅ CSS | ⚠️ Limited | ✅ CSS | ⚠️ |
-| **UI COMPONENTS** |
-| Provided components | None | Dashboard, Headless | Drop zone + preview | Pre-built UI |
-| Customization level | Maximum | High | Medium | Low-Medium |
-| **REMOTE SOURCES** |
-| Google Drive | ❌ | ✅ Companion | ❌ | ❌ |
-| Dropbox | ❌ | ✅ Companion | ❌ | ❌ |
-| Cloud providers | ❌ | ✅ Multiple | ❌ | ❌ |
-| Webcam | ❌ | ✅ | ❌ | ❌ |
-| Screen capture | ❌ | ✅ | ❌ | ❌ |
-| **FRAMEWORK SUPPORT** |
-| React | ✅ Native | ✅ Full | ✅ Adapter | ✅ |
-| Vue | ❌ | ✅ Full | ✅ Adapter | ❌ |
-| Svelte | ❌ | ✅ Full | ✅ Adapter | ❌ |
-| Angular | ❌ | ✅ Full | ✅ Adapter | ❌ |
-| Vanilla JS | ⚠️ Hook-based | ✅ Full | ✅ Full | ✅ |
-| **ADDITIONAL FEATURES** |
-| File recovery (browser crash) | ❌ | ✅ Golden Retriever | ❌ | ❌ |
-| Image editing | ❌ | ✅ ImageEditor | ✅ Pintura (paid) | ❌ |
-| Server integration | ❌ | ✅ Companion | ❌ | ❌ |
-| Form integration | ❌ | ✅ Form plugin | ⚠️ | ✅ |
-| **COMMUNITY & MAINTENANCE** |
-| GitHub stars | ~8.5k | ~30.7k | ~16.3k | ❌ Deprecated |
-| Active development | ✅ | ✅ | ✅ | ❌ |
-| Production ready | ✅ | ✅ | ✅ | ⚠️ Legacy |
-| **BUNDLE SIZE** |
-| Core size | ~8KB | ~80KB+ | ~45KB | N/A |
-| Minified + gzip | ~3KB | ~25KB+ | ~15KB | N/A |
+| Feature                          | React Dropzone | Uppy                | FilePond            | React Fine Uploader |
+| -------------------------------- | -------------- | ------------------- | ------------------- | ------------------- |
+| **CORE FILE HANDLING**           |
+| Drag-and-drop                    | ✅             | ✅                  | ✅                  | ✅                  |
+| Click-to-select                  | ✅             | ✅                  | ✅                  | ✅                  |
+| Paste files                      | ✅             | ✅                  | ✅                  | ✅                  |
+| Keyboard navigation              | ✅             | ✅                  | ✅                  | ✅                  |
+| Folder drag-drop                 | ✅             | ✅                  | ✅                  | ⚠️ Limited          |
+| Multiple file selection          | ✅             | ✅                  | ✅                  | ✅                  |
+| **VALIDATION**                   |
+| File type filtering              | ✅             | ✅                  | ✅                  | ✅                  |
+| File size limits                 | ✅             | ✅                  | ✅                  | ✅                  |
+| Max file count                   | ✅             | ✅                  | ✅                  | ✅                  |
+| Custom validation                | ✅             | ✅                  | ✅ Plugins          | ✅                  |
+| Comprehensive error codes        | ✅ Limited     | ✅ Extensive        | ✅                  | ⚠️ Basic            |
+| **UPLOAD HANDLING**              |
+| Chunking                         | ❌             | ✅                  | ✅                  | ✅                  |
+| Resumable uploads (Tus standard) | ❌             | ✅                  | ❌                  | ⚠️ Proprietary      |
+| Progress tracking                | ❌             | ✅                  | ✅                  | ✅                  |
+| Retry logic                      | ❌             | ✅ Automatic        | ✅                  | ✅                  |
+| Pause/Resume                     | ❌             | ✅                  | ⚠️ Limited          | ✅                  |
+| Built-in upload                  | ❌             | ✅                  | ✅                  | ✅                  |
+| **IMAGE OPTIMIZATION**           |
+| Automatic resizing               | ❌             | ✅                  | ✅                  | ❌                  |
+| Image cropping                   | ❌             | ✅                  | ✅                  | ❌                  |
+| Image compression                | ❌             | ✅                  | ✅                  | ❌                  |
+| Preview generation               | ❌             | ✅                  | ✅                  | ✅                  |
+| EXIF orientation fix             | ❌             | ✅                  | ✅                  | ❌                  |
+| **ACCESSIBILITY**                |
+| WCAG compliant                   | ✅             | ✅                  | ✅                  | ⚠️                  |
+| Keyboard accessible              | ✅             | ✅                  | ✅                  | ✅                  |
+| Screen reader support            | ✅             | ✅                  | ✅                  | ⚠️                  |
+| ARIA labels                      | ✅             | ✅                  | ✅                  | ⚠️                  |
+| **INTERNATIONALIZATION**         |
+| Built-in i18n                    | ❌             | ✅ 30+              | ✅                  | ❌                  |
+| Easy to customize locale         | ✅ User built  | ✅ Easy             | ✅ Easy             | ⚠️ Limited          |
+| **API & CUSTOMIZATION**          |
+| Headless component               | ✅             | ✅                  | ❌                  | ⚠️                  |
+| Pre-built UI                     | ❌             | ✅ Dashboard        | ✅                  | ✅                  |
+| Hooks/React integration          | ✅ Hooks       | ✅ React v5         | ❌                  | ⚠️                  |
+| Plugin system                    | ❌             | ✅ Extensive        | ✅                  | ⚠️                  |
+| Theme customization              | ✅ CSS         | ⚠️ Limited          | ✅ CSS              | ⚠️                  |
+| **UI COMPONENTS**                |
+| Provided components              | None           | Dashboard, Headless | Drop zone + preview | Pre-built UI        |
+| Customization level              | Maximum        | High                | Medium              | Low-Medium          |
+| **REMOTE SOURCES**               |
+| Google Drive                     | ❌             | ✅ Companion        | ❌                  | ❌                  |
+| Dropbox                          | ❌             | ✅ Companion        | ❌                  | ❌                  |
+| Cloud providers                  | ❌             | ✅ Multiple         | ❌                  | ❌                  |
+| Webcam                           | ❌             | ✅                  | ❌                  | ❌                  |
+| Screen capture                   | ❌             | ✅                  | ❌                  | ❌                  |
+| **FRAMEWORK SUPPORT**            |
+| React                            | ✅ Native      | ✅ Full             | ✅ Adapter          | ✅                  |
+| Vue                              | ❌             | ✅ Full             | ✅ Adapter          | ❌                  |
+| Svelte                           | ❌             | ✅ Full             | ✅ Adapter          | ❌                  |
+| Angular                          | ❌             | ✅ Full             | ✅ Adapter          | ❌                  |
+| Vanilla JS                       | ⚠️ Hook-based  | ✅ Full             | ✅ Full             | ✅                  |
+| **ADDITIONAL FEATURES**          |
+| File recovery (browser crash)    | ❌             | ✅ Golden Retriever | ❌                  | ❌                  |
+| Image editing                    | ❌             | ✅ ImageEditor      | ✅ Pintura (paid)   | ❌                  |
+| Server integration               | ❌             | ✅ Companion        | ❌                  | ❌                  |
+| Form integration                 | ❌             | ✅ Form plugin      | ⚠️                  | ✅                  |
+| **COMMUNITY & MAINTENANCE**      |
+| GitHub stars                     | ~8.5k          | ~30.7k              | ~16.3k              | ❌ Deprecated       |
+| Active development               | ✅             | ✅                  | ✅                  | ❌                  |
+| Production ready                 | ✅             | ✅                  | ✅                  | ⚠️ Legacy           |
+| **BUNDLE SIZE**                  |
+| Core size                        | ~8KB           | ~80KB+              | ~45KB               | N/A                 |
+| Minified + gzip                  | ~3KB           | ~25KB+              | ~15KB               | N/A                 |
 
 ---
 
 ## Choosing the Right Library
 
 ### Choose React Dropzone if:
+
 - You want a **headless, lightweight** solution
 - You need **maximum customization** of the UI
 - You're building a **custom file upload experience**
@@ -459,6 +510,7 @@ Fine Uploader was a comprehensive file upload library, but development has large
 - You want to implement your own upload backend logic
 
 ### Choose Uppy if:
+
 - You need a **complete, enterprise-grade** solution
 - You want **resumable uploads** out-of-the-box
 - You need **remote source support** (Google Drive, Dropbox, etc.)
@@ -469,6 +521,7 @@ Fine Uploader was a comprehensive file upload library, but development has large
 - Multi-framework support is important
 
 ### Choose FilePond if:
+
 - You need **image optimization** as a primary feature
 - You want a **lightweight, responsive solution** (~45KB)
 - **Easy setup** with minimal configuration is priority
@@ -478,6 +531,7 @@ Fine Uploader was a comprehensive file upload library, but development has large
 - You work with multiple frameworks (adapter ecosystem)
 
 ### Choose React Fine Uploader if:
+
 - **Not recommended** for new projects
 - Only consider for **legacy system maintenance**
 
@@ -518,37 +572,38 @@ Based on this research, if building a **headless FileUpload component** for Base
 ## Implementation Patterns from Ecosystem
 
 ### Validation Pattern (from Uppy)
+
 ```typescript
 const restrictions = {
   maxFileSize: 5000000,
   minFileSize: 100,
   maxNumberOfFiles: 5,
-  allowedFileTypes: ['image/jpeg', 'image/png', '.pdf']
+  allowedFileTypes: ['image/jpeg', 'image/png', '.pdf'],
 };
 ```
 
 ### Event-Driven Pattern (from Uppy)
+
 ```typescript
-on('file-added', (file) => {})
-on('upload-progress', (file, progress) => {})
-on('upload-success', (file, response) => {})
-on('upload-error', (file, error) => {})
+on('file-added', (file) => {});
+on('upload-progress', (file, progress) => {});
+on('upload-success', (file, response) => {});
+on('upload-error', (file, error) => {});
 ```
 
 ### Headless Hook Pattern (from React Dropzone)
+
 ```typescript
 const { getRootProps, getInputProps, acceptedFiles } = useFileUpload({
   accept: { 'image/*': [] },
-  maxFiles: 5
-})
+  maxFiles: 5,
+});
 ```
 
 ### Plugin Pattern (from Uppy & FilePond)
+
 ```typescript
-uppy
-  .use(Compressor, { quality: 0.8 })
-  .use(ThumbnailGenerator)
-  .use(AwsS3, { bucket: 'my-bucket' })
+uppy.use(Compressor, { quality: 0.8 }).use(ThumbnailGenerator).use(AwsS3, { bucket: 'my-bucket' });
 ```
 
 ---
@@ -563,4 +618,4 @@ uppy
 
 ---
 
-*Last Updated: February 25, 2026*
+_Last Updated: February 25, 2026_

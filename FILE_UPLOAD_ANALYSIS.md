@@ -9,6 +9,7 @@ Base UI's FileUpload component is a **headless, unstyled implementation** focuse
 ## Current Implementation Status
 
 ### ✅ What We Have
+
 1. **Core file handling**
    - Drag-and-drop support
    - Click-to-select via hidden input
@@ -37,6 +38,7 @@ Base UI's FileUpload component is a **headless, unstyled implementation** focuse
 ### ❌ Missing Features
 
 #### High Priority (Breaking gaps for common use cases)
+
 1. **Paste support** - Users can't paste from clipboard
 2. **Folder upload** - Can't select directories recursively
 3. **Keyboard accessibility** - Limited keyboard navigation (e.g., Space/Enter to open dialog)
@@ -45,6 +47,7 @@ Base UI's FileUpload component is a **headless, unstyled implementation** focuse
 6. **onCancel callback** - No way to react to user canceling file selection
 
 #### Medium Priority (Nice-to-have, improves UX)
+
 1. **Duplicate detection** - Warning when adding same file twice
 2. **Abort signal support** - Cancel in-progress uploads
 3. **Multiple input modes** - Ability to create custom triggers beyond button/dropzone
@@ -53,6 +56,7 @@ Base UI's FileUpload component is a **headless, unstyled implementation** focuse
 6. **Image-specific features** - Thumbnail generation, EXIF stripping
 
 #### Lower Priority (Advanced/specialized)
+
 1. **Chunked uploads** - Split large files for parallel upload
 2. **Resumable uploads** - Continue interrupted uploads (requires backend support)
 3. **Remote sources** - Load files from Google Drive, Dropbox, URLs
@@ -64,48 +68,50 @@ Base UI's FileUpload component is a **headless, unstyled implementation** focuse
 
 ## Competitive Feature Matrix
 
-| Feature | Base UI | React Dropzone | Uppy | FilePond |
-|---------|---------|---|------|----------|
+| Feature                | Base UI           | React Dropzone    | Uppy           | FilePond |
+| ---------------------- | ----------------- | ----------------- | -------------- | -------- |
 | **Core File Handling** |
-| Drag-drop | ✅ | ✅ | ✅ | ✅ |
-| Click-select | ✅ | ✅ | ✅ | ✅ |
-| Paste support | ❌ | ✅ | ✅ | ✅ |
-| Folder upload | ❌ | ✅ | ✅ | ❌ |
-| Keyboard control | ⚠️ | ✅ | ✅ | ✅ |
-| **Validation** |
-| File type | ✅ | ✅ | ✅ | ✅ |
-| File size | ✅ | ✅ | ✅ | ✅ |
-| File count | ✅ | ✅ | ✅ | ✅ |
-| Custom validation | ❌ | ✅ | ✅ | ✅ |
-| Duplicate detection | ❌ | ❌ | ✅ | ❌ |
-| **Upload Handling** |
-| Progress tracking | ✅ | ❌ | ✅ | ✅ |
-| Status management | ✅ | ❌ | ✅ | ✅ |
-| Error handling | ⚠️ | ❌ | ✅ | ✅ |
-| Retry logic | ❌ | ❌ | ✅ | ⚠️ |
-| Chunked uploads | ❌ | ❌ | ✅ | ❌ |
-| Resumable uploads | ❌ | ❌ | ✅ | ❌ |
-| Abort signal support | ❌ | ❌ | ✅ | ❌ |
-| **Accessibility** |
-| ARIA labels | ✅ | ✅ | ✅ | ✅ |
-| Screen reader support | ✅ | ✅ | ✅ | ✅ |
-| Keyboard navigation | ⚠️ | ✅ | ✅ | ✅ |
-| Live regions | ❌ | ❌ | ✅ | ⚠️ |
-| **I18n & UX** |
-| Localization | ❌ | ❌ | ✅ (30+ langs) | ⚠️ |
-| Error messages | ✅ (English only) | ✅ (English only) | ✅ | ✅ |
-| Customizable text | ⚠️ | ⚠️ | ✅ | ✅ |
+| Drag-drop              | ✅                | ✅                | ✅             | ✅       |
+| Click-select           | ✅                | ✅                | ✅             | ✅       |
+| Paste support          | ❌                | ✅                | ✅             | ✅       |
+| Folder upload          | ❌                | ✅                | ✅             | ❌       |
+| Keyboard control       | ⚠️                | ✅                | ✅             | ✅       |
+| **Validation**         |
+| File type              | ✅                | ✅                | ✅             | ✅       |
+| File size              | ✅                | ✅                | ✅             | ✅       |
+| File count             | ✅                | ✅                | ✅             | ✅       |
+| Custom validation      | ❌                | ✅                | ✅             | ✅       |
+| Duplicate detection    | ❌                | ❌                | ✅             | ❌       |
+| **Upload Handling**    |
+| Progress tracking      | ✅                | ❌                | ✅             | ✅       |
+| Status management      | ✅                | ❌                | ✅             | ✅       |
+| Error handling         | ⚠️                | ❌                | ✅             | ✅       |
+| Retry logic            | ❌                | ❌                | ✅             | ⚠️       |
+| Chunked uploads        | ❌                | ❌                | ✅             | ❌       |
+| Resumable uploads      | ❌                | ❌                | ✅             | ❌       |
+| Abort signal support   | ❌                | ❌                | ✅             | ❌       |
+| **Accessibility**      |
+| ARIA labels            | ✅                | ✅                | ✅             | ✅       |
+| Screen reader support  | ✅                | ✅                | ✅             | ✅       |
+| Keyboard navigation    | ⚠️                | ✅                | ✅             | ✅       |
+| Live regions           | ❌                | ❌                | ✅             | ⚠️       |
+| **I18n & UX**          |
+| Localization           | ❌                | ❌                | ✅ (30+ langs) | ⚠️       |
+| Error messages         | ✅ (English only) | ✅ (English only) | ✅             | ✅       |
+| Customizable text      | ⚠️                | ⚠️                | ✅             | ✅       |
 
 ---
 
 ## Detailed Gap Analysis
 
 ### 1. **Paste Support** (HIGH PRIORITY)
+
 **Impact**: Users expect to paste images from clipboard
 **Complexity**: Medium
 **Competitors**: React Dropzone, Uppy, FilePond all support this
 
 **Implementation approach**:
+
 - Add `onPaste` handler to root container
 - Check `event.clipboardData.files` and `event.clipboardData.items`
 - Filter for file-like items and convert DataTransferItem to File
@@ -114,11 +120,13 @@ Base UI's FileUpload component is a **headless, unstyled implementation** focuse
 **Files to modify**: `FileUploadRoot.tsx`, `useFileUploadRoot.ts`
 
 ### 2. **Folder Upload** (HIGH PRIORITY)
+
 **Impact**: Users want to select entire directories
 **Complexity**: Medium-High
 **Competitors**: React Dropzone, Uppy support this
 
 **Implementation approach**:
+
 - Add `webkitdirectory` attribute to hidden input (Chrome/Edge/Safari)
 - Add `allowdirs` support where available
 - Track folder hierarchy in extended file metadata
@@ -127,11 +135,13 @@ Base UI's FileUpload component is a **headless, unstyled implementation** focuse
 **Files to modify**: `FileUploadInput.tsx`, `FileUploadRoot.tsx`, `useFileUploadRoot.ts`
 
 ### 3. **Keyboard Accessibility Gaps** (HIGH PRIORITY)
+
 **Impact**: Keyboard-only users can't access upload UI
 **Complexity**: Low
 **Competitors**: All support full keyboard navigation
 
 **Implementation approach**:
+
 - FileUploadTrigger: Already a button (inherently keyboard accessible)
 - FileUploadDropzone: Add `tabindex` when not disabled, handle Space/Enter
 - Add keyboard event handlers to open dialog
@@ -139,11 +149,13 @@ Base UI's FileUpload component is a **headless, unstyled implementation** focuse
 **Files to modify**: `FileUploadDropzone.tsx`, `useFileUploadRoot.ts`
 
 ### 4. **Retry Mechanism for Failed Uploads** (MEDIUM PRIORITY)
+
 **Impact**: Users can recover from transient failures
 **Complexity**: Medium
 **Competitors**: Uppy has built-in retry
 
 **Implementation approach**:
+
 - Add `retryCount` and `maxRetries` to ExtendedFile
 - Add `retryFile(id: string)` method to context
 - Emit `onFileRetry` callback for app to handle
@@ -152,11 +164,13 @@ Base UI's FileUpload component is a **headless, unstyled implementation** focuse
 **Files to modify**: `FileUploadContext.ts`, `FileUploadRoot.tsx`, `useFileUploadRoot.ts`
 
 ### 5. **onCancel Callback** (MEDIUM PRIORITY)
+
 **Impact**: Apps need to know when user cancels file selection
 **Complexity**: Low
 **Competitors**: Uppy, FilePond support this
 
 **Implementation approach**:
+
 - Add `onCancel` prop to FileUploadRoot
 - Detect when input's `value` is reset without new files
 - Call `onCancel` callback
@@ -164,11 +178,13 @@ Base UI's FileUpload component is a **headless, unstyled implementation** focuse
 **Files to modify**: `FileUploadRoot.tsx`, `useFileUploadRoot.ts`
 
 ### 6. **Duplicate File Detection** (MEDIUM PRIORITY)
+
 **Impact**: Prevent accidental duplicate uploads
 **Complexity**: Low
 **Competitors**: Uppy supports this
 
 **Implementation approach**:
+
 - Add `onDuplicateFile` callback to FileUploadRoot
 - Compare new files against existing by name + size + lastModified
 - Emit callback before adding
@@ -176,11 +192,13 @@ Base UI's FileUpload component is a **headless, unstyled implementation** focuse
 **Files to modify**: `useFileUploadRoot.ts`
 
 ### 7. **i18n Support** (MEDIUM PRIORITY)
+
 **Impact**: Error messages not localized
 **Complexity**: Medium
 **Competitors**: Uppy has 30+ languages built-in
 
 **Implementation approach**:
+
 - Create `FileUploadIntl` context or accept `messages` prop
 - Support custom message overrides
 - Provide default English messages
@@ -189,11 +207,13 @@ Base UI's FileUpload component is a **headless, unstyled implementation** focuse
 **Files to modify**: `FileUploadRoot.tsx`, `useFileUploadRoot.ts`, new file: `FileUploadIntl.ts`
 
 ### 8. **Live Region Announcements** (LOW-MEDIUM PRIORITY)
+
 **Impact**: Screen reader users don't hear file updates
 **Complexity**: Low
 **Competitors**: Uppy has this
 
 **Implementation approach**:
+
 - Already have `announcement` state in hook
 - Improve announcements: "3 files added", "File failed: file.txt"
 - Use `aria-live="polite"` region in Root
@@ -201,11 +221,13 @@ Base UI's FileUpload component is a **headless, unstyled implementation** focuse
 **Files to modify**: `useFileUploadRoot.ts`, `FileUploadRoot.tsx`
 
 ### 9. **Abort Signal Support** (LOW PRIORITY)
+
 **Impact**: Allow canceling in-progress uploads
 **Complexity**: Medium
 **Competitors**: Uppy, modern APIs
 
 **Implementation approach**:
+
 - Add `AbortController` to context
 - Expose `abortController` in context value
 - Document how to use with fetch: `fetch(url, { signal: context.abortController.signal })`
@@ -213,11 +235,13 @@ Base UI's FileUpload component is a **headless, unstyled implementation** focuse
 **Files to modify**: `FileUploadContext.ts`, `useFileUploadRoot.ts`
 
 ### 10. **Custom Validation** (LOW PRIORITY)
+
 **Impact**: Apps need to validate beyond type/size/count
 **Complexity**: Medium
 **Competitors**: React Dropzone, Uppy support this
 
 **Implementation approach**:
+
 - Add `validate?: (file: File) => string | null | Promise<string | null>` prop
 - Call in `validateFile` function
 - Await if Promise returned
@@ -229,6 +253,7 @@ Base UI's FileUpload component is a **headless, unstyled implementation** focuse
 ## Phased Enhancement Plan
 
 ### Phase 1: Accessibility & Core UX (Weeks 1-2)
+
 **Goal**: Close critical gaps for everyday users
 
 1. **Keyboard navigation**
@@ -253,6 +278,7 @@ Base UI's FileUpload component is a **headless, unstyled implementation** focuse
 **Test command**: `pnpm test:chromium FileUpload --no-watch`
 
 ### Phase 2: User Experience Improvements (Weeks 2-3)
+
 **Goal**: Improve day-to-day usability
 
 1. **Folder upload support**
@@ -276,6 +302,7 @@ Base UI's FileUpload component is a **headless, unstyled implementation** focuse
 **Test command**: `pnpm test:jsdom FileUpload --no-watch`
 
 ### Phase 3: Developer Experience (Weeks 3-4)
+
 **Goal**: Make it easier to build complex upload UIs
 
 1. **i18n support**
@@ -301,6 +328,7 @@ Base UI's FileUpload component is a **headless, unstyled implementation** focuse
    - **Commit**: `[file-upload] Add file retry mechanism`
 
 ### Phase 4: Advanced Features (Weeks 4-5)
+
 **Goal**: Support power users and complex scenarios
 
 1. **Custom validation**
@@ -321,22 +349,26 @@ Base UI's FileUpload component is a **headless, unstyled implementation** focuse
 ## Implementation Notes
 
 ### Testing Strategy
+
 - **JSDOM tests** (Phase 2-3): File logic, state management, callbacks
 - **Chromium tests** (Phase 1, 4): Keyboard nav, drag-drop, visual interactions
 - **Accessibility tests** (Phase 1): Screen reader compatibility, keyboard
 - **Integration tests**: Full workflows with multiple features
 
 ### Backwards Compatibility
+
 - All changes are additive (new props, optional features)
 - Existing API remains unchanged
 - No breaking changes to context or components
 
 ### Performance Considerations
+
 - Clipboard paste: Check `event.clipboardData` eagerly to avoid holding clipboard
 - Duplicate detection: Compare by `name + size + lastModified` (O(n) per file)
 - i18n: Messages object passed as prop (no dynamic imports)
 
 ### Documentation Updates
+
 - Update component demo to show new features
 - Add code examples for each new feature
 - Update API docs via `pnpm docs:api`
@@ -346,21 +378,15 @@ Base UI's FileUpload component is a **headless, unstyled implementation** focuse
 ## Priority Ranking
 
 **Must Have** (Blocks common use cases):
+
 1. Paste support
 2. Folder upload
 3. Keyboard navigation
 4. Better accessibility announcements
 
-**Should Have** (Improves UX):
-5. onCancel callback
-6. Duplicate detection
-7. i18n support
+**Should Have** (Improves UX): 5. onCancel callback 6. Duplicate detection 7. i18n support
 
-**Nice to Have** (Power users):
-8. Abort signal support
-9. Retry mechanism
-10. Custom validation
-11. File reordering
+**Nice to Have** (Power users): 8. Abort signal support 9. Retry mechanism 10. Custom validation 11. File reordering
 
 ---
 
@@ -371,4 +397,3 @@ Base UI's FileUpload component is a **headless, unstyled implementation** focuse
 3. Start Phase 1 implementation
 4. Test in browser environment (`pnpm test:chromium`)
 5. Update documentation and generate API docs
-
