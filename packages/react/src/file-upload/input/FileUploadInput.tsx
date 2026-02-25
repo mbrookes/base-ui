@@ -21,9 +21,22 @@ export namespace FileUploadInput {
 export type FileUploadInputProps = FileUploadInput.Props;
 
 /**
- * Hidden file input element for triggering file selection.
+ * Hidden file input element for file selection.
  *
- * Documentation: [Base UI File Upload](https://base-ui.com/react/components/file-upload)
+ * This component renders a hidden HTML file input element that is triggered by
+ * other components (like Dropzone or Trigger). It automatically integrates with
+ * the Root component's file validation and state management.
+ *
+ * @component
+ * @example
+ * ```tsx
+ * <FileUpload.Input data-testid="file-input" />
+ * ```
+ *
+ * @param className - CSS class name or function that receives `{ disabled }`
+ * @param disabled - Whether the input is disabled
+ *
+ * @see [File Upload Documentation](https://base-ui.com/react/components/file-upload)
  */
 export const FileUploadInput = React.forwardRef<HTMLInputElement, FileUploadInputProps>(
   function FileUploadInputComponent(props, ref) {

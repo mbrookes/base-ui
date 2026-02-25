@@ -27,9 +27,29 @@ export namespace FileUploadDropzone {
 export type FileUploadDropzoneProps = FileUploadDropzone.Props;
 
 /**
- * Interactive dropzone area for dragging and dropping files or clicking to select.
+ * Interactive drop target and file selection area.
  *
- * Documentation: [Base UI File Upload](https://base-ui.com/react/components/file-upload)
+ * The Dropzone component provides a visual area where users can drag and drop files
+ * or click to select files. It automatically handles drag events and integrates with
+ * the Root component's file validation and state management.
+ *
+ * @component
+ * @example
+ * ```tsx
+ * <FileUpload.Dropzone>
+ *   {({ isDragging }) => (
+ *     <div className={isDragging ? 'dragging' : 'idle'}>
+ *       Drop files here or click to select
+ *     </div>
+ *   )}
+ * </FileUpload.Dropzone>
+ * ```
+ *
+ * @param children - Content to display, or a render function that receives `{ isDragging }`
+ * @param className - CSS class name or function that receives `{ dragging, disabled }`
+ * @param disabled - Whether the dropzone is disabled
+ *
+ * @see [File Upload Documentation](https://base-ui.com/react/components/file-upload)
  */
 export const FileUploadDropzone = React.forwardRef<HTMLDivElement, FileUploadDropzoneProps>(
   function FileUploadDropzoneComponent(props, ref) {

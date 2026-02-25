@@ -23,7 +23,23 @@ export type FileUploadTriggerProps = FileUploadTrigger.Props;
 /**
  * Button component for triggering the file selection dialog.
  *
- * Documentation: [Base UI File Upload](https://base-ui.com/react/components/file-upload)
+ * The Trigger component renders a button that opens the file selection dialog
+ * when clicked. It's typically used as an alternative to the Dropzone for users
+ * who prefer clicking a button instead of drag-and-drop.
+ *
+ * @component
+ * @example
+ * ```tsx
+ * <FileUpload.Trigger>
+ *   Upload Files
+ * </FileUpload.Trigger>
+ * ```
+ *
+ * @param className - CSS class name or function that receives `{ disabled }`
+ * @param children - Button content
+ * @param disabled - Whether the trigger is disabled
+ *
+ * @see [File Upload Documentation](https://base-ui.com/react/components/file-upload)
  */
 export const FileUploadTrigger = React.forwardRef<HTMLButtonElement, FileUploadTriggerProps>(
   function FileUploadTriggerComponent(props, ref) {

@@ -14,13 +14,30 @@ export interface FileUploadPreviewItemContextValue {
 export const FileUploadPreviewItemContext =
   React.createContext<FileUploadPreviewItemContextValue | null>(null);
 
-export const useFileUploadPreviewItem = () => {
-  const context = React.useContext(FileUploadPreviewItemContext);
-  if (!context) {
-    throw new Error('useFileUploadPreviewItem must be used within a FileUploadPreviewItem');
-  }
-  return context;
-};
+/**
+ * Hook to access file preview context within PreviewItem children.
+ *
+ * Provides access to the current file object and onRemove callback for removing
+ * the file from the upload list.
+ *
+ * @throws Error if used outside of a FileUploadPreviewItem component
+ * @returns Object containing `file` and `onRemove` callback
+ *
+ * @example
+ * ```tsx
+ * function FilePreview() {
+ *   const { file, onRemove } = useFileUploadPreviewItem();
+ *   return (
+ *     <div>
+ *       <span>{file.name}</span>
+ *       <button onClick={onRemove}>Remove</button>
+ *     </div>
+ *   );
+ * }
+ * ```
+ *
+ * @see [File Upload Documentation](https://base-ui.com/react/components/file-upload)
+ */
 
 export namespace FileUploadPreviewItem {
   export interface State {}
@@ -39,7 +56,40 @@ export type FileUploadPreviewItemProps = FileUploadPreviewItem.Props;
 /**
  * Individual preview item for an uploaded file.
  *
- * Documentation: [Base UI File Upload](https://base-ui.com/react/components/file-upload)
+ * The PreviewItem component renders a list item that displays a single file
+ * and provides context for accessing the file object and remove functionality.
+ * Use the `useFileUploadPreviewItem` hook in children to access file details
+ * and the remove callback.
+ *
+ * @component
+ * @example
+ * ```tsx
+ * function FilePreview() {
+ *   const { file, onRemove } = useFileUploadPreviewItem();
+ *   return (
+ *     <div>
+ *       <img src={file.preview} alt={file.name} />
+ *       <span>{file.name}</span>
+ *       <button onClick={onRemove}>Remove</button>
+ *     </div>
+ *   );
+ * }
+ *
+ * <FileUpload.PreviewList>
+ *   {files.map(file => (
+ *     <FileUpload.PreviewItem key={file.id} file={file}>
+ *       <FilePreview />
+ *     </FileUpload.PreviewItem>
+ *   ))}
+ * </FileUpload.PreviewList>
+ * ```
+ *
+ * @param file - The file object to preview (ExtendedFile from Root)
+ * @param children - Content to display inside the list item
+ * @param className - CSS class name or function
+ *
+ * @see useFileUploadPreviewItem - Hook for accessing file context
+ * @see [File Upload Documentation](https://base-ui.com/react/components/file-upload)
  */
 export const FileUploadPreviewItem = React.forwardRef<HTMLLIElement, FileUploadPreviewItemProps>(
   function FileUploadPreviewItemComponent(props, ref) {

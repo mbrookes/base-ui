@@ -46,6 +46,7 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
   const [announcement, setAnnouncement] = React.useState('');
   const inputRef = React.useRef<HTMLInputElement | null>(null);
   const inputId = useBaseUIId();
+  const isInitialRender = React.useRef(true);
 
   // Cleanup object URLs to prevent memory leaks
   React.useEffect(() => {
@@ -56,6 +57,10 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
 
   // Notify parent of changes
   React.useEffect(() => {
+    if (isInitialRender.current) {
+      isInitialRender.current = false;
+      return;
+    }
     onFilesChange?.(files);
   }, [files, onFilesChange]);
 

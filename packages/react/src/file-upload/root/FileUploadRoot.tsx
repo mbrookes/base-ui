@@ -95,10 +95,34 @@ export namespace FileUploadRoot {
 export interface FileUploadRootProps extends FileUploadRoot.Props {}
 
 /**
- * Manages the file upload state and provides context for child components.
- * This is the root component that should wrap all other FileUpload components.
+ * Manages file upload state and provides context for child components.
  *
- * Documentation: [Base UI File Upload](https://base-ui.com/react/components/file-upload)
+ * This is the root component that should wrap all other FileUpload components.
+ * It handles file validation, drag-and-drop, and state management for the entire
+ * file upload workflow.
+ *
+ * @component
+ * @example
+ * ```tsx
+ * <FileUpload.Root accept="image/*" maxSize={5242880} onFilesChange={handleFilesChange}>
+ *   <FileUpload.Dropzone>Drop files here</FileUpload.Dropzone>
+ *   <FileUpload.Input />
+ *   <FileUpload.PreviewList>
+ *     {files.map(file => <FileUpload.PreviewItem key={file.id} file={file} />)}
+ *   </FileUpload.PreviewList>
+ * </FileUpload.Root>
+ * ```
+ *
+ * @param maxFiles - Maximum number of files allowed (default: 10)
+ * @param maxSize - Maximum file size in bytes (default: Infinity)
+ * @param minSize - Minimum file size in bytes (default: 0)
+ * @param accept - Accepted file types (e.g., "image/*", ".pdf")
+ * @param multiple - Allow multiple file selection (default: true)
+ * @param disabled - Disable file upload (default: false)
+ * @param onFilesChange - Callback when files are added/removed
+ * @param onFileReject - Callback when a file is rejected
+ *
+ * @see [File Upload Documentation](https://base-ui.com/react/components/file-upload)
  */
 export const FileUploadRoot = React.forwardRef<HTMLDivElement, FileUploadRootProps>(
   // eslint-disable-next-line @typescript-eslint/no-shadow

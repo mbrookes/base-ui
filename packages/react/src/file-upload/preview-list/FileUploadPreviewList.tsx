@@ -14,9 +14,28 @@ export namespace FileUploadPreviewList {
 export type FileUploadPreviewListProps = FileUploadPreviewList.Props;
 
 /**
- * Container for displaying the list of uploaded files.
+ * Container list for displaying uploaded files.
  *
- * Documentation: [Base UI File Upload](https://base-ui.com/react/components/file-upload)
+ * The PreviewList component renders as an unordered list and automatically hides
+ * itself when there are no files. It should contain PreviewItem components for
+ * each file being managed by the Root component.
+ *
+ * @component
+ * @example
+ * ```tsx
+ * <FileUpload.PreviewList>
+ *   {files.map(file => (
+ *     <FileUpload.PreviewItem key={file.id} file={file}>
+ *       {file.name}
+ *     </FileUpload.PreviewItem>
+ *   ))}
+ * </FileUpload.PreviewList>
+ * ```
+ *
+ * @param children - PreviewItem components or other list content
+ * @param className - CSS class name or function
+ *
+ * @see [File Upload Documentation](https://base-ui.com/react/components/file-upload)
  */
 export const FileUploadPreviewList = React.forwardRef<HTMLUListElement, FileUploadPreviewListProps>(
   function FileUploadPreviewListComponent(props, ref) {
