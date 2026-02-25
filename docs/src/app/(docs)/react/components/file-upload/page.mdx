@@ -39,7 +39,7 @@ import { FileUpload } from '@base-ui/react/file-upload';
 
 ### Basic setup
 
-`FileUpload.Root` manages all file state and provides context to child components. It accepts files through drag-and-drop, click-to-select, or the hidden input.
+`FileUpload.Root` manages all file state and provides context to child components. It accepts files through drag-and-drop, click-to-select, paste, or the hidden input.
 
 ```jsx title="Basic file upload" "FileUpload.Root"
 import { FileUpload } from '@base-ui/react/file-upload';
@@ -112,6 +112,17 @@ Access the dragging state in the `FileUploadDropzone` using a function as childr
     </div>
   )}
 </FileUpload.Dropzone>
+```
+
+### Paste from clipboard
+
+`FileUpload.Root` listens for paste events and adds any file-like clipboard items (such as screenshots or copied images). Paste is ignored when the active target is an input, textarea, or contenteditable element.
+
+```jsx title="Paste files"
+<FileUpload.Root>
+  <FileUpload.Input />
+  <FileUpload.Dropzone>Paste or drop files here</FileUpload.Dropzone>
+</FileUpload.Root>
 ```
 
 ### File preview items

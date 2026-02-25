@@ -137,6 +137,7 @@ export const FileUploadRoot = React.forwardRef<HTMLDivElement, FileUploadRootPro
       disabled,
       onFilesChange,
       onFileReject,
+      onPaste,
       onDragEnter,
       onDragLeave,
       onDrop,
@@ -212,6 +213,42 @@ export const FileUploadRoot = React.forwardRef<HTMLDivElement, FileUploadRootPro
       }
     });
 
+    const handlePaste = useStableCallback((event: React.ClipboardEvent) => {
+      if (contextValue.disabled) {
+        return;
+      }
+
+      const target = event.target as HTMLElement | null;
+      if (target && (target.isContentEditable || /^(INPUT|TEXTAREA)$/.test(target.tagName))) {
+        return;
+      }
+
+      const clipboardData = event.clipboardData;
+      if (!clipboardData) {
+        return;
+      }
+
+      const pastedFiles = Array.from(clipboardData.files || []);
+      if (pastedFiles.length === 0 && clipboardData.items) {
+        Array.from(clipboardData.items).forEach((item) => {
+          if (item.kind === 'file') {
+            const file = item.getAsFile();
+            if (file) {
+              pastedFiles.push(file);
+            }
+          }
+        });
+      }
+
+      if (pastedFiles.length === 0) {
+        return;
+      }
+
+      event.preventDefault();
+      event.stopPropagation();
+      addFiles(pastedFiles);
+    });
+
     return (
       <FileUploadContext.Provider value={contextValue}>
         <div
@@ -223,6 +260,7 @@ export const FileUploadRoot = React.forwardRef<HTMLDivElement, FileUploadRootPro
           onDragLeave={composeEventHandlers(onDragLeave, handleDragLeave)}
           onDrop={composeEventHandlers(onDrop, handleDrop)}
           onDragOver={composeEventHandlers(onDragOver, handleDragOver)}
+          onPaste={composeEventHandlers(onPaste, handlePaste)}
           style={{ position: 'relative', ...other.style }}
           {...other}
         >

@@ -71,3 +71,10 @@ export const FileUploadContext = React.createContext<FileUploadContextValue | nu
  *
  * @see [File Upload Documentation](https://base-ui.com/react/components/file-upload)
  */
+export function useFileUploadContext(): FileUploadContextValue {
+  const context = React.useContext(FileUploadContext);
+  if (!context) {
+    throw new Error('useFileUploadContext must be used within a FileUploadRoot');
+  }
+  return context;
+}

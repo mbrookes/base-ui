@@ -112,6 +112,30 @@ describe('FileUpload', () => {
     expect(dropzone).toHaveAttribute('data-dragging', '');
   });
 
+  it('adds files when pasting files onto the root', async () => {
+    const onFilesChange = vi.fn();
+
+    render(
+      <FileUpload.Root onFilesChange={onFilesChange} data-testid="root">
+        <FileUpload.Dropzone>Drop files here</FileUpload.Dropzone>
+      </FileUpload.Root>,
+    );
+
+    const root = screen.getByTestId('root');
+    const file = new File(['content'], 'paste.txt', { type: 'text/plain' });
+
+    fireEvent.paste(root, {
+      clipboardData: {
+        files: [file],
+      },
+    });
+
+    await waitFor(() => expect(onFilesChange).toHaveBeenCalled());
+
+    const latestFiles = onFilesChange.mock.calls.at(-1)?.[0];
+    expect(latestFiles?.[0].name).toBe('paste.txt');
+  });
+
   it('calls onFileReject callback with rejected file', async () => {
     const onFileReject = vi.fn();
 

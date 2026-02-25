@@ -38,6 +38,13 @@ export const FileUploadPreviewItemContext =
  *
  * @see [File Upload Documentation](https://base-ui.com/react/components/file-upload)
  */
+export function useFileUploadPreviewItem(): FileUploadPreviewItemContextValue {
+  const context = React.useContext(FileUploadPreviewItemContext);
+  if (!context) {
+    throw new Error('useFileUploadPreviewItem must be used within a FileUploadPreviewItem');
+  }
+  return context;
+}
 
 export namespace FileUploadPreviewItem {
   export interface State {}
