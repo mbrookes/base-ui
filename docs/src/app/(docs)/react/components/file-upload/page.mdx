@@ -86,6 +86,17 @@ Control which files are accepted using `accept`, `maxSize`, `minSize`, and `maxF
 - `accept` mirrors the native file input: use MIME types (for example `image/png`) or extensions with a leading dot (for example `.png`).
 - If you render previews with images, provide meaningful `alt` text so screen readers can announce the file content.
 
+### Duplicate files
+
+Use `onDuplicateFile` to detect when a user selects the same file more than once. Duplicates are ignored by default.
+
+```jsx title="Duplicate detection" "onDuplicateFile"
+<FileUpload.Root onDuplicateFile={(file) => console.log('Duplicate:', file.name)}>
+  <FileUpload.Input />
+  <FileUpload.Trigger>Select files</FileUpload.Trigger>
+</FileUpload.Root>
+```
+
 ### Handling file changes
 
 Listen to file changes with the `onFilesChange` callback:

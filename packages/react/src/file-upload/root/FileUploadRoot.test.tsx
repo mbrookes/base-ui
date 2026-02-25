@@ -172,6 +172,24 @@ describe('FileUpload', () => {
     await waitFor(() => expect(onCancel).toHaveBeenCalled());
   });
 
+  it('calls onDuplicateFile when the same file is selected again', async () => {
+    const onDuplicateFile = vi.fn();
+
+    render(
+      <FileUpload.Root onDuplicateFile={onDuplicateFile}>
+        <FileUpload.Input data-testid="file-input" />
+      </FileUpload.Root>,
+    );
+
+    const input = screen.getByTestId('file-input') as HTMLInputElement;
+    const file = new File(['content'], 'dup.txt', { type: 'text/plain' });
+
+    await userEvent.upload(input, file);
+    await userEvent.upload(input, file);
+
+    await waitFor(() => expect(onDuplicateFile).toHaveBeenCalledWith(file));
+  });
+
   it('calls onFileReject callback with rejected file', async () => {
     const onFileReject = vi.fn();
 

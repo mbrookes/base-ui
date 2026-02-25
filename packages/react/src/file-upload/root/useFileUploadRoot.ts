@@ -16,6 +16,7 @@ interface UseFileUploadRootParameters {
   onFilesChange?: ((files: FileUploadRoot.ExtendedFile[]) => void) | undefined;
   onFileReject?: ((file: File, reason: string) => void) | undefined;
   onCancel?: (() => void) | undefined;
+  onDuplicateFile?: ((file: File) => void) | undefined;
 }
 
 const generateId = () => Math.random().toString(36).substr(2, 9);
@@ -41,6 +42,7 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
     onFilesChange,
     onFileReject,
     onCancel,
+    onDuplicateFile,
   } = params;
 
   const [files, setFiles] = React.useState<FileUploadRoot.ExtendedFile[]>([]);
@@ -114,12 +116,24 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
       const validFiles: FileUploadRoot.ExtendedFile[] = [];
       const errors: string[] = [];
 
+      const existingKeys = new Set(
+        prev.map((file) => `${file.name}:${file.size}:${file.lastModified}`),
+      );
+
       candidates.forEach((file) => {
+        const fileKey = `${file.name}:${file.size}:${file.lastModified}`;
+        if (existingKeys.has(fileKey)) {
+          onDuplicateFile?.(file);
+          errors.push(`${file.name}: duplicate file`);
+          return;
+        }
+
         const error = validateFile(file);
         if (error) {
           onFileReject?.(file, error);
           errors.push(`${file.name}: ${error}`);
         } else {
+          existingKeys.add(fileKey);
           validFiles.push(
             Object.assign(file, {
               id: generateId(),
