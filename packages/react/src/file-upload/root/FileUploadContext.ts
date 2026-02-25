@@ -33,6 +33,8 @@ export interface FileUploadContextValue {
   clearFiles: () => void;
   /** Add new files with validation */
   addFiles: (files: File[]) => void;
+  /** Callback fired when the file dialog is canceled */
+  onCancel?: () => void;
   /** Trigger the file selection dialog */
   openFileDialog: () => void;
   /** Directly set files state (for advanced use cases) */

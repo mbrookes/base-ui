@@ -41,7 +41,8 @@ export type FileUploadInputProps = FileUploadInput.Props;
 export const FileUploadInput = React.forwardRef<HTMLInputElement, FileUploadInputProps>(
   function FileUploadInputComponent(props, ref) {
     const { className, ...other } = props;
-    const { accept, multiple, disabled, registerInput, inputId, addFiles } = useFileUploadContext();
+    const { accept, multiple, disabled, registerInput, inputId, addFiles, onCancel } =
+      useFileUploadContext();
 
     const state: FileUploadInput.State = React.useMemo(
       () => ({
@@ -68,6 +69,8 @@ export const FileUploadInput = React.forwardRef<HTMLInputElement, FileUploadInpu
     const handleChange = useStableCallback((event: React.ChangeEvent<HTMLInputElement>) => {
       if (event.target.files && event.target.files.length > 0) {
         addFiles(Array.from(event.target.files));
+      } else {
+        onCancel?.();
       }
       // Reset value to allow selecting the same file twice if needed
       if (internalRef.current) {

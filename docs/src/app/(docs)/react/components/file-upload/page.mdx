@@ -100,6 +100,17 @@ Listen to file changes with the `onFilesChange` callback:
 </FileUpload.Root>
 ```
 
+### File dialog cancellation
+
+Use `onCancel` to react when the native file dialog closes without selecting files:
+
+```jsx title="Handle cancel" "onCancel"
+<FileUpload.Root onCancel={() => console.log('User canceled file selection')}>
+  <FileUpload.Input />
+  <FileUpload.Trigger>Select files</FileUpload.Trigger>
+</FileUpload.Root>
+```
+
 ### Drag and drop state
 
 Access the dragging state in the `FileUploadDropzone` using a function as children:

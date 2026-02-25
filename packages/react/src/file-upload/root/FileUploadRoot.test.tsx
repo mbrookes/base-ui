@@ -151,6 +151,27 @@ describe('FileUpload', () => {
     expect(latestFiles?.[0].name).toBe('paste.txt');
   });
 
+  it('calls onCancel when file dialog is canceled', async () => {
+    const onCancel = vi.fn();
+
+    render(
+      <FileUpload.Root onCancel={onCancel}>
+        <FileUpload.Input data-testid="file-input" />
+      </FileUpload.Root>,
+    );
+
+    const input = screen.getByTestId('file-input') as HTMLInputElement;
+
+    Object.defineProperty(input, 'files', {
+      value: [],
+      configurable: true,
+    });
+
+    fireEvent.change(input);
+
+    await waitFor(() => expect(onCancel).toHaveBeenCalled());
+  });
+
   it('calls onFileReject callback with rejected file', async () => {
     const onFileReject = vi.fn();
 

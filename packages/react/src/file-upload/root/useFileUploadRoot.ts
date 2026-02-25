@@ -15,6 +15,7 @@ interface UseFileUploadRootParameters {
   disabled?: boolean | undefined;
   onFilesChange?: ((files: FileUploadRoot.ExtendedFile[]) => void) | undefined;
   onFileReject?: ((file: File, reason: string) => void) | undefined;
+  onCancel?: (() => void) | undefined;
 }
 
 const generateId = () => Math.random().toString(36).substr(2, 9);
@@ -39,6 +40,7 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
     disabled = false,
     onFilesChange,
     onFileReject,
+    onCancel,
   } = params;
 
   const [files, setFiles] = React.useState<FileUploadRoot.ExtendedFile[]>([]);
@@ -180,6 +182,7 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
       removeFile,
       clearFiles,
       addFiles,
+      onCancel,
       openFileDialog,
       setFiles,
       registerInput,
@@ -197,6 +200,7 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
       removeFile,
       clearFiles,
       addFiles,
+      onCancel,
       openFileDialog,
       registerInput,
     ],

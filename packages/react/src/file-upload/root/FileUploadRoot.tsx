@@ -64,6 +64,10 @@ export namespace FileUploadRoot {
      * Callback when a file is rejected.
      */
     onFileReject?: ((file: File, reason: string) => void) | undefined;
+    /**
+     * Callback when the file dialog is canceled.
+     */
+    onCancel?: (() => void) | undefined;
   }
 
   export interface ExtendedFile extends File {
@@ -121,6 +125,7 @@ export interface FileUploadRootProps extends FileUploadRoot.Props {}
  * @param disabled - Disable file upload (default: false)
  * @param onFilesChange - Callback when files are added/removed
  * @param onFileReject - Callback when a file is rejected
+ * @param onCancel - Callback when the file dialog is canceled
  *
  * @see [File Upload Documentation](https://base-ui.com/react/components/file-upload)
  */
@@ -137,6 +142,7 @@ export const FileUploadRoot = React.forwardRef<HTMLDivElement, FileUploadRootPro
       disabled,
       onFilesChange,
       onFileReject,
+      onCancel,
       onPaste,
       onDragEnter,
       onDragLeave,
@@ -155,6 +161,7 @@ export const FileUploadRoot = React.forwardRef<HTMLDivElement, FileUploadRootPro
       disabled,
       onFilesChange,
       onFileReject,
+      onCancel,
     });
 
     const state: FileUploadRoot.State = React.useMemo(
