@@ -4,7 +4,7 @@
   border: 1px solid #e5e7eb;
   background-color: white;
   padding: 2rem;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
 }
 
 .header {
@@ -27,7 +27,7 @@
   display: flex;
   justify-content: center;
   border-radius: 0.5rem;
-  border: 2px dashed rgba(0, 0, 0, 0.16);
+  border: 2px dashed rgb(0 0 0 / 0.16);
   padding: 2.5rem 1.5rem;
   transition: all 0.2s;
   background-color: transparent;
@@ -134,7 +134,7 @@
   border: 1px solid #e5e7eb;
   background-color: white;
   padding: 0.75rem;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   transition: border-color 0.2s;
 
   &:hover {

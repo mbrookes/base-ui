@@ -1,12 +1,12 @@
 # File Upload
 
 <Subtitle>
-  A headless, unstyled file upload component for React with drag-and-drop support.
+  A headless, unstyled file upload component with drag-and-drop, paste, and click-to-select support.
 </Subtitle>
 
 <Meta
   name="description"
-  content="A high-quality, unstyled React file upload component with drag-and-drop support, file validation, and accessibility features."
+  content="A high-quality, unstyled React file upload component with drag-and-drop, paste, file validation, and comprehensive accessibility features."
 />
 
 import { DemoFileUploadHero } from './demos/hero';
@@ -14,13 +14,16 @@ import { DemoFileUploadMinimal } from './demos/minimal';
 
 <DemoFileUploadHero />
 
-## Minimal
+## Usage guidelines
 
-<DemoFileUploadMinimal />
+- **File Upload is headless**: Use File Upload to build custom file selection and upload experiences with full control over the UI. Base UI provides the state management and accessibility, you build the UI.
+- **No built-in upload**: File Upload handles file selection and validation, but does not include upload functionality. You control how and where files are uploaded using callbacks and state.
+- **Ideal for custom workflows**: Perfect for applications that need specific upload flows, preview displays, validation feedback, or integration with custom upload services.
+- **Form controls must have an accessible name**: Ensure file upload dropzones and triggers are properly labeled. Use the [`Field` component](/react/components/field) or native `<label>` elements for accessibility.
 
 ## Anatomy
 
-File Upload is composed of several smaller parts. Import the components:
+File Upload is composed of several subcomponents that work together. Import them and assemble:
 
 ```jsx title="Anatomy"
 import { FileUpload } from '@base-ui/react/file-upload';
@@ -35,13 +38,15 @@ import { FileUpload } from '@base-ui/react/file-upload';
 </FileUpload.Root>;
 ```
 
-## Usage
+## Examples
 
 ### Basic setup
 
-`FileUpload.Root` manages all file state and provides context to child components. It accepts files through drag-and-drop, click-to-select, paste, or the hidden input.
+<DemoFileUploadMinimal />
 
-```jsx title="Basic file upload" "FileUpload.Root"
+`FileUpload.Root` manages file state and provides context to child components. It accepts files through drag-and-drop, click-to-select, paste, or the hidden input element.
+
+```jsx title="Basic file upload"
 import { FileUpload } from '@base-ui/react/file-upload';
 
 function FileList() {
@@ -59,15 +64,43 @@ export default function App() {
     <FileUpload.Root maxFiles={5}>
       <FileUpload.Input />
       <FileUpload.Dropzone>Upload files</FileUpload.Dropzone>
+      <FileUpload.Trigger />
       <FileList />
     </FileUpload.Root>
   );
 }
 ```
 
+### Controlled state
+
+Control file state using `onFilesChange` callback:
+
+```jsx title="Handling file changes" "onFilesChange"
+import * as React from 'react';
+import { FileUpload } from '@base-ui/react/file-upload';
+
+export default function App() {
+  const [files, setFiles] = React.useState([]);
+
+  return (
+    <FileUpload.Root
+      onFilesChange={(newFiles) => {
+        setFiles(newFiles);
+      }}
+    >
+      <FileUpload.Input />
+      <FileUpload.Dropzone>Upload files</FileUpload.Dropzone>
+      <FileUpload.Trigger>Select files</FileUpload.Trigger>
+    </FileUpload.Root>
+  );
+}
+```
+
+## Usage
+
 ### File validation
 
-Control which files are accepted using `accept`, `maxSize`, `minSize`, and `maxFiles` props. By default, `maxSize` is unlimited—set it to enforce a cap:
+Control which files are accepted using `accept`, `maxSize`, `minSize`, and `maxFiles` props:
 
 ```jsx title="File validation" "accept" "maxSize" "maxFiles"
 <FileUpload.Root
@@ -77,67 +110,23 @@ Control which files are accepted using `accept`, `maxSize`, `minSize`, and `maxF
   maxFiles={5}
   onFileReject={(file, reason) => console.log(`Rejected: ${reason}`)}
 >
-  {/* children */}
+  <FileUpload.Input />
+  <FileUpload.Dropzone>Upload files</FileUpload.Dropzone>
+  <FileUpload.Trigger />
 </FileUpload.Root>
 ```
 
 **Notes**
 
-- `accept` mirrors the native file input: use MIME types (for example `image/png`) or extensions with a leading dot (for example `.png`).
-- If you render previews with images, provide meaningful `alt` text so screen readers can announce the file content.
-
-### Duplicate files
-
-Use `onDuplicateFile` to detect when a user selects the same file more than once. Duplicates are ignored by default.
-
-```jsx title="Duplicate detection" "onDuplicateFile"
-<FileUpload.Root onDuplicateFile={(file) => console.log('Duplicate:', file.name)}>
-  <FileUpload.Input />
-  <FileUpload.Trigger>Select files</FileUpload.Trigger>
-</FileUpload.Root>
-```
-
-### Handling file changes
-
-Listen to file changes with the `onFilesChange` callback:
-
-```jsx title="File changes" "onFilesChange"
-<FileUpload.Root
-  onFilesChange={(files) => {
-    console.log('Files changed:', files);
-  }}
->
-  {/* children */}
-</FileUpload.Root>
-```
-
-### File dialog cancellation
-
-Use `onCancel` to react when the native file dialog closes without selecting files:
-
-```jsx title="Handle cancel" "onCancel"
-<FileUpload.Root onCancel={() => console.log('User canceled file selection')}>
-  <FileUpload.Input />
-  <FileUpload.Trigger>Select files</FileUpload.Trigger>
-</FileUpload.Root>
-```
-
-### Folder upload
-
-Enable directory selection with the `directory` prop. This uses `webkitdirectory` under the hood, so support varies by browser.
-
-```jsx title="Folder upload" "directory"
-<FileUpload.Root directory>
-  <FileUpload.Input />
-  <FileUpload.Trigger>Select folder</FileUpload.Trigger>
-</FileUpload.Root>
-```
+- `accept` mirrors the native file input: use MIME types like `image/png` or file extensions like `.png`.
+- For image previews, always provide meaningful `alt` text on preview images for screen reader users.
+- File size limits are in bytes. The example above limits files to 10MB and a minimum of 1KB.
 
 ### Drag and drop state
 
-Access the dragging state in the `FileUploadDropzone` using a function as children:
+Access the dragging state in the Dropzone render prop:
 
-```jsx title="Dragging state" "isDragging"
+```jsx title="Dragging state" "{isDragging}"
 <FileUpload.Dropzone>
   {({ isDragging }) => (
     <div style={{ opacity: isDragging ? 0.5 : 1 }}>
@@ -147,9 +136,31 @@ Access the dragging state in the `FileUploadDropzone` using a function as childr
 </FileUpload.Dropzone>
 ```
 
+### Handling file dialog cancellation
+
+Use `onCancel` to react when the user closes the file dialog without selecting files:
+
+```jsx title="Handle cancel" "onCancel"
+<FileUpload.Root onCancel={() => console.log('User canceled file selection')}>
+  <FileUpload.Input />
+  <FileUpload.Trigger>Select files</FileUpload.Trigger>
+</FileUpload.Root>
+```
+
+### Detecting duplicate files
+
+Use `onDuplicateFile` to detect when a user selects the same file more than once. Duplicates are ignored by default:
+
+```jsx title="Duplicate detection" "onDuplicateFile"
+<FileUpload.Root onDuplicateFile={(file) => console.log('Duplicate:', file.name)}>
+  <FileUpload.Input />
+  <FileUpload.Trigger>Select files</FileUpload.Trigger>
+</FileUpload.Root>
+```
+
 ### Paste from clipboard
 
-`FileUpload.Root` listens for paste events and adds any file-like clipboard items (such as screenshots or copied images). Paste is ignored when the active target is an input, textarea, or contenteditable element.
+`FileUpload.Root` listens for paste events and includes any file-like clipboard items (screenshots, copied images). Paste is ignored when focused on an input, textarea, or contenteditable element:
 
 ```jsx title="Paste files"
 <FileUpload.Root>
@@ -158,11 +169,22 @@ Access the dragging state in the `FileUploadDropzone` using a function as childr
 </FileUpload.Root>
 ```
 
-### File preview items
+### Folder upload
 
-Use `FileUploadPreviewItem` and `useFileUploadPreviewItem` to display file information:
+Enable directory selection with the `directory` prop. This uses `webkitdirectory` under the hood, so browser support varies:
 
-```jsx title="File preview" "useFileUploadPreviewItem"
+```jsx title="Folder upload" "directory"
+<FileUpload.Root directory>
+  <FileUpload.Input />
+  <FileUpload.Trigger>Select folder</FileUpload.Trigger>
+</FileUpload.Root>
+```
+
+### Preview items with context
+
+Use `FileUploadPreviewItem` and `useFileUploadPreviewItem` to display and manage file information:
+
+```jsx title="File preview items" "useFileUploadPreviewItem"
 import { FileUpload } from '@base-ui/react/file-upload';
 
 function CustomPreviewItem({ file }) {
@@ -170,13 +192,52 @@ function CustomPreviewItem({ file }) {
 
   return (
     <div>
-      <img src={file.preview} alt={file.name} />
+      {file.preview && <img src={file.preview} alt={file.name} />}
       <span>{file.name}</span>
       <button onClick={onRemove}>Remove</button>
     </div>
   );
 }
+
+export default function App() {
+  const { files } = FileUpload.useFileUploadContext();
+
+  return (
+    <FileUpload.Root>
+      <FileUpload.Input />
+      <FileUpload.Dropzone>Upload files</FileUpload.Dropzone>
+      <FileUpload.PreviewList>
+        {files.map((file) => (
+          <FileUpload.PreviewItem key={file.id} file={file}>
+            <CustomPreviewItem file={file} />
+          </FileUpload.PreviewItem>
+        ))}
+      </FileUpload.PreviewList>
+    </FileUpload.Root>
+  );
+}
 ```
+
+## Accessibility
+
+File Upload is built with accessibility as a core feature:
+
+## Accessibility
+
+File Upload is built with accessibility as a core feature:
+
+- **WCAG 2.1 Level AA**: Compliant with Web Content Accessibility Guidelines
+- **Keyboard navigation**: Full keyboard support with logical tab order
+- **Screen reader support**: Semantic HTML and ARIA labels for VoiceOver, JAWS, and other assistants
+- **Focus management**: Clear focus indicators and focus trapping in dialogs
+- **Live regions**: File status updates announced to screen reader users
+
+**Best practices:**
+
+- Label your file upload UI with visible text or the [`Field` component](/react/components/field)
+- Provide meaningful alt text for image previews
+- Use ARIA labels on buttons and interactive elements
+- Test with a screen reader during development
 
 ## API reference
 
@@ -189,14 +250,13 @@ export const metadata = {
   keywords: [
     'React File Upload',
     'File Upload Component',
-    'Drag and Drop Upload',
+    'Drag and Drop',
+    'Headless File Upload',
+    'Unstyled File Upload',
     'File Validation',
     'File Preview',
-    'Headless React Components',
-    'Unstyled Components',
     'Accessible File Upload',
+    'WCAG Compliant',
     'Base UI',
-    'File Input',
-    'Multiple File Upload',
   ],
 };
