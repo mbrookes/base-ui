@@ -100,8 +100,7 @@ export interface FileUploadRootExtendedFile extends File {
 export type FileUploadRootFileStatus = 'idle' | 'uploading' | 'success' | 'error';
 
 export interface FileUploadRootProps
-  extends BaseUIComponentProps<'div', FileUploadRootState>,
-    FileUploadRootParameters {
+  extends BaseUIComponentProps<'div', FileUploadRootState>, FileUploadRootParameters {
   children: React.ReactNode;
 }
 

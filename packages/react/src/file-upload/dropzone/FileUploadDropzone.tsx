@@ -18,8 +18,10 @@ export interface FileUploadDropzoneState {
   disabled: boolean;
 }
 
-export interface FileUploadDropzoneProps
-  extends Omit<BaseUIComponentProps<'div', FileUploadDropzoneState>, 'children'> {
+export interface FileUploadDropzoneProps extends Omit<
+  BaseUIComponentProps<'div', FileUploadDropzoneState>,
+  'children'
+> {
   children?: React.ReactNode | ((state: { isDragging: boolean }) => React.ReactNode);
 }
 

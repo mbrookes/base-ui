@@ -15,8 +15,10 @@ export interface FileUploadInputState {
   disabled: boolean;
 }
 
-export interface FileUploadInputProps
-  extends Omit<BaseUIComponentProps<'input', FileUploadInputState>, 'type'> {}
+export interface FileUploadInputProps extends Omit<
+  BaseUIComponentProps<'input', FileUploadInputState>,
+  'type'
+> {}
 
 /**
  * Hidden file input element for file selection.

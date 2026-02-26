@@ -14,7 +14,10 @@ export interface FileUploadTriggerState {
   disabled: boolean;
 }
 
-export interface FileUploadTriggerProps extends BaseUIComponentProps<'button', FileUploadTriggerState> {}
+export interface FileUploadTriggerProps extends BaseUIComponentProps<
+  'button',
+  FileUploadTriggerState
+> {}
 
 /**
  * Button component for triggering the file selection dialog.

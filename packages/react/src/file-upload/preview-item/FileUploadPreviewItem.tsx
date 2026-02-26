@@ -48,7 +48,10 @@ export function useFileUploadPreviewItem(): FileUploadPreviewItemContextValue {
   return context;
 }
 
-export interface FileUploadPreviewItemProps extends BaseUIComponentProps<'li', FileUploadPreviewItemState> {
+export interface FileUploadPreviewItemProps extends BaseUIComponentProps<
+  'li',
+  FileUploadPreviewItemState
+> {
   /**
    * The file to preview.
    */

@@ -7,7 +7,10 @@ import { useFileUploadContext } from '../root/FileUploadContext';
 
 export interface FileUploadPreviewListState {}
 
-export interface FileUploadPreviewListProps extends BaseUIComponentProps<'ul', FileUploadPreviewListState> {}
+export interface FileUploadPreviewListProps extends BaseUIComponentProps<
+  'ul',
+  FileUploadPreviewListState
+> {}
 
 /**
  * Container list for displaying uploaded files.
