@@ -19,7 +19,7 @@ import { DemoFileUploadImagePreview } from './demos/image-preview';
 ## Usage guidelines
 
 - **File Upload is headless**: Use File Upload to build custom file selection and upload experiences with full control over the UI. Base UI provides the state management and accessibility, you build the UI.
-- **No built-in upload**: File Upload handles file selection and validation, but does not include upload functionality. You control how and where files are uploaded using callbacks and state.
+- **No built-in upload**: File Upload handles file selection and validation only. **You must implement the actual file upload** using fetch, axios, or your HTTP client. See [Uploading Files](#uploading-files) below.
 - **Ideal for custom workflows**: Perfect for applications that need specific upload flows, preview displays, validation feedback, or integration with custom upload services.
 - **Form controls must have an accessible name**: Ensure file upload dropzones and triggers are properly labeled. Use the [`Field` component](/react/components/field) or native `<label>` elements for accessibility.
 
@@ -236,19 +236,271 @@ File Upload is built with accessibility as a core feature:
 - **Keyboard navigation**: Full keyboard support with logical tab order
 - **Screen reader support**: Semantic HTML and ARIA labels for VoiceOver, JAWS, and other assistants
 - **Focus management**: Clear focus indicators and focus trapping in dialogs
-- **Live regions**: File status updates announced to screen reader users
+- **Live regions**: File status updates announced to screen reader users## Uploading Files
 
-**Best practices:**
+**Important: FileUpload handles file selection only. You must implement the actual upload.**
 
-- Label your file upload UI with visible text or the [`Field` component](/react/components/field)
-- Provide meaningful alt text for image previews
-- Use ARIA labels on buttons and interactive elements
-- Test with a screen reader during development
+Here's a complete example showing how to upload files to your server:
+
+```jsx title="Upload files with fetch" "FormData" "fetch"
+import * as React from 'react';
+import { FileUpload } from '@base-ui/react/file-upload';
+
+export default function FileUploadWithUpload() {
+  const [isUploading, setIsUploading] = React.useState(false);
+  const [uploadError, setUploadError] = React.useState<string | null>(null);
+  const { files, removeFile } = FileUpload.useFileUploadContext();
+
+  const handleUpload = async () => {
+    setIsUploading(true);
+    setUploadError(null);
+
+    try {
+      const formData = new FormData();
+      files.forEach((file) => {
+        formData.append('files', file);
+      });
+
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error('Upload failed');
+      }
+
+      // Clear files after successful upload
+      files.forEach((file) => removeFile(file.id));
+    } catch (error) {
+      setUploadError(error instanceof Error ? error.message : 'Unknown error');
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  return (
+    <FileUpload.Root>
+      <FileUpload.Input />
+      <FileUpload.Dropzone>Drop files here</FileUpload.Dropzone>
+      <FileUpload.Trigger>Select files</FileUpload.Trigger>
+
+      {files.length > 0 && (
+        <>
+          <button onClick={handleUpload} disabled={isUploading}>
+            {isUploading ? 'Uploading...' : 'Upload Files'}
+          </button>
+          {uploadError && <div style={{ color: 'red' }}>{uploadError}</div>}
+        </>
+      )}
+
+      <FileUpload.PreviewList>
+        {files.map((file) => (
+          <FileUpload.PreviewItem key={file.id} file={file}>
+            <span>{file.name}</span>
+          </FileUpload.PreviewItem>
+        ))}
+      </FileUpload.PreviewList>
+    </FileUpload.Root>
+  );
+}
+```
+
+### Upload with progress tracking
+
+To show upload progress, track the upload state separately from file selection:
+
+```jsx title="Upload with progress" "uploadProgress"
+import * as React from 'react';
+import { FileUpload } from '@base-ui/react/file-upload';
+
+export default function FileUploadWithProgress() {
+  const [uploadProgress, setUploadProgress] = React.useState<Record<string, number>>({});
+  const { files } = FileUpload.useFileUploadContext();
+
+  const uploadFile = async (file: File) => {
+    const xhr = new XMLHttpRequest();
+
+    xhr.upload.addEventListener('progress', (e) => {
+      if (e.lengthComputable) {
+        const percentComplete = Math.round((e.loaded / e.total) * 100);
+        setUploadProgress((prev) => ({
+          ...prev,
+          [file.name]: percentComplete,
+        }));
+      }
+    });
+
+    xhr.addEventListener('load', () => {
+      setUploadProgress((prev) => ({
+        ...prev,
+        [file.name]: 100,
+      }));
+    });
+
+    const formData = new FormData();
+    formData.append('file', file);
+    xhr.open('POST', '/api/upload');
+    xhr.send(formData);
+  };
+
+  return (
+    <FileUpload.Root>
+      <FileUpload.Input />
+      <FileUpload.Dropzone>Drop files here</FileUpload.Dropzone>
+
+      {files.length > 0 && (
+        <button onClick={() => files.forEach(uploadFile)}>
+          Upload All Files
+        </button>
+      )}
+
+      <FileUpload.PreviewList>
+        {files.map((file) => (
+          <FileUpload.PreviewItem key={file.id} file={file}>
+            <div>
+              <span>{file.name}</span>
+              {uploadProgress[file.name] !== undefined && (
+                <div>
+                  <progress
+                    value={uploadProgress[file.name]}
+                    max="100"
+                  />
+                  <span>{uploadProgress[file.name]}%</span>
+                </div>
+              )}
+            </div>
+          </FileUpload.PreviewItem>
+        ))}
+      </FileUpload.PreviewList>
+    </FileUpload.Root>
+  );
+}
+```
+
+### Form integration
+
+Integrate FileUpload with HTML forms:
+
+```jsx title="FileUpload in a form"
+import * as React from 'react';
+import { FileUpload } from '@base-ui/react/file-upload';
+
+export default function FileUploadForm() {
+  const { files } = FileUpload.useFileUploadContext();
+  const [formData, setFormData] = React.useState({ title: '' });
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const data = new FormData();
+    data.append('title', formData.title);
+    files.forEach((file) => data.append('files', file));
+
+    await fetch('/api/submit', { method: 'POST', body: data });
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input
+        type="text"
+        placeholder="Title"
+        value={formData.title}
+        onChange={(e) => setFormData({ title: e.target.value })}
+      />
+
+      <FileUpload.Root>
+        <FileUpload.Input />
+        <FileUpload.Dropzone>Drop files here</FileUpload.Dropzone>
+        <FileUpload.Trigger>Select files</FileUpload.Trigger>
+      </FileUpload.Root>
+
+      <button type="submit">Submit</button>
+    </form>
+  );
+}
+```
+
+## Browser Support
+
+File Upload works in all modern browsers. Here's browser-specific support:
+
+| Feature         | Chrome | Firefox | Safari | Edge |
+| --------------- | ------ | ------- | ------ | ---- |
+| Drag-and-drop   | ✅     | ✅      | ✅     | ✅   |
+| Click-to-select | ✅     | ✅      | ✅     | ✅   |
+| Paste files     | ✅     | ✅      | ✅     | ✅   |
+| Folder upload   | ✅     | ✅      | ⚠️     | ✅   |
+
+**Folder upload notes:**
+- Uses `webkitdirectory` attribute (non-standard but widely supported)
+- **Safari**: Limited support, may not work reliably
+- **Firefox**: Works but with permission prompt on some systems
+- **Mobile**: Generally not supported across browsers
+
+## FAQ
+
+### Why is there no built-in upload?
+
+File Upload is **headless** — it handles the UI abstraction for file selection and validation, but not the upload mechanism. This gives you complete control to:
+
+- Use any HTTP client (fetch, axios, React Query, etc.)
+- Upload to any service (your server, S3, Cloudinary, etc.)
+- Implement custom retry/pause/resume logic
+- Track progress however you want
+
+This design follows Base UI's philosophy of minimal, focused components.
+
+### How do I integrate with my backend?
+
+See the [Uploading Files](#uploading-files) section above. Use `fetch`, `axios`, or any HTTP client with the `onFilesChange` callback to send files when ready.
+
+### Can I crop or resize images?
+
+Image processing (cropping, resizing, filters) is outside FileUpload's scope. Consider using:
+
+- [Sharp](https://sharp.pixelplumbing.com/) (Node.js server-side)
+- [Canvas API](https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API) (client-side)
+- [Konva](https://konvajs.org/) (image editor UI)
+- [Cloudinary](https://cloudinary.com/) (upload service with transformations)
+
+### How do I add drag-to-reorder for files?
+
+Reordering isn't built-in, but you can implement it with the file state:
+
+```jsx title="File reordering"
+const [files, setFiles] = React.useState([]);
+
+const moveFile = (fromIndex: number, toIndex: number) => {
+  const newFiles = [...files];
+  const [removed] = newFiles.splice(fromIndex, 1);
+  newFiles.splice(toIndex, 0, removed);
+  setFiles(newFiles);
+};
+```
+
+### Can I validate file content, not just extension?
+
+Currently, validation is limited to MIME type and extension matching. For deep file validation (magic numbers, actual format), validate on your server:
+
+```jsx title="Server-side validation"
+const handleUpload = async (file: File) => {
+  const formData = new FormData();
+  formData.append('file', file);
+
+  const response = await fetch('/api/validate-upload', {
+    method: 'POST',
+    body: formData,
+  });
+
+  const result = await response.json();
+  if (!result.valid) {
+    // Handle invalid file
+  }
+};
+```
 
 ## API reference
-
-<Reference
-  component="FileUpload"
   parts="Root, Input, Trigger, Dropzone, PreviewList, PreviewItem"
 />
 
