@@ -81,15 +81,15 @@ export default function FileUploadValidationDemo() {
               </svg>
               <div>
                 {isDragging ? (
-                  <>
+                  <React.Fragment>
                     <p>Drop your image files here</p>
                     <span className={styles.subtitle}>Images only, up to 2MB each</span>
-                  </>
+                  </React.Fragment>
                 ) : (
-                  <>
+                  <React.Fragment>
                     <p>Drag and drop images here</p>
                     <span className={styles.subtitle}>or click to browse</span>
-                  </>
+                  </React.Fragment>
                 )}
               </div>
             </div>

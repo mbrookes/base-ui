@@ -20,7 +20,12 @@ function ImagePreviewItem({ file }: { file: FileUpload.Root.ExtendedFile }) {
         <div className={styles.imageName}>{file.name}</div>
         <div className={styles.imageSize}>{(file.size / 1024).toFixed(1)} KB</div>
       </div>
-      <button className={styles.removeBtn} onClick={onRemove} title="Remove image">
+      <button
+        type="button"
+        className={styles.removeBtn}
+        onClick={onRemove}
+        title="Remove image"
+      >
         ✕
       </button>
     </div>
