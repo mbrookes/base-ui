@@ -138,7 +138,6 @@ export interface FileUploadRootProps
  * @see [File Upload Documentation](https://base-ui.com/react/components/file-upload)
  */
 export const FileUploadRoot = React.forwardRef<HTMLDivElement, FileUploadRootProps>(
-  // eslint-disable-next-line @typescript-eslint/no-shadow
   function FileUploadRoot(props, ref) {
     const {
       children,
