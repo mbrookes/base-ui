@@ -7,18 +7,14 @@ import { resolveClassName } from '../../utils/resolveClassName';
 import { composeEventHandlers } from '../../utils/composeEventHandlers';
 import { useFileUploadContext } from '../root/FileUploadContext';
 
-export namespace FileUploadTrigger {
-  export interface State {
-    /**
-     * Whether the trigger is disabled.
-     */
-    disabled: boolean;
-  }
-
-  export interface Props extends BaseUIComponentProps<'button', State> {}
+export interface FileUploadTriggerState {
+  /**
+   * Whether the trigger is disabled.
+   */
+  disabled: boolean;
 }
 
-export type FileUploadTriggerProps = FileUploadTrigger.Props;
+export interface FileUploadTriggerProps extends BaseUIComponentProps<'button', FileUploadTriggerState> {}
 
 /**
  * Button component for triggering the file selection dialog.
@@ -46,7 +42,7 @@ export const FileUploadTrigger = React.forwardRef<HTMLButtonElement, FileUploadT
     const { className, ...other } = props;
     const { openFileDialog, disabled } = useFileUploadContext();
 
-    const state: FileUploadTrigger.State = React.useMemo(
+    const state: FileUploadTriggerState = React.useMemo(
       () => ({
         disabled,
       }),
@@ -73,3 +69,8 @@ export const FileUploadTrigger = React.forwardRef<HTMLButtonElement, FileUploadT
     );
   },
 );
+
+export namespace FileUploadTrigger {
+  export type State = FileUploadTriggerState;
+  export type Props = FileUploadTriggerProps;
+}

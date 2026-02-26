@@ -8,18 +8,15 @@ import { resolveClassName } from '../../utils/resolveClassName';
 import { composeEventHandlers } from '../../utils/composeEventHandlers';
 import { useFileUploadContext } from '../root/FileUploadContext';
 
-export namespace FileUploadInput {
-  export interface State {
-    /**
-     * Whether the input is disabled.
-     */
-    disabled: boolean;
-  }
-
-  export interface Props extends Omit<BaseUIComponentProps<'input', State>, 'type'> {}
+export interface FileUploadInputState {
+  /**
+   * Whether the input is disabled.
+   */
+  disabled: boolean;
 }
 
-export type FileUploadInputProps = FileUploadInput.Props;
+export interface FileUploadInputProps
+  extends Omit<BaseUIComponentProps<'input', FileUploadInputState>, 'type'> {}
 
 /**
  * Hidden file input element for file selection.
@@ -45,7 +42,7 @@ export const FileUploadInput = React.forwardRef<HTMLInputElement, FileUploadInpu
     const { accept, multiple, directory, disabled, registerInput, inputId, addFiles, onCancel } =
       useFileUploadContext();
 
-    const state: FileUploadInput.State = React.useMemo(
+    const state: FileUploadInputState = React.useMemo(
       () => ({
         disabled,
       }),
@@ -116,3 +113,8 @@ export const FileUploadInput = React.forwardRef<HTMLInputElement, FileUploadInpu
     );
   },
 );
+
+export namespace FileUploadInput {
+  export type State = FileUploadInputState;
+  export type Props = FileUploadInputProps;
+}

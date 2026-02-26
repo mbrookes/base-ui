@@ -7,24 +7,21 @@ import { resolveClassName } from '../../utils/resolveClassName';
 import { composeEventHandlers } from '../../utils/composeEventHandlers';
 import { useFileUploadContext } from '../root/FileUploadContext';
 
-export namespace FileUploadDropzone {
-  export interface State {
-    /**
-     * Whether files are being dragged over the dropzone.
-     */
-    dragging: boolean;
-    /**
-     * Whether the dropzone is disabled.
-     */
-    disabled: boolean;
-  }
-
-  export interface Props extends Omit<BaseUIComponentProps<'div', State>, 'children'> {
-    children?: React.ReactNode | ((state: { isDragging: boolean }) => React.ReactNode);
-  }
+export interface FileUploadDropzoneState {
+  /**
+   * Whether files are being dragged over the dropzone.
+   */
+  dragging: boolean;
+  /**
+   * Whether the dropzone is disabled.
+   */
+  disabled: boolean;
 }
 
-export type FileUploadDropzoneProps = FileUploadDropzone.Props;
+export interface FileUploadDropzoneProps
+  extends Omit<BaseUIComponentProps<'div', FileUploadDropzoneState>, 'children'> {
+  children?: React.ReactNode | ((state: { isDragging: boolean }) => React.ReactNode);
+}
 
 /**
  * Interactive drop target and file selection area.
@@ -56,7 +53,7 @@ export const FileUploadDropzone = React.forwardRef<HTMLDivElement, FileUploadDro
     const { children, onClick, onKeyDown, className, ...other } = props;
     const { isDragging, disabled, openFileDialog } = useFileUploadContext();
 
-    const state: FileUploadDropzone.State = React.useMemo(
+    const state: FileUploadDropzoneState = React.useMemo(
       () => ({
         dragging: isDragging,
         disabled,
@@ -114,3 +111,8 @@ export const FileUploadDropzone = React.forwardRef<HTMLDivElement, FileUploadDro
     );
   },
 );
+
+export namespace FileUploadDropzone {
+  export type State = FileUploadDropzoneState;
+  export type Props = FileUploadDropzoneProps;
+}

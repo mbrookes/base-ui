@@ -11,6 +11,8 @@ export interface FileUploadPreviewItemContextValue {
   onRemove: () => void;
 }
 
+export interface FileUploadPreviewItemState {}
+
 export const FileUploadPreviewItemContext =
   React.createContext<FileUploadPreviewItemContextValue | null>(null);
 
@@ -46,19 +48,13 @@ export function useFileUploadPreviewItem(): FileUploadPreviewItemContextValue {
   return context;
 }
 
-export namespace FileUploadPreviewItem {
-  export interface State {}
-
-  export interface Props extends BaseUIComponentProps<'li', State> {
-    /**
-     * The file to preview.
-     */
-    file: FileUploadRoot.ExtendedFile;
-    children: React.ReactNode;
-  }
+export interface FileUploadPreviewItemProps extends BaseUIComponentProps<'li', FileUploadPreviewItemState> {
+  /**
+   * The file to preview.
+   */
+  file: FileUploadRoot.ExtendedFile;
+  children: React.ReactNode;
 }
-
-export type FileUploadPreviewItemProps = FileUploadPreviewItem.Props;
 
 /**
  * Individual preview item for an uploaded file.
@@ -122,3 +118,8 @@ export const FileUploadPreviewItem = React.forwardRef<HTMLLIElement, FileUploadP
     );
   },
 );
+
+export namespace FileUploadPreviewItem {
+  export type State = FileUploadPreviewItemState;
+  export type Props = FileUploadPreviewItemProps;
+}

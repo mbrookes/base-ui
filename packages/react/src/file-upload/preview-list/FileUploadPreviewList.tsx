@@ -5,13 +5,9 @@ import type { BaseUIComponentProps } from '../../utils/types';
 import { resolveClassName } from '../../utils/resolveClassName';
 import { useFileUploadContext } from '../root/FileUploadContext';
 
-export namespace FileUploadPreviewList {
-  export interface State {}
+export interface FileUploadPreviewListState {}
 
-  export interface Props extends BaseUIComponentProps<'ul', State> {}
-}
-
-export type FileUploadPreviewListProps = FileUploadPreviewList.Props;
+export interface FileUploadPreviewListProps extends BaseUIComponentProps<'ul', FileUploadPreviewListState> {}
 
 /**
  * Container list for displaying uploaded files.
@@ -55,3 +51,8 @@ export const FileUploadPreviewList = React.forwardRef<HTMLUListElement, FileUplo
     );
   },
 );
+
+export namespace FileUploadPreviewList {
+  export type State = FileUploadPreviewListState;
+  export type Props = FileUploadPreviewListProps;
+}
