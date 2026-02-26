@@ -11,6 +11,8 @@
 
 import { DemoFileUploadHero } from './demos/hero';
 import { DemoFileUploadMinimal } from './demos/minimal';
+import { DemoFileUploadValidation } from './demos/validation';
+import { DemoFileUploadImagePreview } from './demos/image-preview';
 
 <DemoFileUploadHero />
 
@@ -100,6 +102,8 @@ export default function App() {
 
 ### File validation
 
+<DemoFileUploadValidation />
+
 Control which files are accepted using `accept`, `maxSize`, `minSize`, and `maxFiles` props:
 
 ```jsx title="File validation" "accept" "maxSize" "maxFiles"
@@ -181,6 +185,8 @@ Enable directory selection with the `directory` prop. This uses `webkitdirectory
 ```
 
 ### Preview items with context
+
+<DemoFileUploadImagePreview />
 
 Use `FileUploadPreviewItem` and `useFileUploadPreviewItem` to display and manage file information:
 
