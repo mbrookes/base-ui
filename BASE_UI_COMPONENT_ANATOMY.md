@@ -25,7 +25,7 @@ This document provides a comprehensive guide for creating new Base UI components
 
 Every component has its own directory under `packages/react/src/` with this structure:
 
-```
+```plaintext
 component-name/
 ├── index.ts                          # Main barrel export file
 ├── index.parts.ts                    # Namespace exports for subcomponents
@@ -862,7 +862,7 @@ import type { SomeType } from './types';
 
 ### Commit Messages
 
-```
+```plaintext
 [component-name] Brief imperative summary
 
 Longer description if needed explaining why the change

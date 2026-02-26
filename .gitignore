@@ -43,3 +43,6 @@ next-env.d.ts
 
 # Testing
 test-results/
+# Research documents
+FILE_UPLOAD*.md
+FILEUPLOAD_*.md
