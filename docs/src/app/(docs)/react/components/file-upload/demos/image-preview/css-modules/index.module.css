@@ -7,7 +7,9 @@
 .dropzone {
   border: 2px dashed #ccc;
   border-radius: 8px;
-  transition: border-color 200ms, background-color 200ms;
+  transition:
+    border-color 200ms,
+    background-color 200ms;
 
   &:hover {
     border-color: #999;

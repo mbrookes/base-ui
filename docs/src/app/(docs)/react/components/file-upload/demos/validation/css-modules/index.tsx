@@ -20,11 +20,7 @@ function FileList() {
               <div className={styles.fileName}>{file.name}</div>
               <div className={styles.fileSize}>{(file.size / 1024).toFixed(1)} KB</div>
             </div>
-            <button
-              type="button"
-              className={styles.removeBtn}
-              onClick={() => removeFile(file.id)}
-            >
+            <button type="button" className={styles.removeBtn} onClick={() => removeFile(file.id)}>
               Remove
             </button>
           </div>
@@ -67,9 +63,7 @@ export default function FileUploadValidationDemo() {
         <FileUpload.Input />
         <FileUpload.Dropzone className={styles.dropzone}>
           {({ isDragging }) => (
-            <div
-              className={`${styles.dropzoneContent} ${isDragging ? styles.isDragging : ''}`}
-            >
+            <div className={`${styles.dropzoneContent} ${isDragging ? styles.isDragging : ''}`}>
               <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
                 <path
                   d="M12 2v12m0 0l-3.5-3.5m3.5 3.5l3.5-3.5M2 12h8m0 0v8m0-8H2m12 8h8m0-8h-8"

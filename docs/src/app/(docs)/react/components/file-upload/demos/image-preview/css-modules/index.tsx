@@ -9,23 +9,12 @@ function ImagePreviewItem({ file }: { file: FileUpload.Root.ExtendedFile }) {
 
   return (
     <div className={styles.imageItem}>
-      {file.preview && (
-        <img
-          src={file.preview}
-          alt={file.name}
-          className={styles.image}
-        />
-      )}
+      {file.preview && <img src={file.preview} alt={file.name} className={styles.image} />}
       <div className={styles.imageInfo}>
         <div className={styles.imageName}>{file.name}</div>
         <div className={styles.imageSize}>{(file.size / 1024).toFixed(1)} KB</div>
       </div>
-      <button
-        type="button"
-        className={styles.removeBtn}
-        onClick={onRemove}
-        title="Remove image"
-      >
+      <button type="button" className={styles.removeBtn} onClick={onRemove} title="Remove image">
         ✕
       </button>
     </div>

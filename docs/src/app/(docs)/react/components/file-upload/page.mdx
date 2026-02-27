@@ -248,7 +248,7 @@ import { FileUpload } from '@base-ui/react/file-upload';
 
 export default function FileUploadWithUpload() {
   const [isUploading, setIsUploading] = React.useState(false);
-  const [uploadError, setUploadError] = React.useState<string | null>(null);
+  const [uploadError, setUploadError] = (React.useState < string) | (null > null);
   const { files, removeFile } = FileUpload.useFileUploadContext();
 
   const handleUpload = async () => {
@@ -433,6 +433,7 @@ File Upload works in all modern browsers. Here's browser-specific support:
 | Folder upload   | ✅     | ✅      | ⚠️     | ✅   |
 
 **Folder upload notes:**
+
 - Uses `webkitdirectory` attribute (non-standard but widely supported)
 - **Safari**: Limited support, may not work reliably
 - **Firefox**: Works but with permission prompt on some systems
@@ -501,7 +502,8 @@ const handleUpload = async (file: File) => {
 ```
 
 ## API reference
-  parts="Root, Input, Trigger, Dropzone, PreviewList, PreviewItem"
+
+parts="Root, Input, Trigger, Dropzone, PreviewList, PreviewItem"
 />
 
 export const metadata = {

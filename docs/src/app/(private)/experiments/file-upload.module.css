@@ -1,0 +1,106 @@
+.Container {
+  max-width: 600px;
+  margin: 2rem auto;
+  padding: 1rem;
+}
+
+.Dropzone {
+  border: 2px dashed #cbd5e0;
+  border-radius: 8px;
+  padding: 3rem;
+  text-align: center;
+  transition: all 0.2s;
+  background: #f7fafc;
+  cursor: pointer;
+}
+
+.Dropzone:hover {
+  border-color: #4299e1;
+  background: #ebf8ff;
+}
+
+.Dropzone[data-dragging] .Dragging {
+  border-color: #3182ce;
+  background: #bee3f8;
+}
+
+.Icon {
+  color: #4299e1;
+  margin-bottom: 1rem;
+}
+
+.Text {
+  font-size: 1rem;
+  color: #4a5568;
+  margin: 0.5rem 0 1rem;
+}
+
+.Button {
+  background: #4299e1;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 0.75rem 1.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.Button:hover {
+  background: #3182ce;
+}
+
+.Button:disabled {
+  background: #cbd5e0;
+  cursor: not-allowed;
+}
+
+.PreviewList {
+  list-style: none;
+  padding: 0;
+  margin: 1.5rem 0 0;
+}
+
+.PreviewItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  margin-bottom: 0.5rem;
+  background: white;
+}
+
+.FileInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.FileName {
+  font-weight: 500;
+  color: #2d3748;
+}
+
+.FileSize {
+  font-size: 0.875rem;
+  color: #718096;
+}
+
+.RemoveButton {
+  background: none;
+  border: none;
+  color: #e53e3e;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  line-height: 1;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+.RemoveButton:hover {
+  background: #fed7d7;
+}
