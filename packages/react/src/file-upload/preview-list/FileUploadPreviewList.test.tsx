@@ -197,45 +197,44 @@ describe('FileUpload.PreviewList', () => {
   describe('filter prop', () => {
     it('filters files by status', async () => {
       function TestComponent() {
-        const [files, setFiles] = React.useState<any[]>([]);
+        const context = FileUpload.useFileUploadContext();
+        const { files } = context;
 
         React.useEffect(() => {
-          if (files.length === 0) {
-            setFiles([
-              {
-                id: '1',
-                name: 'uploading.txt',
-                size: 100,
-                type: 'text/plain',
-                preview: 'blob:test1',
-                status: 'uploading',
-                progress: 50,
-              },
-              {
-                id: '2',
-                name: 'error.txt',
-                size: 100,
-                type: 'text/plain',
-                preview: 'blob:test2',
-                status: 'error',
-                progress: 0,
-                error: 'Failed',
-              },
-              {
-                id: '3',
-                name: 'success.txt',
-                size: 100,
-                type: 'text/plain',
-                preview: 'blob:test3',
-                status: 'success',
-                progress: 100,
-              },
-            ]);
-          }
-        }, [files.length]);
+          context.setFiles([
+            {
+              id: '1',
+              name: 'uploading.txt',
+              size: 100,
+              type: 'text/plain',
+              preview: 'blob:test1',
+              status: 'uploading',
+              progress: 50,
+            } as any,
+            {
+              id: '2',
+              name: 'error.txt',
+              size: 100,
+              type: 'text/plain',
+              preview: 'blob:test2',
+              status: 'error',
+              progress: 0,
+              error: 'Failed',
+            } as any,
+            {
+              id: '3',
+              name: 'success.txt',
+              size: 100,
+              type: 'text/plain',
+              preview: 'blob:test3',
+              status: 'success',
+              progress: 100,
+            } as any,
+          ]);
+        }, [context]);
 
         return (
-          <FileUpload.Root onFilesChange={setFiles}>
+          <React.Fragment>
             <FileUpload.Input />
             <FileUpload.PreviewList
               data-testid="error-list"
@@ -249,11 +248,15 @@ describe('FileUpload.PreviewList', () => {
                   </FileUpload.PreviewItem>
                 ))}
             </FileUpload.PreviewList>
-          </FileUpload.Root>
+          </React.Fragment>
         );
       }
 
-      render(<TestComponent />);
+      render(
+        <FileUpload.Root>
+          <TestComponent />
+        </FileUpload.Root>,
+      );
 
       await waitFor(() => {
         expect(screen.getByTestId('error-list')).toBeInTheDocument();
@@ -265,38 +268,43 @@ describe('FileUpload.PreviewList', () => {
 
     it('shows only uploading files with filter', async () => {
       function TestComponent() {
-        const [files, setFiles] = React.useState<any[]>([
-          {
-            id: '1',
-            name: 'uploading1.txt',
-            size: 100,
-            type: 'text/plain',
-            preview: 'blob:test1',
-            status: 'uploading',
-            progress: 30,
-          },
-          {
-            id: '2',
-            name: 'uploading2.txt',
-            size: 100,
-            type: 'text/plain',
-            preview: 'blob:test2',
-            status: 'uploading',
-            progress: 60,
-          },
-          {
-            id: '3',
-            name: 'idle.txt',
-            size: 100,
-            type: 'text/plain',
-            preview: 'blob:test3',
-            status: 'idle',
-            progress: 0,
-          },
-        ]);
+        const context = FileUpload.useFileUploadContext();
+        const { files } = context;
+
+        React.useEffect(() => {
+          context.setFiles([
+            {
+              id: '1',
+              name: 'uploading1.txt',
+              size: 100,
+              type: 'text/plain',
+              preview: 'blob:test1',
+              status: 'uploading',
+              progress: 30,
+            } as any,
+            {
+              id: '2',
+              name: 'uploading2.txt',
+              size: 100,
+              type: 'text/plain',
+              preview: 'blob:test2',
+              status: 'uploading',
+              progress: 60,
+            } as any,
+            {
+              id: '3',
+              name: 'idle.txt',
+              size: 100,
+              type: 'text/plain',
+              preview: 'blob:test3',
+              status: 'idle',
+              progress: 0,
+            } as any,
+          ]);
+        }, [context]);
 
         return (
-          <FileUpload.Root onFilesChange={setFiles}>
+          <React.Fragment>
             <FileUpload.Input />
             <FileUpload.PreviewList
               data-testid="uploading-list"
@@ -310,83 +318,97 @@ describe('FileUpload.PreviewList', () => {
                   </FileUpload.PreviewItem>
                 ))}
             </FileUpload.PreviewList>
-          </FileUpload.Root>
+          </React.Fragment>
         );
       }
 
-      render(<TestComponent />);
+      render(
+        <FileUpload.Root>
+          <TestComponent />
+        </FileUpload.Root>,
+      );
 
-      expect(screen.getByTestId('file-uploading1.txt')).toBeInTheDocument();
-      expect(screen.getByTestId('file-uploading2.txt')).toBeInTheDocument();
-      expect(screen.queryByTestId('file-idle.txt')).not.toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.getByTestId('file-uploading1.txt')).toBeInTheDocument();
+        expect(screen.getByTestId('file-uploading2.txt')).toBeInTheDocument();
+        expect(screen.queryByTestId('file-idle.txt')).not.toBeInTheDocument();
+      });
     });
 
     it('hides list when filter returns empty array', async () => {
       function TestComponent() {
-        const [files, setFiles] = React.useState<any[]>([
-          {
-            id: '1',
-            name: 'idle.txt',
-            size: 100,
-            type: 'text/plain',
-            preview: 'blob:test1',
-            status: 'idle',
-            progress: 0,
-          },
-        ]);
+        const context = FileUpload.useFileUploadContext();
+
+        React.useEffect(() => {
+          context.setFiles([
+            {
+              id: '1',
+              name: 'idle.txt',
+              size: 100,
+              type: 'text/plain',
+              preview: 'blob:test1',
+              status: 'idle',
+              progress: 0,
+            } as any,
+          ]);
+        }, [context]);
 
         return (
-          <FileUpload.Root onFilesChange={setFiles}>
+          <React.Fragment>
             <FileUpload.Input />
             <FileUpload.PreviewList
               data-testid="error-list"
               filter={(allFiles) => allFiles.filter((f) => f.status === 'error')}
             >
-              {files
-                .filter((f) => f.status === 'error')
-                .map((file) => (
-                  <FileUpload.PreviewItem key={file.id} file={file}>
-                    {file.name}
-                  </FileUpload.PreviewItem>
-                ))}
+              <li>Items</li>
             </FileUpload.PreviewList>
-          </FileUpload.Root>
+          </React.Fragment>
         );
       }
 
-      render(<TestComponent />);
+      render(
+        <FileUpload.Root>
+          <TestComponent />
+        </FileUpload.Root>,
+      );
 
-      expect(screen.queryByTestId('error-list')).not.toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.queryByTestId('error-list')).not.toBeInTheDocument();
+      });
     });
 
     it('passes filtered files in state to className callback', async () => {
       const classNameFn = vi.fn(() => 'custom-class');
 
       function TestComponent() {
-        const [, setFiles] = React.useState<any[]>([
-          {
-            id: '1',
-            name: 'error1.txt',
-            size: 100,
-            type: 'text/plain',
-            preview: 'blob:test1',
-            status: 'error',
-            progress: 0,
-            error: 'Failed',
-          },
-          {
-            id: '2',
-            name: 'success.txt',
-            size: 100,
-            type: 'text/plain',
-            preview: 'blob:test2',
-            status: 'success',
-            progress: 100,
-          },
-        ]);
+        const context = FileUpload.useFileUploadContext();
+
+        React.useEffect(() => {
+          context.setFiles([
+            {
+              id: '1',
+              name: 'error1.txt',
+              size: 100,
+              type: 'text/plain',
+              preview: 'blob:test1',
+              status: 'error',
+              progress: 0,
+              error: 'Failed',
+            } as any,
+            {
+              id: '2',
+              name: 'success.txt',
+              size: 100,
+              type: 'text/plain',
+              preview: 'blob:test2',
+              status: 'success',
+              progress: 100,
+            } as any,
+          ]);
+        }, [context]);
 
         return (
-          <FileUpload.Root onFilesChange={setFiles}>
+          <React.Fragment>
             <FileUpload.Input />
             <FileUpload.PreviewList
               data-testid="filtered-list"
@@ -395,13 +417,15 @@ describe('FileUpload.PreviewList', () => {
             >
               <li>Items</li>
             </FileUpload.PreviewList>
-          </FileUpload.Root>
+          </React.Fragment>
         );
       }
 
-      render(<TestComponent />);
-
-      render(<TestComponent />);
+      render(
+        <FileUpload.Root>
+          <TestComponent />
+        </FileUpload.Root>,
+      );
 
       await waitFor(() => {
         expect(classNameFn).toHaveBeenCalled();

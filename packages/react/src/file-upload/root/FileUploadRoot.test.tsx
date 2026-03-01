@@ -208,8 +208,7 @@ describe('FileUpload', () => {
       configurable: true,
     });
 
-    const event = new Event('change', { bubbles: true });
-    input.dispatchEvent(event);
+    fireEvent.change(input);
 
     await waitFor(() => expect(onFileReject).toHaveBeenCalled());
     expect(onFileReject).toHaveBeenCalledWith(file, expect.any(String));
