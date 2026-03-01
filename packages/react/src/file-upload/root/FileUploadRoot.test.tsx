@@ -608,11 +608,11 @@ describe('FileUpload', () => {
       }
 
       function TestComponent() {
-        const context = FileUpload.useFileUploadContext();
+        const { setFiles } = FileUpload.useFileUploadContext();
 
         React.useEffect(() => {
           // Set files directly using context
-          context.setFiles([
+          setFiles([
             {
               id: '1',
               name: 'failed.txt',
@@ -624,7 +624,7 @@ describe('FileUpload', () => {
               error: 'Network error',
             } as any,
           ]);
-        }, [context]);
+        }, [setFiles]);
 
         return (
           <React.Fragment>
@@ -659,10 +659,10 @@ describe('FileUpload', () => {
       }
 
       function TestComponent() {
-        const context = FileUpload.useFileUploadContext();
+        const { setFiles } = FileUpload.useFileUploadContext();
 
         React.useEffect(() => {
-          context.setFiles([
+          setFiles([
             {
               id: '1',
               name: 'failed.txt',
@@ -674,7 +674,7 @@ describe('FileUpload', () => {
               error: 'Network error',
             } as any,
           ]);
-        }, [context]);
+        }, [setFiles]);
 
         return (
           <React.Fragment>
@@ -708,10 +708,10 @@ describe('FileUpload', () => {
   describe('preview list filtering', () => {
     it('filters files by status', async () => {
       function TestComponent() {
-        const context = FileUpload.useFileUploadContext();
+        const { setFiles } = FileUpload.useFileUploadContext();
 
         React.useEffect(() => {
-          context.setFiles([
+          setFiles([
             {
               id: '1',
               name: 'uploading.txt',
@@ -741,7 +741,7 @@ describe('FileUpload', () => {
               progress: 100,
             } as any,
           ]);
-        }, [context]);
+        }, [setFiles]);
 
         return (
           <React.Fragment>
@@ -810,7 +810,7 @@ describe('FileUpload', () => {
               progress: 0,
             } as any,
           ]);
-        }, [context]);
+        }, [setFiles]);
 
         return (
           <React.Fragment>
@@ -848,15 +848,15 @@ describe('FileUpload', () => {
   describe('abort signal support', () => {
     it('provides abort signal for upload tracking', () => {
       function TestComponent() {
-        const context = FileUpload.useFileUploadContext();
+        const { getAbortSignal } = FileUpload.useFileUploadContext();
         const [signal, setSignal] = React.useState<AbortSignal | null>(null);
 
         React.useEffect(() => {
-          if (context.getAbortSignal) {
-            const sig = context.getAbortSignal('test-id');
+          if (getAbortSignal) {
+            const sig = getAbortSignal('test-id');
             setSignal(sig);
           }
-        }, [context]);
+        }, [getAbortSignal]);
 
         return (
           <div>
