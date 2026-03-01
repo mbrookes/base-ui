@@ -38,9 +38,27 @@ export interface FileUploadRootParameters {
   minSize?: number | undefined;
   /**
    * Accepted file types (e.g., "image/*", ".pdf", "image/png,image/jpeg").
+   * Supports MIME types and file extensions.
    * @default ''
    */
   accept?: string | undefined;
+  /**
+   * Custom validation function for additional file validation beyond built-in checks.
+   * Return an error message string if validation fails, or null if valid.
+   *
+   * @example
+   * ```tsx
+   * <FileUpload.Root
+   *   validator={(file) => {
+   *     if (file.name.includes('confidential')) {
+   *       return 'Confidential files not allowed';
+   *     }
+   *     return null;
+   *   }}
+   * />
+   * ```
+   */
+  validator?: ((file: File) => string | null) | undefined;
   /**
    * Allow multiple file selection.
    * @default true
@@ -127,6 +145,7 @@ export interface FileUploadRootProps
  * @param maxSize - Maximum file size in bytes (default: Infinity)
  * @param minSize - Minimum file size in bytes (default: 0)
  * @param accept - Accepted file types (e.g., "image/*", ".pdf")
+ * @param validator - Custom validation function returning error message or null
  * @param multiple - Allow multiple file selection (default: true)
  * @param directory - Allow selecting directories (default: false)
  * @param disabled - Disable file upload (default: false)
@@ -145,6 +164,7 @@ export const FileUploadRoot = React.forwardRef<HTMLDivElement, FileUploadRootPro
       maxSize,
       minSize,
       accept,
+      validator,
       multiple,
       directory,
       disabled,
@@ -166,6 +186,7 @@ export const FileUploadRoot = React.forwardRef<HTMLDivElement, FileUploadRootPro
       maxSize,
       minSize,
       accept,
+      validator,
       multiple,
       directory,
       disabled,

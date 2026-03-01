@@ -123,8 +123,29 @@ Control which files are accepted using `accept`, `maxSize`, `minSize`, and `maxF
 **Notes**
 
 - `accept` mirrors the native file input: use MIME types like `image/png` or file extensions like `.png`.
+- File extensions are matched against the file name (case-insensitive).
 - For image previews, always provide meaningful `alt` text on preview images for screen reader users.
 - File size limits are in bytes. The example above limits files to 10MB and a minimum of 1KB.
+
+### Custom validation
+
+Use `validator` for custom rules beyond size and type checks. Return an error message to reject the file:
+
+```jsx title="Custom validation" "validator"
+<FileUpload.Root
+  validator={(file) => {
+    if (file.name.includes('confidential')) {
+      return 'Confidential files are not allowed';
+    }
+    return null;
+  }}
+  onFileReject={(file, reason) => console.log(`${file.name}: ${reason}`)}
+>
+  <FileUpload.Input />
+  <FileUpload.Dropzone>Upload files</FileUpload.Dropzone>
+  <FileUpload.Trigger />
+</FileUpload.Root>
+```
 
 ### Drag and drop state
 
@@ -464,6 +485,20 @@ Image processing (cropping, resizing, filters) is outside FileUpload's scope. Co
 - [Canvas API](https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API) (client-side)
 - [Konva](https://konvajs.org/) (image editor UI)
 - [Cloudinary](https://cloudinary.com/) (upload service with transformations)
+
+### Do I need to revoke preview URLs?
+
+If you create your own previews with `URL.createObjectURL`, you should revoke them when a file is removed or when the component unmounts to avoid memory leaks.
+
+File Upload automatically revokes the `file.preview` URLs it creates when files are removed or the component unmounts. If you create additional preview URLs, revoke them manually:
+
+```jsx title="Preview cleanup"
+React.useEffect(() => {
+  return () => {
+    files.forEach((file) => URL.revokeObjectURL(file.preview));
+  };
+}, [files]);
+```
 
 ### How do I add drag-to-reorder for files?
 

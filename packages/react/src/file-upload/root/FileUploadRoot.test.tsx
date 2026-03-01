@@ -217,6 +217,62 @@ describe('FileUpload', () => {
     expect(onFileReject).toHaveBeenCalledWith(file, expect.any(String));
   });
 
+  it('accepts files when accept includes file extensions', async () => {
+    const onFilesChange = vi.fn();
+    const onFileReject = vi.fn();
+
+    render(
+      <FileUpload.Root accept=".txt" onFilesChange={onFilesChange} onFileReject={onFileReject}>
+        <FileUpload.Input data-testid="file-input" />
+      </FileUpload.Root>,
+    );
+
+    const input = screen.getByTestId('file-input') as HTMLInputElement;
+    const file = new File(['content'], 'READme.TXT', { type: 'text/plain' });
+
+    Object.defineProperty(input, 'files', {
+      value: [file],
+      configurable: true,
+    });
+
+    fireEvent.change(input);
+
+    await waitFor(() => expect(onFilesChange).toHaveBeenCalled());
+    expect(onFileReject).not.toHaveBeenCalled();
+  });
+
+  it('uses custom validator to reject files', async () => {
+    const onFilesChange = vi.fn();
+    const onFileReject = vi.fn();
+    const validator = vi.fn().mockReturnValue('Blocked by policy');
+
+    render(
+      <FileUpload.Root
+        accept="*"
+        onFilesChange={onFilesChange}
+        onFileReject={onFileReject}
+        validator={validator}
+      >
+        <FileUpload.Input data-testid="file-input" />
+      </FileUpload.Root>,
+    );
+
+    const input = screen.getByTestId('file-input') as HTMLInputElement;
+    const file = new File(['content'], 'notes.txt', { type: 'text/plain' });
+
+    Object.defineProperty(input, 'files', {
+      value: [file],
+      configurable: true,
+    });
+
+    fireEvent.change(input);
+
+    await waitFor(() => expect(onFileReject).toHaveBeenCalledWith(file, 'Blocked by policy'));
+    const latestFiles = onFilesChange.mock.calls.at(-1)?.[0] ?? [];
+    expect(latestFiles).not.toEqual(expect.arrayContaining([file]));
+    expect(validator).toHaveBeenCalledWith(file);
+  });
+
   it('does not enforce a max file size by default', async () => {
     const onFilesChange = vi.fn();
     const onFileReject = vi.fn();

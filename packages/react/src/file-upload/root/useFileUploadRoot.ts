@@ -30,6 +30,7 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
     maxSize = Number.POSITIVE_INFINITY,
     minSize = 0,
     accept = '',
+    validator,
     multiple = true,
     directory = false,
     disabled = false,
@@ -72,23 +73,36 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
       return `File too small (min ${formatBytes(minSize)})`;
     }
 
-    if (
-      accept &&
-      accept !== '*' &&
-      !accept.split(',').some((acceptType) => {
-        const trimmedType = acceptType.trim();
-        if (trimmedType === '*') {
+    if (accept && accept !== '*') {
+      const acceptTypes = accept.split(',').map((t) => t.trim());
+      const isAccepted = acceptTypes.some((acceptType) => {
+        if (acceptType === '*') {
           return true;
         }
-        if (trimmedType.endsWith('/*')) {
-          // e.g., "image/*" matches "image/png"
-          const prefix = trimmedType.slice(0, -2);
+        // File extension like .png, .pdf
+        if (acceptType.startsWith('.')) {
+          return file.name.toLowerCase().endsWith(acceptType.toLowerCase());
+        }
+        // MIME type wildcard like image/*
+        if (acceptType.endsWith('/*')) {
+          const prefix = acceptType.slice(0, -2);
           return file.type.startsWith(prefix);
         }
-        return file.type === trimmedType;
-      })
-    ) {
-      return 'File type not accepted';
+        // Exact MIME type like image/png
+        return file.type === acceptType;
+      });
+
+      if (!isAccepted) {
+        return 'File type not accepted';
+      }
+    }
+
+    // Custom validation
+    if (validator) {
+      const customError = validator(file);
+      if (customError) {
+        return customError;
+      }
     }
 
     return null;
