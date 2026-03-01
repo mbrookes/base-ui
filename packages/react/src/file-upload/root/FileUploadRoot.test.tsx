@@ -542,8 +542,7 @@ describe('FileUpload', () => {
         configurable: true,
       });
 
-      const event = new Event('change', { bubbles: true });
-      input.dispatchEvent(event);
+      fireEvent.change(input);
 
       await waitFor(() => expect(onFileReject).toHaveBeenCalled());
       expect(onFileReject.mock.calls[0][0]).toBe(textFile);
@@ -568,8 +567,7 @@ describe('FileUpload', () => {
         configurable: true,
       });
 
-      const event = new Event('change', { bubbles: true });
-      input.dispatchEvent(event);
+      fireEvent.change(input);
 
       await waitFor(() => expect(onFileReject).toHaveBeenCalled());
     });
@@ -591,8 +589,7 @@ describe('FileUpload', () => {
         configurable: true,
       });
 
-      const event = new Event('change', { bubbles: true });
-      input.dispatchEvent(event);
+      fireEvent.change(input);
 
       await waitFor(() => expect(onFileReject).toHaveBeenCalled());
     });
