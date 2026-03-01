@@ -26,6 +26,12 @@
       "description": "Maximum file size in bytes.",
       "detailedType": "number | undefined"
     },
+    "messages": {
+      "type": "FileUpload.Root.Messages",
+      "description": "Localized messages for error messages and announcements.\nProvide custom messages to support different languages or customize default messaging.",
+      "example": "```tsx\n<FileUpload.Root\n  messages={{\n    fileTooLarge: (file, max) => `${file.name} は大きすぎます（最大 ${max}）`,\n    fileTooSmall: (file, min) => `${file.name} は小さすぎます（最小 ${min}）`,\n    fileTypeNotAccepted: (file) => `${file.name} はサポートされていないファイル形式です`,\n    maxFilesReached: (max) => `ファイルの上限 ${max} に達しました`,\n    duplicateFile: (file) => `${file.name} は既に追加されています`,\n    filesAdded: (count) => `${count} 個のファイルを追加しました`,\n    fileRemoved: (file) => `${file.name} を削除しました`,\n    allFilesRemoved: () => 'すべてのファイルを削除しました',\n    retryingUpload: (file) => `${file.name} の再試行中`,\n    uploadCanceled: (file) => `${file.name} のアップロードをキャンセルしました`,\n  }}\n/>\n```",
+      "detailedType": "| {\n    fileTooLarge?: (file: File, maxSize: string) => string\n    fileTooSmall?: (file: File, minSize: string) => string\n    fileTypeNotAccepted?: (file: File) => string\n    maxFilesReached?: (maxFiles: number) => string\n    duplicateFile?: (file: File) => string\n    filesAdded?: (count: number) => string\n    filesRejected?: (\n      count: number,\n      errors: string[],\n    ) => string\n    fileRemoved?: (\n      file: FileUpload.Root.ExtendedFile,\n    ) => string\n    allFilesRemoved?: () => string\n    retryingUpload?: (\n      file: FileUpload.Root.ExtendedFile,\n    ) => string\n    uploadCanceled?: (\n      file: FileUpload.Root.ExtendedFile,\n    ) => string\n  }\n| undefined"
+    },
     "minSize": {
       "type": "number",
       "default": "0",
@@ -57,6 +63,11 @@
       "type": "((files: FileUpload.Root.ExtendedFile[]) => void)",
       "description": "Callback when files are added.",
       "detailedType": "| ((files: FileUpload.Root.ExtendedFile[]) => void)\n| undefined"
+    },
+    "onRetry": {
+      "type": "((file: FileUpload.Root.ExtendedFile) => void)",
+      "description": "Callback when a file retry is initiated.",
+      "detailedType": "| ((file: FileUpload.Root.ExtendedFile) => void)\n| undefined"
     },
     "validator": {
       "type": "((file: File) => string | null)",

@@ -35,8 +35,16 @@ export interface FileUploadContextValue {
   clearFiles: () => void;
   /** Add new files with validation */
   addFiles: (files: File[]) => void;
+  /** Retry a file that failed to upload */
+  retryFile: (id: string) => void;
+  /** Abort an in-progress upload */
+  abortUpload: (id: string) => void;
+  /** Get an AbortSignal for tracking upload cancellation */
+  getAbortSignal: (id: string) => AbortSignal;
   /** Callback fired when the file dialog is canceled */
   onCancel?: (() => void) | undefined;
+  /** Callback fired when a file retry is initiated */
+  onRetry?: ((file: FileUploadRoot.ExtendedFile) => void) | undefined;
   /** Trigger the file selection dialog */
   openFileDialog: () => void;
   /** Directly set files state (for advanced use cases) */

@@ -90,6 +90,93 @@ export interface FileUploadRootParameters {
    * Callback when a duplicate file is selected.
    */
   onDuplicateFile?: ((file: File) => void) | undefined;
+  /**
+   * Callback when a file retry is initiated.
+   */
+  onRetry?: ((file: FileUploadRootExtendedFile) => void) | undefined;
+  /**
+   * Localized messages for error messages and announcements.
+   * Provide custom messages to support different languages or customize default messaging.
+   *
+   * @example
+   * ```tsx
+   * <FileUpload.Root
+   *   messages={{
+   *     fileTooLarge: (file, max) => `${file.name} は大きすぎます（最大 ${max}）`,
+   *     fileTooSmall: (file, min) => `${file.name} は小さすぎます（最小 ${min}）`,
+   *     fileTypeNotAccepted: (file) => `${file.name} はサポートされていないファイル形式です`,
+   *     maxFilesReached: (max) => `ファイルの上限 ${max} に達しました`,
+   *     duplicateFile: (file) => `${file.name} は既に追加されています`,
+   *     filesAdded: (count) => `${count} 個のファイルを追加しました`,
+   *     fileRemoved: (file) => `${file.name} を削除しました`,
+   *     allFilesRemoved: () => 'すべてのファイルを削除しました',
+   *     retryingUpload: (file) => `${file.name} の再試行中`,
+   *     uploadCanceled: (file) => `${file.name} のアップロードをキャンセルしました`,
+   *   }}
+   * />
+   * ```
+   */
+  messages?: FileUploadRootMessages | undefined;
+}
+
+export interface FileUploadRootMessages {
+  /**
+   * Message when file exceeds maximum size.
+   * @param file - The rejected file
+   * @param maxSize - Maximum size in formatted string (e.g., '5 MB')
+   */
+  fileTooLarge?: ((file: File, maxSize: string) => string) | undefined;
+  /**
+   * Message when file is below minimum size.
+   * @param file - The rejected file
+   * @param minSize - Minimum size in formatted string (e.g., '1 KB')
+   */
+  fileTooSmall?: ((file: File, minSize: string) => string) | undefined;
+  /**
+   * Message when file type is not accepted.
+   * @param file - The rejected file
+   */
+  fileTypeNotAccepted?: ((file: File) => string) | undefined;
+  /**
+   * Message when maximum file count is reached.
+   * @param maxFiles - Maximum number of files allowed
+   */
+  maxFilesReached?: ((maxFiles: number) => string) | undefined;
+  /**
+   * Message when a duplicate file is detected.
+   * @param file - The duplicate file
+   */
+  duplicateFile?: ((file: File) => string) | undefined;
+  /**
+   * Message when files are successfully added.
+   * @param count - Number of files added
+   */
+  filesAdded?: ((count: number) => string) | undefined;
+  /**
+   * Message when files are rejected.
+   * @param count - Number of files rejected
+   * @param errors - Array of error messages
+   */
+  filesRejected?: ((count: number, errors: string[]) => string) | undefined;
+  /**
+   * Message when a file is removed.
+   * @param file - The removed file
+   */
+  fileRemoved?: ((file: FileUploadRootExtendedFile) => string) | undefined;
+  /**
+   * Message when all files are removed.
+   */
+  allFilesRemoved?: (() => string) | undefined;
+  /**
+   * Message when retrying a failed upload.
+   * @param file - The file being retried
+   */
+  retryingUpload?: ((file: FileUploadRootExtendedFile) => string) | undefined;
+  /**
+   * Message when an upload is canceled.
+   * @param file - The file whose upload was canceled
+   */
+  uploadCanceled?: ((file: FileUploadRootExtendedFile) => string) | undefined;
 }
 
 export interface FileUploadRootExtendedFile extends File {
@@ -153,6 +240,7 @@ export interface FileUploadRootProps
  * @param onFileReject - Callback when a file is rejected
  * @param onCancel - Callback when the file dialog is canceled
  * @param onDuplicateFile - Callback when a duplicate file is selected
+ * @param onRetry - Callback when a file retry is initiated
  *
  * @see [File Upload Documentation](https://base-ui.com/react/components/file-upload)
  */
@@ -172,6 +260,8 @@ export const FileUploadRoot = React.forwardRef<HTMLDivElement, FileUploadRootPro
       onFileReject,
       onCancel,
       onDuplicateFile,
+      onRetry,
+      messages,
       onPaste,
       onDragEnter,
       onDragLeave,
@@ -194,6 +284,8 @@ export const FileUploadRoot = React.forwardRef<HTMLDivElement, FileUploadRootPro
       onFileReject,
       onCancel,
       onDuplicateFile,
+      onRetry,
+      messages,
     });
 
     const state: FileUploadRootState = React.useMemo(

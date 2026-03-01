@@ -7,6 +7,7 @@ import type {
   FileUploadRootExtendedFile,
   FileUploadRootParameters,
   FileUploadRootFileStatus,
+  FileUploadRootMessages,
 } from './FileUploadRoot';
 import type { FileUploadContextValue } from './FileUploadContext';
 
@@ -38,19 +39,41 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
     onFileReject,
     onCancel,
     onDuplicateFile,
+    onRetry,
+    messages: customMessages,
   } = params;
+
+  const defaultMessages: Required<FileUploadRootMessages> = {
+    fileTooLarge: (_file, maxSizeFormatted) => `File too large (max ${maxSizeFormatted})`,
+    fileTooSmall: (_file, minSizeFormatted) => `File too small (min ${minSizeFormatted})`,
+    fileTypeNotAccepted: (_file) => 'File type not accepted',
+    maxFilesReached: (maxFilesCount) => `Cannot add files. Limit of ${maxFilesCount} reached.`,
+    duplicateFile: (fileItem) => `${fileItem.name}: duplicate file`,
+    filesAdded: (count) => `Added ${count} file${count !== 1 ? 's' : ''}.`,
+    filesRejected: (count, errors) => ` ${count} rejected: ${errors.join(', ')}`,
+    fileRemoved: (fileItem) => `Removed file ${fileItem.name}`,
+    allFilesRemoved: () => 'All files removed',
+    retryingUpload: (fileItem) => `Retrying upload for ${fileItem.name}`,
+    uploadCanceled: (fileItem) => `Upload canceled for ${fileItem.name}`,
+  };
+
+  const messages = { ...defaultMessages, ...customMessages };
 
   const [files, setFiles] = React.useState<FileUploadRootExtendedFile[]>([]);
   const [isDragging, setIsDragging] = React.useState(false);
   const [announcement, setAnnouncement] = React.useState('');
   const inputRef = React.useRef<HTMLInputElement | null>(null);
+  const abortControllersRef = React.useRef<Map<string, AbortController>>(new Map());
   const inputId = useBaseUIId();
   const isInitialRender = React.useRef(true);
 
-  // Cleanup object URLs to prevent memory leaks
+  // Cleanup object URLs and abort controllers to prevent memory leaks
   React.useEffect(() => {
+    const controllers = abortControllersRef.current;
     return () => {
       files.forEach((file) => URL.revokeObjectURL(file.preview));
+      controllers.forEach((controller) => controller.abort());
+      controllers.clear();
     };
   }, [files]);
 
@@ -67,10 +90,10 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
     const hasMaxSizeLimit = Number.isFinite(maxSize);
 
     if (hasMaxSizeLimit && file.size > maxSize) {
-      return `File too large (max ${formatBytes(maxSize)})`;
+      return messages.fileTooLarge(file, formatBytes(maxSize));
     }
     if (file.size < minSize) {
-      return `File too small (min ${formatBytes(minSize)})`;
+      return messages.fileTooSmall(file, formatBytes(minSize));
     }
 
     if (accept && accept !== '*') {
@@ -93,7 +116,7 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
       });
 
       if (!isAccepted) {
-        return 'File type not accepted';
+        return messages.fileTypeNotAccepted(file);
       }
     }
 
@@ -116,7 +139,7 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
     setFiles((prev) => {
       const remainingSlots = maxFiles - prev.length;
       if (remainingSlots <= 0) {
-        setAnnouncement(`Cannot add files. Limit of ${maxFiles} reached.`);
+        setAnnouncement(messages.maxFilesReached(maxFiles));
         return prev;
       }
 
@@ -132,7 +155,7 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
         const fileKey = `${file.name}:${file.size}:${file.lastModified}`;
         if (existingKeys.has(fileKey)) {
           onDuplicateFile?.(file);
-          errors.push(`${file.name}: duplicate file`);
+          errors.push(messages.duplicateFile(file));
           return;
         }
 
@@ -153,11 +176,8 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
         }
       });
 
-      const successMsg =
-        validFiles.length > 0
-          ? `Added ${validFiles.length} file${validFiles.length !== 1 ? 's' : ''}.`
-          : '';
-      const errorMsg = errors.length > 0 ? ` ${errors.length} rejected: ${errors.join(', ')}` : '';
+      const successMsg = validFiles.length > 0 ? messages.filesAdded(validFiles.length) : '';
+      const errorMsg = errors.length > 0 ? messages.filesRejected(errors.length, errors) : '';
 
       setAnnouncement(`${successMsg}${errorMsg}`);
 
@@ -169,7 +189,7 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
     setFiles((prev) => {
       const fileToRemove = prev.find((f) => f.id === id);
       if (fileToRemove) {
-        setAnnouncement(`Removed file ${fileToRemove.name}`);
+        setAnnouncement(messages.fileRemoved(fileToRemove));
       }
       return prev.filter((f) => f.id !== id);
     });
@@ -177,7 +197,52 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
 
   const clearFiles = useStableCallback(() => {
     setFiles([]);
-    setAnnouncement('All files removed');
+    setAnnouncement(messages.allFilesRemoved());
+  });
+
+  const retryFile = useStableCallback((id: string) => {
+    setFiles((prev) => {
+      return prev.map((file) => {
+        if (file.id === id && file.status === 'error') {
+          onRetry?.(file);
+          setAnnouncement(messages.retryingUpload(file));
+          return {
+            ...file,
+            status: 'idle' as FileUploadRootFileStatus,
+            progress: 0,
+            error: undefined,
+          };
+        }
+        return file;
+      });
+    });
+  });
+
+  const abortUpload = useStableCallback((id: string) => {
+    const controller = abortControllersRef.current.get(id);
+    if (controller) {
+      controller.abort();
+      abortControllersRef.current.delete(id);
+      setFiles((prev) => {
+        return prev.map((file) => {
+          if (file.id === id && file.status === 'uploading') {
+            setAnnouncement(messages.uploadCanceled(file));
+            return {
+              ...file,
+              status: 'error' as FileUploadRootFileStatus,
+              error: 'Upload canceled',
+            };
+          }
+          return file;
+        });
+      });
+    }
+  });
+
+  const getAbortSignal = useStableCallback((id: string): AbortSignal => {
+    const controller = new AbortController();
+    abortControllersRef.current.set(id, controller);
+    return controller.signal;
   });
 
   const openFileDialog = useStableCallback(() => {
@@ -205,7 +270,11 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
       removeFile,
       clearFiles,
       addFiles,
+      retryFile,
+      abortUpload,
+      getAbortSignal,
       onCancel,
+      onRetry,
       openFileDialog,
       setFiles,
       registerInput,
@@ -224,7 +293,11 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
       removeFile,
       clearFiles,
       addFiles,
+      retryFile,
+      abortUpload,
+      getAbortSignal,
       onCancel,
+      onRetry,
       openFileDialog,
       registerInput,
     ],

@@ -517,25 +517,46 @@ A native fieldset element with an easily stylable legend.
 
 ## File Upload
 
-A headless, unstyled file upload component for React with drag-and-drop support.
+A headless, unstyled file upload component with drag-and-drop, paste, and click-to-select support.
 
 <details>
 
 <summary>Outline</summary>
 
-- Keywords: React File Upload, File Upload Component, Drag and Drop Upload, File Validation, File Preview, Headless React Components, Unstyled Components, Accessible File Upload, Base UI, File Input, Multiple File Upload
+- Keywords: React File Upload, File Upload Component, Drag and Drop, Headless File Upload, Unstyled File Upload, File Validation, File Preview, Accessible File Upload, WCAG Compliant, Base UI
 - Sections:
+  - Usage guidelines
   - Anatomy
-  - Usage
+  - Examples
     - Basic setup
+    - Controlled state
+  - Usage
     - File validation
-    - Handling file changes
+    - Custom validation
+    - Image validation
     - Drag and drop state
-    - File preview items
+    - Handling file dialog cancellation
+    - Detecting duplicate files
+    - Paste from clipboard
+    - Folder upload
+    - Preview items with context
+  - Accessibility
+    - Upload with progress tracking
+    - Upload with retry and cancel
+    - Upload with pause and resume
+    - Form integration
+  - Browser Support
+  - FAQ
+    - Why is there no built-in upload?
+    - How do I integrate with my backend?
+    - Can I crop or resize images?
+    - Do I need to revoke preview URLs?
+    - How do I add drag-to-reorder for files?
+    - Can I validate file content, not just extension?
   - API reference
 - Exports:
   - File Upload - Root
-    - Props: accept, children, className, directory, disabled, maxFiles, maxSize, minSize, multiple, onCancel, onDuplicateFile, onFileReject, onFilesChange, render, style, validator
+    - Props: accept, children, className, directory, disabled, maxFiles, maxSize, messages, minSize, multiple, onCancel, onDuplicateFile, onFileReject, onFilesChange, onRetry, render, style, validator
     - Data Attributes: data-disabled, data-dragging
   - File Upload - Dropzone
     - Props: children, className, render, style
@@ -547,7 +568,7 @@ A headless, unstyled file upload component for React with drag-and-drop support.
     - Props: children, className, file, render, style
     - Data Attributes: data-complete, data-uploading
   - File Upload - PreviewList
-    - Props: className, render, style
+    - Props: className, filter, render, style
     - Data Attributes: data-empty
   - File Upload - Trigger
     - Props: className, render, style

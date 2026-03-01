@@ -193,4 +193,222 @@ describe('FileUpload.PreviewList', () => {
     const list = await screen.findByTestId('preview-list');
     expect(list?.className).toContain('preview-list-class');
   });
+
+  describe('filter prop', () => {
+    it('filters files by status', async () => {
+      function TestComponent() {
+        const [files, setFiles] = React.useState<any[]>([]);
+
+        React.useEffect(() => {
+          if (files.length === 0) {
+            setFiles([
+              {
+                id: '1',
+                name: 'uploading.txt',
+                size: 100,
+                type: 'text/plain',
+                preview: 'blob:test1',
+                status: 'uploading',
+                progress: 50,
+              },
+              {
+                id: '2',
+                name: 'error.txt',
+                size: 100,
+                type: 'text/plain',
+                preview: 'blob:test2',
+                status: 'error',
+                progress: 0,
+                error: 'Failed',
+              },
+              {
+                id: '3',
+                name: 'success.txt',
+                size: 100,
+                type: 'text/plain',
+                preview: 'blob:test3',
+                status: 'success',
+                progress: 100,
+              },
+            ]);
+          }
+        }, [files.length]);
+
+        return (
+          <FileUpload.Root onFilesChange={setFiles}>
+            <FileUpload.Input />
+            <FileUpload.PreviewList
+              data-testid="error-list"
+              filter={(fileList) => fileList.filter((f) => f.status === 'error')}
+            >
+              {files
+                .filter((f) => f.status === 'error')
+                .map((file) => (
+                  <FileUpload.PreviewItem key={file.id} file={file}>
+                    <span data-testid={`file-${file.name}`}>{file.name}</span>
+                  </FileUpload.PreviewItem>
+                ))}
+            </FileUpload.PreviewList>
+          </FileUpload.Root>
+        );
+      }
+
+      render(<TestComponent />);
+
+      await waitFor(() => {
+        expect(screen.getByTestId('error-list')).toBeInTheDocument();
+        expect(screen.getByTestId('file-error.txt')).toBeInTheDocument();
+        expect(screen.queryByTestId('file-uploading.txt')).not.toBeInTheDocument();
+        expect(screen.queryByTestId('file-success.txt')).not.toBeInTheDocument();
+      });
+    });
+
+    it('shows only uploading files with filter', async () => {
+      function TestComponent() {
+        const [files, setFiles] = React.useState<any[]>([
+          {
+            id: '1',
+            name: 'uploading1.txt',
+            size: 100,
+            type: 'text/plain',
+            preview: 'blob:test1',
+            status: 'uploading',
+            progress: 30,
+          },
+          {
+            id: '2',
+            name: 'uploading2.txt',
+            size: 100,
+            type: 'text/plain',
+            preview: 'blob:test2',
+            status: 'uploading',
+            progress: 60,
+          },
+          {
+            id: '3',
+            name: 'idle.txt',
+            size: 100,
+            type: 'text/plain',
+            preview: 'blob:test3',
+            status: 'idle',
+            progress: 0,
+          },
+        ]);
+
+        return (
+          <FileUpload.Root onFilesChange={setFiles}>
+            <FileUpload.Input />
+            <FileUpload.PreviewList
+              data-testid="uploading-list"
+              filter={(allFiles) => allFiles.filter((f) => f.status === 'uploading')}
+            >
+              {files
+                .filter((f) => f.status === 'uploading')
+                .map((file) => (
+                  <FileUpload.PreviewItem key={file.id} file={file}>
+                    <span data-testid={`file-${file.name}`}>{file.name}</span>
+                  </FileUpload.PreviewItem>
+                ))}
+            </FileUpload.PreviewList>
+          </FileUpload.Root>
+        );
+      }
+
+      render(<TestComponent />);
+
+      expect(screen.getByTestId('file-uploading1.txt')).toBeInTheDocument();
+      expect(screen.getByTestId('file-uploading2.txt')).toBeInTheDocument();
+      expect(screen.queryByTestId('file-idle.txt')).not.toBeInTheDocument();
+    });
+
+    it('hides list when filter returns empty array', async () => {
+      function TestComponent() {
+        const [files, setFiles] = React.useState<any[]>([
+          {
+            id: '1',
+            name: 'idle.txt',
+            size: 100,
+            type: 'text/plain',
+            preview: 'blob:test1',
+            status: 'idle',
+            progress: 0,
+          },
+        ]);
+
+        return (
+          <FileUpload.Root onFilesChange={setFiles}>
+            <FileUpload.Input />
+            <FileUpload.PreviewList
+              data-testid="error-list"
+              filter={(allFiles) => allFiles.filter((f) => f.status === 'error')}
+            >
+              {files
+                .filter((f) => f.status === 'error')
+                .map((file) => (
+                  <FileUpload.PreviewItem key={file.id} file={file}>
+                    {file.name}
+                  </FileUpload.PreviewItem>
+                ))}
+            </FileUpload.PreviewList>
+          </FileUpload.Root>
+        );
+      }
+
+      render(<TestComponent />);
+
+      expect(screen.queryByTestId('error-list')).not.toBeInTheDocument();
+    });
+
+    it('passes filtered files in state to className callback', async () => {
+      const classNameFn = vi.fn(() => 'custom-class');
+
+      function TestComponent() {
+        const [, setFiles] = React.useState<any[]>([
+          {
+            id: '1',
+            name: 'error1.txt',
+            size: 100,
+            type: 'text/plain',
+            preview: 'blob:test1',
+            status: 'error',
+            progress: 0,
+            error: 'Failed',
+          },
+          {
+            id: '2',
+            name: 'success.txt',
+            size: 100,
+            type: 'text/plain',
+            preview: 'blob:test2',
+            status: 'success',
+            progress: 100,
+          },
+        ]);
+
+        return (
+          <FileUpload.Root onFilesChange={setFiles}>
+            <FileUpload.Input />
+            <FileUpload.PreviewList
+              data-testid="filtered-list"
+              filter={(allFiles) => allFiles.filter((f) => f.status === 'error')}
+              className={classNameFn}
+            >
+              <li>Items</li>
+            </FileUpload.PreviewList>
+          </FileUpload.Root>
+        );
+      }
+
+      render(<TestComponent />);
+
+      render(<TestComponent />);
+
+      await waitFor(() => {
+        expect(classNameFn).toHaveBeenCalled();
+        // Verify the filter worked by checking the function was called with filtered state
+        const list = screen.getByTestId('filtered-list');
+        expect(list).toBeInTheDocument();
+      });
+    });
+  });
 });

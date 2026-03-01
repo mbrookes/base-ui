@@ -1,5 +1,28 @@
 # FileUpload Component: Competitive Analysis & Enhancement Plan
 
+**Last Updated:** March 1, 2026 (Originally created: February 26, 2026)
+
+## Recent Updates (March 1, 2026)
+
+🎉 **Major Progress Since Initial Analysis:**
+
+- ✅ Custom validator feature added (validator prop)
+- ✅ Fixed file extension validation bug
+- ✅ Paste support fully implemented
+- ✅ Folder upload support added (directory prop)
+- ✅ Complete keyboard navigation
+- ✅ Dialog cancellation detection (onCancel)
+- ✅ Duplicate file detection (onDuplicateFile)
+- ✅ Screen reader live region announcements
+- ✅ **Retry mechanism for failed uploads** (retryFile method, onRetry callback)
+- ✅ **File filtering options** (filter prop on PreviewList)
+- ✅ **Abort signal support** (abortUpload, getAbortSignal methods)
+- ✅ **i18n support** (messages prop for customized/localized messaging)
+
+**Status:** All high-priority features are now implemented! Only 2 medium-priority and 5 low-priority features remain.
+
+---
+
 ## Executive Summary
 
 Base UI's FileUpload component is a **headless, unstyled implementation** focused on being a minimal building block rather than a full-featured upload solution. Compared to market leaders (React Dropzone, Uppy, FilePond), it currently covers the **core foundation** but is missing several important features. This document outlines gaps and a phased plan to address them.
@@ -39,20 +62,20 @@ Base UI's FileUpload component is a **headless, unstyled implementation** focuse
 
 #### High Priority (Breaking gaps for common use cases)
 
-1. **Paste support** - Users can't paste from clipboard
-2. **Folder upload** - Can't select directories recursively
-3. **Keyboard accessibility** - Limited keyboard navigation (e.g., Space/Enter to open dialog)
-4. **File listing options** - No way to customize which files are shown (e.g., show upload progress)
-5. **Error recovery** - No retry mechanism for failed uploads
-6. **onCancel callback** - No way to react to user canceling file selection
+1. ~~**Paste support**~~ - ✅ **IMPLEMENTED** (March 1, 2026)
+2. ~~**Folder upload**~~ - ✅ **IMPLEMENTED** (directory prop)
+3. ~~**Keyboard accessibility**~~ - ✅ **IMPLEMENTED** (Enter/Space on Dropzone)
+4. ~~**File listing options**~~ - ✅ **IMPLEMENTED** (filter prop on PreviewList) _(March 1, 2026)_
+5. ~~**Error recovery**~~ - ✅ **IMPLEMENTED** (retryFile method, onRetry callback) _(March 1, 2026)_
+6. ~~**onCancel callback**~~ - ✅ **IMPLEMENTED** (March 1, 2026)
 
 #### Medium Priority (Nice-to-have, improves UX)
 
-1. **Duplicate detection** - Warning when adding same file twice
-2. **Abort signal support** - Cancel in-progress uploads
-3. **Multiple input modes** - Ability to create custom triggers beyond button/dropzone
+1. ~~**Duplicate detection**~~ - ✅ **IMPLEMENTED** (onDuplicateFile callback)
+2. ~~**Abort signal support**~~ - ✅ **IMPLEMENTED** (abortUpload method, getAbortSignal) _(March 1, 2026)_
+3. ~~**Multiple input modes**~~ - ✅ **IMPLEMENTED** (Trigger + Dropzone components)
 4. **File sorting/reordering** - Drag-to-reorder in preview list
-5. **i18n support** - Localized error messages and announcements
+5. ~~**i18n support**~~ - ✅ **IMPLEMENTED** (messages prop for localized strings) _(March 1, 2026)_
 6. **Image-specific features** - Thumbnail generation, EXIF stripping
 
 #### Lower Priority (Advanced/specialized)
@@ -62,7 +85,7 @@ Base UI's FileUpload component is a **headless, unstyled implementation** focuse
 3. **Remote sources** - Load files from Google Drive, Dropbox, URLs
 4. **Native upload hooks** - `useFilesFromClick`, `useFilesFromPaste`, etc.
 5. **Compression** - Client-side image/file compression
-6. **Validation plugins** - Custom validation rule system
+6. ~~**Validation plugins**~~ - ✅ **IMPLEMENTED** (validator prop for custom rules)
 
 ---
 
@@ -73,15 +96,15 @@ Base UI's FileUpload component is a **headless, unstyled implementation** focuse
 | **Core File Handling** |
 | Drag-drop              | ✅                | ✅                | ✅             | ✅       |
 | Click-select           | ✅                | ✅                | ✅             | ✅       |
-| Paste support          | ❌                | ✅                | ✅             | ✅       |
-| Folder upload          | ❌                | ✅                | ✅             | ❌       |
-| Keyboard control       | ⚠️                | ✅                | ✅             | ✅       |
+| Paste support          | ✅                | ✅                | ✅             | ✅       |
+| Folder upload          | ✅                | ✅                | ✅             | ❌       |
+| Keyboard control       | ✅                | ✅                | ✅             | ✅       |
 | **Validation**         |
 | File type              | ✅                | ✅                | ✅             | ✅       |
 | File size              | ✅                | ✅                | ✅             | ✅       |
 | File count             | ✅                | ✅                | ✅             | ✅       |
-| Custom validation      | ❌                | ✅                | ✅             | ✅       |
-| Duplicate detection    | ❌                | ❌                | ✅             | ❌       |
+| Custom validation      | ✅                | ✅                | ✅             | ✅       |
+| Duplicate detection    | ✅                | ❌                | ✅             | ❌       |
 | **Upload Handling**    |
 | Progress tracking      | ✅                | ❌                | ✅             | ✅       |
 | Status management      | ✅                | ❌                | ✅             | ✅       |
@@ -93,8 +116,8 @@ Base UI's FileUpload component is a **headless, unstyled implementation** focuse
 | **Accessibility**      |
 | ARIA labels            | ✅                | ✅                | ✅             | ✅       |
 | Screen reader support  | ✅                | ✅                | ✅             | ✅       |
-| Keyboard navigation    | ⚠️                | ✅                | ✅             | ✅       |
-| Live regions           | ❌                | ❌                | ✅             | ⚠️       |
+| Keyboard navigation    | ✅                | ✅                | ✅             | ✅       |
+| Live regions           | ✅                | ❌                | ✅             | ⚠️       |
 | **I18n & UX**          |
 | Localization           | ❌                | ❌                | ✅ (30+ langs) | ⚠️       |
 | Error messages         | ✅ (English only) | ✅ (English only) | ✅             | ✅       |

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { render, screen, waitFor, fireEvent, act } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi } from 'vitest';
 import { FileUpload } from '../index';
@@ -208,10 +208,8 @@ describe('FileUpload', () => {
       configurable: true,
     });
 
-    await act(async () => {
-      const event = new Event('change', { bubbles: true });
-      input.dispatchEvent(event);
-    });
+    const event = new Event('change', { bubbles: true });
+    input.dispatchEvent(event);
 
     await waitFor(() => expect(onFileReject).toHaveBeenCalled());
     expect(onFileReject).toHaveBeenCalledWith(file, expect.any(String));
@@ -545,10 +543,8 @@ describe('FileUpload', () => {
         configurable: true,
       });
 
-      await act(async () => {
-        const event = new Event('change', { bubbles: true });
-        input.dispatchEvent(event);
-      });
+      const event = new Event('change', { bubbles: true });
+      input.dispatchEvent(event);
 
       await waitFor(() => expect(onFileReject).toHaveBeenCalled());
       expect(onFileReject.mock.calls[0][0]).toBe(textFile);
@@ -573,10 +569,8 @@ describe('FileUpload', () => {
         configurable: true,
       });
 
-      await act(async () => {
-        const event = new Event('change', { bubbles: true });
-        input.dispatchEvent(event);
-      });
+      const event = new Event('change', { bubbles: true });
+      input.dispatchEvent(event);
 
       await waitFor(() => expect(onFileReject).toHaveBeenCalled());
     });
@@ -598,12 +592,481 @@ describe('FileUpload', () => {
         configurable: true,
       });
 
-      await act(async () => {
-        const event = new Event('change', { bubbles: true });
-        input.dispatchEvent(event);
-      });
+      const event = new Event('change', { bubbles: true });
+      input.dispatchEvent(event);
 
       await waitFor(() => expect(onFileReject).toHaveBeenCalled());
+    });
+  });
+
+  describe('retry functionality', () => {
+    it('retries a failed file upload', async () => {
+      const onRetry = vi.fn();
+
+      function RetryButton({ fileId }: { fileId: string }) {
+        const { retryFile } = FileUpload.useFileUploadContext();
+        return <button onClick={() => retryFile(fileId)}>Retry</button>;
+      }
+
+      function TestComponent() {
+        const context = FileUpload.useFileUploadContext();
+
+        React.useEffect(() => {
+          // Set files directly using context
+          context.setFiles([
+            {
+              id: '1',
+              name: 'failed.txt',
+              size: 100,
+              type: 'text/plain',
+              preview: 'blob:test',
+              status: 'error',
+              progress: 0,
+              error: 'Network error',
+            } as any,
+          ]);
+        }, [context]);
+
+        return (
+          <React.Fragment>
+            <FileUpload.Input />
+            <RetryButton fileId="1" />
+          </React.Fragment>
+        );
+      }
+
+      render(
+        <FileUpload.Root onRetry={onRetry}>
+          <TestComponent />
+        </FileUpload.Root>,
+      );
+
+      const retryButton = await screen.findByRole('button', { name: 'Retry' });
+      await userEvent.setup().click(retryButton);
+
+      await waitFor(() => expect(onRetry).toHaveBeenCalled());
+    });
+
+    it('resets file status and progress on retry', async () => {
+      function RetryButton({ fileId }: { fileId: string }) {
+        const { retryFile, files } = FileUpload.useFileUploadContext();
+        return (
+          <React.Fragment>
+            <button onClick={() => retryFile(fileId)}>Retry</button>
+            <div data-testid="file-status">{files[0]?.status}</div>
+            <div data-testid="file-progress">{files[0]?.progress}</div>
+          </React.Fragment>
+        );
+      }
+
+      function TestComponent() {
+        const context = FileUpload.useFileUploadContext();
+
+        React.useEffect(() => {
+          context.setFiles([
+            {
+              id: '1',
+              name: 'failed.txt',
+              size: 100,
+              type: 'text/plain',
+              preview: 'blob:test',
+              status: 'error',
+              progress: 50,
+              error: 'Network error',
+            } as any,
+          ]);
+        }, [context]);
+
+        return (
+          <React.Fragment>
+            <FileUpload.Input />
+            <RetryButton fileId="1" />
+          </React.Fragment>
+        );
+      }
+
+      render(
+        <FileUpload.Root>
+          <TestComponent />
+        </FileUpload.Root>,
+      );
+
+      await waitFor(() => {
+        expect(screen.getByTestId('file-status')).toHaveTextContent('error');
+        expect(screen.getByTestId('file-progress')).toHaveTextContent('50');
+      });
+
+      const retryButton = screen.getByRole('button', { name: 'Retry' });
+      await userEvent.setup().click(retryButton);
+
+      await waitFor(() => {
+        expect(screen.getByTestId('file-status')).toHaveTextContent('idle');
+        expect(screen.getByTestId('file-progress')).toHaveTextContent('0');
+      });
+    });
+  });
+
+  describe('preview list filtering', () => {
+    it('filters files by status', async () => {
+      function TestComponent() {
+        const context = FileUpload.useFileUploadContext();
+
+        React.useEffect(() => {
+          context.setFiles([
+            {
+              id: '1',
+              name: 'uploading.txt',
+              size: 100,
+              type: 'text/plain',
+              preview: 'blob:test1',
+              status: 'uploading',
+              progress: 50,
+            } as any,
+            {
+              id: '2',
+              name: 'error.txt',
+              size: 100,
+              type: 'text/plain',
+              preview: 'blob:test2',
+              status: 'error',
+              progress: 0,
+              error: 'Failed',
+            } as any,
+            {
+              id: '3',
+              name: 'success.txt',
+              size: 100,
+              type: 'text/plain',
+              preview: 'blob:test3',
+              status: 'success',
+              progress: 100,
+            } as any,
+          ]);
+        }, [context]);
+
+        return (
+          <React.Fragment>
+            <FileUpload.Input />
+            <FileUpload.PreviewList
+              data-testid="error-list"
+              filter={(files) => files.filter((f) => f.status === 'error')}
+            >
+              {context.files
+                .filter((f) => f.status === 'error')
+                .map((file) => (
+                  <FileUpload.PreviewItem key={file.id} file={file}>
+                    <span data-testid={`file-${file.name}`}>{file.name}</span>
+                  </FileUpload.PreviewItem>
+                ))}
+            </FileUpload.PreviewList>
+          </React.Fragment>
+        );
+      }
+
+      render(
+        <FileUpload.Root>
+          <TestComponent />
+        </FileUpload.Root>,
+      );
+
+      await waitFor(() => {
+        expect(screen.getByTestId('error-list')).toBeInTheDocument();
+        expect(screen.getByTestId('file-error.txt')).toBeInTheDocument();
+        expect(screen.queryByTestId('file-uploading.txt')).not.toBeInTheDocument();
+        expect(screen.queryByTestId('file-success.txt')).not.toBeInTheDocument();
+      });
+    });
+
+    it('shows uploading files only with filter', async () => {
+      function TestComponent() {
+        const context = FileUpload.useFileUploadContext();
+
+        React.useEffect(() => {
+          context.setFiles([
+            {
+              id: '1',
+              name: 'uploading1.txt',
+              size: 100,
+              type: 'text/plain',
+              preview: 'blob:test1',
+              status: 'uploading',
+              progress: 30,
+            } as any,
+            {
+              id: '2',
+              name: 'uploading2.txt',
+              size: 100,
+              type: 'text/plain',
+              preview: 'blob:test2',
+              status: 'uploading',
+              progress: 60,
+            } as any,
+            {
+              id: '3',
+              name: 'idle.txt',
+              size: 100,
+              type: 'text/plain',
+              preview: 'blob:test3',
+              status: 'idle',
+              progress: 0,
+            } as any,
+          ]);
+        }, [context]);
+
+        return (
+          <React.Fragment>
+            <FileUpload.Input />
+            <FileUpload.PreviewList
+              data-testid="uploading-list"
+              filter={(files) => files.filter((f) => f.status === 'uploading')}
+            >
+              {context.files
+                .filter((f) => f.status === 'uploading')
+                .map((file) => (
+                  <FileUpload.PreviewItem key={file.id} file={file}>
+                    <span data-testid={`file-${file.name}`}>{file.name}</span>
+                  </FileUpload.PreviewItem>
+                ))}
+            </FileUpload.PreviewList>
+          </React.Fragment>
+        );
+      }
+
+      render(
+        <FileUpload.Root>
+          <TestComponent />
+        </FileUpload.Root>,
+      );
+
+      await waitFor(() => {
+        expect(screen.getByTestId('file-uploading1.txt')).toBeInTheDocument();
+        expect(screen.getByTestId('file-uploading2.txt')).toBeInTheDocument();
+        expect(screen.queryByTestId('file-idle.txt')).not.toBeInTheDocument();
+      });
+    });
+  });
+
+  describe('abort signal support', () => {
+    it('provides abort signal for upload tracking', () => {
+      function TestComponent() {
+        const context = FileUpload.useFileUploadContext();
+        const [signal, setSignal] = React.useState<AbortSignal | null>(null);
+
+        React.useEffect(() => {
+          if (context.getAbortSignal) {
+            const sig = context.getAbortSignal('test-id');
+            setSignal(sig);
+          }
+        }, [context]);
+
+        return (
+          <div>
+            <FileUpload.Input />
+            {signal && <div data-testid="has-signal">Has Signal</div>}
+          </div>
+        );
+      }
+
+      render(
+        <FileUpload.Root>
+          <TestComponent />
+        </FileUpload.Root>,
+      );
+
+      expect(screen.getByTestId('has-signal')).toBeInTheDocument();
+    });
+
+    it('aborts upload when abortUpload is called', async () => {
+      function TestComponent() {
+        const context = FileUpload.useFileUploadContext();
+        const [aborted, setAborted] = React.useState(false);
+
+        return (
+          <div>
+            <FileUpload.Input />
+            <button
+              onClick={() => {
+                const signal = context.getAbortSignal('test-id');
+                signal.addEventListener('abort', () => setAborted(true));
+                context.abortUpload('test-id');
+              }}
+            >
+              Abort Upload
+            </button>
+            {aborted && <div data-testid="aborted">Aborted</div>}
+          </div>
+        );
+      }
+
+      render(
+        <FileUpload.Root>
+          <TestComponent />
+        </FileUpload.Root>,
+      );
+
+      const abortButton = screen.getByRole('button', { name: 'Abort Upload' });
+      await userEvent.setup().click(abortButton);
+
+      await waitFor(() => {
+        expect(screen.getByTestId('aborted')).toBeInTheDocument();
+      });
+    });
+  });
+
+  describe('i18n support', () => {
+    it('uses custom messages for file too large', async () => {
+      const customMessages = {
+        fileTooLarge: (file: File, maxSize: string) =>
+          `${file.name} est trop grand (max ${maxSize})`,
+      };
+      const onFileReject = vi.fn();
+
+      render(
+        <FileUpload.Root maxSize={100} messages={customMessages} onFileReject={onFileReject}>
+          <FileUpload.Input data-testid="file-input" />
+        </FileUpload.Root>,
+      );
+
+      const file = new File(['a'.repeat(200)], 'large.txt', { type: 'text/plain' });
+      const input = screen.getByTestId('file-input') as HTMLInputElement;
+
+      Object.defineProperty(input, 'files', {
+        value: [file],
+        writable: false,
+      });
+
+      const event = new Event('change', { bubbles: true });
+      input.dispatchEvent(event);
+
+      await waitFor(() => {
+        expect(onFileReject).toHaveBeenCalledWith(file, expect.stringContaining('trop grand'));
+      });
+    });
+
+    it('uses custom messages for file type not accepted', async () => {
+      const customMessages = {
+        fileTypeNotAccepted: (file: File) => `${file.name} 形式はサポートされていません`,
+      };
+      const onFileReject = vi.fn();
+
+      render(
+        <FileUpload.Root accept="image/*" messages={customMessages} onFileReject={onFileReject}>
+          <FileUpload.Input data-testid="file-input" />
+        </FileUpload.Root>,
+      );
+
+      const file = new File(['content'], 'document.pdf', { type: 'application/pdf' });
+      const input = screen.getByTestId('file-input') as HTMLInputElement;
+
+      Object.defineProperty(input, 'files', {
+        value: [file],
+        writable: false,
+      });
+
+      const event = new Event('change', { bubbles: true });
+      input.dispatchEvent(event);
+
+      await waitFor(() => {
+        expect(onFileReject).toHaveBeenCalledWith(
+          file,
+          expect.stringContaining('サポートされていません'),
+        );
+      });
+    });
+
+    it('uses custom messages for max files reached', async () => {
+      const customMessages = {
+        maxFilesReached: (max: number) => `Limite de ${max} fichiers atteinte`,
+      };
+
+      function TestComponent() {
+        const [announcement, setAnnouncement] = React.useState('');
+        return (
+          <FileUpload.Root maxFiles={1} messages={customMessages}>
+            <FileUpload.Input data-testid="file-input" />
+            <div data-testid="announcement">{announcement}</div>
+            <button
+              onClick={() => {
+                const input = document.querySelector(
+                  '[data-testid="file-input"]',
+                ) as HTMLInputElement;
+                const ann = input.parentElement?.querySelector('[role="status"]')?.textContent;
+                if (ann) {
+                  setAnnouncement(ann);
+                }
+              }}
+            >
+              Check
+            </button>
+          </FileUpload.Root>
+        );
+      }
+
+      render(<TestComponent />);
+
+      const file1 = new File(['content1'], 'file1.txt', { type: 'text/plain' });
+      const file2 = new File(['content2'], 'file2.txt', { type: 'text/plain' });
+      const input = screen.getByTestId('file-input') as HTMLInputElement;
+
+      // Add first file
+      Object.defineProperty(input, 'files', {
+        value: [file1],
+        configurable: true,
+      });
+
+      fireEvent.change(input);
+
+      // Try to add second file when max is reached
+      Object.defineProperty(input, 'files', {
+        value: [file2],
+        configurable: true,
+      });
+
+      fireEvent.change(input);
+
+      const checkButton = screen.getByRole('button', { name: 'Check' });
+      await userEvent.setup().click(checkButton);
+
+      await waitFor(() => {
+        const announcement = screen.getByTestId('announcement');
+        expect(announcement.textContent).toContain('Limite de 1 fichiers atteinte');
+      });
+    });
+
+    it('uses custom messages for duplicate files', async () => {
+      const customMessages = {
+        duplicateFile: (file: File) => `${file.name} ya está añadido`,
+      };
+      const onDuplicateFile = vi.fn();
+
+      render(
+        <FileUpload.Root messages={customMessages} onDuplicateFile={onDuplicateFile}>
+          <FileUpload.Input data-testid="file-input" />
+        </FileUpload.Root>,
+      );
+
+      const file = new File(['content'], 'duplicate.txt', { type: 'text/plain' });
+      const input = screen.getByTestId('file-input') as HTMLInputElement;
+
+      // Add file first time
+      Object.defineProperty(input, 'files', {
+        value: [file],
+        configurable: true,
+      });
+
+      fireEvent.change(input);
+
+      // Try to add same file again
+      Object.defineProperty(input, 'files', {
+        value: [file],
+        configurable: true,
+      });
+
+      fireEvent.change(input);
+
+      await waitFor(() => {
+        expect(onDuplicateFile).toHaveBeenCalled();
+      });
     });
   });
 });

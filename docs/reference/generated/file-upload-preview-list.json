@@ -2,6 +2,12 @@
   "name": "FileUploadPreviewList",
   "description": "Container list for displaying uploaded files.\n\nThe PreviewList component renders as an unordered list and automatically hides\nitself when there are no files. It should contain PreviewItem components for\neach file being managed by the Root component.",
   "props": {
+    "filter": {
+      "type": "((files: FileUpload.Root.ExtendedFile[]) => FileUpload.Root.ExtendedFile[])",
+      "description": "Function to filter which files should be displayed.\nReceives the full list of files and should return the filtered list.\nUseful for showing only uploading files, only errors, etc.",
+      "example": "```tsx\n// Show only uploading files\n<FileUpload.PreviewList filter={(files) => files.filter(f => f.status === 'uploading')}>\n\n// Show only errors\n<FileUpload.PreviewList filter={(files) => files.filter(f => f.status === 'error')}>\n\n// Show files by status\n<FileUpload.PreviewList filter={(files) => files.filter(f => ['uploading', 'error'].includes(f.status))}>\n```",
+      "detailedType": "| ((\n    files: FileUpload.Root.ExtendedFile[],\n  ) => FileUpload.Root.ExtendedFile[])\n| undefined"
+    },
     "className": {
       "type": "string | ((state: FileUpload.PreviewList.State) => string | undefined)",
       "description": "CSS class applied to the element, or a function that\nreturns a class based on the component’s state.",
