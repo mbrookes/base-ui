@@ -197,11 +197,10 @@ describe('FileUpload.PreviewList', () => {
   describe('filter prop', () => {
     it('filters files by status', async () => {
       function TestComponent() {
-        const context = FileUpload.useFileUploadContext();
-        const { files } = context;
+        const { files, setFiles } = FileUpload.useFileUploadContext();
 
         React.useEffect(() => {
-          context.setFiles([
+          setFiles([
             {
               id: '1',
               name: 'uploading.txt',
@@ -231,7 +230,7 @@ describe('FileUpload.PreviewList', () => {
               progress: 100,
             } as any,
           ]);
-        }, [context]);
+        }, [setFiles]);
 
         return (
           <React.Fragment>
@@ -268,11 +267,10 @@ describe('FileUpload.PreviewList', () => {
 
     it('shows only uploading files with filter', async () => {
       function TestComponent() {
-        const context = FileUpload.useFileUploadContext();
-        const { files } = context;
+        const { files, setFiles } = FileUpload.useFileUploadContext();
 
         React.useEffect(() => {
-          context.setFiles([
+          setFiles([
             {
               id: '1',
               name: 'uploading1.txt',
@@ -301,7 +299,7 @@ describe('FileUpload.PreviewList', () => {
               progress: 0,
             } as any,
           ]);
-        }, [context]);
+        }, [setFiles]);
 
         return (
           <React.Fragment>
@@ -337,10 +335,10 @@ describe('FileUpload.PreviewList', () => {
 
     it('hides list when filter returns empty array', async () => {
       function TestComponent() {
-        const context = FileUpload.useFileUploadContext();
+        const { setFiles } = FileUpload.useFileUploadContext();
 
         React.useEffect(() => {
-          context.setFiles([
+          setFiles([
             {
               id: '1',
               name: 'idle.txt',
@@ -351,7 +349,7 @@ describe('FileUpload.PreviewList', () => {
               progress: 0,
             } as any,
           ]);
-        }, [context]);
+        }, [setFiles]);
 
         return (
           <React.Fragment>
@@ -381,10 +379,10 @@ describe('FileUpload.PreviewList', () => {
       const classNameFn = vi.fn(() => 'custom-class');
 
       function TestComponent() {
-        const context = FileUpload.useFileUploadContext();
+        const { setFiles } = FileUpload.useFileUploadContext();
 
         React.useEffect(() => {
-          context.setFiles([
+          setFiles([
             {
               id: '1',
               name: 'error1.txt',
@@ -405,7 +403,7 @@ describe('FileUpload.PreviewList', () => {
               progress: 100,
             } as any,
           ]);
-        }, [context]);
+        }, [setFiles]);
 
         return (
           <React.Fragment>
