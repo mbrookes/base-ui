@@ -147,6 +147,53 @@ Use `validator` for custom rules beyond size and type checks. Return an error me
 </FileUpload.Root>
 ```
 
+### Image validation
+
+Use utility functions to validate image dimensions and detect actual file types:
+
+```jsx title="Image dimension validation" "getImageDimensions"
+import * as React from 'react';
+import { FileUpload } from '@base-ui/react/file-upload';
+import { getImageDimensions } from '@base-ui/utils/getImageDimensions';
+
+export default function ImageUpload() {
+  return (
+    <FileUpload.Root
+      accept="image/*"
+      validator={async (file) => {
+        const dimensions = await getImageDimensions(file);
+
+        if (!dimensions) {
+          return 'Unable to determine image dimensions';
+        }
+
+        if (dimensions.width < 800) {
+          return `Image width must be at least 800px (current: ${dimensions.width}px)`;
+        }
+
+        if (dimensions.height < 600) {
+          return `Image height must be at least 600px (current: ${dimensions.height}px)`;
+        }
+
+        return null;
+      }}
+    >
+      <FileUpload.Input />
+      <FileUpload.Dropzone>Drop images here</FileUpload.Dropzone>
+      <FileUpload.Trigger>Select images</FileUpload.Trigger>
+    </FileUpload.Root>
+  );
+}
+```
+
+**Available image utilities:**
+
+- `getImageDimensions(file)` - Get width and height of an image
+- `validateImageDimensions(file, constraints)` - Validate against min/max width/height
+- `getImageAspectRatio(file)` - Calculate aspect ratio
+- `detectFileType(file)` - Detect actual file type from magic numbers (more reliable than MIME type)
+- `isValidFileType(file, acceptedTypes)` - Validate file type against accepted list
+
 ### Drag and drop state
 
 Access the dragging state in the Dropzone render prop:
