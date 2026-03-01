@@ -5,7 +5,7 @@
     "accept": {
       "type": "string",
       "default": "''",
-      "description": "Accepted file types (e.g., \"image/*\", \".pdf\", \"image/png,image/jpeg\").",
+      "description": "Accepted file types (e.g., \"image/*\", \".pdf\", \"image/png,image/jpeg\").\nSupports MIME types and file extensions.",
       "detailedType": "string | undefined"
     },
     "directory": {
@@ -57,6 +57,12 @@
       "type": "((files: FileUpload.Root.ExtendedFile[]) => void)",
       "description": "Callback when files are added.",
       "detailedType": "| ((files: FileUpload.Root.ExtendedFile[]) => void)\n| undefined"
+    },
+    "validator": {
+      "type": "((file: File) => string | null)",
+      "description": "Custom validation function for additional file validation beyond built-in checks.\nReturn an error message string if validation fails, or null if valid.",
+      "example": "```tsx\n<FileUpload.Root\n  validator={(file) => {\n    if (file.name.includes('confidential')) {\n      return 'Confidential files not allowed';\n    }\n    return null;\n  }}\n/>\n```",
+      "detailedType": "((file: File) => string | null) | undefined"
     },
     "disabled": {
       "type": "boolean",
