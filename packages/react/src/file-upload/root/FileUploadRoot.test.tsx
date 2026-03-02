@@ -879,11 +879,7 @@ describe('FileUpload', () => {
 
         act(() => {
           contextValue!.setFiles((prev) =>
-            prev.map((f) =>
-              f.id === fileId
-                ? { ...f, uploadedBytes: 5, progress: 50 }
-                : f,
-            ),
+            prev.map((f) => (f.id === fileId ? { ...f, uploadedBytes: 5, progress: 50 } : f)),
           );
         });
 
@@ -956,5 +952,4 @@ describe('FileUpload', () => {
       }
     });
   });
-
 });

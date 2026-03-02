@@ -7,6 +7,7 @@
 🎉 **FEATURE COMPLETE - All Planned Features Implemented and Tested!**
 
 ✅ **Core Features (Phase 1 & 2)**
+
 - Custom validator feature (validator prop)
 - Fixed file extension validation bug (case-insensitive)
 - Paste support fully implemented (clipboard handling)
@@ -17,15 +18,18 @@
 - Screen reader live region announcements (aria-live regions)
 
 ✅ **Advanced Features (Phase 3)**
+
 - **Retry mechanism** (retryFile method, onRetry callback)
 - **File filtering** (filter prop on PreviewList component)
 - **Abort signal support** (abortUpload, getAbortSignal methods with AbortController)
 - **i18n support** (messages prop with 11 customizable message types for localization)
 
 ✅ **Extended Features (Phase 5 - March 2, 2026)**
+
 - **Resumable uploads** (pauseFile, resumeFile methods with pause state tracking)
 
 ✅ **Code Quality & Testing**
+
 - 119 comprehensive tests covering all features (JSDOM + Chromium environments)
 - All tests passing with zero failures
 - ESLint clean (no warnings or violations)
@@ -104,37 +108,37 @@ Base UI's FileUpload component is a **headless, unstyled implementation** focuse
 
 ## Competitive Feature Matrix
 
-| Feature                | Base UI           | React Dropzone    | Uppy           | FilePond |
-| ---------------------- | ----------------- | ----------------- | -------------- | -------- |
+| Feature                | Base UI    | React Dropzone    | Uppy           | FilePond |
+| ---------------------- | ---------- | ----------------- | -------------- | -------- |
 | **Core File Handling** |
-| Drag-drop              | ✅ (Mar 1)        | ✅                | ✅             | ✅       |
-| Click-select           | ✅                | ✅                | ✅             | ✅       |
-| Paste support          | ✅ (Mar 1)        | ✅                | ✅             | ✅       |
-| Folder upload          | ✅ (Mar 1)        | ✅                | ✅             | ❌       |
-| Keyboard control       | ✅ (Mar 1)        | ✅                | ✅             | ✅       |
+| Drag-drop              | ✅ (Mar 1) | ✅                | ✅             | ✅       |
+| Click-select           | ✅         | ✅                | ✅             | ✅       |
+| Paste support          | ✅ (Mar 1) | ✅                | ✅             | ✅       |
+| Folder upload          | ✅ (Mar 1) | ✅                | ✅             | ❌       |
+| Keyboard control       | ✅ (Mar 1) | ✅                | ✅             | ✅       |
 | **Validation**         |
-| File type              | ✅                | ✅                | ✅             | ✅       |
-| File size              | ✅                | ✅                | ✅             | ✅       |
-| File count             | ✅                | ✅                | ✅             | ✅       |
-| Custom validation      | ✅ (Mar 1)        | ✅                | ✅             | ✅       |
-| Duplicate detection    | ✅ (Mar 1)        | ❌                | ✅             | ❌       |
+| File type              | ✅         | ✅                | ✅             | ✅       |
+| File size              | ✅         | ✅                | ✅             | ✅       |
+| File count             | ✅         | ✅                | ✅             | ✅       |
+| Custom validation      | ✅ (Mar 1) | ✅                | ✅             | ✅       |
+| Duplicate detection    | ✅ (Mar 1) | ❌                | ✅             | ❌       |
 | **Upload Handling**    |
-| Progress tracking      | ✅                | ❌                | ✅             | ✅       |
-| Status management      | ✅                | ❌                | ✅             | ✅       |
-| Error handling         | ✅ (Mar 1)        | ❌                | ✅             | ✅       |
-| Retry logic            | ✅ (Mar 2)        | ❌                | ✅             | ⚠️       |
-| Chunked uploads        | ❌                | ❌                | ✅             | ❌       |
-| Resumable uploads      | ✅ (Mar 2)        | ❌                | ✅             | ❌       |
-| Abort signal support   | ✅ (Mar 2)        | ❌                | ✅             | ❌       |
+| Progress tracking      | ✅         | ❌                | ✅             | ✅       |
+| Status management      | ✅         | ❌                | ✅             | ✅       |
+| Error handling         | ✅ (Mar 1) | ❌                | ✅             | ✅       |
+| Retry logic            | ✅ (Mar 2) | ❌                | ✅             | ⚠️       |
+| Chunked uploads        | ❌         | ❌                | ✅             | ❌       |
+| Resumable uploads      | ✅ (Mar 2) | ❌                | ✅             | ❌       |
+| Abort signal support   | ✅ (Mar 2) | ❌                | ✅             | ❌       |
 | **Accessibility**      |
-| ARIA labels            | ✅                | ✅                | ✅             | ✅       |
-| Screen reader support  | ✅                | ✅                | ✅             | ✅       |
-| Keyboard navigation    | ✅ (Mar 1)        | ✅                | ✅             | ✅       |
-| Live regions           | ✅ (Mar 1)        | ❌                | ✅             | ⚠️       |
+| ARIA labels            | ✅         | ✅                | ✅             | ✅       |
+| Screen reader support  | ✅         | ✅                | ✅             | ✅       |
+| Keyboard navigation    | ✅ (Mar 1) | ✅                | ✅             | ✅       |
+| Live regions           | ✅ (Mar 1) | ❌                | ✅             | ⚠️       |
 | **I18n & UX**          |
-| Localization           | ✅ (Mar 2)        | ❌                | ✅ (30+ langs) | ⚠️       |
-| Error messages         | ✅ (Mar 1)        | ✅ (English only) | ✅             | ✅       |
-| Customizable text      | ✅ (Mar 2)        | ⚠️                | ✅             | ✅       |
+| Localization           | ✅ (Mar 2) | ❌                | ✅ (30+ langs) | ⚠️       |
+| Error messages         | ✅ (Mar 1) | ✅ (English only) | ✅             | ✅       |
+| Customizable text      | ✅ (Mar 2) | ⚠️                | ✅             | ✅       |
 
 ---
 
