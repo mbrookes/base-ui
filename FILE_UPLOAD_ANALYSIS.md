@@ -284,8 +284,8 @@ Base UI's FileUpload component is a **headless, unstyled implementation** focuse
 
 ### 11. **Resumable Uploads (Pause/Resume)** (LOW PRIORITY - IMPLEMENTED MARCH 2)
 
-**Impact**: Users can pause and resume large file uploads  
-**Complexity**: Low-Medium  
+**Impact**: Users can pause and resume large file uploads
+**Complexity**: Low-Medium
 **Competitors**: Uppy supports this
 
 **Implementation approach**:

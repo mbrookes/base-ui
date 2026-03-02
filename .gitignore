@@ -45,4 +45,3 @@ next-env.d.ts
 test-results/
 # Research documents
 FILE_UPLOAD*.md
-FILEUPLOAD_*.md
