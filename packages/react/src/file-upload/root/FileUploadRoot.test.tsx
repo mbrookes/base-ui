@@ -4,6 +4,38 @@ import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi } from 'vitest';
 import { FileUpload } from '../index';
 
+type TestFileUploadContext = {
+  files: Array<{
+    id: string;
+    status: 'idle' | 'uploading' | 'success' | 'error' | 'paused';
+    isPaused?: boolean;
+    uploadedBytes?: number;
+    progress?: number;
+  }>;
+  addFiles: (files: File[]) => void;
+  setFiles: React.Dispatch<
+    React.SetStateAction<
+      Array<{
+        id: string;
+        status: 'idle' | 'uploading' | 'success' | 'error' | 'paused';
+        isPaused?: boolean;
+        uploadedBytes?: number;
+        progress?: number;
+      }>
+    >
+  >;
+  pauseFile: (id: string) => void;
+  resumeFile: (id: string) => void;
+};
+
+function getTestContext(contextValue: TestFileUploadContext | null): TestFileUploadContext {
+  if (contextValue === null) {
+    throw new Error('Expected FileUpload context to be available');
+  }
+
+  return contextValue;
+}
+
 const createClipboardData = (files: File[]) => {
   if (typeof DataTransfer === 'undefined') {
     return { files } as unknown as DataTransfer;
@@ -771,10 +803,10 @@ describe('FileUpload', () => {
 
   describe('Resumable uploads (pause/resume)', () => {
     it('exposes pauseFile and resumeFile methods in context', () => {
-      let contextValue: ReturnType<typeof FileUpload.useFileUploadContext> | null = null;
+      let contextValue: TestFileUploadContext | null = null;
 
       function TestComponent() {
-        contextValue = FileUpload.useFileUploadContext();
+        contextValue = FileUpload.useFileUploadContext() as unknown as TestFileUploadContext;
         return null;
       }
 
@@ -784,15 +816,18 @@ describe('FileUpload', () => {
         </FileUpload.Root>,
       );
 
-      expect(typeof contextValue?.pauseFile).toBe('function');
-      expect(typeof contextValue?.resumeFile).toBe('function');
+      expect(contextValue).not.toBeNull();
+      const context = getTestContext(contextValue);
+
+      expect(typeof context.pauseFile).toBe('function');
+      expect(typeof context.resumeFile).toBe('function');
     });
 
     it('paused file has isPaused flag set to true', () => {
-      let contextValue: ReturnType<typeof FileUpload.useFileUploadContext> | null = null;
+      let contextValue: TestFileUploadContext | null = null;
 
       function TestComponent() {
-        const context = FileUpload.useFileUploadContext();
+        const context = FileUpload.useFileUploadContext() as unknown as TestFileUploadContext;
         contextValue = context;
         return null;
       }
@@ -804,28 +839,27 @@ describe('FileUpload', () => {
       );
 
       const file = new File(['test content'], 'test.txt', { type: 'text/plain' });
-      if (contextValue) {
-        act(() => {
-          contextValue!.addFiles([file]);
-        });
-        const fileId = contextValue.files[0].id;
+      expect(contextValue).not.toBeNull();
+      const context = getTestContext(contextValue);
 
-        act(() => {
-          contextValue!.setFiles((prev) =>
-            prev.map((f) => ({ ...f, status: 'uploading' as const })),
-          );
-          contextValue!.pauseFile(fileId);
-        });
+      act(() => {
+        context.addFiles([file]);
+      });
+      const fileId = context.files[0].id;
 
-        expect(contextValue.files[0].isPaused).toBe(true);
-      }
+      act(() => {
+        context.setFiles((prev) => prev.map((f) => ({ ...f, status: 'uploading' as const })));
+        context.pauseFile(fileId);
+      });
+
+      expect(context.files[0].isPaused).toBe(true);
     });
 
     it('resumed file has isPaused flag set to false', () => {
-      let contextValue: ReturnType<typeof FileUpload.useFileUploadContext> | null = null;
+      let contextValue: TestFileUploadContext | null = null;
 
       function TestComponent() {
-        const context = FileUpload.useFileUploadContext();
+        const context = FileUpload.useFileUploadContext() as unknown as TestFileUploadContext;
         contextValue = context;
         return null;
       }
@@ -837,29 +871,28 @@ describe('FileUpload', () => {
       );
 
       const file = new File(['test'], 'test.txt', { type: 'text/plain' });
-      if (contextValue) {
-        act(() => {
-          contextValue!.addFiles([file]);
-        });
-        const fileId = contextValue.files[0].id;
+      expect(contextValue).not.toBeNull();
+      const context = getTestContext(contextValue);
 
-        act(() => {
-          contextValue!.setFiles((prev) =>
-            prev.map((f) => ({ ...f, status: 'uploading' as const })),
-          );
-          contextValue!.pauseFile(fileId);
-          contextValue!.resumeFile(fileId);
-        });
+      act(() => {
+        context.addFiles([file]);
+      });
+      const fileId = context.files[0].id;
 
-        expect(contextValue.files[0].isPaused).toBe(false);
-      }
+      act(() => {
+        context.setFiles((prev) => prev.map((f) => ({ ...f, status: 'uploading' as const })));
+        context.pauseFile(fileId);
+        context.resumeFile(fileId);
+      });
+
+      expect(context.files[0].isPaused).toBe(false);
     });
 
     it('supports uploadedBytes property for tracking progress', () => {
-      let contextValue: ReturnType<typeof FileUpload.useFileUploadContext> | null = null;
+      let contextValue: TestFileUploadContext | null = null;
 
       function TestComponent() {
-        const context = FileUpload.useFileUploadContext();
+        const context = FileUpload.useFileUploadContext() as unknown as TestFileUploadContext;
         contextValue = context;
         return null;
       }
@@ -871,29 +904,30 @@ describe('FileUpload', () => {
       );
 
       const file = new File(['0123456789'], 'test.txt', { type: 'text/plain' });
-      if (contextValue) {
-        act(() => {
-          contextValue!.addFiles([file]);
-        });
-        const fileId = contextValue.files[0].id;
+      expect(contextValue).not.toBeNull();
+      const context = getTestContext(contextValue);
 
-        act(() => {
-          contextValue!.setFiles((prev) =>
-            prev.map((f) => (f.id === fileId ? { ...f, uploadedBytes: 5, progress: 50 } : f)),
-          );
-        });
+      act(() => {
+        context.addFiles([file]);
+      });
+      const fileId = context.files[0].id;
 
-        expect(contextValue.files[0].uploadedBytes).toBe(5);
-        expect(contextValue.files[0].progress).toBe(50);
-      }
+      act(() => {
+        context.setFiles((prev) =>
+          prev.map((f) => (f.id === fileId ? { ...f, uploadedBytes: 5, progress: 50 } : f)),
+        );
+      });
+
+      expect(context.files[0].uploadedBytes).toBe(5);
+      expect(context.files[0].progress).toBe(50);
     });
 
     it('does not pause a file that is not uploading', () => {
       const onFilePause = vi.fn();
-      let contextValue: ReturnType<typeof FileUpload.useFileUploadContext> | null = null;
+      let contextValue: TestFileUploadContext | null = null;
 
       function TestComponent() {
-        const context = FileUpload.useFileUploadContext();
+        const context = FileUpload.useFileUploadContext() as unknown as TestFileUploadContext;
         contextValue = context;
         return null;
       }
@@ -905,27 +939,28 @@ describe('FileUpload', () => {
       );
 
       const file = new File(['test'], 'test.txt', { type: 'text/plain' });
-      if (contextValue) {
-        act(() => {
-          contextValue!.addFiles([file]);
-        });
-        const fileId = contextValue.files[0].id;
+      expect(contextValue).not.toBeNull();
+      const context = getTestContext(contextValue);
 
-        act(() => {
-          contextValue!.pauseFile(fileId);
-        });
+      act(() => {
+        context.addFiles([file]);
+      });
+      const fileId = context.files[0].id;
 
-        expect(onFilePause).not.toHaveBeenCalled();
-        expect(contextValue.files[0].status).toBe('idle');
-      }
+      act(() => {
+        context.pauseFile(fileId);
+      });
+
+      expect(onFilePause).not.toHaveBeenCalled();
+      expect(context.files[0].status).toBe('idle');
     });
 
     it('does not resume a file that is not paused', () => {
       const onFileResume = vi.fn();
-      let contextValue: ReturnType<typeof FileUpload.useFileUploadContext> | null = null;
+      let contextValue: TestFileUploadContext | null = null;
 
       function TestComponent() {
-        const context = FileUpload.useFileUploadContext();
+        const context = FileUpload.useFileUploadContext() as unknown as TestFileUploadContext;
         contextValue = context;
         return null;
       }
@@ -937,19 +972,20 @@ describe('FileUpload', () => {
       );
 
       const file = new File(['test'], 'test.txt', { type: 'text/plain' });
-      if (contextValue) {
-        act(() => {
-          contextValue!.addFiles([file]);
-        });
-        const fileId = contextValue.files[0].id;
+      expect(contextValue).not.toBeNull();
+      const context = getTestContext(contextValue);
 
-        act(() => {
-          contextValue!.resumeFile(fileId);
-        });
+      act(() => {
+        context.addFiles([file]);
+      });
+      const fileId = context.files[0].id;
 
-        expect(onFileResume).not.toHaveBeenCalled();
-        expect(contextValue.files[0].status).toBe('idle');
-      }
+      act(() => {
+        context.resumeFile(fileId);
+      });
+
+      expect(onFileResume).not.toHaveBeenCalled();
+      expect(context.files[0].status).toBe('idle');
     });
   });
 });
