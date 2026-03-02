@@ -296,15 +296,13 @@ export default function App() {
 
 File Upload is built with accessibility as a core feature:
 
-## Accessibility
-
-File Upload is built with accessibility as a core feature:
-
 - **WCAG 2.1 Level AA**: Compliant with Web Content Accessibility Guidelines
 - **Keyboard navigation**: Full keyboard support with logical tab order
 - **Screen reader support**: Semantic HTML and ARIA labels for VoiceOver, JAWS, and other assistants
 - **Focus management**: Clear focus indicators and focus trapping in dialogs
-- **Live regions**: File status updates announced to screen reader users## Uploading Files
+- **Live regions**: File status updates announced to screen reader users
+
+## Uploading Files
 
 **Important: FileUpload handles file selection only. You must implement the actual upload.**
 
@@ -782,7 +780,6 @@ export default function FileUploadWithPause() {
 
 **Note**: Complete pause/resume requires chunked uploads with server support (upload part by part). The example above shows the UI pattern; your server needs to support resuming from the last received byte.
 
-
 ### File pause/resume via context
 
 The FileUpload context provides `pauseFile` and `resumeFile` methods to control file upload state directly:
@@ -851,7 +848,6 @@ export default function FileUploadWithContextPause() {
 
 - `file.isPaused?: boolean` - Indicates if the file is currently paused
 - `file.uploadedBytes?: number` - Bytes uploaded so far (useful for resumable uploads)
-
 
 ### Form integration
 
@@ -1018,6 +1014,7 @@ File Upload includes comprehensive accessibility features:
 - **Color independence**: Drag-and-drop state changes aren't communicated by color alone
 
 **Live announcements** are automatically read by screen readers when:
+
 - Files are successfully added
 - A file is removed
 - A validation error occurs
@@ -1060,17 +1057,16 @@ export default function FileUploadWithAnnouncements() {
 }
 ```
 
-
 ## Browser Support
 
 File Upload works in all modern browsers. Here's browser-specific support:
 
-| Feature         | Chrome | Firefox | Safari | Edge |
-| --------------- | ------ | ------- | ------ | ---- |
-| Drag-and-drop   | ✅     | ✅      | ✅     | ✅   |
-| Click-to-select | ✅     | ✅      | ✅     | ✅   |
-| Paste files     | ✅     | ✅      | ✅     | ✅   |
-| Folder upload   | ✅     | ✅      | ⚠️     | ✅   |
+| Feature         | Chrome  | Firefox | Safari | Edge   |
+| :-------------- | :-----: | :-----: | :----: | :----: |
+| Drag-and-drop   | ✅      | ✅      | ✅     | ✅     |
+| Click-to-select | ✅      | ✅      | ✅     | ✅     |
+| Paste files     | ✅      | ✅      | ✅     | ✅     |
+| Folder upload   | ✅      | ✅      | ⚠️     | ✅     |
 
 **Folder upload notes:**
 
