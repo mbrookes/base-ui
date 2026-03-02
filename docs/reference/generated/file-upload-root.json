@@ -54,10 +54,20 @@
       "description": "Callback when a duplicate file is selected.",
       "detailedType": "((file: File) => void) | undefined"
     },
+    "onFilePause": {
+      "type": "((file: FileUpload.Root.ExtendedFile) => void)",
+      "description": "Callback when a file upload is paused.",
+      "detailedType": "| ((file: FileUpload.Root.ExtendedFile) => void)\n| undefined"
+    },
     "onFileReject": {
       "type": "((file: File, reason: string) => void)",
       "description": "Callback when a file is rejected.",
       "detailedType": "((file: File, reason: string) => void) | undefined"
+    },
+    "onFileResume": {
+      "type": "((file: FileUpload.Root.ExtendedFile) => void)",
+      "description": "Callback when a paused file upload is resumed.",
+      "detailedType": "| ((file: FileUpload.Root.ExtendedFile) => void)\n| undefined"
     },
     "onFilesChange": {
       "type": "((files: FileUpload.Root.ExtendedFile[]) => void)",

@@ -41,10 +41,18 @@ export interface FileUploadContextValue {
   abortUpload: (id: string) => void;
   /** Get an AbortSignal for tracking upload cancellation */
   getAbortSignal: (id: string) => AbortSignal;
+  /** Pause an in-progress upload */
+  pauseFile: (id: string) => void;
+  /** Resume a paused upload */
+  resumeFile: (id: string) => void;
   /** Callback fired when the file dialog is canceled */
   onCancel?: (() => void) | undefined;
   /** Callback fired when a file retry is initiated */
   onRetry?: ((file: FileUploadRoot.ExtendedFile) => void) | undefined;
+  /** Callback fired when a file upload is paused */
+  onFilePause?: ((file: FileUploadRoot.ExtendedFile) => void) | undefined;
+  /** Callback fired when a paused file upload is resumed */
+  onFileResume?: ((file: FileUploadRoot.ExtendedFile) => void) | undefined;
   /** Trigger the file selection dialog */
   openFileDialog: () => void;
   /** Directly set files state (for advanced use cases) */

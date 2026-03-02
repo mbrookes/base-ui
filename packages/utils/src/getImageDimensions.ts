@@ -56,10 +56,10 @@ export async function getImageDimensions(
 export async function validateImageDimensions(
   file: File | Blob,
   constraints: {
-    minWidth?: number;
-    maxWidth?: number;
-    minHeight?: number;
-    maxHeight?: number;
+    minWidth?: number | undefined;
+    maxWidth?: number | undefined;
+    minHeight?: number | undefined;
+    maxHeight?: number | undefined;
   },
 ): Promise<string | null> {
   const dimensions = await getImageDimensions(file);

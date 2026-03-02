@@ -40,6 +40,8 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
     onCancel,
     onDuplicateFile,
     onRetry,
+    onFilePause,
+    onFileResume,
     messages: customMessages,
   } = params;
 
@@ -245,6 +247,38 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
     return controller.signal;
   });
 
+  const pauseFile = useStableCallback((id: string) => {
+    setFiles((prev) => {
+      return prev.map((file) => {
+        if (file.id === id && file.status === 'uploading') {
+          onFilePause?.(file);
+          return {
+            ...file,
+            status: 'paused' as FileUploadRootFileStatus,
+            isPaused: true,
+          };
+        }
+        return file;
+      });
+    });
+  });
+
+  const resumeFile = useStableCallback((id: string) => {
+    setFiles((prev) => {
+      return prev.map((file) => {
+        if (file.id === id && file.status === 'paused') {
+          onFileResume?.(file);
+          return {
+            ...file,
+            status: 'uploading' as FileUploadRootFileStatus,
+            isPaused: false,
+          };
+        }
+        return file;
+      });
+    });
+  });
+
   const openFileDialog = useStableCallback(() => {
     if (!disabled && inputRef.current) {
       inputRef.current.click();
@@ -273,8 +307,12 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
       retryFile,
       abortUpload,
       getAbortSignal,
+      pauseFile,
+      resumeFile,
       onCancel,
       onRetry,
+      onFilePause,
+      onFileResume,
       openFileDialog,
       setFiles,
       registerInput,
@@ -296,8 +334,12 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
       retryFile,
       abortUpload,
       getAbortSignal,
+      pauseFile,
+      resumeFile,
       onCancel,
       onRetry,
+      onFilePause,
+      onFileResume,
       openFileDialog,
       registerInput,
     ],

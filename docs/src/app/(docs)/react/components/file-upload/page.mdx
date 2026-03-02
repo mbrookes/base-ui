@@ -782,6 +782,77 @@ export default function FileUploadWithPause() {
 
 **Note**: Complete pause/resume requires chunked uploads with server support (upload part by part). The example above shows the UI pattern; your server needs to support resuming from the last received byte.
 
+
+### File pause/resume via context
+
+The FileUpload context provides `pauseFile` and `resumeFile` methods to control file upload state directly:
+
+```jsx title="Using pauseFile and resumeFile" "pauseFile" "resumeFile" "onFilePause" "onFileResume"
+import * as React from 'react';
+import { FileUpload } from '@base-ui/react/file-upload';
+
+export default function FileUploadWithContextPause() {
+  const { files, pauseFile, resumeFile } = FileUpload.useFileUploadContext();
+  const [pauses, setPauses] = React.useState<Map<string, boolean>>(new Map());
+
+  const togglePause = async (fileId: string) => {
+    if (pauses.get(fileId)) {
+      await resumeFile(fileId);
+      setPauses((prev) => {
+        const next = new Map(prev);
+        next.set(fileId, false);
+        return next;
+      });
+    } else {
+      await pauseFile(fileId);
+      setPauses((prev) => {
+        const next = new Map(prev);
+        next.set(fileId, true);
+        return next;
+      });
+    }
+  };
+
+  return (
+    <FileUpload.Root
+      onFilePause={(file) => console.log('File paused:', file.name)}
+      onFileResume={(file) => console.log('File resumed:', file.name)}
+    >
+      <FileUpload.Input />
+      <FileUpload.Dropzone>Drop files here</FileUpload.Dropzone>
+      <FileUpload.PreviewList>
+        {files.map((file) => {
+          const isPaused = pauses.get(file.id) || false;
+          return (
+            <FileUpload.PreviewItem key={file.id} file={file}>
+              <button onClick={() => togglePause(file.id)}>
+                {isPaused ? 'Resume' : 'Pause'}
+              </button>
+            </FileUpload.PreviewItem>
+          );
+        })}
+      </FileUpload.PreviewList>
+    </FileUpload.Root>
+  );
+}
+```
+
+**Context methods:**
+
+- `pauseFile(fileId: string)` - Pause an uploading file. Only works on files with status `uploading`.
+- `resumeFile(fileId: string)` - Resume a paused file. Only works on files with status `paused`.
+
+**Callbacks:**
+
+- `onFilePause: (file: FileUploadRootExtendedFile) => void` - Called when a file is paused
+- `onFileResume: (file: FileUploadRootExtendedFile) => void` - Called when a file is resumed
+
+**File properties:**
+
+- `file.isPaused?: boolean` - Indicates if the file is currently paused
+- `file.uploadedBytes?: number` - Bytes uploaded so far (useful for resumable uploads)
+
+
 ### Form integration
 
 Integrate FileUpload with HTML forms:
@@ -824,6 +895,171 @@ export default function FileUploadForm() {
   );
 }
 ```
+
+### File filtering
+
+Filter which files are displayed in the preview list using the `filter` prop on `FileUpload.PreviewList`:
+
+```jsx title="File filtering" "filter"
+import * as React from 'react';
+import { FileUpload } from '@base-ui/react/file-upload';
+
+export default function FileUploadWithFiltering() {
+  const { files } = FileUpload.useFileUploadContext();
+  const [showOnlyImages, setShowOnlyImages] = React.useState(false);
+
+  const filterFn = (file: File) => {
+    if (showOnlyImages) {
+      return file.type.startsWith('image/');
+    }
+    return true;
+  };
+
+  return (
+    <FileUpload.Root>
+      <FileUpload.Input />
+      <FileUpload.Dropzone>Drop files here</FileUpload.Dropzone>
+      <FileUpload.Trigger>Select files</FileUpload.Trigger>
+
+      <label>
+        <input
+          type="checkbox"
+          checked={showOnlyImages}
+          onChange={(e) => setShowOnlyImages(e.target.checked)}
+        />
+        Show only images
+      </label>
+
+      <FileUpload.PreviewList filter={filterFn}>
+        {files.map((file) => (
+          <FileUpload.PreviewItem key={file.id} file={file}>
+            <span>{file.name}</span>
+          </FileUpload.PreviewItem>
+        ))}
+      </FileUpload.PreviewList>
+    </FileUpload.Root>
+  );
+}
+```
+
+The `filter` function receives a `File` object and should return `true` to display it or `false` to hide it. Only filtered files are rendered in the preview list.
+
+### Internationalization (i18n)
+
+Customize error messages and announcements for different languages using the `messages` prop:
+
+```jsx title="Internationalization" "messages"
+import * as React from 'react';
+import { FileUpload } from '@base-ui/react/file-upload';
+
+const spanishMessages = {
+  fileTooLarge: 'El archivo es demasiado grande',
+  fileTooSmall: 'El archivo es demasiado pequeño',
+  invalidFileType: 'Tipo de archivo no válido',
+  tooManyFiles: 'Demasiados archivos',
+  filesAdded: (count: number) => `${count} archivo(s) añadido(s)`,
+  fileRemoved: (fileName: string) => `${fileName} eliminado`,
+  validationFailed: 'La validación del archivo falló',
+  unsupportedFileFormat: 'Formato de archivo no soportado',
+  dragActiveMessage: 'Suelta los archivos aquí',
+  selectFilesMessage: 'Selecciona archivos',
+  minFilesRequired: 'Se requiere un archivo mínimo',
+  maxFilesExceeded: 'Se ha excedido el número máximo de archivos',
+};
+
+export default function FileUploadI18n() {
+  const [language, setLanguage] = React.useState<'en' | 'es'>('en');
+
+  const messages = language === 'es' ? spanishMessages : undefined;
+
+  return (
+    <div>
+      <select value={language} onChange={(e) => setLanguage(e.target.value as 'en' | 'es')}>
+        <option value="en">English</option>
+        <option value="es">Español</option>
+      </select>
+
+      <FileUpload.Root messages={messages} maxSize={5 * 1024 * 1024}>
+        <FileUpload.Input />
+        <FileUpload.Dropzone>
+          {language === 'es' ? 'Arrastra archivos aquí' : 'Drag files here'}
+        </FileUpload.Dropzone>
+        <FileUpload.Trigger>
+          {language === 'es' ? 'Seleccionar archivos' : 'Select files'}
+        </FileUpload.Trigger>
+      </FileUpload.Root>
+    </div>
+  );
+}
+```
+
+**Available message keys:**
+
+- `fileTooLarge` - File exceeds max size
+- `fileTooSmall` - File is below min size
+- `invalidFileType` - File type not accepted
+- `tooManyFiles` - Exceeded maxFiles limit
+- `filesAdded` - Announcement when files are added
+- `fileRemoved` - Announcement when a file is removed
+- `validationFailed` - Custom validation failed
+- `unsupportedFileFormat` - File format unsupported
+- `dragActiveMessage` - Message during drag
+- `selectFilesMessage` - Default message
+- `minFilesRequired` - Minimum file count not met
+- `maxFilesExceeded` - Maximum file count exceeded
+
+### Accessibility features
+
+File Upload includes comprehensive accessibility features:
+
+- **Keyboard navigation**: Use Space/Enter to open file dialog, Tab to navigate components
+- **Screen reader support**: Live region announcements for file operations ("3 files added", "File failed")
+- **ARIA labels**: All dropzones and triggers have proper `role` and `aria-label` attributes
+- **Color independence**: Drag-and-drop state changes aren't communicated by color alone
+
+**Live announcements** are automatically read by screen readers when:
+- Files are successfully added
+- A file is removed
+- A validation error occurs
+- File upload succeeds or fails
+
+The live region is visually hidden but available to screen readers:
+
+```jsx title="Live region example" "aria-live"
+<FileUpload.Root>
+  <FileUpload.Input />
+  <FileUpload.Dropzone>Upload files</FileUpload.Dropzone>
+  {/* Live region announcements happen automatically */}
+</FileUpload.Root>
+```
+
+For custom announcements, listen to the callbacks:
+
+```jsx title="Custom announcements"
+import * as React from 'react';
+import { FileUpload } from '@base-ui/react/file-upload';
+
+export default function FileUploadWithAnnouncements() {
+  const [announcement, setAnnouncement] = React.useState('');
+
+  return (
+    <FileUpload.Root
+      onFilesChange={(files) => {
+        setAnnouncement(`${files.length} file(s) selected`);
+      }}
+    >
+      <FileUpload.Input />
+      <FileUpload.Dropzone>Drop files here</FileUpload.Dropzone>
+      
+      {/* Optional: Custom live region for additional announcements */}
+      <div aria-live="polite" aria-atomic="true">
+        {announcement}
+      </div>
+    </FileUpload.Root>
+  );
+}
+```
+
 
 ## Browser Support
 

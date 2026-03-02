@@ -6,7 +6,7 @@
       "type": "FileUpload.Root.ExtendedFile",
       "required": true,
       "description": "The file to preview.",
-      "detailedType": "  id: string\n  preview: string\n  status: FileUpload.Root.FileStatus\n  progress: number\n  error?: string\n}"
+      "detailedType": "  id: string\n  preview: string\n  status: FileUpload.Root.FileStatus\n  progress: number\n  error?: string\n  isPaused?: boolean\n  uploadedBytes?: number\n}"
     },
     "children": {
       "type": "ReactNode",

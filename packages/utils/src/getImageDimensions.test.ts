@@ -11,8 +11,8 @@ describe('getImageDimensions', () => {
     canvas.width = 100;
     canvas.height = 50;
     const blob = await new Promise<Blob>((resolve) => {
-      canvas.toBlob((blob) => {
-        resolve(blob!);
+      canvas.toBlob((canvasBlob) => {
+        resolve(canvasBlob!);
       });
     });
 
@@ -35,8 +35,8 @@ describe('validateImageDimensions', () => {
     canvas.width = 800;
     canvas.height = 600;
     const blob = await new Promise<Blob>((resolve) => {
-      canvas.toBlob((blob) => {
-        resolve(blob!);
+      canvas.toBlob((canvasBlob) => {
+        resolve(canvasBlob!);
       });
     });
 
@@ -55,8 +55,8 @@ describe('validateImageDimensions', () => {
     canvas.width = 320;
     canvas.height = 240;
     const blob = await new Promise<Blob>((resolve) => {
-      canvas.toBlob((blob) => {
-        resolve(blob!);
+      canvas.toBlob((canvasBlob) => {
+        resolve(canvasBlob!);
       });
     });
 
@@ -72,8 +72,8 @@ describe('validateImageDimensions', () => {
     canvas.width = 3000;
     canvas.height = 2000;
     const blob = await new Promise<Blob>((resolve) => {
-      canvas.toBlob((blob) => {
-        resolve(blob!);
+      canvas.toBlob((canvasBlob) => {
+        resolve(canvasBlob!);
       });
     });
 
@@ -91,8 +91,8 @@ describe('getImageAspectRatio', () => {
     canvas.width = 1920;
     canvas.height = 1080;
     const blob = await new Promise<Blob>((resolve) => {
-      canvas.toBlob((blob) => {
-        resolve(blob!);
+      canvas.toBlob((canvasBlob) => {
+        resolve(canvasBlob!);
       });
     });
 

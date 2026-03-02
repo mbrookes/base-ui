@@ -95,6 +95,14 @@ export interface FileUploadRootParameters {
    */
   onRetry?: ((file: FileUploadRootExtendedFile) => void) | undefined;
   /**
+   * Callback when a file upload is paused.
+   */
+  onFilePause?: ((file: FileUploadRootExtendedFile) => void) | undefined;
+  /**
+   * Callback when a paused file upload is resumed.
+   */
+  onFileResume?: ((file: FileUploadRootExtendedFile) => void) | undefined;
+  /**
    * Localized messages for error messages and announcements.
    * Provide custom messages to support different languages or customize default messaging.
    *
@@ -200,9 +208,17 @@ export interface FileUploadRootExtendedFile extends File {
    * Error message if the file failed to upload.
    */
   error?: string | undefined;
+  /**
+   * Whether the file upload is currently paused.
+   */
+  isPaused?: boolean | undefined;
+  /**
+   * Number of bytes already uploaded (for resumable uploads).
+   */
+  uploadedBytes?: number | undefined;
 }
 
-export type FileUploadRootFileStatus = 'idle' | 'uploading' | 'success' | 'error';
+export type FileUploadRootFileStatus = 'idle' | 'uploading' | 'success' | 'error' | 'paused';
 
 export interface FileUploadRootProps
   extends BaseUIComponentProps<'div', FileUploadRootState>, FileUploadRootParameters {
@@ -241,6 +257,8 @@ export interface FileUploadRootProps
  * @param onCancel - Callback when the file dialog is canceled
  * @param onDuplicateFile - Callback when a duplicate file is selected
  * @param onRetry - Callback when a file retry is initiated
+ * @param onFilePause - Callback when a file upload is paused
+ * @param onFileResume - Callback when a paused file upload is resumed
  *
  * @see [File Upload Documentation](https://base-ui.com/react/components/file-upload)
  */
@@ -261,6 +279,8 @@ export const FileUploadRoot = React.forwardRef<HTMLDivElement, FileUploadRootPro
       onCancel,
       onDuplicateFile,
       onRetry,
+      onFilePause,
+      onFileResume,
       messages,
       onPaste,
       onDragEnter,
@@ -285,6 +305,8 @@ export const FileUploadRoot = React.forwardRef<HTMLDivElement, FileUploadRootPro
       onCancel,
       onDuplicateFile,
       onRetry,
+      onFilePause,
+      onFileResume,
       messages,
     });
 
