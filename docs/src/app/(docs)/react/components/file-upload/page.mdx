@@ -312,10 +312,10 @@ Here's a complete example showing how to upload files to your server:
 import * as React from 'react';
 import { FileUpload } from '@base-ui/react/file-upload';
 
-export default function FileUploadWithUpload() {
-  const [isUploading, setIsUploading] = React.useState(false);
-  const [uploadError, setUploadError] = (React.useState < string) | (null > null);
+function FileUploadContent() {
   const { files, removeFile } = FileUpload.useFileUploadContext();
+  const [isUploading, setIsUploading] = React.useState(false);
+  const [uploadError, setUploadError] = React.useState<string | null>(null);
 
   const handleUpload = async () => {
     setIsUploading(true);
@@ -346,7 +346,7 @@ export default function FileUploadWithUpload() {
   };
 
   return (
-    <FileUpload.Root>
+    <>
       <FileUpload.Input />
       <FileUpload.Dropzone>Drop files here</FileUpload.Dropzone>
       <FileUpload.Trigger>Select files</FileUpload.Trigger>
@@ -367,6 +367,14 @@ export default function FileUploadWithUpload() {
           </FileUpload.PreviewItem>
         ))}
       </FileUpload.PreviewList>
+    </>
+  );
+}
+
+export default function FileUploadWithUpload() {
+  return (
+    <FileUpload.Root>
+      <FileUploadContent />
     </FileUpload.Root>
   );
 }
@@ -380,9 +388,9 @@ To show upload progress, track the upload state separately from file selection:
 import * as React from 'react';
 import { FileUpload } from '@base-ui/react/file-upload';
 
-export default function FileUploadWithProgress() {
-  const [uploadProgress, setUploadProgress] = React.useState<Record<string, number>>({});
+function FileUploadContent() {
   const { files } = FileUpload.useFileUploadContext();
+  const [uploadProgress, setUploadProgress] = React.useState<Record<string, number>>({});
 
   const uploadFile = async (file: File) => {
     const xhr = new XMLHttpRequest();
@@ -411,7 +419,7 @@ export default function FileUploadWithProgress() {
   };
 
   return (
-    <FileUpload.Root>
+    <>
       <FileUpload.Input />
       <FileUpload.Dropzone>Drop files here</FileUpload.Dropzone>
 
@@ -439,6 +447,14 @@ export default function FileUploadWithProgress() {
           </FileUpload.PreviewItem>
         ))}
       </FileUpload.PreviewList>
+    </>
+  );
+}
+
+export default function FileUploadWithProgress() {
+  return (
+    <FileUpload.Root>
+      <FileUploadContent />
     </FileUpload.Root>
   );
 }
@@ -459,7 +475,7 @@ interface FileUploadState {
   retries: number;
 }
 
-export default function FileUploadWithRetry() {
+function FileUploadContent() {
   const { files, removeFile } = FileUpload.useFileUploadContext();
   const [uploadStates, setUploadStates] = React.useState<Record<string, FileUploadState>>({});
   const abortControllersRef = React.useRef<Record<string, AbortController>>({});
@@ -570,7 +586,7 @@ export default function FileUploadWithRetry() {
   };
 
   return (
-    <FileUpload.Root>
+    <>
       <FileUpload.Input />
       <FileUpload.Dropzone>Drop files here</FileUpload.Dropzone>
 
@@ -640,7 +656,7 @@ interface UploadState {
   error?: string;
 }
 
-export default function FileUploadWithPause() {
+function FileUploadContent() {
   const { files } = FileUpload.useFileUploadContext();
   const [uploadStates, setUploadStates] = React.useState<Record<string, UploadState>>({});
   const xhrsRef = React.useRef<Record<string, XMLHttpRequest>>({});
@@ -724,7 +740,7 @@ export default function FileUploadWithPause() {
   };
 
   return (
-    <FileUpload.Root>
+    <>
       <FileUpload.Input />
       <FileUpload.Dropzone>Drop files here</FileUpload.Dropzone>
 
@@ -773,6 +789,14 @@ export default function FileUploadWithPause() {
           );
         })}
       </FileUpload.PreviewList>
+    </>
+  );
+}
+
+export default function FileUploadWithPause() {
+  return (
+    <FileUpload.Root>
+      <FileUploadContent />
     </FileUpload.Root>
   );
 }
@@ -788,7 +812,7 @@ The FileUpload context provides `pauseFile` and `resumeFile` methods to control 
 import * as React from 'react';
 import { FileUpload } from '@base-ui/react/file-upload';
 
-export default function FileUploadWithContextPause() {
+function FileUploadContent() {
   const { files, pauseFile, resumeFile } = FileUpload.useFileUploadContext();
   const [pauses, setPauses] = React.useState<Map<string, boolean>>(new Map());
 
@@ -811,10 +835,7 @@ export default function FileUploadWithContextPause() {
   };
 
   return (
-    <FileUpload.Root
-      onFilePause={(file) => console.log('File paused:', file.name)}
-      onFileResume={(file) => console.log('File resumed:', file.name)}
-    >
+    <>
       <FileUpload.Input />
       <FileUpload.Dropzone>Drop files here</FileUpload.Dropzone>
       <FileUpload.PreviewList>
@@ -829,6 +850,17 @@ export default function FileUploadWithContextPause() {
           );
         })}
       </FileUpload.PreviewList>
+    </>
+  );
+}
+
+export default function FileUploadWithContextPause() {
+  return (
+    <FileUpload.Root
+      onFilePause={(file) => console.log('File paused:', file.name)}
+      onFileResume={(file) => console.log('File resumed:', file.name)}
+    >
+      <FileUploadContent />
     </FileUpload.Root>
   );
 }
@@ -857,7 +889,7 @@ Integrate FileUpload with HTML forms:
 import * as React from 'react';
 import { FileUpload } from '@base-ui/react/file-upload';
 
-export default function FileUploadForm() {
+function FileUploadFormContent() {
   const { files } = FileUpload.useFileUploadContext();
   const [formData, setFormData] = React.useState({ title: '' });
 
@@ -880,14 +912,20 @@ export default function FileUploadForm() {
         onChange={(e) => setFormData({ title: e.target.value })}
       />
 
-      <FileUpload.Root>
-        <FileUpload.Input />
-        <FileUpload.Dropzone>Drop files here</FileUpload.Dropzone>
-        <FileUpload.Trigger>Select files</FileUpload.Trigger>
-      </FileUpload.Root>
+      <FileUpload.Input />
+      <FileUpload.Dropzone>Drop files here</FileUpload.Dropzone>
+      <FileUpload.Trigger>Select files</FileUpload.Trigger>
 
       <button type="submit">Submit</button>
     </form>
+  );
+}
+
+export default function FileUploadForm() {
+  return (
+    <FileUpload.Root>
+      <FileUploadFormContent />
+    </FileUpload.Root>
   );
 }
 ```
@@ -900,16 +938,17 @@ Filter which files are displayed in the preview list using the `filter` prop on 
 import * as React from 'react';
 import { FileUpload } from '@base-ui/react/file-upload';
 
-export default function FileUploadWithFiltering() {
+function FileList() {
   const { files } = FileUpload.useFileUploadContext();
-  const [showOnlyImages, setShowOnlyImages] = React.useState(false);
+  return files.map((file) => (
+    <FileUpload.PreviewItem key={file.id} file={file}>
+      <span>{file.name}</span>
+    </FileUpload.PreviewItem>
+  ));
+}
 
-  const filterFn = (file: File) => {
-    if (showOnlyImages) {
-      return file.type.startsWith('image/');
-    }
-    return true;
-  };
+export default function FileUploadWithFiltering() {
+  const [showOnlyImages, setShowOnlyImages] = React.useState(false);
 
   return (
     <FileUpload.Root>
@@ -926,19 +965,22 @@ export default function FileUploadWithFiltering() {
         Show only images
       </label>
 
-      <FileUpload.PreviewList filter={filterFn}>
-        {files.map((file) => (
-          <FileUpload.PreviewItem key={file.id} file={file}>
-            <span>{file.name}</span>
-          </FileUpload.PreviewItem>
-        ))}
+      <FileUpload.PreviewList
+        filter={(files) => {
+          if (showOnlyImages) {
+            return files.filter((file) => file.type.startsWith('image/'));
+          }
+          return files;
+        }}
+      >
+        <FileList />
       </FileUpload.PreviewList>
     </FileUpload.Root>
   );
 }
 ```
 
-The `filter` function receives a `File` object and should return `true` to display it or `false` to hide it. Only filtered files are rendered in the preview list.
+The `filter` function receives the full array of files and should return a filtered array. Only the filtered files are rendered in the preview list.
 
 ### Locale-based formatting
 
