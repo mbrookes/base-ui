@@ -7,7 +7,6 @@ import type {
   FileUploadRootExtendedFile,
   FileUploadRootParameters,
   FileUploadRootFileStatus,
-  FileUploadRootMessages,
 } from './FileUploadRoot';
 import type { FileUploadContextValue } from './FileUploadContext';
 
@@ -15,14 +14,22 @@ type UseFileUploadRootParameters = FileUploadRootParameters;
 
 const generateId = () => Math.random().toString(36).substr(2, 9);
 
-const formatBytes = (bytes: number) => {
+const formatBytes = (bytes: number, locale?: Intl.LocalesArgument) => {
   if (bytes === 0) {
     return '0 B';
   }
+
   const k = 1024;
   const sizes = ['B', 'KB', 'MB', 'GB'];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(1))} ${sizes[i]}`;
+
+  const value = bytes / Math.pow(k, i);
+  const formattedValue = new Intl.NumberFormat(locale, {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 1,
+  }).format(value);
+
+  return `${formattedValue} ${sizes[i]}`;
 };
 
 export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
@@ -42,24 +49,52 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
     onRetry,
     onFilePause,
     onFileResume,
-    messages: customMessages,
+    locale,
   } = params;
 
-  const defaultMessages: Required<FileUploadRootMessages> = {
-    fileTooLarge: (_file, maxSizeFormatted) => `File too large (max ${maxSizeFormatted})`,
-    fileTooSmall: (_file, minSizeFormatted) => `File too small (min ${minSizeFormatted})`,
-    fileTypeNotAccepted: (_file) => 'File type not accepted',
-    maxFilesReached: (maxFilesCount) => `Cannot add files. Limit of ${maxFilesCount} reached.`,
-    duplicateFile: (fileItem) => `${fileItem.name}: duplicate file`,
-    filesAdded: (count) => `Added ${count} file${count !== 1 ? 's' : ''}.`,
-    filesRejected: (count, errors) => ` ${count} rejected: ${errors.join(', ')}`,
-    fileRemoved: (fileItem) => `Removed file ${fileItem.name}`,
-    allFilesRemoved: () => 'All files removed',
-    retryingUpload: (fileItem) => `Retrying upload for ${fileItem.name}`,
-    uploadCanceled: (fileItem) => `Upload canceled for ${fileItem.name}`,
-  };
+  const getFileTooLargeMessage = useStableCallback((_file: File, maxSizeFormatted: string) => {
+    return `File too large (max ${maxSizeFormatted})`;
+  });
 
-  const messages = { ...defaultMessages, ...customMessages };
+  const getFileTooSmallMessage = useStableCallback((_file: File, minSizeFormatted: string) => {
+    return `File too small (min ${minSizeFormatted})`;
+  });
+
+  const getFileTypeNotAcceptedMessage = useStableCallback((_file: File) => {
+    return 'File type not accepted';
+  });
+
+  const getMaxFilesReachedMessage = useStableCallback((maxFilesCount: number) => {
+    return `Cannot add files. Limit of ${maxFilesCount} reached.`;
+  });
+
+  const getDuplicateFileMessage = useStableCallback((fileItem: File) => {
+    return `${fileItem.name}: duplicate file`;
+  });
+
+  const getFilesAddedMessage = useStableCallback((count: number) => {
+    return `Added ${count} file${count !== 1 ? 's' : ''}.`;
+  });
+
+  const getFilesRejectedMessage = useStableCallback((count: number, errors: string[]) => {
+    return `${count} rejected: ${errors.join(', ')}`;
+  });
+
+  const getFileRemovedMessage = useStableCallback((fileItem: FileUploadRootExtendedFile) => {
+    return `Removed file ${fileItem.name}`;
+  });
+
+  const getAllFilesRemovedMessage = useStableCallback(() => {
+    return 'All files removed';
+  });
+
+  const getRetryingUploadMessage = useStableCallback((fileItem: FileUploadRootExtendedFile) => {
+    return `Retrying upload for ${fileItem.name}`;
+  });
+
+  const getUploadCanceledMessage = useStableCallback((fileItem: FileUploadRootExtendedFile) => {
+    return `Upload canceled for ${fileItem.name}`;
+  });
 
   const [files, setFiles] = React.useState<FileUploadRootExtendedFile[]>([]);
   const [isDragging, setIsDragging] = React.useState(false);
@@ -92,10 +127,10 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
     const hasMaxSizeLimit = Number.isFinite(maxSize);
 
     if (hasMaxSizeLimit && file.size > maxSize) {
-      return messages.fileTooLarge(file, formatBytes(maxSize));
+      return getFileTooLargeMessage(file, formatBytes(maxSize, locale));
     }
     if (file.size < minSize) {
-      return messages.fileTooSmall(file, formatBytes(minSize));
+      return getFileTooSmallMessage(file, formatBytes(minSize, locale));
     }
 
     if (accept && accept !== '*') {
@@ -118,7 +153,7 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
       });
 
       if (!isAccepted) {
-        return messages.fileTypeNotAccepted(file);
+        return getFileTypeNotAcceptedMessage(file);
       }
     }
 
@@ -141,7 +176,7 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
     setFiles((prev) => {
       const remainingSlots = maxFiles - prev.length;
       if (remainingSlots <= 0) {
-        setAnnouncement(messages.maxFilesReached(maxFiles));
+        setAnnouncement(getMaxFilesReachedMessage(maxFiles));
         return prev;
       }
 
@@ -157,7 +192,7 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
         const fileKey = `${file.name}:${file.size}:${file.lastModified}`;
         if (existingKeys.has(fileKey)) {
           onDuplicateFile?.(file);
-          errors.push(messages.duplicateFile(file));
+          errors.push(getDuplicateFileMessage(file));
           return;
         }
 
@@ -178,8 +213,8 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
         }
       });
 
-      const successMsg = validFiles.length > 0 ? messages.filesAdded(validFiles.length) : '';
-      const errorMsg = errors.length > 0 ? messages.filesRejected(errors.length, errors) : '';
+      const successMsg = validFiles.length > 0 ? getFilesAddedMessage(validFiles.length) : '';
+      const errorMsg = errors.length > 0 ? getFilesRejectedMessage(errors.length, errors) : '';
 
       setAnnouncement(`${successMsg}${errorMsg}`);
 
@@ -191,7 +226,7 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
     setFiles((prev) => {
       const fileToRemove = prev.find((f) => f.id === id);
       if (fileToRemove) {
-        setAnnouncement(messages.fileRemoved(fileToRemove));
+        setAnnouncement(getFileRemovedMessage(fileToRemove));
       }
       return prev.filter((f) => f.id !== id);
     });
@@ -199,7 +234,7 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
 
   const clearFiles = useStableCallback(() => {
     setFiles([]);
-    setAnnouncement(messages.allFilesRemoved());
+    setAnnouncement(getAllFilesRemovedMessage());
   });
 
   const retryFile = useStableCallback((id: string) => {
@@ -207,7 +242,7 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
       return prev.map((file) => {
         if (file.id === id && file.status === 'error') {
           onRetry?.(file);
-          setAnnouncement(messages.retryingUpload(file));
+          setAnnouncement(getRetryingUploadMessage(file));
           return {
             ...file,
             status: 'idle' as FileUploadRootFileStatus,
@@ -228,7 +263,7 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
       setFiles((prev) => {
         return prev.map((file) => {
           if (file.id === id && file.status === 'uploading') {
-            setAnnouncement(messages.uploadCanceled(file));
+            setAnnouncement(getUploadCanceledMessage(file));
             return {
               ...file,
               status: 'error' as FileUploadRootFileStatus,

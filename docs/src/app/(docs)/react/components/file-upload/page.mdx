@@ -940,69 +940,49 @@ export default function FileUploadWithFiltering() {
 
 The `filter` function receives a `File` object and should return `true` to display it or `false` to hide it. Only filtered files are rendered in the preview list.
 
-### Internationalization (i18n)
+### Locale-based formatting
 
-Customize error messages and announcements for different languages using the `messages` prop:
+File Upload follows the same pattern as other components:
 
-```jsx title="Internationalization" "messages"
+- use `locale` for `Intl` formatting in built-in messages (for example file sizes), and
+- use targeted callbacks (`onFileReject`, `onDuplicateFile`, `onRetry`, etc.) to customize behavior.
+
+```jsx title="Locale formatting" "locale"
 import * as React from 'react';
 import { FileUpload } from '@base-ui/react/file-upload';
 
-const spanishMessages = {
-  fileTooLarge: 'El archivo es demasiado grande',
-  fileTooSmall: 'El archivo es demasiado pequeño',
-  invalidFileType: 'Tipo de archivo no válido',
-  tooManyFiles: 'Demasiados archivos',
-  filesAdded: (count: number) => `${count} archivo(s) añadido(s)`,
-  fileRemoved: (fileName: string) => `${fileName} eliminado`,
-  validationFailed: 'La validación del archivo falló',
-  unsupportedFileFormat: 'Formato de archivo no soportado',
-  dragActiveMessage: 'Suelta los archivos aquí',
-  selectFilesMessage: 'Selecciona archivos',
-  minFilesRequired: 'Se requiere un archivo mínimo',
-  maxFilesExceeded: 'Se ha excedido el número máximo de archivos',
-};
-
-export default function FileUploadI18n() {
-  const [language, setLanguage] = React.useState<'en' | 'es'>('en');
-
-  const messages = language === 'es' ? spanishMessages : undefined;
-
+export default function FileUploadLocale() {
   return (
-    <div>
-      <select value={language} onChange={(e) => setLanguage(e.target.value as 'en' | 'es')}>
-        <option value="en">English</option>
-        <option value="es">Español</option>
-      </select>
-
-      <FileUpload.Root messages={messages} maxSize={5 * 1024 * 1024}>
-        <FileUpload.Input />
-        <FileUpload.Dropzone>
-          {language === 'es' ? 'Arrastra archivos aquí' : 'Drag files here'}
-        </FileUpload.Dropzone>
-        <FileUpload.Trigger>
-          {language === 'es' ? 'Seleccionar archivos' : 'Select files'}
-        </FileUpload.Trigger>
-      </FileUpload.Root>
-    </div>
+    <FileUpload.Root locale="de-DE" maxSize={5 * 1024 * 1024}>
+      <FileUpload.Input />
+      <FileUpload.Dropzone>Dateien hier ablegen</FileUpload.Dropzone>
+      <FileUpload.Trigger>Dateien auswählen</FileUpload.Trigger>
+    </FileUpload.Root>
   );
 }
 ```
 
-**Available message keys:**
+```jsx title="Callback-based customization" "onFileReject" "onDuplicateFile"
+import * as React from 'react';
+import { FileUpload } from '@base-ui/react/file-upload';
 
-- `fileTooLarge` - File exceeds max size
-- `fileTooSmall` - File is below min size
-- `invalidFileType` - File type not accepted
-- `tooManyFiles` - Exceeded maxFiles limit
-- `filesAdded` - Announcement when files are added
-- `fileRemoved` - Announcement when a file is removed
-- `validationFailed` - Custom validation failed
-- `unsupportedFileFormat` - File format unsupported
-- `dragActiveMessage` - Message during drag
-- `selectFilesMessage` - Default message
-- `minFilesRequired` - Minimum file count not met
-- `maxFilesExceeded` - Maximum file count exceeded
+export default function FileUploadCustomHandling() {
+  return (
+    <FileUpload.Root
+      onFileReject={(file, reason) => {
+        console.log('Rejected:', file.name, reason);
+      }}
+      onDuplicateFile={(file) => {
+        console.log('Duplicate:', file.name);
+      }}
+    >
+      <FileUpload.Input />
+      <FileUpload.Dropzone>Drop files here</FileUpload.Dropzone>
+      <FileUpload.Trigger>Select files</FileUpload.Trigger>
+    </FileUpload.Root>
+  );
+}
+```
 
 ### Accessibility features
 
