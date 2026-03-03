@@ -840,19 +840,19 @@ describe('FileUpload', () => {
 
       const file = new File(['test content'], 'test.txt', { type: 'text/plain' });
       expect(contextValue).not.toBeNull();
-      const context = getTestContext(contextValue);
+      const fileId = 'test-file-id';
 
       act(() => {
-        context.addFiles([file]);
+        getTestContext(contextValue).setFiles(() => [{ ...file, id: fileId, status: 'idle', progress: 0 }]);
       });
-      const fileId = context.files[0].id;
 
       act(() => {
-        context.setFiles((prev) => prev.map((f) => ({ ...f, status: 'uploading' as const })));
-        context.pauseFile(fileId);
+        const latestContext = getTestContext(contextValue);
+        latestContext.setFiles((prev) => prev.map((f) => ({ ...f, status: 'uploading' as const })));
+        latestContext.pauseFile(fileId);
       });
 
-      expect(context.files[0].isPaused).toBe(true);
+      expect(getTestContext(contextValue).files[0].isPaused).toBe(true);
     });
 
     it('resumed file has isPaused flag set to false', () => {
@@ -872,20 +872,20 @@ describe('FileUpload', () => {
 
       const file = new File(['test'], 'test.txt', { type: 'text/plain' });
       expect(contextValue).not.toBeNull();
-      const context = getTestContext(contextValue);
+      const fileId = 'test-file-id';
 
       act(() => {
-        context.addFiles([file]);
+        getTestContext(contextValue).setFiles(() => [{ ...file, id: fileId, status: 'idle', progress: 0 }]);
       });
-      const fileId = context.files[0].id;
 
       act(() => {
-        context.setFiles((prev) => prev.map((f) => ({ ...f, status: 'uploading' as const })));
-        context.pauseFile(fileId);
-        context.resumeFile(fileId);
+        const latestContext = getTestContext(contextValue);
+        latestContext.setFiles((prev) => prev.map((f) => ({ ...f, status: 'uploading' as const })));
+        latestContext.pauseFile(fileId);
+        latestContext.resumeFile(fileId);
       });
 
-      expect(context.files[0].isPaused).toBe(false);
+      expect(getTestContext(contextValue).files[0].isPaused).toBe(false);
     });
 
     it('supports uploadedBytes property for tracking progress', () => {
@@ -905,21 +905,20 @@ describe('FileUpload', () => {
 
       const file = new File(['0123456789'], 'test.txt', { type: 'text/plain' });
       expect(contextValue).not.toBeNull();
-      const context = getTestContext(contextValue);
+      const fileId = 'test-file-id';
 
       act(() => {
-        context.addFiles([file]);
+        getTestContext(contextValue).setFiles(() => [{ ...file, id: fileId, status: 'idle', progress: 0 }]);
       });
-      const fileId = context.files[0].id;
 
       act(() => {
-        context.setFiles((prev) =>
+        getTestContext(contextValue).setFiles((prev) =>
           prev.map((f) => (f.id === fileId ? { ...f, uploadedBytes: 5, progress: 50 } : f)),
         );
       });
 
-      expect(context.files[0].uploadedBytes).toBe(5);
-      expect(context.files[0].progress).toBe(50);
+      expect(getTestContext(contextValue).files[0].uploadedBytes).toBe(5);
+      expect(getTestContext(contextValue).files[0].progress).toBe(50);
     });
 
     it('does not pause a file that is not uploading', () => {
@@ -940,19 +939,18 @@ describe('FileUpload', () => {
 
       const file = new File(['test'], 'test.txt', { type: 'text/plain' });
       expect(contextValue).not.toBeNull();
-      const context = getTestContext(contextValue);
+      const fileId = 'test-file-id';
 
       act(() => {
-        context.addFiles([file]);
+        getTestContext(contextValue).setFiles(() => [{ ...file, id: fileId, status: 'idle', progress: 0 }]);
       });
-      const fileId = context.files[0].id;
 
       act(() => {
-        context.pauseFile(fileId);
+        getTestContext(contextValue).pauseFile(fileId);
       });
 
       expect(onFilePause).not.toHaveBeenCalled();
-      expect(context.files[0].status).toBe('idle');
+      expect(getTestContext(contextValue).files[0].status).toBe('idle');
     });
 
     it('does not resume a file that is not paused', () => {
@@ -973,19 +971,18 @@ describe('FileUpload', () => {
 
       const file = new File(['test'], 'test.txt', { type: 'text/plain' });
       expect(contextValue).not.toBeNull();
-      const context = getTestContext(contextValue);
+      const fileId = 'test-file-id';
 
       act(() => {
-        context.addFiles([file]);
+        getTestContext(contextValue).setFiles(() => [{ ...file, id: fileId, status: 'idle', progress: 0 }]);
       });
-      const fileId = context.files[0].id;
 
       act(() => {
-        context.resumeFile(fileId);
+        getTestContext(contextValue).resumeFile(fileId);
       });
 
       expect(onFileResume).not.toHaveBeenCalled();
-      expect(context.files[0].status).toBe('idle');
+      expect(getTestContext(contextValue).files[0].status).toBe('idle');
     });
   });
 });

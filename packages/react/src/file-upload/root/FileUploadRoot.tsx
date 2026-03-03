@@ -3,11 +3,13 @@
 import * as React from 'react';
 import { useStableCallback } from '@base-ui/utils/useStableCallback';
 import { visuallyHidden } from '@base-ui/utils/visuallyHidden';
-import type { BaseUIComponentProps } from '../../utils/types';
+import { useRenderElement } from '../../utils/useRenderElement';
+import type { BaseUIComponentProps, HTMLProps } from '../../utils/types';
 import { resolveClassName } from '../../utils/resolveClassName';
 import { composeEventHandlers } from '../../utils/composeEventHandlers';
 import { FileUploadContext } from './FileUploadContext';
 import { useFileUploadRoot } from './useFileUploadRoot';
+import { fileUploadRootStateAttributesMapping } from './stateAttributesMapping';
 
 export interface FileUploadRootState {
   /**
@@ -209,6 +211,7 @@ export const FileUploadRoot = React.forwardRef<HTMLDivElement, FileUploadRootPro
       onDragLeave,
       onDrop,
       onDragOver,
+      style,
       className,
       ...other
     } = props;
@@ -324,27 +327,33 @@ export const FileUploadRoot = React.forwardRef<HTMLDivElement, FileUploadRootPro
       addFiles(pastedFiles);
     });
 
-    return (
-      <FileUploadContext.Provider value={contextValue}>
-        <div
-          ref={ref}
-          data-dragging={state.dragging ? '' : undefined}
-          data-disabled={state.disabled ? '' : undefined}
-          className={resolvedClassName}
-          onDragEnter={composeEventHandlers(onDragEnter, handleDragEnter)}
-          onDragLeave={composeEventHandlers(onDragLeave, handleDragLeave)}
-          onDrop={composeEventHandlers(onDrop, handleDrop)}
-          onDragOver={composeEventHandlers(onDragOver, handleDragOver)}
-          onPaste={composeEventHandlers(onPaste, handlePaste)}
-          style={{ position: 'relative', ...other.style }}
-          {...other}
-        >
+    const defaultProps: HTMLProps = {
+      className: resolvedClassName,
+      onDragEnter: composeEventHandlers(onDragEnter, handleDragEnter),
+      onDragLeave: composeEventHandlers(onDragLeave, handleDragLeave),
+      onDrop: composeEventHandlers(onDrop, handleDrop),
+      onDragOver: composeEventHandlers(onDragOver, handleDragOver),
+      onPaste: composeEventHandlers(onPaste, handlePaste),
+      style: { position: 'relative', ...style },
+      children: (
+        <>
           <div style={visuallyHidden} role="status" aria-live="polite">
             {announcement}
           </div>
           {children}
-        </div>
-      </FileUploadContext.Provider>
+        </>
+      ),
+    };
+
+    const element = useRenderElement('div', props, {
+      state,
+      ref,
+      props: [defaultProps, other],
+      stateAttributesMapping: fileUploadRootStateAttributesMapping,
+    });
+
+    return (
+      <FileUploadContext.Provider value={contextValue}>{element}</FileUploadContext.Provider>
     );
   },
 );

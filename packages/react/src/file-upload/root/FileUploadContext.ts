@@ -61,7 +61,9 @@ export interface FileUploadContextValue {
   registerInput: (node: HTMLInputElement | null) => void;
 }
 
-export const FileUploadContext = React.createContext<FileUploadContextValue | null>(null);
+export const FileUploadContext = React.createContext<FileUploadContextValue | undefined>(
+  undefined,
+);
 
 /**
  * Hook to access FileUpload context within child components.
@@ -93,8 +95,11 @@ export const FileUploadContext = React.createContext<FileUploadContextValue | nu
  */
 export function useFileUploadContext(): FileUploadContextValue {
   const context = React.useContext(FileUploadContext);
-  if (!context) {
-    throw new Error('useFileUploadContext must be used within a FileUploadRoot');
+  if (context === undefined) {
+    throw new Error(
+      'Base UI: FileUploadContext is missing. File upload parts must be placed within <FileUpload.Root>.',
+    );
   }
+
   return context;
 }

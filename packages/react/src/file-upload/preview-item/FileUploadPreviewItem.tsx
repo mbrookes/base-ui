@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import type { BaseUIComponentProps } from '../../utils/types';
+import { useRenderElement } from '../../utils/useRenderElement';
 import { resolveClassName } from '../../utils/resolveClassName';
 import type { FileUploadRoot } from '../root/FileUploadRoot';
 import { useFileUploadContext } from '../root/FileUploadContext';
@@ -14,7 +15,7 @@ export interface FileUploadPreviewItemContextValue {
 export interface FileUploadPreviewItemState {}
 
 export const FileUploadPreviewItemContext =
-  React.createContext<FileUploadPreviewItemContextValue | null>(null);
+  React.createContext<FileUploadPreviewItemContextValue | undefined>(undefined);
 
 /**
  * Hook to access file preview context within PreviewItem children.
@@ -42,9 +43,12 @@ export const FileUploadPreviewItemContext =
  */
 export function useFileUploadPreviewItem(): FileUploadPreviewItemContextValue {
   const context = React.useContext(FileUploadPreviewItemContext);
-  if (!context) {
-    throw new Error('useFileUploadPreviewItem must be used within a FileUploadPreviewItem');
+  if (context === undefined) {
+    throw new Error(
+      'Base UI: FileUploadPreviewItemContext is missing. File upload preview parts must be placed within <FileUpload.PreviewItem>.',
+    );
   }
+
   return context;
 }
 
@@ -99,8 +103,10 @@ export interface FileUploadPreviewItemProps extends BaseUIComponentProps<
  */
 export const FileUploadPreviewItem = React.forwardRef<HTMLLIElement, FileUploadPreviewItemProps>(
   function FileUploadPreviewItemComponent(props, ref) {
-    const { file, children, className, ...other } = props;
+    const { file, children, className, ...elementProps } = props;
     const { removeFile } = useFileUploadContext();
+
+    const state: FileUploadPreviewItemState = React.useMemo(() => ({}), []);
 
     const contextValue = React.useMemo(
       () => ({
@@ -112,13 +118,19 @@ export const FileUploadPreviewItem = React.forwardRef<HTMLLIElement, FileUploadP
 
     const resolvedClassName = resolveClassName(className, {});
 
-    return (
-      <FileUploadPreviewItemContext.Provider value={contextValue}>
-        <li ref={ref} className={resolvedClassName} {...other}>
-          {children}
-        </li>
-      </FileUploadPreviewItemContext.Provider>
-    );
+    const element = useRenderElement('li', props, {
+      state,
+      ref,
+      props: [
+        {
+          className: resolvedClassName,
+          children,
+        },
+        elementProps,
+      ],
+    });
+
+    return <FileUploadPreviewItemContext.Provider value={contextValue}>{element}</FileUploadPreviewItemContext.Provider>;
   },
 );
 

@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import type { BaseUIComponentProps } from '../../utils/types';
+import { useRenderElement } from '../../utils/useRenderElement';
 import { resolveClassName } from '../../utils/resolveClassName';
 import { useFileUploadContext } from '../root/FileUploadContext';
 import type { FileUploadRoot } from '../root/FileUploadRoot';
@@ -76,7 +77,7 @@ export interface FileUploadPreviewListProps
  */
 export const FileUploadPreviewList = React.forwardRef<HTMLUListElement, FileUploadPreviewListProps>(
   function FileUploadPreviewListComponent(props, ref) {
-    const { children, filter, className, ...other } = props;
+    const { children, filter, className, ...elementProps } = props;
     const { files } = useFileUploadContext();
 
     const filteredFiles = React.useMemo(() => {
@@ -92,15 +93,23 @@ export const FileUploadPreviewList = React.forwardRef<HTMLUListElement, FileUplo
 
     const resolvedClassName = resolveClassName(className, state);
 
+    const element = useRenderElement('ul', props, {
+      state,
+      ref,
+      props: [
+        {
+          className: resolvedClassName,
+          children,
+        },
+        elementProps,
+      ],
+    });
+
     if (filteredFiles.length === 0) {
       return null;
     }
 
-    return (
-      <ul ref={ref} className={resolvedClassName} {...other}>
-        {children}
-      </ul>
-    );
+    return element;
   },
 );
 

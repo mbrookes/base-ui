@@ -4,9 +4,11 @@ import * as React from 'react';
 import { useStableCallback } from '@base-ui/utils/useStableCallback';
 import { useIsoLayoutEffect } from '@base-ui/utils/useIsoLayoutEffect';
 import type { BaseUIComponentProps } from '../../utils/types';
+import { useRenderElement } from '../../utils/useRenderElement';
 import { resolveClassName } from '../../utils/resolveClassName';
 import { composeEventHandlers } from '../../utils/composeEventHandlers';
 import { useFileUploadContext } from '../root/FileUploadContext';
+import { fileUploadInputStateAttributesMapping } from './stateAttributesMapping';
 
 export interface FileUploadInputState {
   /**
@@ -40,7 +42,7 @@ export interface FileUploadInputProps extends Omit<
  */
 export const FileUploadInput = React.forwardRef<HTMLInputElement, FileUploadInputProps>(
   function FileUploadInputComponent(props, ref) {
-    const { className, ...other } = props;
+    const { className, ...elementProps } = props;
     const { accept, multiple, directory, disabled, registerInput, inputId, addFiles, onCancel } =
       useFileUploadContext();
 
@@ -94,24 +96,27 @@ export const FileUploadInput = React.forwardRef<HTMLInputElement, FileUploadInpu
     });
 
     return (
-      <input
-        {...other}
-        ref={handleRef}
-        id={inputId}
-        type="file"
-        accept={accept}
-        multiple={directory || multiple}
-        disabled={disabled}
-        data-disabled={disabled ? '' : undefined}
-        className={resolvedClassName}
-        style={{ display: 'none' }}
-        onChange={
-          composeEventHandlers(
-            other.onChange as React.ChangeEventHandler<HTMLInputElement> | undefined,
-            handleChange,
-          ) as React.ChangeEventHandler<HTMLInputElement>
-        }
-      />
+      useRenderElement('input', props, {
+        state,
+        ref: handleRef,
+        props: [
+          {
+            id: inputId,
+            type: 'file',
+            accept,
+            multiple: directory || multiple,
+            disabled,
+            className: resolvedClassName,
+            style: { display: 'none' },
+            onChange: composeEventHandlers(
+              elementProps.onChange as React.ChangeEventHandler<HTMLInputElement> | undefined,
+              handleChange,
+            ) as React.ChangeEventHandler<HTMLInputElement>,
+          },
+          elementProps,
+        ],
+        stateAttributesMapping: fileUploadInputStateAttributesMapping,
+      })
     );
   },
 );

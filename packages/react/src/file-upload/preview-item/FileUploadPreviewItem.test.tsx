@@ -213,7 +213,9 @@ describe('FileUpload.PreviewItem', () => {
 
     expect(() => {
       render(<TestComponent />);
-    }).toThrow('useFileUploadPreviewItem must be used within a FileUploadPreviewItem');
+    }).toThrow(
+      'Base UI: FileUploadPreviewItemContext is missing. File upload preview parts must be placed within <FileUpload.PreviewItem>.',
+    );
 
     consoleSpy.mockRestore();
   });

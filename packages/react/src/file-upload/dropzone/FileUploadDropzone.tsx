@@ -3,9 +3,11 @@
 import * as React from 'react';
 import { useStableCallback } from '@base-ui/utils/useStableCallback';
 import type { BaseUIComponentProps } from '../../utils/types';
+import { useRenderElement } from '../../utils/useRenderElement';
 import { resolveClassName } from '../../utils/resolveClassName';
 import { composeEventHandlers } from '../../utils/composeEventHandlers';
 import { useFileUploadContext } from '../root/FileUploadContext';
+import { fileUploadDropzoneStateAttributesMapping } from './stateAttributesMapping';
 
 export interface FileUploadDropzoneState {
   /**
@@ -52,7 +54,7 @@ export interface FileUploadDropzoneProps extends Omit<
  */
 export const FileUploadDropzone = React.forwardRef<HTMLDivElement, FileUploadDropzoneProps>(
   function FileUploadDropzoneComponent(props, ref) {
-    const { children, onClick, onKeyDown, className, ...other } = props;
+    const { children, onClick, onKeyDown, className, ...elementProps } = props;
     const { isDragging, disabled, openFileDialog } = useFileUploadContext();
 
     const state: FileUploadDropzoneState = React.useMemo(
@@ -95,21 +97,24 @@ export const FileUploadDropzone = React.forwardRef<HTMLDivElement, FileUploadDro
     });
 
     return (
-      <div
-        ref={ref}
-        data-dragging={state.dragging ? '' : undefined}
-        data-disabled={state.disabled ? '' : undefined}
-        aria-disabled={state.disabled || undefined}
-        aria-label={other['aria-label'] || 'Drop files here or click to select'}
-        role="button"
-        tabIndex={state.disabled ? -1 : 0}
-        className={resolvedClassName}
-        onClick={composeEventHandlers(onClick, handleClick)}
-        onKeyDown={composeEventHandlers(onKeyDown, handleKeyDown)}
-        {...other}
-      >
-        {typeof children === 'function' ? children({ isDragging }) : children}
-      </div>
+      useRenderElement('div', props, {
+        state,
+        ref,
+        props: [
+          {
+            'aria-disabled': state.disabled || undefined,
+            'aria-label': elementProps['aria-label'] || 'Drop files here or click to select',
+            role: 'button',
+            tabIndex: state.disabled ? -1 : 0,
+            className: resolvedClassName,
+            onClick: composeEventHandlers(onClick, handleClick),
+            onKeyDown: composeEventHandlers(onKeyDown, handleKeyDown),
+            children: typeof children === 'function' ? children({ isDragging }) : children,
+          },
+          elementProps,
+        ],
+        stateAttributesMapping: fileUploadDropzoneStateAttributesMapping,
+      })
     );
   },
 );
