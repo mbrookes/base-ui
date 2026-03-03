@@ -6,13 +6,14 @@ import styles from './index.module.css';
 
 function ImagePreviewItem({ file }: { file: FileUpload.Root.ExtendedFile }) {
   const { onRemove } = FileUpload.useFileUploadPreviewItem();
+  const fileSize = file.size ? (file.size / 1024).toFixed(1) : '0';
 
   return (
     <div className={styles.imageItem}>
       {file.preview && <img src={file.preview} alt={file.name} className={styles.image} />}
       <div className={styles.imageInfo}>
         <div className={styles.imageName}>{file.name}</div>
-        <div className={styles.imageSize}>{(file.size / 1024).toFixed(1)} KB</div>
+        <div className={styles.imageSize}>{fileSize} KB</div>
       </div>
       <button type="button" className={styles.removeBtn} onClick={onRemove} title="Remove image">
         ✕

@@ -5,8 +5,8 @@ import { UploadCloud, X, CheckCircle2, AlertCircle } from 'lucide-react';
 import { FileUpload } from '@base-ui/react/file-upload';
 import { Progress } from '@base-ui/react/progress';
 
-function formatBytes(bytes: number) {
-  if (bytes === 0) {
+function formatBytes(bytes?: number) {
+  if (!bytes || bytes === 0) {
     return '0 B';
   }
   const k = 1024;
