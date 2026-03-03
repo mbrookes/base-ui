@@ -202,11 +202,20 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
           errors.push(`${file.name}: ${error}`);
         } else {
           existingKeys.add(fileKey);
-          const extendedFile = file as FileUploadRootExtendedFile;
-          extendedFile.id = generateId();
-          extendedFile.preview = URL.createObjectURL(file);
-          extendedFile.status = 'idle';
-          extendedFile.progress = 0;
+          // Create an object with all File properties plus our extended properties
+          const extendedFile: FileUploadRootExtendedFile = {
+            // Copy File properties
+            name: file.name,
+            size: file.size,
+            type: file.type,
+            lastModified: file.lastModified,
+            webkitRelativePath: file.webkitRelativePath,
+            // Extended properties
+            id: generateId(),
+            preview: URL.createObjectURL(file),
+            status: 'idle',
+            progress: 0,
+          } as any; // Cast to any to allow File methods
           validFiles.push(extendedFile);
         }
       });
