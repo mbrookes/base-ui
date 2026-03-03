@@ -61,9 +61,7 @@ export interface FileUploadContextValue {
   registerInput: (node: HTMLInputElement | null) => void;
 }
 
-export const FileUploadContext = React.createContext<FileUploadContextValue | undefined>(
-  undefined,
-);
+export const FileUploadContext = React.createContext<FileUploadContextValue | undefined>(undefined);
 
 /**
  * Hook to access FileUpload context within child components.

@@ -61,22 +61,20 @@ export const FileUploadTrigger = React.forwardRef<HTMLButtonElement, FileUploadT
       openFileDialog();
     });
 
-    return (
-      useRenderElement('button', props, {
-        state,
-        ref,
-        props: [
-          {
-            type: 'button',
-            className: resolvedClassName,
-            disabled,
-            onClick: composeEventHandlers(elementProps.onClick, handleClick),
-          },
-          elementProps,
-        ],
-        stateAttributesMapping: fileUploadTriggerStateAttributesMapping,
-      })
-    );
+    return useRenderElement('button', props, {
+      state,
+      ref,
+      props: [
+        {
+          type: 'button',
+          className: resolvedClassName,
+          disabled,
+          onClick: composeEventHandlers(elementProps.onClick, handleClick),
+        },
+        elementProps,
+      ],
+      stateAttributesMapping: fileUploadTriggerStateAttributesMapping,
+    });
   },
 );
 

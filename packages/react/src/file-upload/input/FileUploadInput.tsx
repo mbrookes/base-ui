@@ -95,29 +95,27 @@ export const FileUploadInput = React.forwardRef<HTMLInputElement, FileUploadInpu
       }
     });
 
-    return (
-      useRenderElement('input', props, {
-        state,
-        ref: handleRef,
-        props: [
-          {
-            id: inputId,
-            type: 'file',
-            accept,
-            multiple: directory || multiple,
-            disabled,
-            className: resolvedClassName,
-            style: { display: 'none' },
-            onChange: composeEventHandlers(
-              elementProps.onChange as React.ChangeEventHandler<HTMLInputElement> | undefined,
-              handleChange,
-            ) as React.ChangeEventHandler<HTMLInputElement>,
-          },
-          elementProps,
-        ],
-        stateAttributesMapping: fileUploadInputStateAttributesMapping,
-      })
-    );
+    return useRenderElement('input', props, {
+      state,
+      ref: handleRef,
+      props: [
+        {
+          id: inputId,
+          type: 'file',
+          accept,
+          multiple: directory || multiple,
+          disabled,
+          className: resolvedClassName,
+          style: { display: 'none' },
+          onChange: composeEventHandlers(
+            elementProps.onChange as React.ChangeEventHandler<HTMLInputElement> | undefined,
+            handleChange,
+          ) as React.ChangeEventHandler<HTMLInputElement>,
+        },
+        elementProps,
+      ],
+      stateAttributesMapping: fileUploadInputStateAttributesMapping,
+    });
   },
 );
 

@@ -14,8 +14,9 @@ export interface FileUploadPreviewItemContextValue {
 
 export interface FileUploadPreviewItemState {}
 
-export const FileUploadPreviewItemContext =
-  React.createContext<FileUploadPreviewItemContextValue | undefined>(undefined);
+export const FileUploadPreviewItemContext = React.createContext<
+  FileUploadPreviewItemContextValue | undefined
+>(undefined);
 
 /**
  * Hook to access file preview context within PreviewItem children.
@@ -130,7 +131,11 @@ export const FileUploadPreviewItem = React.forwardRef<HTMLLIElement, FileUploadP
       ],
     });
 
-    return <FileUploadPreviewItemContext.Provider value={contextValue}>{element}</FileUploadPreviewItemContext.Provider>;
+    return (
+      <FileUploadPreviewItemContext.Provider value={contextValue}>
+        {element}
+      </FileUploadPreviewItemContext.Provider>
+    );
   },
 );
 

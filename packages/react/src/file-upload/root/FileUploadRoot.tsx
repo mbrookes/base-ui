@@ -352,9 +352,7 @@ export const FileUploadRoot = React.forwardRef<HTMLDivElement, FileUploadRootPro
       stateAttributesMapping: fileUploadRootStateAttributesMapping,
     });
 
-    return (
-      <FileUploadContext.Provider value={contextValue}>{element}</FileUploadContext.Provider>
-    );
+    return <FileUploadContext.Provider value={contextValue}>{element}</FileUploadContext.Provider>;
   },
 );
 

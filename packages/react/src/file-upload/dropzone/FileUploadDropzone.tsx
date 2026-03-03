@@ -96,26 +96,24 @@ export const FileUploadDropzone = React.forwardRef<HTMLDivElement, FileUploadDro
       }
     });
 
-    return (
-      useRenderElement('div', props, {
-        state,
-        ref,
-        props: [
-          {
-            'aria-disabled': state.disabled || undefined,
-            'aria-label': elementProps['aria-label'] || 'Drop files here or click to select',
-            role: 'button',
-            tabIndex: state.disabled ? -1 : 0,
-            className: resolvedClassName,
-            onClick: composeEventHandlers(onClick, handleClick),
-            onKeyDown: composeEventHandlers(onKeyDown, handleKeyDown),
-            children: typeof children === 'function' ? children({ isDragging }) : children,
-          },
-          elementProps,
-        ],
-        stateAttributesMapping: fileUploadDropzoneStateAttributesMapping,
-      })
-    );
+    return useRenderElement('div', props, {
+      state,
+      ref,
+      props: [
+        {
+          'aria-disabled': state.disabled || undefined,
+          'aria-label': elementProps['aria-label'] || 'Drop files here or click to select',
+          role: 'button',
+          tabIndex: state.disabled ? -1 : 0,
+          className: resolvedClassName,
+          onClick: composeEventHandlers(onClick, handleClick),
+          onKeyDown: composeEventHandlers(onKeyDown, handleKeyDown),
+          children: typeof children === 'function' ? children({ isDragging }) : children,
+        },
+        elementProps,
+      ],
+      stateAttributesMapping: fileUploadDropzoneStateAttributesMapping,
+    });
   },
 );
 

@@ -843,7 +843,9 @@ describe('FileUpload', () => {
       const fileId = 'test-file-id';
 
       act(() => {
-        getTestContext(contextValue).setFiles(() => [{ ...file, id: fileId, status: 'idle', progress: 0 }]);
+        getTestContext(contextValue).setFiles(() => [
+          { ...file, id: fileId, status: 'idle', progress: 0 },
+        ]);
       });
 
       act(() => {
@@ -875,7 +877,9 @@ describe('FileUpload', () => {
       const fileId = 'test-file-id';
 
       act(() => {
-        getTestContext(contextValue).setFiles(() => [{ ...file, id: fileId, status: 'idle', progress: 0 }]);
+        getTestContext(contextValue).setFiles(() => [
+          { ...file, id: fileId, status: 'idle', progress: 0 },
+        ]);
       });
 
       act(() => {
@@ -908,7 +912,9 @@ describe('FileUpload', () => {
       const fileId = 'test-file-id';
 
       act(() => {
-        getTestContext(contextValue).setFiles(() => [{ ...file, id: fileId, status: 'idle', progress: 0 }]);
+        getTestContext(contextValue).setFiles(() => [
+          { ...file, id: fileId, status: 'idle', progress: 0 },
+        ]);
       });
 
       act(() => {
@@ -942,7 +948,9 @@ describe('FileUpload', () => {
       const fileId = 'test-file-id';
 
       act(() => {
-        getTestContext(contextValue).setFiles(() => [{ ...file, id: fileId, status: 'idle', progress: 0 }]);
+        getTestContext(contextValue).setFiles(() => [
+          { ...file, id: fileId, status: 'idle', progress: 0 },
+        ]);
       });
 
       act(() => {
@@ -974,7 +982,9 @@ describe('FileUpload', () => {
       const fileId = 'test-file-id';
 
       act(() => {
-        getTestContext(contextValue).setFiles(() => [{ ...file, id: fileId, status: 'idle', progress: 0 }]);
+        getTestContext(contextValue).setFiles(() => [
+          { ...file, id: fileId, status: 'idle', progress: 0 },
+        ]);
       });
 
       act(() => {
