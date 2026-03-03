@@ -203,12 +203,13 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
         } else {
           existingKeys.add(fileKey);
           validFiles.push(
-            Object.assign(file, {
+            {
+              ...file,
               id: generateId(),
               preview: URL.createObjectURL(file),
               status: 'idle' as FileUploadRootFileStatus,
               progress: 0,
-            }),
+            } as FileUploadRootExtendedFile,
           );
         }
       });
