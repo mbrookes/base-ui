@@ -25,7 +25,7 @@ export interface FileUploadRootState {
 export interface FileUploadRootParameters {
   /**
    * Maximum number of files allowed.
-   * @default 10
+   * @default Infinity
    */
   maxFiles?: number | undefined;
   /**
@@ -168,7 +168,7 @@ export interface FileUploadRootProps
  * </FileUpload.Root>
  * ```
  *
- * @param maxFiles - Maximum number of files allowed (default: 10)
+ * @param maxFiles - Maximum number of files allowed (default: Infinity)
  * @param maxSize - Maximum file size in bytes (default: Infinity)
  * @param minSize - Minimum file size in bytes (default: 0)
  * @param accept - Accepted file types (e.g., "image/*", ".pdf")

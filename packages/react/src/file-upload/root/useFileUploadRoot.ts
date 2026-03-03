@@ -34,7 +34,7 @@ const formatBytes = (bytes: number, locale?: Intl.LocalesArgument) => {
 
 export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
   const {
-    maxFiles = 10,
+    maxFiles = Number.POSITIVE_INFINITY,
     maxSize = Number.POSITIVE_INFINITY,
     minSize = 0,
     accept = '',
