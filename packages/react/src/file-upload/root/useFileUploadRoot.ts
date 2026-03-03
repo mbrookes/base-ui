@@ -202,14 +202,12 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
           errors.push(`${file.name}: ${error}`);
         } else {
           existingKeys.add(fileKey);
-          const extendedFile = Object.create(Object.getPrototypeOf(file));
-          Object.assign(extendedFile, file, {
-            id: generateId(),
-            preview: URL.createObjectURL(file),
-            status: 'idle' as FileUploadRootFileStatus,
-            progress: 0,
-          });
-          validFiles.push(extendedFile as FileUploadRootExtendedFile);
+          const extendedFile = file as FileUploadRootExtendedFile;
+          extendedFile.id = generateId();
+          extendedFile.preview = URL.createObjectURL(file);
+          extendedFile.status = 'idle';
+          extendedFile.progress = 0;
+          validFiles.push(extendedFile);
         }
       });
 
