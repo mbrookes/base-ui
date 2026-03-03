@@ -208,6 +208,7 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
               preview: URL.createObjectURL(file),
               status: 'idle' as FileUploadRootFileStatus,
               progress: 0,
+              size: file.size,
             }),
           );
         }
