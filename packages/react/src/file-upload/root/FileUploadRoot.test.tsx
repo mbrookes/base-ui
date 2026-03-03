@@ -995,4 +995,450 @@ describe('FileUpload', () => {
       expect(getTestContext(contextValue).files[0].status).toBe('idle');
     });
   });
+
+  describe('clearFiles', () => {
+    it('removes all files from the list', async () => {
+      let contextValue: TestFileUploadContext | null = null;
+
+      function TestComponent() {
+        const ctx = FileUpload.useFileUploadContext();
+        contextValue = ctx as unknown as TestFileUploadContext;
+        return null;
+      }
+
+      render(
+        <FileUpload.Root>
+          <FileUpload.Input data-testid="file-input" />
+          <TestComponent />
+        </FileUpload.Root>,
+      );
+
+      const input = screen.getByTestId('file-input') as HTMLInputElement;
+      const file1 = new File(['content1'], 'test1.txt', { type: 'text/plain' });
+      const file2 = new File(['content2'], 'test2.txt', { type: 'text/plain' });
+
+      await act(async () => {
+        fireEvent.change(input, { target: { files: [file1, file2] } });
+      });
+
+      expect(getTestContext(contextValue).files).toHaveLength(2);
+
+      act(() => {
+        getTestContext(contextValue).clearFiles();
+      });
+
+      expect(getTestContext(contextValue).files).toHaveLength(0);
+    });
+
+    it('announces to screen readers when all files are cleared', async () => {
+      let contextValue: TestFileUploadContext | null = null;
+
+      function TestComponent() {
+        const ctx = FileUpload.useFileUploadContext();
+        contextValue = ctx as unknown as TestFileUploadContext;
+        return null;
+      }
+
+      render(
+        <FileUpload.Root>
+          <FileUpload.Input data-testid="file-input" />
+          <div role="status" aria-live="polite" aria-atomic="true" />
+          <TestComponent />
+        </FileUpload.Root>,
+      );
+
+      const input = screen.getByTestId('file-input') as HTMLInputElement;
+      const file = new File(['content'], 'test.txt', { type: 'text/plain' });
+
+      await act(async () => {
+        fireEvent.change(input, { target: { files: [file] } });
+      });
+
+      act(() => {
+        getTestContext(contextValue).clearFiles();
+      });
+
+      await waitFor(() => {
+        expect(screen.getByText('All files removed', { exact: false })).toBeInTheDocument();
+      });
+    });
+  });
+
+  describe('maxFiles in multiple mode', () => {
+    it('respects maxFiles limit when selecting multiple files', async () => {
+      const onFilesChange = vi.fn();
+
+      render(
+        <FileUpload.Root maxFiles={3} multiple onFilesChange={onFilesChange}>
+          <FileUpload.Input data-testid="file-input" />
+        </FileUpload.Root>,
+      );
+
+      const input = screen.getByTestId('file-input') as HTMLInputElement;
+      const files = [
+        new File(['content1'], 'test1.txt', { type: 'text/plain' }),
+        new File(['content2'], 'test2.txt', { type: 'text/plain' }),
+        new File(['content3'], 'test3.txt', { type: 'text/plain' }),
+        new File(['content4'], 'test4.txt', { type: 'text/plain' }),
+        new File(['content5'], 'test5.txt', { type: 'text/plain' }),
+      ];
+
+      await act(async () => {
+        fireEvent.change(input, { target: { files } });
+      });
+
+      // Should only add 3 files due to maxFiles limit
+      await waitFor(() => {
+        expect(onFilesChange).toHaveBeenCalledWith(
+          expect.arrayContaining([
+            expect.objectContaining({ name: 'test1.txt' }),
+            expect.objectContaining({ name: 'test2.txt' }),
+            expect.objectContaining({ name: 'test3.txt' }),
+          ]),
+        );
+      });
+
+      expect(onFilesChange.mock.calls[0][0]).toHaveLength(3);
+    });
+
+    it('announces max files reached message', async () => {
+      let contextValue: TestFileUploadContext | null = null;
+
+      function TestComponent() {
+        const ctx = FileUpload.useFileUploadContext();
+        contextValue = ctx as unknown as TestFileUploadContext;
+        return null;
+      }
+
+      render(
+        <FileUpload.Root maxFiles={2} multiple>
+          <FileUpload.Input data-testid="file-input" />
+          <div role="status" aria-live="polite" aria-atomic="true" />
+          <TestComponent />
+        </FileUpload.Root>,
+      );
+
+      const input = screen.getByTestId('file-input') as HTMLInputElement;
+      const files = [
+        new File(['content1'], 'test1.txt', { type: 'text/plain' }),
+        new File(['content2'], 'test2.txt', { type: 'text/plain' }),
+      ];
+
+      await act(async () => {
+        fireEvent.change(input, { target: { files } });
+      });
+
+      expect(getTestContext(contextValue).files).toHaveLength(2);
+
+      // Try to add more files when at limit
+      const moreFiles = [new File(['content3'], 'test3.txt', { type: 'text/plain' })];
+
+      await act(async () => {
+        fireEvent.change(input, { target: { files: moreFiles } });
+      });
+
+      await waitFor(() => {
+        expect(
+          screen.getByText('Cannot add files. Limit of 2 reached.', { exact: false }),
+        ).toBeInTheDocument();
+      });
+
+      expect(getTestContext(contextValue).files).toHaveLength(2);
+    });
+
+    it('allows adding files up to the limit in increments', async () => {
+      const onFilesChange = vi.fn();
+
+      render(
+        <FileUpload.Root maxFiles={5} multiple onFilesChange={onFilesChange}>
+          <FileUpload.Input data-testid="file-input" />
+        </FileUpload.Root>,
+      );
+
+      const input = screen.getByTestId('file-input') as HTMLInputElement;
+
+      // Add 2 files
+      const firstBatch = [
+        new File(['content1'], 'test1.txt', { type: 'text/plain' }),
+        new File(['content2'], 'test2.txt', { type: 'text/plain' }),
+      ];
+
+      await act(async () => {
+        fireEvent.change(input, { target: { files: firstBatch } });
+      });
+
+      await waitFor(() => {
+        expect(onFilesChange).toHaveBeenCalledWith(
+          expect.arrayContaining([
+            expect.objectContaining({ name: 'test1.txt' }),
+            expect.objectContaining({ name: 'test2.txt' }),
+          ]),
+        );
+      });
+
+      // Add 3 more files (should reach limit of 5)
+      const secondBatch = [
+        new File(['content3'], 'test3.txt', { type: 'text/plain' }),
+        new File(['content4'], 'test4.txt', { type: 'text/plain' }),
+        new File(['content5'], 'test5.txt', { type: 'text/plain' }),
+      ];
+
+      await act(async () => {
+        fireEvent.change(input, { target: { files: secondBatch } });
+      });
+
+      await waitFor(() => {
+        expect(onFilesChange).toHaveBeenCalledWith(
+          expect.arrayContaining([
+            expect.objectContaining({ name: 'test1.txt' }),
+            expect.objectContaining({ name: 'test2.txt' }),
+            expect.objectContaining({ name: 'test3.txt' }),
+            expect.objectContaining({ name: 'test4.txt' }),
+            expect.objectContaining({ name: 'test5.txt' }),
+          ]),
+        );
+      });
+
+      expect(onFilesChange.mock.calls[onFilesChange.mock.calls.length - 1][0]).toHaveLength(5);
+    });
+  });
+
+  describe('onFilesChange callback', () => {
+    it('calls onFilesChange when files are added', async () => {
+      const onFilesChange = vi.fn();
+
+      render(
+        <FileUpload.Root onFilesChange={onFilesChange}>
+          <FileUpload.Input data-testid="file-input" />
+        </FileUpload.Root>,
+      );
+
+      const input = screen.getByTestId('file-input') as HTMLInputElement;
+      const file = new File(['content'], 'test.txt', { type: 'text/plain' });
+
+      await act(async () => {
+        fireEvent.change(input, { target: { files: [file] } });
+      });
+
+      await waitFor(() => {
+        expect(onFilesChange).toHaveBeenCalledWith(
+          expect.arrayContaining([expect.objectContaining({ name: 'test.txt' })]),
+        );
+      });
+    });
+
+    it('calls onFilesChange when a file is removed', async () => {
+      const onFilesChange = vi.fn();
+      let contextValue: TestFileUploadContext | null = null;
+
+      function TestComponent() {
+        const ctx = FileUpload.useFileUploadContext();
+        contextValue = ctx as unknown as TestFileUploadContext;
+        return null;
+      }
+
+      render(
+        <FileUpload.Root onFilesChange={onFilesChange}>
+          <FileUpload.Input data-testid="file-input" />
+          <TestComponent />
+        </FileUpload.Root>,
+      );
+
+      const input = screen.getByTestId('file-input') as HTMLInputElement;
+      const file = new File(['content'], 'test.txt', { type: 'text/plain' });
+
+      await act(async () => {
+        fireEvent.change(input, { target: { files: [file] } });
+      });
+
+      await waitFor(() => {
+        expect(onFilesChange).toHaveBeenCalled();
+      });
+
+      onFilesChange.mockClear();
+
+      const fileId = getTestContext(contextValue).files[0].id;
+
+      act(() => {
+        getTestContext(contextValue).removeFile(fileId);
+      });
+
+      await waitFor(() => {
+        expect(onFilesChange).toHaveBeenCalledWith([]);
+      });
+    });
+
+    it('calls onFilesChange when all files are cleared', async () => {
+      const onFilesChange = vi.fn();
+      let contextValue: TestFileUploadContext | null = null;
+
+      function TestComponent() {
+        const ctx = FileUpload.useFileUploadContext();
+        contextValue = ctx as unknown as TestFileUploadContext;
+        return null;
+      }
+
+      render(
+        <FileUpload.Root onFilesChange={onFilesChange}>
+          <FileUpload.Input data-testid="file-input" />
+          <TestComponent />
+        </FileUpload.Root>,
+      );
+
+      const input = screen.getByTestId('file-input') as HTMLInputElement;
+      const files = [
+        new File(['content1'], 'test1.txt', { type: 'text/plain' }),
+        new File(['content2'], 'test2.txt', { type: 'text/plain' }),
+      ];
+
+      await act(async () => {
+        fireEvent.change(input, { target: { files } });
+      });
+
+      await waitFor(() => {
+        expect(onFilesChange).toHaveBeenCalled();
+      });
+
+      onFilesChange.mockClear();
+
+      act(() => {
+        getTestContext(contextValue).clearFiles();
+      });
+
+      await waitFor(() => {
+        expect(onFilesChange).toHaveBeenCalledWith([]);
+      });
+    });
+
+    it('provides extended file properties in onFilesChange', async () => {
+      const onFilesChange = vi.fn();
+
+      render(
+        <FileUpload.Root onFilesChange={onFilesChange}>
+          <FileUpload.Input data-testid="file-input" />
+        </FileUpload.Root>,
+      );
+
+      const input = screen.getByTestId('file-input') as HTMLInputElement;
+      const file = new File(['content'], 'test.txt', { type: 'text/plain' });
+
+      await act(async () => {
+        fireEvent.change(input, { target: { files: [file] } });
+      });
+
+      await waitFor(() => {
+        expect(onFilesChange).toHaveBeenCalledWith(
+          expect.arrayContaining([
+            expect.objectContaining({
+              name: 'test.txt',
+              id: expect.any(String),
+              preview: expect.stringContaining('blob:'),
+              status: 'idle',
+              progress: 0,
+            }),
+          ]),
+        );
+      });
+    });
+  });
+
+  describe('File property preservation', () => {
+    it('preserves File size property', async () => {
+      let contextValue: TestFileUploadContext | null = null;
+
+      function TestComponent() {
+        const ctx = FileUpload.useFileUploadContext();
+        contextValue = ctx as unknown as TestFileUploadContext;
+        return null;
+      }
+
+      render(
+        <FileUpload.Root>
+          <FileUpload.Input data-testid="file-input" />
+          <TestComponent />
+        </FileUpload.Root>,
+      );
+
+      const input = screen.getByTestId('file-input') as HTMLInputElement;
+      const fileSize = 1024;
+      const file = new File(['a'.repeat(fileSize)], 'test.txt', { type: 'text/plain' });
+
+      await act(async () => {
+        fireEvent.change(input, { target: { files: [file] } });
+      });
+
+      await waitFor(() => {
+        expect(getTestContext(contextValue).files).toHaveLength(1);
+      });
+
+      const uploadedFile = getTestContext(contextValue).files[0];
+      expect(uploadedFile).toHaveProperty('size');
+      expect(uploadedFile.size).toBe(fileSize);
+    });
+
+    it('preserves File type property', async () => {
+      let contextValue: TestFileUploadContext | null = null;
+
+      function TestComponent() {
+        const ctx = FileUpload.useFileUploadContext();
+        contextValue = ctx as unknown as TestFileUploadContext;
+        return null;
+      }
+
+      render(
+        <FileUpload.Root>
+          <FileUpload.Input data-testid="file-input" />
+          <TestComponent />
+        </FileUpload.Root>,
+      );
+
+      const input = screen.getByTestId('file-input') as HTMLInputElement;
+      const file = new File(['content'], 'test.json', { type: 'application/json' });
+
+      await act(async () => {
+        fireEvent.change(input, { target: { files: [file] } });
+      });
+
+      await waitFor(() => {
+        expect(getTestContext(contextValue).files).toHaveLength(1);
+      });
+
+      const uploadedFile = getTestContext(contextValue).files[0];
+      expect(uploadedFile).toHaveProperty('type');
+      expect(uploadedFile.type).toBe('application/json');
+    });
+
+    it('preserves File lastModified property', async () => {
+      let contextValue: TestFileUploadContext | null = null;
+
+      function TestComponent() {
+        const ctx = FileUpload.useFileUploadContext();
+        contextValue = ctx as unknown as TestFileUploadContext;
+        return null;
+      }
+
+      render(
+        <FileUpload.Root>
+          <FileUpload.Input data-testid="file-input" />
+          <TestComponent />
+        </FileUpload.Root>,
+      );
+
+      const input = screen.getByTestId('file-input') as HTMLInputElement;
+      const lastModified = Date.now();
+      const file = new File(['content'], 'test.txt', { type: 'text/plain', lastModified });
+
+      await act(async () => {
+        fireEvent.change(input, { target: { files: [file] } });
+      });
+
+      await waitFor(() => {
+        expect(getTestContext(contextValue).files).toHaveLength(1);
+      });
+
+      const uploadedFile = getTestContext(contextValue).files[0];
+      expect(uploadedFile).toHaveProperty('lastModified');
+      expect(uploadedFile.lastModified).toBe(lastModified);
+    });
+  });
 });
