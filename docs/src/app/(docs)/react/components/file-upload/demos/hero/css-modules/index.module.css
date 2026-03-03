@@ -223,6 +223,7 @@
   font-size: 0.75rem;
   font-weight: 500;
   color: #059669;
+  white-space: nowrap;
 }
 
 .statusError {
@@ -231,6 +232,7 @@
   font-size: 0.75rem;
   font-weight: 500;
   color: #dc2626;
+  white-space: nowrap;
 }
 
 .statusIcon {

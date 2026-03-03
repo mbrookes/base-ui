@@ -69,12 +69,12 @@ function FilePreviewItems() {
               )}
               <div className="mt-1 flex items-center gap-2">
                 {file.status === 'success' && (
-                  <span className="flex items-center text-xs font-medium text-green-600">
+                  <span className="flex items-center whitespace-nowrap text-xs font-medium text-green-600">
                     <CheckCircle2 className="mr-1 h-3 w-3" /> Complete
                   </span>
                 )}
                 {file.status === 'error' && (
-                  <span className="flex items-center text-xs font-medium text-red-600">
+                  <span className="flex items-center whitespace-nowrap text-xs font-medium text-red-600">
                     <AlertCircle className="mr-1 h-3 w-3" /> Error
                   </span>
                 )}
