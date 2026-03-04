@@ -6,6 +6,10 @@ import { FileUpload } from '../index';
 
 type TestFileUploadContext = {
   files: Array<{
+    name: string;
+    size: number;
+    type: string;
+    lastModified: number;
     id: string;
     status: 'idle' | 'uploading' | 'success' | 'error' | 'paused';
     isPaused?: boolean;
@@ -13,9 +17,15 @@ type TestFileUploadContext = {
     progress?: number;
   }>;
   addFiles: (files: File[]) => void;
+  removeFile: (id: string) => void;
+  clearFiles: () => void;
   setFiles: React.Dispatch<
     React.SetStateAction<
       Array<{
+        name: string;
+        size: number;
+        type: string;
+        lastModified: number;
         id: string;
         status: 'idle' | 'uploading' | 'success' | 'error' | 'paused';
         isPaused?: boolean;
