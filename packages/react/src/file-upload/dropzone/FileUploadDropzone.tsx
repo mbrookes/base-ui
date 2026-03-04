@@ -24,6 +24,7 @@ export interface FileUploadDropzoneProps extends Omit<
   BaseUIComponentProps<'div', FileUploadDropzoneState>,
   'children'
 > {
+  // eslint-disable-next-line react/no-unused-prop-types
   children?: React.ReactNode | ((state: { isDragging: boolean }) => React.ReactNode);
 }
 

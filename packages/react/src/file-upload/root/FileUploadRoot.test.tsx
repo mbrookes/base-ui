@@ -1017,9 +1017,7 @@ describe('FileUpload', () => {
       const file1 = new File(['content1'], 'test1.txt', { type: 'text/plain' });
       const file2 = new File(['content2'], 'test2.txt', { type: 'text/plain' });
 
-      await act(async () => {
-        fireEvent.change(input, { target: { files: [file1, file2] } });
-      });
+      fireEvent.change(input, { target: { files: [file1, file2] } });
 
       expect(getTestContext(contextValue).files).toHaveLength(2);
 
@@ -1050,9 +1048,7 @@ describe('FileUpload', () => {
       const input = screen.getByTestId('file-input') as HTMLInputElement;
       const file = new File(['content'], 'test.txt', { type: 'text/plain' });
 
-      await act(async () => {
-        fireEvent.change(input, { target: { files: [file] } });
-      });
+      fireEvent.change(input, { target: { files: [file] } });
 
       act(() => {
         getTestContext(contextValue).clearFiles();
@@ -1083,9 +1079,7 @@ describe('FileUpload', () => {
         new File(['content5'], 'test5.txt', { type: 'text/plain' }),
       ];
 
-      await act(async () => {
-        fireEvent.change(input, { target: { files } });
-      });
+      fireEvent.change(input, { target: { files } });
 
       // Should only add 3 files due to maxFiles limit
       await waitFor(() => {
@@ -1124,18 +1118,14 @@ describe('FileUpload', () => {
         new File(['content2'], 'test2.txt', { type: 'text/plain' }),
       ];
 
-      await act(async () => {
-        fireEvent.change(input, { target: { files } });
-      });
+      fireEvent.change(input, { target: { files } });
 
       expect(getTestContext(contextValue).files).toHaveLength(2);
 
       // Try to add more files when at limit
       const moreFiles = [new File(['content3'], 'test3.txt', { type: 'text/plain' })];
 
-      await act(async () => {
-        fireEvent.change(input, { target: { files: moreFiles } });
-      });
+      fireEvent.change(input, { target: { files: moreFiles } });
 
       await waitFor(() => {
         expect(
@@ -1163,9 +1153,7 @@ describe('FileUpload', () => {
         new File(['content2'], 'test2.txt', { type: 'text/plain' }),
       ];
 
-      await act(async () => {
-        fireEvent.change(input, { target: { files: firstBatch } });
-      });
+      fireEvent.change(input, { target: { files: firstBatch } });
 
       await waitFor(() => {
         expect(onFilesChange).toHaveBeenCalledWith(
@@ -1183,9 +1171,7 @@ describe('FileUpload', () => {
         new File(['content5'], 'test5.txt', { type: 'text/plain' }),
       ];
 
-      await act(async () => {
-        fireEvent.change(input, { target: { files: secondBatch } });
-      });
+      fireEvent.change(input, { target: { files: secondBatch } });
 
       await waitFor(() => {
         expect(onFilesChange).toHaveBeenCalledWith(
@@ -1216,9 +1202,7 @@ describe('FileUpload', () => {
       const input = screen.getByTestId('file-input') as HTMLInputElement;
       const file = new File(['content'], 'test.txt', { type: 'text/plain' });
 
-      await act(async () => {
-        fireEvent.change(input, { target: { files: [file] } });
-      });
+      fireEvent.change(input, { target: { files: [file] } });
 
       await waitFor(() => {
         expect(onFilesChange).toHaveBeenCalledWith(
@@ -1247,9 +1231,7 @@ describe('FileUpload', () => {
       const input = screen.getByTestId('file-input') as HTMLInputElement;
       const file = new File(['content'], 'test.txt', { type: 'text/plain' });
 
-      await act(async () => {
-        fireEvent.change(input, { target: { files: [file] } });
-      });
+      fireEvent.change(input, { target: { files: [file] } });
 
       await waitFor(() => {
         expect(onFilesChange).toHaveBeenCalled();
@@ -1291,9 +1273,7 @@ describe('FileUpload', () => {
         new File(['content2'], 'test2.txt', { type: 'text/plain' }),
       ];
 
-      await act(async () => {
-        fireEvent.change(input, { target: { files } });
-      });
+      fireEvent.change(input, { target: { files } });
 
       await waitFor(() => {
         expect(onFilesChange).toHaveBeenCalled();
@@ -1322,9 +1302,7 @@ describe('FileUpload', () => {
       const input = screen.getByTestId('file-input') as HTMLInputElement;
       const file = new File(['content'], 'test.txt', { type: 'text/plain' });
 
-      await act(async () => {
-        fireEvent.change(input, { target: { files: [file] } });
-      });
+      fireEvent.change(input, { target: { files: [file] } });
 
       await waitFor(() => {
         expect(onFilesChange).toHaveBeenCalledWith(
@@ -1363,9 +1341,7 @@ describe('FileUpload', () => {
       const fileSize = 1024;
       const file = new File(['a'.repeat(fileSize)], 'test.txt', { type: 'text/plain' });
 
-      await act(async () => {
-        fireEvent.change(input, { target: { files: [file] } });
-      });
+      fireEvent.change(input, { target: { files: [file] } });
 
       await waitFor(() => {
         expect(getTestContext(contextValue).files).toHaveLength(1);
@@ -1395,9 +1371,7 @@ describe('FileUpload', () => {
       const input = screen.getByTestId('file-input') as HTMLInputElement;
       const file = new File(['content'], 'test.json', { type: 'application/json' });
 
-      await act(async () => {
-        fireEvent.change(input, { target: { files: [file] } });
-      });
+      fireEvent.change(input, { target: { files: [file] } });
 
       await waitFor(() => {
         expect(getTestContext(contextValue).files).toHaveLength(1);
@@ -1428,9 +1402,7 @@ describe('FileUpload', () => {
       const lastModified = Date.now();
       const file = new File(['content'], 'test.txt', { type: 'text/plain', lastModified });
 
-      await act(async () => {
-        fireEvent.change(input, { target: { files: [file] } });
-      });
+      fireEvent.change(input, { target: { files: [file] } });
 
       await waitFor(() => {
         expect(getTestContext(contextValue).files).toHaveLength(1);

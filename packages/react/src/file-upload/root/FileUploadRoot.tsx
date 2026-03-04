@@ -336,12 +336,12 @@ export const FileUploadRoot = React.forwardRef<HTMLDivElement, FileUploadRootPro
       onPaste: composeEventHandlers(onPaste, handlePaste),
       style: { position: 'relative', ...style },
       children: (
-        <>
+        <React.Fragment>
           <div style={visuallyHidden} role="status" aria-live="polite">
             {announcement}
           </div>
           {children}
-        </>
+        </React.Fragment>
       ),
     };
 
