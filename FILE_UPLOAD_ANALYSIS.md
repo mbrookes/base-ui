@@ -1,9 +1,5 @@
 # FileUpload Component: Competitive Analysis & Enhancement Plan
 
-**Last Updated:** March 2, 2026 (Originally created: February 26, 2026)
-
-## Final Status Update (March 2, 2026)
-
 🎉 **FEATURE COMPLETE - All Planned Features Implemented and Tested!**
 
 ✅ **Core Features (Phase 1 & 2)**
@@ -22,7 +18,7 @@
 - **Retry mechanism** (retryFile method, onRetry callback)
 - **File filtering** (filter prop on PreviewList component)
 - **Abort signal support** (abortUpload, getAbortSignal methods with AbortController)
-- **i18n support** (messages prop with 11 customizable message types for localization)
+- **Locale-aware default messaging** (`locale` prop for size formatting in built-in messages)
 
 ✅ **Extended Features (Phase 5 - March 2, 2026)**
 
@@ -30,13 +26,16 @@
 
 ✅ **Code Quality & Testing**
 
-- 119 comprehensive tests covering all features (JSDOM + Chromium environments)
+- 131 comprehensive tests covering all FileUpload features in the current suite
 - All tests passing with zero failures
 - ESLint clean (no warnings or violations)
 - TypeScript strict mode compliance
 - Full Prettier formatting compliance
 
 **Status:** ✨ **COMPLETE** - All high, medium, and extended priority features are now fully implemented, tested, and production-ready!
+
+> Note: The gap-analysis and phased-plan sections below are retained as historical implementation planning records.
+> The "Final Status Update" section above reflects the current component state.
 
 ---
 
@@ -92,7 +91,7 @@ Base UI's FileUpload component is a **headless, unstyled implementation** focuse
 2. ✅ **Abort signal support** (March 2, 2026)
 3. ✅ **Multiple input modes** (March 1, 2026)
 4. **File sorting/reordering** - Not yet implemented
-5. ✅ **i18n support** (March 2, 2026)
+5. ✅ **Locale-aware defaults** (March 2, 2026)
 6. **Image-specific features** - Not yet implemented
 
 #### Lower Priority (Partially Complete)
@@ -136,9 +135,9 @@ Base UI's FileUpload component is a **headless, unstyled implementation** focuse
 | Keyboard navigation    | ✅ (Mar 1) | ✅                | ✅             | ✅       |
 | Live regions           | ✅ (Mar 1) | ❌                | ✅             | ⚠️       |
 | **I18n & UX**          |
-| Localization           | ✅ (Mar 2) | ❌                | ✅ (30+ langs) | ⚠️       |
+| Localization           | ⚠️ Locale formatting only | ❌ | ✅ (30+ langs) | ⚠️       |
 | Error messages         | ✅ (Mar 1) | ✅ (English only) | ✅             | ✅       |
-| Customizable text      | ✅ (Mar 2) | ⚠️                | ✅             | ✅       |
+| Customizable text      | ⚠️ Not exposed as public API | ⚠️ | ✅ | ✅ |
 
 ---
 
@@ -198,7 +197,7 @@ Base UI's FileUpload component is a **headless, unstyled implementation** focuse
 
 - Add `retryCount` and `maxRetries` to ExtendedFile
 - Add `retryFile(id: string)` method to context
-- Emit `onFileRetry` callback for app to handle
+- Emit `onRetry` callback for app to handle
 - Reset error state when retry initiated
 
 **Files to modify**: `FileUploadContext.ts`, `FileUploadRoot.tsx`, `useFileUploadRoot.ts`
@@ -231,7 +230,7 @@ Base UI's FileUpload component is a **headless, unstyled implementation** focuse
 
 **Files to modify**: `useFileUploadRoot.ts`
 
-### 7. **i18n Support** (MEDIUM PRIORITY)
+### 7. **Localization Support** (MEDIUM PRIORITY)
 
 **Impact**: Error messages not localized
 **Complexity**: Medium
@@ -308,7 +307,7 @@ Base UI's FileUpload component is a **headless, unstyled implementation** focuse
 - **FileUploadContext.ts**: Added `pauseFile` and `resumeFile` methods to FileUploadContextValue
 - **useFileUploadRoot.ts**: Implemented pause/resume logic with state transitions and callbacks
 - **FileUploadRoot.test.tsx**: Added 6 comprehensive tests for pause/resume functionality
-- **Test Coverage**: All 119 tests passing (113 original + 6 new resumable upload tests)
+- **Test Coverage**: All 131 tests passing in the current suite
 
 **Files modified**: `FileUploadRoot.tsx`, `FileUploadContext.ts`, `useFileUploadRoot.ts`, `FileUploadRoot.test.tsx`
 
@@ -373,7 +372,7 @@ Base UI's FileUpload component is a **headless, unstyled implementation** focuse
 
 **Goal**: Make it easier to build complex upload UIs
 
-1. **i18n support** ✅
+1. **Localization support (locale-aware default messaging)** ✅
    - [x] Created message system with 11 customizable message types
    - [x] Accept `messages` prop on FileUploadRoot
    - [x] Provided default English messages
@@ -390,7 +389,7 @@ Base UI's FileUpload component is a **headless, unstyled implementation** focuse
 
 3. **Retry mechanism** ✅
    - [x] Added `retryFile` method to context
-   - [x] Added `onFileRetry` callback
+   - [x] Added `onRetry` callback
    - [x] Track retry attempts in ExtendedFile
    - [x] Added comprehensive tests
    - **Commit**: `[file-upload] Add file retry mechanism`
@@ -402,7 +401,7 @@ Base UI's FileUpload component is a **headless, unstyled implementation** focuse
 **Goal**: Ensure production-ready code quality
 
 1. **Comprehensive Testing** ✅
-   - [x] Written 119 tests across 6 test files (added 6 resumable upload tests)
+   - [x] Written 131 tests across 6 test files
    - [x] All tests passing in JSDOM environment
    - [x] All tests passing in Chromium environment
    - [x] Fixed infinite loop issues in tests
@@ -481,7 +480,7 @@ Base UI's FileUpload component is a **headless, unstyled implementation** focuse
 3. Keyboard navigation
 4. Better accessibility announcements
 
-**Should Have** (Improves UX): 5. onCancel callback 6. Duplicate detection 7. i18n support
+**Should Have** (Improves UX): 5. onCancel callback 6. Duplicate detection 7. localization support
 
 **Nice to Have** (Power users): 8. Abort signal support 9. Retry mechanism 10. Custom validation 11. File reordering
 
