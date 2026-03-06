@@ -3,8 +3,12 @@
 import * as React from 'react';
 import { useId as useBaseUIId } from '@base-ui/utils/useId';
 import { useStableCallback } from '@base-ui/utils/useStableCallback';
+import { createChangeEventDetails } from '../../utils/createBaseUIEventDetails';
+import { FILE_UPLOAD_ROOT_REJECT_REASONS } from './FileUploadRoot';
 import type {
+  FileUploadRootRejectReason,
   FileUploadRootExtendedFile,
+  FileUploadRootFileUpdates,
   FileUploadRootParameters,
   FileUploadRootFileStatus,
 } from './FileUploadRoot';
@@ -12,7 +16,23 @@ import type { FileUploadContextValue } from './FileUploadContext';
 
 type UseFileUploadRootParameters = FileUploadRootParameters;
 
-const generateId = () => Math.random().toString(36).substr(2, 9);
+const generateId = () => Math.random().toString(36).slice(2, 11);
+
+type RejectReasonCode =
+  (typeof FILE_UPLOAD_ROOT_REJECT_REASONS)[keyof typeof FILE_UPLOAD_ROOT_REJECT_REASONS];
+
+type ValidationResult = {
+  reason: RejectReasonCode;
+  message: string;
+} | null;
+
+const isPromiseLike = (value: unknown): value is PromiseLike<unknown> => {
+  if (!value || typeof value !== 'object') {
+    return false;
+  }
+
+  return 'then' in value && typeof (value as PromiseLike<unknown>).then === 'function';
+};
 
 // Generate a unique key for file deduplication based on name, size, and timestamp
 const getFileKey = (file: { name: string; size: number; lastModified: number }) =>
@@ -87,6 +107,8 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
       fileTooLarge: (maxSizeFormatted: string) => `File too large (max ${maxSizeFormatted})`,
       fileTooSmall: (minSizeFormatted: string) => `File too small (min ${minSizeFormatted})`,
       fileTypeNotAccepted: () => 'File type not accepted',
+      asyncValidatorNotSupported: () =>
+        'Async validators are not supported. Return a string or null synchronously.',
       maxFilesReached: (count: number) => `Cannot add files. Limit of ${count} reached.`,
       duplicateFile: (fileName: string) => `${fileName}: duplicate file`,
       filesAdded: (count: number) => `Added ${count} file${count !== 1 ? 's' : ''}.`,
@@ -104,18 +126,22 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
   const [announcement, setAnnouncement] = React.useState('');
   const inputRef = React.useRef<HTMLInputElement | null>(null);
   const abortControllersRef = React.useRef<Map<string, AbortController>>(new Map());
+  const previewUrlsRef = React.useRef<Map<string, string>>(new Map());
   const inputId = useBaseUIId();
   const isInitialRender = React.useRef(true);
 
   // Cleanup object URLs and abort controllers to prevent memory leaks
   React.useEffect(() => {
     const controllers = abortControllersRef.current;
+    const previewUrls = previewUrlsRef.current;
+
     return () => {
-      files.forEach((file) => URL.revokeObjectURL(file.preview));
+      previewUrls.forEach((previewUrl) => URL.revokeObjectURL(previewUrl));
+      previewUrls.clear();
       controllers.forEach((controller) => controller.abort());
       controllers.clear();
     };
-  }, [files]);
+  }, []);
 
   // Notify parent of changes
   React.useEffect(() => {
@@ -126,32 +152,52 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
     onFilesChange?.(files);
   }, [files, onFilesChange]);
 
-  const validateFile = useStableCallback((file: File): string | null => {
+  const validateFile = useStableCallback((file: File): ValidationResult => {
     const hasMaxSizeLimit = Number.isFinite(maxSize);
 
     if (hasMaxSizeLimit && file.size > maxSize) {
-      return messages.fileTooLarge(formatBytes(maxSize, locale));
+      return {
+        reason: FILE_UPLOAD_ROOT_REJECT_REASONS.FILE_TOO_LARGE,
+        message: messages.fileTooLarge(formatBytes(maxSize, locale)),
+      };
     }
+
     if (file.size < minSize) {
-      return messages.fileTooSmall(formatBytes(minSize, locale));
+      return {
+        reason: FILE_UPLOAD_ROOT_REJECT_REASONS.FILE_TOO_SMALL,
+        message: messages.fileTooSmall(formatBytes(minSize, locale)),
+      };
     }
 
     if (!isFileTypeAccepted(file, accept)) {
-      return messages.fileTypeNotAccepted();
+      return {
+        reason: FILE_UPLOAD_ROOT_REJECT_REASONS.MIME_TYPE_NOT_ALLOWED,
+        message: messages.fileTypeNotAccepted(),
+      };
     }
 
     // Custom validation
     if (validator) {
       const customError = validator(file);
+      if (isPromiseLike(customError)) {
+        return {
+          reason: FILE_UPLOAD_ROOT_REJECT_REASONS.CUSTOM_VALIDATION_FAILED,
+          message: messages.asyncValidatorNotSupported(),
+        };
+      }
+
       if (customError) {
-        return customError;
+        return {
+          reason: FILE_UPLOAD_ROOT_REJECT_REASONS.CUSTOM_VALIDATION_FAILED,
+          message: customError,
+        };
       }
     }
 
     return null;
   });
 
-  const addFiles = useStableCallback((newFiles: File[]) => {
+  const addFiles = useStableCallback((newFiles: File[], event?: Event) => {
     if (disabled) {
       return;
     }
@@ -179,24 +225,29 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
 
         const error = validateFile(file);
         if (error) {
-          onFileReject?.(file, error);
-          errors.push(`${file.name}: ${error}`);
+          const eventDetails = createChangeEventDetails<FileUploadRootRejectReason, { message: string }>(
+            error.reason,
+            event,
+            undefined,
+            { message: error.message },
+          );
+
+          onFileReject?.(file, error.reason, eventDetails);
+          errors.push(`${file.name}: ${error.message}`);
         } else {
           existingKeys.add(fileKey);
-          // Create an object with all File properties plus our extended properties
-          const extendedFile: FileUploadRootExtendedFile = {
-            // Copy File properties
-            name: file.name,
-            size: file.size,
-            type: file.type,
-            lastModified: file.lastModified,
-            webkitRelativePath: file.webkitRelativePath,
-            // Extended properties
-            id: generateId(),
-            preview: URL.createObjectURL(file),
-            status: 'idle',
+
+          const id = generateId();
+          const preview = URL.createObjectURL(file);
+          previewUrlsRef.current.set(id, preview);
+
+          const extendedFile = Object.assign(file, {
+            id,
+            preview,
+            status: 'idle' as const,
             progress: 0,
-          } as any; // Cast to any to allow File methods
+          }) as FileUploadRootExtendedFile;
+
           validFiles.push(extendedFile);
         }
       });
@@ -206,7 +257,19 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
 
       setAnnouncement(`${successMsg}${errorMsg}`);
 
-      return multiple ? [...prev, ...validFiles] : validFiles;
+      const nextFiles = multiple ? [...prev, ...validFiles] : validFiles;
+
+      if (!multiple) {
+        const nextIds = new Set(nextFiles.map((file) => file.id));
+        prev.forEach((file) => {
+          if (!nextIds.has(file.id)) {
+            URL.revokeObjectURL(file.preview);
+            previewUrlsRef.current.delete(file.id);
+          }
+        });
+      }
+
+      return nextFiles;
     });
   });
 
@@ -215,14 +278,26 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
       const fileToRemove = prev.find((f) => f.id === id);
       if (fileToRemove) {
         setAnnouncement(messages.fileRemoved(fileToRemove.name));
+        URL.revokeObjectURL(fileToRemove.preview);
+        previewUrlsRef.current.delete(id);
       }
       return prev.filter((f) => f.id !== id);
     });
   });
 
   const clearFiles = useStableCallback(() => {
-    setFiles([]);
+    setFiles((prev) => {
+      prev.forEach((file) => {
+        URL.revokeObjectURL(file.preview);
+        previewUrlsRef.current.delete(file.id);
+      });
+      return [];
+    });
     setAnnouncement(messages.allFilesRemoved());
+  });
+
+  const updateFile = useStableCallback((id: string, updates: FileUploadRootFileUpdates) => {
+    setFiles((prev) => prev.map((file) => (file.id === id ? { ...file, ...updates } : file)));
   });
 
   const retryFile = useStableCallback((id: string) => {
@@ -327,6 +402,7 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
       removeFile,
       clearFiles,
       addFiles,
+      updateFile,
       retryFile,
       abortUpload,
       getAbortSignal,
@@ -354,6 +430,7 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
       removeFile,
       clearFiles,
       addFiles,
+      updateFile,
       retryFile,
       abortUpload,
       getAbortSignal,
@@ -364,6 +441,7 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
       onFilePause,
       onFileResume,
       openFileDialog,
+      setFiles,
       registerInput,
     ],
   );

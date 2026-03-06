@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import { FileUpload } from '@base-ui/react/file-upload';
+import { useTimeout } from '@base-ui/utils/useTimeout';
 import styles from './index.module.css';
 
 function FileList() {
@@ -42,9 +43,10 @@ function RejectionMessage({ reason }: { reason?: string }) {
 }
 
 export default function FileUploadValidationDemo() {
+  const rejectionTimeout = useTimeout();
   const [rejectedFile, setRejectedFile] = React.useState<{
     file: File;
-    reason?: string;
+    reason: string;
   } | null>(null);
 
   return (
@@ -56,8 +58,8 @@ export default function FileUploadValidationDemo() {
         maxFiles={5}
         onFileReject={(file, reason) => {
           setRejectedFile({ file, reason });
-          // Auto-dismiss error after 4 seconds
-          setTimeout(() => setRejectedFile(null), 4000);
+          rejectionTimeout.clear();
+          rejectionTimeout.start(4000, () => setRejectedFile(null));
         }}
       >
         <FileUpload.Input />

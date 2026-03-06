@@ -19,25 +19,26 @@ function formatBytes(bytes?: number) {
 }
 
 function FilePreviewItems() {
-  const { files, removeFile, setFiles } = FileUpload.useFileUploadContext();
+  const { files, removeFile, updateFile } = FileUpload.useFileUploadContext();
 
   // Simulate upload progress
   React.useEffect(() => {
     const interval = setInterval(() => {
-      setFiles((prevFiles) =>
-        prevFiles.map((file) => {
-          if (file.status === 'idle' || file.status === 'uploading') {
-            const newProgress = Math.min(file.progress + Math.random() * 15, 100);
-            const newStatus = newProgress >= 100 ? 'success' : 'uploading';
-            return { ...file, progress: newProgress, status: newStatus };
-          }
-          return file;
-        }),
-      );
+      files.forEach((file) => {
+        if (file.status !== 'idle' && file.status !== 'uploading') {
+          return;
+        }
+
+        const newProgress = Math.min(file.progress + Math.random() * 15, 100);
+        updateFile(file.id, {
+          progress: newProgress,
+          status: newProgress >= 100 ? 'success' : 'uploading',
+        });
+      });
     }, 300);
 
     return () => clearInterval(interval);
-  }, [setFiles]);
+  }, [files, updateFile]);
 
   return (
     <React.Fragment>

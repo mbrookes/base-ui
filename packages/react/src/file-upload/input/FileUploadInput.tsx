@@ -42,7 +42,7 @@ export interface FileUploadInputProps extends Omit<
  */
 export const FileUploadInput = React.forwardRef<HTMLInputElement, FileUploadInputProps>(
   function FileUploadInputComponent(props, ref) {
-    const { className, ...elementProps } = props;
+    const { className, render, nativeButton, ...elementProps } = props;
     const { accept, multiple, directory, disabled, registerInput, inputId, addFiles, onCancel } =
       useFileUploadContext();
 
@@ -85,7 +85,7 @@ export const FileUploadInput = React.forwardRef<HTMLInputElement, FileUploadInpu
 
     const handleChange = useStableCallback((event: React.ChangeEvent<HTMLInputElement>) => {
       if (event.target.files && event.target.files.length > 0) {
-        addFiles(Array.from(event.target.files));
+        addFiles(Array.from(event.target.files), event.nativeEvent);
       } else {
         onCancel?.();
       }

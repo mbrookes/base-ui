@@ -6,13 +6,23 @@ import { useRenderElement } from '../../utils/useRenderElement';
 import { resolveClassName } from '../../utils/resolveClassName';
 import type { FileUploadRoot } from '../root/FileUploadRoot';
 import { useFileUploadContext } from '../root/FileUploadContext';
+import { fileUploadPreviewItemStateAttributesMapping } from './stateAttributesMapping';
 
 export interface FileUploadPreviewItemContextValue {
   file: FileUploadRoot.ExtendedFile;
   onRemove: () => void;
 }
 
-export interface FileUploadPreviewItemState {}
+export interface FileUploadPreviewItemState {
+  /**
+   * Whether the file is currently uploading.
+   */
+  uploading: boolean;
+  /**
+   * Whether the file upload completed successfully.
+   */
+  complete: boolean;
+}
 
 export const FileUploadPreviewItemContext = React.createContext<
   FileUploadPreviewItemContextValue | undefined
@@ -107,7 +117,13 @@ export const FileUploadPreviewItem = React.forwardRef<HTMLLIElement, FileUploadP
     const { file, children, className, ...elementProps } = props;
     const { removeFile } = useFileUploadContext();
 
-    const state: FileUploadPreviewItemState = React.useMemo(() => ({}), []);
+    const state: FileUploadPreviewItemState = React.useMemo(
+      () => ({
+        uploading: file.status === 'uploading',
+        complete: file.status === 'success',
+      }),
+      [file.status],
+    );
 
     const contextValue = React.useMemo(
       () => ({
@@ -117,7 +133,7 @@ export const FileUploadPreviewItem = React.forwardRef<HTMLLIElement, FileUploadP
       [file, removeFile],
     );
 
-    const resolvedClassName = resolveClassName(className, {});
+    const resolvedClassName = resolveClassName(className, state);
 
     const element = useRenderElement('li', props, {
       state,
@@ -129,6 +145,7 @@ export const FileUploadPreviewItem = React.forwardRef<HTMLLIElement, FileUploadP
         },
         elementProps,
       ],
+      stateAttributesMapping: fileUploadPreviewItemStateAttributesMapping,
     });
 
     return (

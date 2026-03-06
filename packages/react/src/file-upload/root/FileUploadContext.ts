@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { FileUploadRoot } from './FileUploadRoot';
+import type { FileUploadRoot } from './FileUploadRoot';
 
 /**
  * Context value provided by FileUploadRoot to all child components.
@@ -34,7 +34,9 @@ export interface FileUploadContextValue {
   /** Clear all files */
   clearFiles: () => void;
   /** Add new files with validation */
-  addFiles: (files: File[]) => void;
+  addFiles: (files: File[], event?: Event) => void;
+  /** Update a file's upload metadata without replacing the full files array */
+  updateFile: (id: string, updates: FileUploadRoot.FileUpdates) => void;
   /** Retry a file that failed to upload */
   retryFile: (id: string) => void;
   /** Abort an in-progress upload */
@@ -55,7 +57,9 @@ export interface FileUploadContextValue {
   onFileResume?: ((file: FileUploadRoot.ExtendedFile) => void) | undefined;
   /** Trigger the file selection dialog */
   openFileDialog: () => void;
-  /** Directly set files state (for advanced use cases) */
+  /**
+   * @deprecated Use `addFiles`, `removeFile`, `clearFiles`, or `updateFile` instead.
+   */
   setFiles: React.Dispatch<React.SetStateAction<FileUploadRoot.ExtendedFile[]>>;
   /** Register the hidden file input element */
   registerInput: (node: HTMLInputElement | null) => void;

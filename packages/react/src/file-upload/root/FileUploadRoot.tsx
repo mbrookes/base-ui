@@ -7,9 +7,26 @@ import { useRenderElement } from '../../utils/useRenderElement';
 import type { BaseUIComponentProps, HTMLProps } from '../../utils/types';
 import { resolveClassName } from '../../utils/resolveClassName';
 import { composeEventHandlers } from '../../utils/composeEventHandlers';
+import type { BaseUIChangeEventDetails } from '../../utils/createBaseUIEventDetails';
+import type { StateAttributesMapping } from '../../utils/getStateAttributesProps';
 import { FileUploadContext } from './FileUploadContext';
+import { FileUploadRootDataAttributes } from './FileUploadRootDataAttributes';
 import { useFileUploadRoot } from './useFileUploadRoot';
-import { fileUploadRootStateAttributesMapping } from './stateAttributesMapping';
+
+export const FILE_UPLOAD_ROOT_REJECT_REASONS = {
+  FILE_TOO_LARGE: 'FILE_TOO_LARGE',
+  FILE_TOO_SMALL: 'FILE_TOO_SMALL',
+  MIME_TYPE_NOT_ALLOWED: 'MIME_TYPE_NOT_ALLOWED',
+  CUSTOM_VALIDATION_FAILED: 'CUSTOM_VALIDATION_FAILED',
+} as const;
+
+export type FileUploadRootRejectReason =
+  (typeof FILE_UPLOAD_ROOT_REJECT_REASONS)[keyof typeof FILE_UPLOAD_ROOT_REJECT_REASONS];
+
+export type FileUploadRootRejectEventDetails = BaseUIChangeEventDetails<
+  FileUploadRootRejectReason,
+  { message: string }
+>;
 
 export interface FileUploadRootState {
   /**
@@ -21,6 +38,27 @@ export interface FileUploadRootState {
    */
   disabled: boolean;
 }
+
+const fileUploadRootStateAttributesMapping: StateAttributesMapping<FileUploadRootState> = {
+  dragging(value): Record<string, string> | null {
+    if (!value) {
+      return null;
+    }
+
+    return {
+      [FileUploadRootDataAttributes.dragging]: '',
+    };
+  },
+  disabled(value): Record<string, string> | null {
+    if (!value) {
+      return null;
+    }
+
+    return {
+      [FileUploadRootDataAttributes.disabled]: '',
+    };
+  },
+};
 
 export interface FileUploadRootParameters {
   /**
@@ -46,7 +84,9 @@ export interface FileUploadRootParameters {
   accept?: string | undefined;
   /**
    * Custom validation function for additional file validation beyond built-in checks.
-   * Return an error message string if validation fails, or null if valid.
+    * Return an error message string if validation fails, or null if valid.
+    *
+    * Note: Validation is synchronous. Async validators are not supported.
    *
    * @example
    * ```tsx
@@ -82,8 +122,15 @@ export interface FileUploadRootParameters {
   onFilesChange?: ((files: FileUploadRootExtendedFile[]) => void) | undefined;
   /**
    * Callback when a file is rejected.
+    * Receives a machine-readable reason code and detailed event metadata.
    */
-  onFileReject?: ((file: File, reason: string) => void) | undefined;
+  onFileReject?: (
+    (
+      file: File,
+      reason: FileUploadRootRejectReason,
+      eventDetails: FileUploadRootRejectEventDetails,
+    ) => void
+  ) | undefined;
   /**
    * Callback when the file dialog is canceled.
    */
@@ -142,6 +189,14 @@ export interface FileUploadRootExtendedFile extends File {
   uploadedBytes?: number | undefined;
 }
 
+export interface FileUploadRootFileUpdates {
+  status?: FileUploadRootFileStatus | undefined;
+  progress?: number | undefined;
+  error?: string | undefined;
+  isPaused?: boolean | undefined;
+  uploadedBytes?: number | undefined;
+}
+
 export type FileUploadRootFileStatus = 'idle' | 'uploading' | 'success' | 'error' | 'paused';
 
 export interface FileUploadRootProps
@@ -177,7 +232,7 @@ export interface FileUploadRootProps
  * @param directory - Allow selecting directories (default: false)
  * @param disabled - Disable file upload (default: false)
  * @param onFilesChange - Callback when files are added/removed
- * @param onFileReject - Callback when a file is rejected
+ * @param onFileReject - Callback when a file is rejected (`reason` + `eventDetails`)
  * @param onCancel - Callback when the file dialog is canceled
  * @param onDuplicateFile - Callback when a duplicate file is selected
  * @param onRetry - Callback when a file retry is initiated
@@ -213,6 +268,8 @@ export const FileUploadRoot = React.forwardRef<HTMLDivElement, FileUploadRootPro
       onDragOver,
       style,
       className,
+      render: _render,
+      nativeButton: _nativeButton,
       ...other
     } = props;
 
@@ -275,7 +332,7 @@ export const FileUploadRoot = React.forwardRef<HTMLDivElement, FileUploadRootPro
       setIsDragging(false);
 
       if (event.dataTransfer.files && event.dataTransfer.files.length > 0) {
-        addFiles(Array.from(event.dataTransfer.files));
+        addFiles(Array.from(event.dataTransfer.files), event.nativeEvent);
       }
     });
 
@@ -324,7 +381,7 @@ export const FileUploadRoot = React.forwardRef<HTMLDivElement, FileUploadRootPro
 
       event.preventDefault();
       event.stopPropagation();
-      addFiles(pastedFiles);
+      addFiles(pastedFiles, event.nativeEvent);
     });
 
     const defaultProps: HTMLProps = {
@@ -361,5 +418,8 @@ export namespace FileUploadRoot {
   export type Props = FileUploadRootProps;
   export type Parameters = FileUploadRootParameters;
   export type ExtendedFile = FileUploadRootExtendedFile;
+  export type FileUpdates = FileUploadRootFileUpdates;
   export type FileStatus = FileUploadRootFileStatus;
+  export type RejectReason = FileUploadRootRejectReason;
+  export type RejectEventDetails = FileUploadRootRejectEventDetails;
 }

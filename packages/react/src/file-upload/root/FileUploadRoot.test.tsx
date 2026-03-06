@@ -253,7 +253,13 @@ describe('FileUpload', () => {
     fireEvent.change(input);
 
     await waitFor(() => expect(onFileReject).toHaveBeenCalled());
-    expect(onFileReject).toHaveBeenCalledWith(file, expect.any(String));
+    expect(onFileReject).toHaveBeenCalledWith(
+      file,
+      'MIME_TYPE_NOT_ALLOWED',
+      expect.objectContaining({
+        message: expect.any(String),
+      }),
+    );
   });
 
   it('accepts files when accept includes file extensions', async () => {
@@ -306,7 +312,14 @@ describe('FileUpload', () => {
 
     fireEvent.change(input);
 
-    await waitFor(() => expect(onFileReject).toHaveBeenCalledWith(file, 'Blocked by policy'));
+    await waitFor(() => expect(onFileReject).toHaveBeenCalled());
+    expect(onFileReject).toHaveBeenCalledWith(
+      file,
+      'CUSTOM_VALIDATION_FAILED',
+      expect.objectContaining({
+        message: 'Blocked by policy',
+      }),
+    );
     const latestFiles = onFilesChange.mock.calls.at(-1)?.[0] ?? [];
     expect(latestFiles).not.toEqual(expect.arrayContaining([file]));
     expect(validator).toHaveBeenCalledWith(file);
@@ -362,7 +375,13 @@ describe('FileUpload', () => {
     fireEvent.change(input);
 
     await waitFor(() => expect(onFileReject).toHaveBeenCalled());
-    expect(onFileReject).toHaveBeenCalledWith(largeFile, expect.stringContaining('too large'));
+    expect(onFileReject).toHaveBeenCalledWith(
+      largeFile,
+      'FILE_TOO_LARGE',
+      expect.objectContaining({
+        message: expect.stringContaining('too large'),
+      }),
+    );
     expect(onFilesChange).toHaveBeenCalledWith([]);
   });
 
@@ -387,7 +406,13 @@ describe('FileUpload', () => {
     fireEvent.change(input);
 
     await waitFor(() => expect(onFileReject).toHaveBeenCalled());
-    expect(onFileReject).toHaveBeenCalledWith(tinyFile, expect.stringContaining('too small'));
+    expect(onFileReject).toHaveBeenCalledWith(
+      tinyFile,
+      'FILE_TOO_SMALL',
+      expect.objectContaining({
+        message: expect.stringContaining('too small'),
+      }),
+    );
   });
 
   it('respects maxFiles constraint in single file mode', async () => {
@@ -434,6 +459,40 @@ describe('FileUpload', () => {
       expect(revokeObjectURLSpy).toHaveBeenCalled();
     });
 
+    revokeObjectURLSpy.mockRestore();
+  });
+
+  it('does not revoke preview URL on non-removal file updates', async () => {
+    let contextValue: TestFileUploadContext | null = null;
+
+    function TestComponent() {
+      contextValue = FileUpload.useFileUploadContext() as unknown as TestFileUploadContext;
+      return <FileUpload.Input data-testid="file-input" />;
+    }
+
+    render(
+      <FileUpload.Root>
+        <TestComponent />
+      </FileUpload.Root>,
+    );
+
+    const input = screen.getByTestId('file-input') as HTMLInputElement;
+    const file = new File(['content'], 'test.txt', { type: 'text/plain' });
+    const revokeObjectURLSpy = vi.spyOn(URL, 'revokeObjectURL');
+
+    await userEvent.upload(input, file);
+
+    const firstFile = getTestContext(contextValue).files[0];
+
+    act(() => {
+      getTestContext(contextValue).setFiles((prev) =>
+        prev.map((existing) =>
+          existing.id === firstFile.id ? { ...existing, progress: 30, status: 'uploading' } : existing,
+        ),
+      );
+    });
+
+    expect(revokeObjectURLSpy).not.toHaveBeenCalled();
     revokeObjectURLSpy.mockRestore();
   });
 

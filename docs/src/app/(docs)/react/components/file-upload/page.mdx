@@ -66,11 +66,27 @@ export default function App() {
     <FileUpload.Root maxFiles={5}>
       <FileUpload.Input />
       <FileUpload.Dropzone>Upload files</FileUpload.Dropzone>
-      <FileUpload.Trigger />
+      <FileUpload.Trigger>Select files</FileUpload.Trigger>
       <FileList />
     </FileUpload.Root>
   );
 }
+```
+
+For explicit accessible labeling, pair File Upload controls with `Field`:
+
+```jsx title="Accessible labeling with Field"
+import { Field } from '@base-ui/react/field';
+import { FileUpload } from '@base-ui/react/file-upload';
+
+<Field.Root>
+  <Field.Label>Profile image</Field.Label>
+  <FileUpload.Root accept="image/*">
+    <FileUpload.Input />
+    <FileUpload.Dropzone>Drop image here</FileUpload.Dropzone>
+    <FileUpload.Trigger>Select image</FileUpload.Trigger>
+  </FileUpload.Root>
+</Field.Root>;
 ```
 
 ### Controlled state
@@ -112,11 +128,13 @@ Control which files are accepted using `accept`, `maxSize`, `minSize`, and `maxF
   maxSize={10 * 1024 * 1024}
   minSize={1024}
   maxFiles={5}
-  onFileReject={(file, reason) => console.log(`Rejected: ${reason}`)}
+  onFileReject={(file, reason, details) => {
+    console.log(`Rejected ${file.name}: ${reason}`, details.message);
+  }}
 >
   <FileUpload.Input />
   <FileUpload.Dropzone>Upload files</FileUpload.Dropzone>
-  <FileUpload.Trigger />
+  <FileUpload.Trigger>Select files</FileUpload.Trigger>
 </FileUpload.Root>
 ```
 
@@ -139,7 +157,9 @@ Use `validator` for custom rules beyond size and type checks. Return an error me
     }
     return null;
   }}
-  onFileReject={(file, reason) => console.log(`${file.name}: ${reason}`)}
+  onFileReject={(file, reason, details) => {
+    console.log(`${file.name}: ${reason}`, details.message);
+  }}
 >
   <FileUpload.Input />
   <FileUpload.Dropzone>Upload files</FileUpload.Dropzone>
@@ -149,30 +169,19 @@ Use `validator` for custom rules beyond size and type checks. Return an error me
 
 ### Image validation
 
-Use utility functions to validate image dimensions and detect actual file types:
+`validator` is synchronous. Use utility helpers that do not require async work:
 
 ```jsx title="Image dimension validation" "getImageDimensions"
 import * as React from 'react';
 import { FileUpload } from '@base-ui/react/file-upload';
-import { getImageDimensions } from '@base-ui/utils/getImageDimensions';
 
 export default function ImageUpload() {
   return (
     <FileUpload.Root
       accept="image/*"
-      validator={async (file) => {
-        const dimensions = await getImageDimensions(file);
-
-        if (!dimensions) {
-          return 'Unable to determine image dimensions';
-        }
-
-        if (dimensions.width < 800) {
-          return `Image width must be at least 800px (current: ${dimensions.width}px)`;
-        }
-
-        if (dimensions.height < 600) {
-          return `Image height must be at least 600px (current: ${dimensions.height}px)`;
+      validator={(file) => {
+        if (!file.name.match(/\.(png|jpe?g|gif|webp)$/i)) {
+          return 'Only PNG, JPG, GIF, and WebP images are allowed';
         }
 
         return null;
@@ -186,13 +195,7 @@ export default function ImageUpload() {
 }
 ```
 
-**Available image utilities:**
-
-- `getImageDimensions(file)` - Get width and height of an image
-- `validateImageDimensions(file, constraints)` - Validate against min/max width/height
-- `getImageAspectRatio(file)` - Calculate aspect ratio
-- `detectFileType(file)` - Detect actual file type from magic numbers (more reliable than MIME type)
-- `isValidFileType(file, acceptedTypes)` - Validate file type against accepted list
+If you need async checks (for example image dimensions from file decoding), run those checks in your upload pipeline after file selection.
 
 ### Drag and drop state
 
@@ -294,13 +297,15 @@ export default function App() {
 
 ## Accessibility
 
-File Upload is built with accessibility as a core feature:
+File Upload is built with accessibility best practices in mind:
 
-- **WCAG 2.1 Level AA**: Compliant with Web Content Accessibility Guidelines
+- **WCAG-aligned guidance**: Supports patterns commonly used to satisfy WCAG 2.1 Level AA requirements
 - **Keyboard navigation**: Full keyboard support with logical tab order
 - **Screen reader support**: Semantic HTML and ARIA labels for VoiceOver, JAWS, and other assistants
-- **Focus management**: Clear focus indicators and focus trapping in dialogs
+- **Focus management**: Clear focus indicators for interactive controls
 - **Live regions**: File status updates announced to screen reader users
+
+For accessible naming, pair file upload controls with visible labels (for example using `Field.Root` and `Field.Label`).
 
 ## Uploading Files
 
@@ -315,7 +320,7 @@ import { FileUpload } from '@base-ui/react/file-upload';
 function FileUploadContent() {
   const { files, removeFile } = FileUpload.useFileUploadContext();
   const [isUploading, setIsUploading] = React.useState(false);
-  const [uploadError, setUploadError] = (React.useState < string) | (null > null);
+  const [uploadError, setUploadError] = React.useState<string | null>(null);
 
   const handleUpload = async () => {
     setIsUploading(true);

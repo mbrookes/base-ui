@@ -44,7 +44,7 @@ export interface FileUploadTriggerProps extends BaseUIComponentProps<
  */
 export const FileUploadTrigger = React.forwardRef<HTMLButtonElement, FileUploadTriggerProps>(
   function FileUploadTriggerComponent(props, ref) {
-    const { className, ...elementProps } = props;
+    const { className, render, nativeButton, ...elementProps } = props;
     const { openFileDialog, disabled } = useFileUploadContext();
 
     const state: FileUploadTriggerState = React.useMemo(
