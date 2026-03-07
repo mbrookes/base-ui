@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { useStableCallback } from '@base-ui/utils/useStableCallback';
-import type { BaseUIComponentProps } from '../../utils/types';
+import type { BaseUIComponentProps, NativeButtonProps } from '../../utils/types';
 import { useRenderElement } from '../../utils/useRenderElement';
 import { resolveClassName } from '../../utils/resolveClassName';
 import { composeEventHandlers } from '../../utils/composeEventHandlers';
@@ -16,10 +16,8 @@ export interface FileUploadTriggerState {
   disabled: boolean;
 }
 
-export interface FileUploadTriggerProps extends BaseUIComponentProps<
-  'button',
-  FileUploadTriggerState
-> {}
+export interface FileUploadTriggerProps
+  extends NativeButtonProps, BaseUIComponentProps<'button', FileUploadTriggerState> {}
 
 /**
  * Button component for triggering the file selection dialog.
@@ -44,13 +42,7 @@ export interface FileUploadTriggerProps extends BaseUIComponentProps<
  */
 export const FileUploadTrigger = React.forwardRef<HTMLButtonElement, FileUploadTriggerProps>(
   function FileUploadTriggerComponent(componentProps, ref) {
-    const {
-      className,
-      render,
-      // @ts-expect-error - nativeButton is not in props but may be passed by conformance tests
-      nativeButton,
-      ...elementProps
-    } = componentProps;
+    const { className, nativeButton, ...elementProps } = componentProps;
     const { openFileDialog, disabled } = useFileUploadContext();
 
     const state: FileUploadTriggerState = React.useMemo(

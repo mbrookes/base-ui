@@ -24,7 +24,7 @@ export interface FileUploadDropzoneProps extends Omit<
   BaseUIComponentProps<'div', FileUploadDropzoneState>,
   'children'
 > {
-  // eslint-disable-next-line react/no-unused-prop-types
+  // eslint-disable-next-line react/no-unused-prop-types -- false positive, used in useRenderElement children prop
   children?: React.ReactNode | ((state: { isDragging: boolean }) => React.ReactNode);
 }
 
@@ -55,7 +55,7 @@ export interface FileUploadDropzoneProps extends Omit<
  */
 export const FileUploadDropzone = React.forwardRef<HTMLDivElement, FileUploadDropzoneProps>(
   function FileUploadDropzoneComponent(props, ref) {
-    const { children, onClick, onKeyDown, className, render, ...elementProps } = props;
+    const { children, onClick, onKeyDown, className, ...elementProps } = props;
     const { isDragging, disabled, openFileDialog } = useFileUploadContext();
 
     const state: FileUploadDropzoneState = React.useMemo(

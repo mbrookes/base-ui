@@ -268,7 +268,6 @@ export const FileUploadRoot = React.forwardRef<HTMLDivElement, FileUploadRootPro
       onDragOver,
       style,
       className,
-      render,
       ...other
     } = props;
 
