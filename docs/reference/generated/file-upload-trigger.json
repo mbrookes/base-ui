@@ -2,6 +2,12 @@
   "name": "FileUploadTrigger",
   "description": "Button component for triggering the file selection dialog.\n\nThe Trigger component renders a button that opens the file selection dialog\nwhen clicked. It's typically used as an alternative to the Dropzone for users\nwho prefer clicking a button instead of drag-and-drop.",
   "props": {
+    "nativeButton": {
+      "type": "boolean",
+      "default": "true",
+      "description": "Whether the component renders a native `<button>` element when replacing it\nvia the `render` prop.\nSet to `false` if the rendered element is not a button (e.g. `<div>`).",
+      "detailedType": "boolean | undefined"
+    },
     "className": {
       "type": "string | ((state: FileUpload.Trigger.State) => string | undefined)",
       "description": "CSS class applied to the element, or a function that\nreturns a class based on the component’s state.",
