@@ -57,10 +57,6 @@ export interface FileUploadContextValue {
   onFileResume?: ((file: FileUploadRoot.ExtendedFile) => void) | undefined;
   /** Trigger the file selection dialog */
   openFileDialog: () => void;
-  /**
-   * @deprecated Use `addFiles`, `removeFile`, `clearFiles`, or `updateFile` instead.
-   */
-  setFiles: React.Dispatch<React.SetStateAction<FileUploadRoot.ExtendedFile[]>>;
   /** Register the hidden file input element */
   registerInput: (node: HTMLInputElement | null) => void;
 }

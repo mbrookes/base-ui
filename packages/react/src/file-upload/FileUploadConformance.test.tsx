@@ -43,18 +43,16 @@ describe('FileUpload conformance', () => {
   }));
 
   function FileInitializer() {
-    const { setFiles } = FileUpload.useFileUploadContext();
+    const { addFiles } = FileUpload.useFileUploadContext();
+    const initRef = React.useRef(false);
 
     React.useEffect(() => {
-      const file = Object.assign(new File(['content'], 'test.txt', { type: 'text/plain' }), {
-        id: 'conformance-file',
-        preview: 'blob:conformance-file',
-        status: 'idle' as const,
-        progress: 0,
-      });
-
-      setFiles([file]);
-    }, [setFiles]);
+      if (initRef.current) return;
+      initRef.current = true;
+      
+      const file = new File(['content'], 'test.txt', { type: 'text/plain' });
+      addFiles([file]);
+    }, [addFiles]);
 
     return null;
   }
