@@ -107,37 +107,37 @@ Base UI's FileUpload component is a **headless, unstyled implementation** focuse
 
 ## Competitive Feature Matrix
 
-| Feature                | Base UI    | React Dropzone    | Uppy           | FilePond |
-| ---------------------- | ---------- | ----------------- | -------------- | -------- |
+| Feature                | Base UI                      | React Dropzone    | Uppy           | FilePond |
+| ---------------------- | ---------------------------- | ----------------- | -------------- | -------- |
 | **Core File Handling** |
-| Drag-drop              | ✅ (Mar 1) | ✅                | ✅             | ✅       |
-| Click-select           | ✅         | ✅                | ✅             | ✅       |
-| Paste support          | ✅ (Mar 1) | ✅                | ✅             | ✅       |
-| Folder upload          | ✅ (Mar 1) | ✅                | ✅             | ❌       |
-| Keyboard control       | ✅ (Mar 1) | ✅                | ✅             | ✅       |
+| Drag-drop              | ✅ (Mar 1)                   | ✅                | ✅             | ✅       |
+| Click-select           | ✅                           | ✅                | ✅             | ✅       |
+| Paste support          | ✅ (Mar 1)                   | ✅                | ✅             | ✅       |
+| Folder upload          | ✅ (Mar 1)                   | ✅                | ✅             | ❌       |
+| Keyboard control       | ✅ (Mar 1)                   | ✅                | ✅             | ✅       |
 | **Validation**         |
-| File type              | ✅         | ✅                | ✅             | ✅       |
-| File size              | ✅         | ✅                | ✅             | ✅       |
-| File count             | ✅         | ✅                | ✅             | ✅       |
-| Custom validation      | ✅ (Mar 1) | ✅                | ✅             | ✅       |
-| Duplicate detection    | ✅ (Mar 1) | ❌                | ✅             | ❌       |
+| File type              | ✅                           | ✅                | ✅             | ✅       |
+| File size              | ✅                           | ✅                | ✅             | ✅       |
+| File count             | ✅                           | ✅                | ✅             | ✅       |
+| Custom validation      | ✅ (Mar 1)                   | ✅                | ✅             | ✅       |
+| Duplicate detection    | ✅ (Mar 1)                   | ❌                | ✅             | ❌       |
 | **Upload Handling**    |
-| Progress tracking      | ✅         | ❌                | ✅             | ✅       |
-| Status management      | ✅         | ❌                | ✅             | ✅       |
-| Error handling         | ✅ (Mar 1) | ❌                | ✅             | ✅       |
-| Retry logic            | ✅ (Mar 2) | ❌                | ✅             | ⚠️       |
-| Chunked uploads        | ❌         | ❌                | ✅             | ❌       |
-| Resumable uploads      | ✅ (Mar 2) | ❌                | ✅             | ❌       |
-| Abort signal support   | ✅ (Mar 2) | ❌                | ✅             | ❌       |
+| Progress tracking      | ✅                           | ❌                | ✅             | ✅       |
+| Status management      | ✅                           | ❌                | ✅             | ✅       |
+| Error handling         | ✅ (Mar 1)                   | ❌                | ✅             | ✅       |
+| Retry logic            | ✅ (Mar 2)                   | ❌                | ✅             | ⚠️       |
+| Chunked uploads        | ❌                           | ❌                | ✅             | ❌       |
+| Resumable uploads      | ✅ (Mar 2)                   | ❌                | ✅             | ❌       |
+| Abort signal support   | ✅ (Mar 2)                   | ❌                | ✅             | ❌       |
 | **Accessibility**      |
-| ARIA labels            | ✅         | ✅                | ✅             | ✅       |
-| Screen reader support  | ✅         | ✅                | ✅             | ✅       |
-| Keyboard navigation    | ✅ (Mar 1) | ✅                | ✅             | ✅       |
-| Live regions           | ✅ (Mar 1) | ❌                | ✅             | ⚠️       |
+| ARIA labels            | ✅                           | ✅                | ✅             | ✅       |
+| Screen reader support  | ✅                           | ✅                | ✅             | ✅       |
+| Keyboard navigation    | ✅ (Mar 1)                   | ✅                | ✅             | ✅       |
+| Live regions           | ✅ (Mar 1)                   | ❌                | ✅             | ⚠️       |
 | **I18n & UX**          |
-| Localization           | ⚠️ Locale formatting only | ❌ | ✅ (30+ langs) | ⚠️       |
-| Error messages         | ✅ (Mar 1) | ✅ (English only) | ✅             | ✅       |
-| Customizable text      | ⚠️ Not exposed as public API | ⚠️ | ✅ | ✅ |
+| Localization           | ⚠️ Locale formatting only    | ❌                | ✅ (30+ langs) | ⚠️       |
+| Error messages         | ✅ (Mar 1)                   | ✅ (English only) | ✅             | ✅       |
+| Customizable text      | ⚠️ Not exposed as public API | ⚠️                | ✅             | ✅       |
 
 ---
 

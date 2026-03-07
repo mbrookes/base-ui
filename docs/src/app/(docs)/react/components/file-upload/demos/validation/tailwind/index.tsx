@@ -75,7 +75,9 @@ export default function FileUploadValidationTailwindDemo() {
         <FileUpload.Input />
         <FileUpload.Dropzone className="rounded-lg border border-dashed border-gray-300 px-4 py-8 text-center text-sm text-gray-600 hover:bg-gray-50">
           {({ isDragging }) =>
-            isDragging ? 'Drop your image files here' : 'Drag and drop images here, or click to browse'
+            isDragging
+              ? 'Drop your image files here'
+              : 'Drag and drop images here, or click to browse'
           }
         </FileUpload.Dropzone>
 

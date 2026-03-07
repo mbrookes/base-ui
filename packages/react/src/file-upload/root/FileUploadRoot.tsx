@@ -84,9 +84,9 @@ export interface FileUploadRootParameters {
   accept?: string | undefined;
   /**
    * Custom validation function for additional file validation beyond built-in checks.
-    * Return an error message string if validation fails, or null if valid.
-    *
-    * Note: Validation is synchronous. Async validators are not supported.
+   * Return an error message string if validation fails, or null if valid.
+   *
+   * Note: Validation is synchronous. Async validators are not supported.
    *
    * @example
    * ```tsx
@@ -122,15 +122,15 @@ export interface FileUploadRootParameters {
   onFilesChange?: ((files: FileUploadRootExtendedFile[]) => void) | undefined;
   /**
    * Callback when a file is rejected.
-    * Receives a machine-readable reason code and detailed event metadata.
+   * Receives a machine-readable reason code and detailed event metadata.
    */
-  onFileReject?: (
-    (
-      file: File,
-      reason: FileUploadRootRejectReason,
-      eventDetails: FileUploadRootRejectEventDetails,
-    ) => void
-  ) | undefined;
+  onFileReject?:
+    | ((
+        file: File,
+        reason: FileUploadRootRejectReason,
+        eventDetails: FileUploadRootRejectEventDetails,
+      ) => void)
+    | undefined;
   /**
    * Callback when the file dialog is canceled.
    */
@@ -268,8 +268,8 @@ export const FileUploadRoot = React.forwardRef<HTMLDivElement, FileUploadRootPro
       onDragOver,
       style,
       className,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       render: _render,
-      nativeButton: _nativeButton,
       ...other
     } = props;
 

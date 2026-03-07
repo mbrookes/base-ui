@@ -3,6 +3,7 @@
 import * as React from 'react';
 import { useId as useBaseUIId } from '@base-ui/utils/useId';
 import { useStableCallback } from '@base-ui/utils/useStableCallback';
+import { generateId } from '@base-ui/utils/generateId';
 import { createChangeEventDetails } from '../../utils/createBaseUIEventDetails';
 import { FILE_UPLOAD_ROOT_REJECT_REASONS } from './FileUploadRoot';
 import type {
@@ -15,8 +16,6 @@ import type {
 import type { FileUploadContextValue } from './FileUploadContext';
 
 type UseFileUploadRootParameters = FileUploadRootParameters;
-
-const generateId = () => Math.random().toString(36).slice(2, 11);
 
 type RejectReasonCode =
   (typeof FILE_UPLOAD_ROOT_REJECT_REASONS)[keyof typeof FILE_UPLOAD_ROOT_REJECT_REASONS];
@@ -225,19 +224,17 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
 
         const error = validateFile(file);
         if (error) {
-          const eventDetails = createChangeEventDetails<FileUploadRootRejectReason, { message: string }>(
-            error.reason,
-            event,
-            undefined,
-            { message: error.message },
-          );
+          const eventDetails = createChangeEventDetails<
+            FileUploadRootRejectReason,
+            { message: string }
+          >(error.reason, event, undefined, { message: error.message });
 
           onFileReject?.(file, error.reason, eventDetails);
           errors.push(`${file.name}: ${error.message}`);
         } else {
           existingKeys.add(fileKey);
 
-          const id = generateId();
+          const id = generateId('file');
           const preview = URL.createObjectURL(file);
           previewUrlsRef.current.set(id, preview);
 

@@ -487,7 +487,9 @@ describe('FileUpload', () => {
     act(() => {
       getTestContext(contextValue).setFiles((prev) =>
         prev.map((existing) =>
-          existing.id === firstFile.id ? { ...existing, progress: 30, status: 'uploading' } : existing,
+          existing.id === firstFile.id
+            ? { ...existing, progress: 30, status: 'uploading' }
+            : existing,
         ),
       );
     });

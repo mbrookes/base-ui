@@ -60,8 +60,8 @@ export const FileUploadDropzone = React.forwardRef<HTMLDivElement, FileUploadDro
       onClick,
       onKeyDown,
       className,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       render: _render,
-      nativeButton: _nativeButton,
       ...elementProps
     } = props;
     const { isDragging, disabled, openFileDialog } = useFileUploadContext();

@@ -9,7 +9,9 @@ function ImagePreviewItem({ file }: { file: FileUpload.Root.ExtendedFile }) {
 
   return (
     <div className="relative overflow-hidden rounded-lg border border-gray-200 bg-white">
-      {file.preview && <img src={file.preview} alt={file.name} className="h-32 w-full object-cover" />}
+      {file.preview && (
+        <img src={file.preview} alt={file.name} className="h-32 w-full object-cover" />
+      )}
       <div className="flex items-center justify-between gap-2 p-2">
         <div className="min-w-0">
           <p className="truncate text-sm font-medium text-gray-900">{file.name}</p>
@@ -52,7 +54,9 @@ export default function FileUploadImagePreviewTailwindDemo() {
       <FileUpload.Input />
 
       <FileUpload.Dropzone className="rounded-lg border border-dashed border-gray-300 px-4 py-8 text-center text-sm text-gray-600 hover:bg-gray-50">
-        {({ isDragging }) => (isDragging ? 'Drop images here' : 'Drag images here or click to select')}
+        {({ isDragging }) =>
+          isDragging ? 'Drop images here' : 'Drag images here or click to select'
+        }
       </FileUpload.Dropzone>
 
       <div className="mt-3 flex items-center justify-between gap-3">

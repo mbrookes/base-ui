@@ -3,6 +3,6 @@ import CssModules from './css-modules';
 import Tailwind from './tailwind';
 
 export const DemoFileUploadMinimal = createDemoWithVariants(import.meta.url, {
-	CssModules,
-	Tailwind,
+  CssModules,
+  Tailwind,
 });
