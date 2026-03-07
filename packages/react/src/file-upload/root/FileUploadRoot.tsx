@@ -18,6 +18,7 @@ export const FILE_UPLOAD_ROOT_REJECT_REASONS = {
   FILE_TOO_SMALL: 'FILE_TOO_SMALL',
   MIME_TYPE_NOT_ALLOWED: 'MIME_TYPE_NOT_ALLOWED',
   CUSTOM_VALIDATION_FAILED: 'CUSTOM_VALIDATION_FAILED',
+  DUPLICATE_FILE: 'DUPLICATE_FILE',
 } as const;
 
 export type FileUploadRootRejectReason =
@@ -136,10 +137,6 @@ export interface FileUploadRootParameters {
    */
   onCancel?: (() => void) | undefined;
   /**
-   * Callback when a duplicate file is selected.
-   */
-  onDuplicateFile?: ((file: File) => void) | undefined;
-  /**
    * Callback when a file retry is initiated.
    */
   onRetry?: ((file: FileUploadRootExtendedFile) => void) | undefined;
@@ -234,7 +231,6 @@ export interface FileUploadRootProps
  * @param onFilesChange - Callback when files are added/removed
  * @param onFileReject - Callback when a file is rejected (`reason` + `eventDetails`)
  * @param onCancel - Callback when the file dialog is canceled
- * @param onDuplicateFile - Callback when a duplicate file is selected
  * @param onRetry - Callback when a file retry is initiated
  * @param onFilePause - Callback when a file upload is paused
  * @param onFileResume - Callback when a paused file upload is resumed
@@ -256,7 +252,6 @@ export const FileUploadRoot = React.forwardRef<HTMLDivElement, FileUploadRootPro
       onFilesChange,
       onFileReject,
       onCancel,
-      onDuplicateFile,
       onRetry,
       onFilePause,
       onFileResume,
@@ -283,7 +278,6 @@ export const FileUploadRoot = React.forwardRef<HTMLDivElement, FileUploadRootPro
       onFilesChange,
       onFileReject,
       onCancel,
-      onDuplicateFile,
       onRetry,
       onFilePause,
       onFileResume,

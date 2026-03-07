@@ -93,7 +93,6 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
     onFilesChange,
     onFileReject,
     onCancel,
-    onDuplicateFile,
     onRetry,
     onFilePause,
     onFileResume,
@@ -217,7 +216,11 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
       candidates.forEach((file) => {
         const fileKey = getFileKey(file);
         if (existingKeys.has(fileKey)) {
-          onDuplicateFile?.(file);
+          const eventDetails = createChangeEventDetails<
+            FileUploadRootRejectReason,
+            { message: string }
+          >('DUPLICATE_FILE', event, undefined, { message: messages.duplicateFile(file.name) });
+          onFileReject?.(file, 'DUPLICATE_FILE', eventDetails);
           errors.push(messages.duplicateFile(file.name));
           return;
         }

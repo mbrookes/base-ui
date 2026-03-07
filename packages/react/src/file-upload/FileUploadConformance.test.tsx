@@ -47,9 +47,11 @@ describe('FileUpload conformance', () => {
     const initRef = React.useRef(false);
 
     React.useEffect(() => {
-      if (initRef.current) return;
+      if (initRef.current) {
+        return;
+      }
       initRef.current = true;
-      
+
       const file = new File(['content'], 'test.txt', { type: 'text/plain' });
       addFiles([file]);
     }, [addFiles]);

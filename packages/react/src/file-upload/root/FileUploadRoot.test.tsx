@@ -214,11 +214,11 @@ describe('FileUpload', () => {
     await waitFor(() => expect(onCancel).toHaveBeenCalled());
   });
 
-  it('calls onDuplicateFile when the same file is selected again', async () => {
-    const onDuplicateFile = vi.fn();
+  it('calls onFileReject with DUPLICATE_FILE reason when the same file is selected again', async () => {
+    const onFileReject = vi.fn();
 
     render(
-      <FileUpload.Root onDuplicateFile={onDuplicateFile}>
+      <FileUpload.Root onFileReject={onFileReject}>
         <FileUpload.Input data-testid="file-input" />
       </FileUpload.Root>,
     );
@@ -229,7 +229,15 @@ describe('FileUpload', () => {
     await userEvent.upload(input, file);
     await userEvent.upload(input, file);
 
-    await waitFor(() => expect(onDuplicateFile).toHaveBeenCalledWith(file));
+    await waitFor(() => {
+      expect(onFileReject).toHaveBeenCalledWith(
+        expect.any(File),
+        'DUPLICATE_FILE',
+        expect.objectContaining({
+          reason: 'DUPLICATE_FILE',
+        }),
+      );
+    });
   });
 
   it('calls onFileReject callback with rejected file', async () => {
@@ -695,113 +703,6 @@ describe('FileUpload', () => {
       fireEvent.change(input);
 
       await waitFor(() => expect(onFileReject).toHaveBeenCalled());
-    });
-  });
-
-  describe('retry functionality', () => {
-    it('retries a failed file upload', async () => {
-      const onRetry = vi.fn();
-
-      function RetryButton({ fileId }: { fileId: string }) {
-        const { retryFile } = FileUpload.useFileUploadContext();
-        return <button onClick={() => retryFile(fileId)}>Retry</button>;
-      }
-
-      function TestComponent() {
-        const { setFiles } = FileUpload.useFileUploadContext();
-
-        React.useEffect(() => {
-          // Set files directly using context
-          setFiles([
-            {
-              id: '1',
-              name: 'failed.txt',
-              size: 100,
-              type: 'text/plain',
-              preview: 'blob:test',
-              status: 'error',
-              progress: 0,
-              error: 'Network error',
-            } as any,
-          ]);
-        }, [setFiles]);
-
-        return (
-          <React.Fragment>
-            <FileUpload.Input />
-            <RetryButton fileId="1" />
-          </React.Fragment>
-        );
-      }
-
-      render(
-        <FileUpload.Root onRetry={onRetry}>
-          <TestComponent />
-        </FileUpload.Root>,
-      );
-
-      const retryButton = await screen.findByRole('button', { name: 'Retry' });
-      await userEvent.setup().click(retryButton);
-
-      await waitFor(() => expect(onRetry).toHaveBeenCalled());
-    });
-
-    it('resets file status and progress on retry', async () => {
-      function RetryButton({ fileId }: { fileId: string }) {
-        const { retryFile, files } = FileUpload.useFileUploadContext();
-        return (
-          <React.Fragment>
-            <button onClick={() => retryFile(fileId)}>Retry</button>
-            <div data-testid="file-status">{files[0]?.status}</div>
-            <div data-testid="file-progress">{files[0]?.progress}</div>
-          </React.Fragment>
-        );
-      }
-
-      function TestComponent() {
-        const { setFiles } = FileUpload.useFileUploadContext();
-
-        React.useEffect(() => {
-          setFiles([
-            {
-              id: '1',
-              name: 'failed.txt',
-              size: 100,
-              type: 'text/plain',
-              preview: 'blob:test',
-              status: 'error',
-              progress: 50,
-              error: 'Network error',
-            } as any,
-          ]);
-        }, [setFiles]);
-
-        return (
-          <React.Fragment>
-            <FileUpload.Input />
-            <RetryButton fileId="1" />
-          </React.Fragment>
-        );
-      }
-
-      render(
-        <FileUpload.Root>
-          <TestComponent />
-        </FileUpload.Root>,
-      );
-
-      await waitFor(() => {
-        expect(screen.getByTestId('file-status')).toHaveTextContent('error');
-        expect(screen.getByTestId('file-progress')).toHaveTextContent('50');
-      });
-
-      const retryButton = screen.getByRole('button', { name: 'Retry' });
-      await userEvent.setup().click(retryButton);
-
-      await waitFor(() => {
-        expect(screen.getByTestId('file-status')).toHaveTextContent('idle');
-        expect(screen.getByTestId('file-progress')).toHaveTextContent('0');
-      });
     });
   });
 

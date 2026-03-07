@@ -202,7 +202,9 @@ describe('FileUpload.PreviewList', () => {
         const filesRef = React.useRef<string[]>([]);
 
         React.useEffect(() => {
-          if (initRef.current) return;
+          if (initRef.current) {
+            return;
+          }
           initRef.current = true;
 
           addFiles([
@@ -260,7 +262,9 @@ describe('FileUpload.PreviewList', () => {
         const filesRef = React.useRef<string[]>([]);
 
         React.useEffect(() => {
-          if (initRef.current) return;
+          if (initRef.current) {
+            return;
+          }
           initRef.current = true;
 
           addFiles([
@@ -319,7 +323,9 @@ describe('FileUpload.PreviewList', () => {
         const initRef = React.useRef(false);
 
         React.useEffect(() => {
-          if (initRef.current) return;
+          if (initRef.current) {
+            return;
+          }
           initRef.current = true;
           addFiles([new File(['idle'], 'idle.txt', { type: 'text/plain' })]);
         }, [addFiles]);
@@ -357,7 +363,9 @@ describe('FileUpload.PreviewList', () => {
         const filesRef = React.useRef<string[]>([]);
 
         React.useEffect(() => {
-          if (initRef.current) return;
+          if (initRef.current) {
+            return;
+          }
           initRef.current = true;
 
           addFiles([
