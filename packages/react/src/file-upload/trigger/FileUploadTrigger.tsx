@@ -43,15 +43,14 @@ export interface FileUploadTriggerProps extends BaseUIComponentProps<
  * @see [File Upload Documentation](https://base-ui.com/react/components/file-upload)
  */
 export const FileUploadTrigger = React.forwardRef<HTMLButtonElement, FileUploadTriggerProps>(
-  function FileUploadTriggerComponent(props, ref) {
+  function FileUploadTriggerComponent(componentProps, ref) {
     const {
       className,
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      render: _render,
+      render,
       // @ts-expect-error - nativeButton is not in props but may be passed by conformance tests
-      nativeButton: _nativeButton,
+      nativeButton,
       ...elementProps
-    } = props;
+    } = componentProps;
     const { openFileDialog, disabled } = useFileUploadContext();
 
     const state: FileUploadTriggerState = React.useMemo(
@@ -68,7 +67,7 @@ export const FileUploadTrigger = React.forwardRef<HTMLButtonElement, FileUploadT
       openFileDialog();
     });
 
-    return useRenderElement('button', props, {
+    return useRenderElement('button', componentProps, {
       state,
       ref,
       props: [

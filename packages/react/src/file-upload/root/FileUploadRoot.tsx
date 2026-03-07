@@ -268,8 +268,7 @@ export const FileUploadRoot = React.forwardRef<HTMLDivElement, FileUploadRootPro
       onDragOver,
       style,
       className,
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      render: _render,
+      render,
       ...other
     } = props;
 
