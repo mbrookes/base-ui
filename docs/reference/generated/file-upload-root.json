@@ -63,9 +63,9 @@
       "detailedType": "| ((file: FileUpload.Root.ExtendedFile) => void)\n| undefined"
     },
     "onFilesChange": {
-      "type": "((files: FileUpload.Root.ExtendedFile[]) => void)",
-      "description": "Callback when files are added.",
-      "detailedType": "| ((files: FileUpload.Root.ExtendedFile[]) => void)\n| undefined"
+      "type": "((files: FileUpload.Root.ExtendedFile[], eventDetails: FileUpload.Root.ChangeEventDetails) => void)",
+      "description": "Callback when files are added or removed.",
+      "detailedType": "| ((\n    files: FileUpload.Root.ExtendedFile[],\n    eventDetails: FileUpload.Root.ChangeEventDetails,\n  ) => void)\n| undefined"
     },
     "onRetry": {
       "type": "((file: FileUpload.Root.ExtendedFile) => void)",
