@@ -296,17 +296,61 @@ export interface ComponentNameProps extends BaseUIComponentProps<
 
 **Namespace Pattern:**
 
+Every component part exports a namespace with its types for clean API usage:
+
 ```typescript
 export namespace ComponentName {
+  // Required exports
   export type State = ComponentNameState;
   export type Props = ComponentNameProps;
 
-  // Additional nested types if needed
-  export interface Parameters {
-    // Parameter definitions
+  // Event-related types (if component has change events)
+  export type ChangeEventDetails = ComponentNameChangeEventDetails;
+  export type ChangeReason = ComponentNameChangeReason;
+
+  // Additional domain-specific types as needed
+  export type Parameters = ComponentNameParameters;
+  export type ExtendedType = ComponentNameExtendedType;
+  
+  // For components with imperative methods
+  export type Actions = ComponentNameActions;
+}
+```
+
+**Usage examples:**
+
+```typescript
+// Using Props type for wrapper components
+function MyTooltip(props: Tooltip.Root.Props) {
+  return <Tooltip.Root {...props} />;
+}
+
+// Using State in render props
+function renderPositioner(
+  props: Popover.Positioner.Props,
+  state: Popover.Positioner.State
+) {
+  return <div {...props}>Position: {state.side}</div>;
+}
+
+// Using ChangeEventDetails for typed handlers
+function handleChange(
+  value: string,
+  details: Combobox.Root.ChangeEventDetails
+) {
+  if (details.reason === 'user-input') {
+    logAnalytics();
   }
 }
 ```
+
+**What to export in namespaces:**
+
+1. **Always export:** `State`, `Props`
+2. **Export if component has change events:** `ChangeEventDetails`, `ChangeReason`
+3. **Export if component has parameters:** `Parameters` interface
+4. **Export if component has imperative methods:** `Actions` interface
+5. **Export domain-specific types:** File objects, toast objects, etc.
 
 **Critical Type Rules:**
 
