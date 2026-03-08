@@ -21,7 +21,12 @@ function FileList() {
               <div className={styles.fileName}>{file.name}</div>
               <div className={styles.fileSize}>{(file.size / 1024).toFixed(1)} KB</div>
             </div>
-            <button type="button" className={styles.removeBtn} onClick={() => removeFile(file.id)}>
+            <button
+              type="button"
+              className={styles.removeBtn}
+              onClick={() => removeFile(file.id)}
+              aria-label={`Remove ${file.name}`}
+            >
               Remove
             </button>
           </div>
@@ -65,15 +70,19 @@ export default function FileUploadValidationDemo() {
         <FileUpload.Input />
 
         <div className={styles.footer}>
-          <FileUpload.Trigger className={styles.trigger}>Select files</FileUpload.Trigger>
-          <span className={styles.hint}>Max 5 files • 1KB - 2MB each • Images only</span>
+          <FileUpload.Trigger className={styles.trigger} aria-describedby="file-validation-hint">
+            Select files
+          </FileUpload.Trigger>
+          <span id="file-validation-hint" className={styles.hint}>
+            Max 5 files • 1KB - 2MB each • Images only
+          </span>
         </div>
 
         <FileList />
       </FileUpload.Root>
 
       {rejectedFile && (
-        <div className={styles.errorContainer}>
+        <div className={styles.errorContainer} role="alert">
           <strong>Rejected: {rejectedFile.file.name}</strong>
           <RejectionMessage reason={rejectedFile.reason} />
         </div>

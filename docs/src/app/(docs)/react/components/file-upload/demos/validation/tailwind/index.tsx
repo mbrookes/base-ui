@@ -43,6 +43,7 @@ function FileList() {
             type="button"
             className="text-sm text-red-600 hover:text-red-700"
             onClick={() => removeFile(file.id)}
+            aria-label={`Remove ${file.name}`}
           >
             Remove
           </button>
@@ -75,17 +76,22 @@ export default function FileUploadValidationTailwindDemo() {
         <FileUpload.Input />
 
         <div className="flex items-center justify-between gap-3">
-          <FileUpload.Trigger className="inline-flex rounded-md bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700">
+          <FileUpload.Trigger
+            className="inline-flex rounded-md bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-2 focus:outline-offset-2 focus:outline-blue-600"
+            aria-describedby="file-validation-hint"
+          >
             Select files
           </FileUpload.Trigger>
-          <span className="text-xs text-gray-500">Max 5 files • 1KB - 2MB each • Images only</span>
+          <span id="file-validation-hint" className="text-xs text-gray-500">
+            Max 5 files • 1KB - 2MB each • Images only
+          </span>
         </div>
 
         <FileList />
       </FileUpload.Root>
 
       {rejectedFile && (
-        <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+        <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700" role="alert">
           <strong>Rejected: {rejectedFile.file.name}</strong>
           <RejectionMessage reason={rejectedFile.reason} />
         </div>
