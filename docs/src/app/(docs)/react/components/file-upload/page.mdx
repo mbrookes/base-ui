@@ -17,9 +17,8 @@ import { DemoFileUploadImagePreview } from './demos/image-preview';
 
 ## Usage guidelines
 
-- **File Upload is headless**: Use File Upload to build custom file selection and upload experiences with full control over the UI. Base UI provides the state management and accessibility, you build the UI.
-- **No built-in upload**: File Upload handles file selection and validation only. **You must implement the actual file upload** using fetch, axios, or your HTTP client. See [Uploading Files](#uploading-files) below.
 - **Ideal for custom workflows**: Perfect for applications that need specific upload flows, preview displays, validation feedback, or integration with custom upload services.
+- **No built-in upload**: File Upload handles file selection and validation only. **You must implement the actual file upload** using fetch, axios, or your HTTP client. See [Uploading Files](#uploading-files) below.
 - **Form controls must have an accessible name**: Ensure file upload dropzones and triggers are properly labeled. Use the [`Field` component](/react/components/field) or native `<label>` elements for accessibility.
 
 ## Anatomy
@@ -68,24 +67,6 @@ export default function App() {
     </FileUpload.Root>
   );
 }
-```
-
-### Accessible labeling
-
-For explicit accessible labeling, pair File Upload controls with `Field`:
-
-```jsx title="Accessible labeling with Field"
-import { Field } from '@base-ui/react/field';
-import { FileUpload } from '@base-ui/react/file-upload';
-
-<Field.Root>
-  <Field.Label>Profile image</Field.Label>
-  <FileUpload.Root accept="image/*">
-    <FileUpload.Input />
-    <FileUpload.Dropzone>Drop image here</FileUpload.Dropzone>
-    <FileUpload.Trigger>Select image</FileUpload.Trigger>
-  </FileUpload.Root>
-</Field.Root>;
 ```
 
 ### Controlled state
@@ -304,8 +285,23 @@ File Upload is built with accessibility best practices in mind:
 - **Focus management**: Clear focus indicators for interactive controls
 - **Live regions**: File status updates announced to screen reader users
 
+### Accessible labeling
+
 For accessible naming, pair file upload controls with visible labels (for example using `Field.Root` and `Field.Label`).
 
+```jsx title="Accessible labeling with Field"
+import { Field } from '@base-ui/react/field';
+import { FileUpload } from '@base-ui/react/file-upload';
+
+<Field.Root>
+  <Field.Label>Profile image</Field.Label>
+  <FileUpload.Root accept="image/*">
+    <FileUpload.Input />
+    <FileUpload.Dropzone>Drop image here</FileUpload.Dropzone>
+    <FileUpload.Trigger>Select image</FileUpload.Trigger>
+  </FileUpload.Root>
+</Field.Root>;
+```
 ## Uploading Files
 
 **Important: FileUpload handles file selection only. You must implement the actual upload.**
