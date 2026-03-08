@@ -479,6 +479,39 @@ onValueChange?: ((
 4. Pass both value and details to parent callback
 5. Include optional `nativeEvent` when available
 
+### Canceling Changes and Allowing Propagation
+
+The `BaseUIChangeEventDetails` object provides methods for controlling event behavior:
+
+```typescript
+onValueChange?: ((value: Type, details: BaseUIChangeEventDetails) => void) {
+  // Cancel the change to prevent internal state updates
+  if (someCondition) {
+    details.cancel();
+    return;
+  }
+
+  // Allow the DOM event to propagate (useful for nested popups)
+  if (details.reason === 'escape-key') {
+    details.allowPropagation();
+  }
+
+  // Perform side effects based on the reason
+  if (details.reason === 'user-interaction') {
+    logAnalytics();
+  }
+}
+```
+
+**Available methods:**
+
+- `cancel()`: Prevents the component from updating its internal state. Used to keep components uncontrolled while conditionally preventing certain changes.
+- `allowPropagation()`: Allows the underlying DOM event to propagate. By default, some events like Escape key presses stop propagation to prevent parent popups from closing.
+- `reason`: A string indicating why the change occurred. Check IDE autocomplete for available values per component.
+- `event`: The native DOM event that triggered the change (when available).
+- `isCanceled`: Boolean indicating if `cancel()` was called.
+- `isPropagationAllowed`: Boolean indicating if `allowPropagation()` was called.
+
 ### Event Handler Composition
 
 Use `composeEventHandlers` for combining handlers:
@@ -493,6 +526,30 @@ const element = useRenderElement('button', componentProps, {
   },
 });
 ```
+
+### Preventing Base UI Event Handling
+
+To prevent Base UI from handling a React event, use `preventBaseUIHandler()` on the event object:
+
+```typescript
+<Component.Input
+  onPaste={(event) => {
+    // Prevent Base UI's default paste handling
+    event.preventBaseUIHandler();
+    
+    // Implement custom paste logic
+    customPasteHandler(event);
+  }}
+/>
+```
+
+**Use cases:**
+
+- Overriding default keyboard navigation
+- Implementing custom paste/drag-drop behavior
+- Preventing default focus management in specific scenarios
+
+**Note:** This is an escape hatch for cases where there isn't a prop to customize behavior yet. Native events (not React events) are not affected by this method.
 
 ---
 
