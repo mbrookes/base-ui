@@ -9,7 +9,7 @@ function FileList() {
   const { files, removeFile } = FileUpload.useFileUploadContext();
 
   if (files.length === 0) {
-    return <p>No files selected. Maximum 5 files, 2MB each.</p>;
+    return <p>No files selected.</p>;
   }
 
   return (
