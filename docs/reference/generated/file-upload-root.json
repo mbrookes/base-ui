@@ -47,11 +47,6 @@
       "description": "Callback when the file dialog is canceled.",
       "detailedType": "(() => void) | undefined"
     },
-    "onDuplicateFile": {
-      "type": "((file: File) => void)",
-      "description": "Callback when a duplicate file is selected.",
-      "detailedType": "((file: File) => void) | undefined"
-    },
     "onFilePause": {
       "type": "((file: FileUpload.Root.ExtendedFile) => void)",
       "description": "Callback when a file upload is paused.",

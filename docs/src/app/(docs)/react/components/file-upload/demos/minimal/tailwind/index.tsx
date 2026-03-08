@@ -21,7 +21,7 @@ function FileList() {
           <span className="truncate text-sm text-gray-900">{file.name}</span>
           <button
             type="button"
-            className="text-sm text-red-600 hover:text-red-700"
+            className="text-sm text-gray-900 hover:text-gray-700"
             onClick={() => removeFile(file.id)}
           >
             Remove

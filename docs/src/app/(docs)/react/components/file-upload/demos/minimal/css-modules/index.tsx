@@ -26,7 +26,7 @@ function FileList() {
 
 export default function FileUploadMinimalDemo() {
   return (
-    <FileUpload.Root>
+    <FileUpload.Root style={{ color: 'black' }}>
       <FileUpload.Input />
       <FileUpload.Dropzone>Drop files here or click to select</FileUpload.Dropzone>
       <FileUpload.Trigger>Choose files</FileUpload.Trigger>
