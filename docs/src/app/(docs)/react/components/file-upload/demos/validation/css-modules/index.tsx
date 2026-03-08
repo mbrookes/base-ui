@@ -63,38 +63,10 @@ export default function FileUploadValidationDemo() {
         }}
       >
         <FileUpload.Input />
-        <FileUpload.Dropzone className={styles.dropzone}>
-          {({ isDragging }) => (
-            <div className={`${styles.dropzoneContent} ${isDragging ? styles.isDragging : ''}`}>
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
-                <path
-                  d="M12 2v12m0 0l-3.5-3.5m3.5 3.5l3.5-3.5M2 12h8m0 0v8m0-8H2m12 8h8m0-8h-8"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-              <div>
-                {isDragging ? (
-                  <React.Fragment>
-                    <p>Drop your image files here</p>
-                    <span className={styles.subtitle}>Images only, up to 2MB each</span>
-                  </React.Fragment>
-                ) : (
-                  <React.Fragment>
-                    <p>Drag and drop images here</p>
-                    <span className={styles.subtitle}>or click to browse</span>
-                  </React.Fragment>
-                )}
-              </div>
-            </div>
-          )}
-        </FileUpload.Dropzone>
 
         <div className={styles.footer}>
-          <FileUpload.Trigger className={styles.trigger}>Browse files</FileUpload.Trigger>
-          <span className={styles.hint}>Max 5 files • 1KB - 2MB each</span>
+          <FileUpload.Trigger className={styles.trigger}>Select files</FileUpload.Trigger>
+          <span className={styles.hint}>Max 5 files • 1KB - 2MB each • Images only</span>
         </div>
 
         <FileList />

@@ -73,19 +73,12 @@ export default function FileUploadValidationTailwindDemo() {
         }}
       >
         <FileUpload.Input />
-        <FileUpload.Dropzone className="rounded-lg border border-dashed border-gray-300 px-4 py-8 text-center text-sm text-gray-600 hover:bg-gray-50">
-          {({ isDragging }) =>
-            isDragging
-              ? 'Drop your image files here'
-              : 'Drag and drop images here, or click to browse'
-          }
-        </FileUpload.Dropzone>
 
-        <div className="mt-3 flex items-center justify-between gap-3">
+        <div className="flex items-center justify-between gap-3">
           <FileUpload.Trigger className="inline-flex rounded-md bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700">
-            Browse files
+            Select files
           </FileUpload.Trigger>
-          <span className="text-xs text-gray-500">Max 5 files • 1KB - 2MB each</span>
+          <span className="text-xs text-gray-500">Max 5 files • 1KB - 2MB each • Images only</span>
         </div>
 
         <FileList />
