@@ -1011,16 +1011,40 @@ Study these components to understand patterns for your use case.
 
 ### Render Prop Support
 
-All components support custom rendering:
+All components that use `useRenderElement` must preserve the `render` prop throughout the component lifecycle:
 
-```typescript
-const element = useRenderElement('defaultElement', componentProps, {
-  ref: forwardedRef,
-  state,
-  props: elementProps,
-  stateAttributesMapping,
-});
-```
+**Critical Pattern:**
+
+1. **Always destructure `render` explicitly (do not ignore it):**
+   ```typescript
+   const { render, className, disabled = false, ...elementProps } = componentProps;
+   ```
+
+2. **Pass the original `componentProps` to `useRenderElement` to preserve the render prop:**
+   ```typescript
+   const element = useRenderElement('button', componentProps, {
+     state,
+     ref: forwardedRef,
+     props: [elementProps, getButtonProps],
+     stateAttributesMapping,
+   });
+   ```
+
+3. **Never destructure the render prop as a throwaway variable:**
+   ```typescript
+   // ❌ WRONG: Ignoring render prevents custom rendering
+   const { render: _render, ...props } = componentProps;
+   
+   // ✅ CORRECT: Preserve render for useRenderElement
+   const { render, ...props } = componentProps;
+   ```
+
+**Why this matters:** The `render` prop allows consumers to completely customize how a component renders. If the render prop is lost during destructuring, users cannot override the default element type or structure.
+
+**When using `useRenderElement`:**
+- Always pass `componentProps` as the second argument (not a modified `props` object)
+- Destructure custom component props (`render`, `className`, etc.) but keep them separate from `elementProps`
+- Provide `elementProps` in the props array for merging with other prop objects
 
 ### Hidden Input Pattern
 
