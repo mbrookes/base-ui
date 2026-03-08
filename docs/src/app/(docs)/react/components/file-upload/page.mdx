@@ -302,6 +302,7 @@ import { FileUpload } from '@base-ui/react/file-upload';
   </FileUpload.Root>
 </Field.Root>;
 ```
+
 ## Uploading Files
 
 **Important: FileUpload handles file selection only. You must implement the actual upload.**
@@ -315,7 +316,7 @@ import { FileUpload } from '@base-ui/react/file-upload';
 function FileUploadContent() {
   const { files, removeFile } = FileUpload.useFileUploadContext();
   const [isUploading, setIsUploading] = React.useState(false);
-  const [uploadError, setUploadError] = React.useState<string | null>(null);
+  const [uploadError, setUploadError] = (React.useState < string) | (null > null);
 
   const handleUpload = async () => {
     setIsUploading(true);
