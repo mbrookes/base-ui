@@ -10,7 +10,6 @@
 />
 
 import { DemoFileUploadHero } from './demos/hero';
-import { DemoFileUploadMinimal } from './demos/minimal';
 import { DemoFileUploadValidation } from './demos/validation';
 import { DemoFileUploadImagePreview } from './demos/image-preview';
 
@@ -44,8 +43,6 @@ import { FileUpload } from '@base-ui/react/file-upload';
 
 ### Basic setup
 
-<DemoFileUploadMinimal />
-
 `FileUpload.Root` manages file state and provides context to child components. It accepts files through drag-and-drop, click-to-select, paste, or the hidden input element.
 
 ```jsx title="Basic file upload"
@@ -66,7 +63,6 @@ export default function App() {
     <FileUpload.Root maxFiles={5}>
       <FileUpload.Input />
       <FileUpload.Dropzone>Upload files</FileUpload.Dropzone>
-      <FileUpload.Trigger>Select files</FileUpload.Trigger>
       <FileList />
     </FileUpload.Root>
   );

@@ -39,9 +39,6 @@ export default function FileUploadMinimalTailwindDemo() {
       <FileUpload.Dropzone className="rounded-lg border border-dashed border-gray-300 px-4 py-8 text-center text-sm text-gray-600 hover:bg-gray-50">
         Drop files here or click to select
       </FileUpload.Dropzone>
-      <FileUpload.Trigger className="mt-3 inline-flex rounded-md bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700">
-        Choose files
-      </FileUpload.Trigger>
       <FileList />
     </FileUpload.Root>
   );
