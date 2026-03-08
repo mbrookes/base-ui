@@ -390,7 +390,7 @@ describe('FileUpload', () => {
         message: expect.stringContaining('too large'),
       }),
     );
-    expect(onFilesChange).toHaveBeenCalledWith([]);
+    expect(onFilesChange).toHaveBeenCalledWith([], expect.objectContaining({ reason: expect.any(String) }));
   });
 
   it('respects minSize constraint and rejects undersized files', async () => {
@@ -440,6 +440,7 @@ describe('FileUpload', () => {
     await waitFor(() => {
       expect(onFilesChange).toHaveBeenCalledWith(
         expect.arrayContaining([expect.objectContaining({ name: 'test.txt' })]),
+        expect.objectContaining({ reason: expect.any(String) }),
       );
     });
 
@@ -601,6 +602,7 @@ describe('FileUpload', () => {
       await waitFor(() => {
         expect(onFilesChange).toHaveBeenCalledWith(
           expect.arrayContaining([expect.objectContaining({ name: 'test.txt' })]),
+          expect.objectContaining({ reason: expect.any(String) }),
         );
       });
     });
@@ -623,6 +625,7 @@ describe('FileUpload', () => {
       await waitFor(() => {
         expect(onFilesChange).toHaveBeenCalledWith(
           expect.arrayContaining([expect.objectContaining({ name: 'test1.txt' })]),
+          expect.objectContaining({ reason: expect.any(String) }),
         );
       });
 
@@ -1061,6 +1064,7 @@ describe('FileUpload', () => {
             expect.objectContaining({ name: 'test2.txt' }),
             expect.objectContaining({ name: 'test3.txt' }),
           ]),
+          expect.objectContaining({ reason: expect.any(String) }),
         );
       });
 
@@ -1133,6 +1137,7 @@ describe('FileUpload', () => {
             expect.objectContaining({ name: 'test1.txt' }),
             expect.objectContaining({ name: 'test2.txt' }),
           ]),
+          expect.objectContaining({ reason: expect.any(String) }),
         );
       });
 
@@ -1154,6 +1159,7 @@ describe('FileUpload', () => {
             expect.objectContaining({ name: 'test4.txt' }),
             expect.objectContaining({ name: 'test5.txt' }),
           ]),
+          expect.objectContaining({ reason: expect.any(String) }),
         );
       });
 
@@ -1179,6 +1185,7 @@ describe('FileUpload', () => {
       await waitFor(() => {
         expect(onFilesChange).toHaveBeenCalledWith(
           expect.arrayContaining([expect.objectContaining({ name: 'test.txt' })]),
+          expect.objectContaining({ reason: expect.any(String) }),
         );
       });
     });
@@ -1218,7 +1225,7 @@ describe('FileUpload', () => {
       });
 
       await waitFor(() => {
-        expect(onFilesChange).toHaveBeenCalledWith([]);
+        expect(onFilesChange).toHaveBeenCalledWith([], expect.objectContaining({ reason: expect.any(String) }));
       });
     });
 
@@ -1258,7 +1265,7 @@ describe('FileUpload', () => {
       });
 
       await waitFor(() => {
-        expect(onFilesChange).toHaveBeenCalledWith([]);
+        expect(onFilesChange).toHaveBeenCalledWith([], expect.objectContaining({ reason: expect.any(String) }));
       });
     });
 
@@ -1287,6 +1294,7 @@ describe('FileUpload', () => {
               progress: 0,
             }),
           ]),
+          expect.objectContaining({ reason: expect.any(String) }),
         );
       });
     });

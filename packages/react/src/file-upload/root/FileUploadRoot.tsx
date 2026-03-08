@@ -24,6 +24,17 @@ export const FILE_UPLOAD_ROOT_REJECT_REASONS = {
 export type FileUploadRootRejectReason =
   (typeof FILE_UPLOAD_ROOT_REJECT_REASONS)[keyof typeof FILE_UPLOAD_ROOT_REJECT_REASONS];
 
+export const FILE_UPLOAD_ROOT_CHANGE_REASONS = {
+  FILE_ADDED: 'file-added',
+  FILE_REMOVED: 'file-removed',
+  FILES_CLEARED: 'files-cleared',
+} as const;
+
+export type FileUploadRootChangeReason =
+  (typeof FILE_UPLOAD_ROOT_CHANGE_REASONS)[keyof typeof FILE_UPLOAD_ROOT_CHANGE_REASONS];
+
+export type FileUploadRootChangeEventDetails = BaseUIChangeEventDetails<FileUploadRootChangeReason>;
+
 export type FileUploadRootRejectEventDetails = BaseUIChangeEventDetails<
   FileUploadRootRejectReason,
   { message: string }
@@ -118,9 +129,14 @@ export interface FileUploadRootParameters {
    */
   disabled?: boolean | undefined;
   /**
-   * Callback when files are added.
+   * Callback when files are added or removed.
    */
-  onFilesChange?: ((files: FileUploadRootExtendedFile[]) => void) | undefined;
+  onFilesChange?:
+    | ((
+        files: FileUploadRootExtendedFile[],
+        eventDetails: FileUploadRootChangeEventDetails,
+      ) => void)
+    | undefined;
   /**
    * Callback when a file is rejected.
    * Receives a machine-readable reason code and detailed event metadata.
@@ -414,4 +430,6 @@ export namespace FileUploadRoot {
   export type FileStatus = FileUploadRootFileStatus;
   export type RejectReason = FileUploadRootRejectReason;
   export type RejectEventDetails = FileUploadRootRejectEventDetails;
+  export type ChangeEventDetails = FileUploadRootChangeEventDetails;
+  export type ChangeReason = FileUploadRootChangeReason;
 }

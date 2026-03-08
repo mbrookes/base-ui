@@ -5,9 +5,10 @@ import { useId as useBaseUIId } from '@base-ui/utils/useId';
 import { useStableCallback } from '@base-ui/utils/useStableCallback';
 import { generateId } from '@base-ui/utils/generateId';
 import { createChangeEventDetails } from '../../utils/createBaseUIEventDetails';
-import { FILE_UPLOAD_ROOT_REJECT_REASONS } from './FileUploadRoot';
+import { FILE_UPLOAD_ROOT_REJECT_REASONS, FILE_UPLOAD_ROOT_CHANGE_REASONS } from './FileUploadRoot';
 import type {
   FileUploadRootRejectReason,
+  FileUploadRootChangeReason,
   FileUploadRootExtendedFile,
   FileUploadRootFileUpdates,
   FileUploadRootParameters,
@@ -127,6 +128,8 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
   const previewUrlsRef = React.useRef<Map<string, string>>(new Map());
   const inputId = useBaseUIId();
   const isInitialRender = React.useRef(true);
+  const lastChangeReasonRef = React.useRef<FileUploadRootChangeReason>('file-added');
+  const lastChangeEventRef = React.useRef<Event | undefined>(undefined);
 
   // Cleanup object URLs and abort controllers to prevent memory leaks
   React.useEffect(() => {
@@ -147,7 +150,11 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
       isInitialRender.current = false;
       return;
     }
-    onFilesChange?.(files);
+    const eventDetails = createChangeEventDetails<FileUploadRootChangeReason>(
+      lastChangeReasonRef.current,
+      lastChangeEventRef.current,
+    );
+    onFilesChange?.(files, eventDetails);
   }, [files, onFilesChange]);
 
   const validateFile = useStableCallback((file: File): ValidationResult => {
@@ -199,6 +206,9 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
     if (disabled) {
       return;
     }
+
+    lastChangeReasonRef.current = FILE_UPLOAD_ROOT_CHANGE_REASONS.FILE_ADDED;
+    lastChangeEventRef.current = event;
 
     setFiles((prev) => {
       const remainingSlots = maxFiles - prev.length;
@@ -274,6 +284,9 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
   });
 
   const removeFile = useStableCallback((id: string) => {
+    lastChangeReasonRef.current = FILE_UPLOAD_ROOT_CHANGE_REASONS.FILE_REMOVED;
+    lastChangeEventRef.current = undefined;
+
     setFiles((prev) => {
       const fileToRemove = prev.find((f) => f.id === id);
       if (fileToRemove) {
@@ -286,6 +299,9 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
   });
 
   const clearFiles = useStableCallback(() => {
+    lastChangeReasonRef.current = FILE_UPLOAD_ROOT_CHANGE_REASONS.FILES_CLEARED;
+    lastChangeEventRef.current = undefined;
+
     setFiles((prev) => {
       prev.forEach((file) => {
         URL.revokeObjectURL(file.preview);

@@ -427,6 +427,7 @@ describe('FileUpload.Dropzone', () => {
 
       expect(onFilesChange).toHaveBeenCalledWith(
         expect.arrayContaining([expect.objectContaining({ name: 'test.txt' })]),
+        expect.objectContaining({ reason: expect.any(String) }),
       );
     });
 
@@ -456,6 +457,7 @@ describe('FileUpload.Dropzone', () => {
           expect.objectContaining({ name: 'file1.txt' }),
           expect.objectContaining({ name: 'file2.txt' }),
         ]),
+        expect.objectContaining({ reason: expect.any(String) }),
       );
     });
 
@@ -607,6 +609,7 @@ describe('FileUpload.Dropzone', () => {
 
       expect(onFilesChange).toHaveBeenCalledWith(
         expect.arrayContaining([expect.objectContaining({ name: 'file.txt' })]),
+        expect.objectContaining({ reason: expect.any(String) }),
       );
       expect(state).toHaveTextContent('idle');
     });

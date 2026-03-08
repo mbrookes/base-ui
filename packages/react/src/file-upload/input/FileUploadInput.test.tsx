@@ -95,6 +95,7 @@ describe('FileUpload.Input', () => {
             type: 'text/plain',
           }),
         ]),
+        expect.objectContaining({ reason: expect.any(String) }),
       );
     });
   });
@@ -160,6 +161,7 @@ describe('FileUpload.Input', () => {
           expect.objectContaining({ name: 'test1.txt' }),
           expect.objectContaining({ name: 'test2.txt' }),
         ]),
+        expect.objectContaining({ reason: expect.any(String) }),
       );
     });
   });
