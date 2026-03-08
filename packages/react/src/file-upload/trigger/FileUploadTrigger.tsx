@@ -42,7 +42,7 @@ export interface FileUploadTriggerProps
  */
 export const FileUploadTrigger = React.forwardRef<HTMLButtonElement, FileUploadTriggerProps>(
   function FileUploadTriggerComponent(componentProps, ref) {
-    const { className, nativeButton, ...elementProps } = componentProps;
+    const { className, render, nativeButton, ...elementProps } = componentProps;
     const { openFileDialog, disabled } = useFileUploadContext();
 
     const state: FileUploadTriggerState = React.useMemo(
