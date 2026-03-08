@@ -63,11 +63,14 @@ export default function App() {
     <FileUpload.Root maxFiles={5}>
       <FileUpload.Input />
       <FileUpload.Dropzone>Upload files</FileUpload.Dropzone>
+      <FileUpload.Trigger>Select files</FileUpload.Trigger>
       <FileList />
     </FileUpload.Root>
   );
 }
 ```
+
+### Accessible labeling
 
 For explicit accessible labeling, pair File Upload controls with `Field`:
 
