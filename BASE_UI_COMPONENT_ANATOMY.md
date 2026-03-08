@@ -15,7 +15,8 @@ This document provides a comprehensive guide for creating new Base UI components
 9. [Data Attributes](#data-attributes)
 10. [Testing](#testing)
 11. [Documentation](#documentation)
-12. [Code Conventions](#code-conventions)
+12. [PR Readiness / Quality Gates](#pr-readiness--quality-gates)
+13. [Code Conventions](#code-conventions)
 
 ---
 
@@ -789,6 +790,58 @@ Components require API documentation in `docs/reference/generated/`:
 ```
 
 This is auto-generated but may need manual updates.
+
+---
+
+## PR Readiness / Quality Gates
+
+Use these gates for any component PR, not just File Upload.
+
+### Behavioral correctness
+
+- Define ownership/lifecycle for external resources (object URLs, timers, subscriptions, observers).
+- Avoid broad cleanup tied to unrelated state updates.
+- Add tests that verify resources remain valid across unrelated state changes.
+
+### API contract consistency
+
+- Keep component types, runtime behavior, and docs aligned (for example sync vs async callback contracts).
+- If changing callback signatures, preserve backward compatibility where practical.
+- Prefer machine-readable reason codes for failures/rejections (`SOME_REASON_CODE`) over ad-hoc prose.
+
+### Event callback shape
+
+- Prefer callbacks that include structured details objects when behavior requires metadata.
+- Include stable fields such as:
+  - `reason` (stable code)
+  - `message` (human-readable)
+  - event metadata/control details when relevant
+
+### Public API surface safety
+
+- Do not expose raw mutable setters in public context APIs unless intentionally supported.
+- Prefer constrained helper methods (`add*`, `remove*`, `clear*`, `update*`) that preserve invariants.
+- Tests should use supported public APIs instead of internal escape hatches.
+
+### Code quality baseline
+
+- Replace deprecated APIs with modern equivalents.
+- Avoid `as any` unless unavoidable and documented.
+- Keep model types explicit and safe (composition/typed wrappers over loose casting).
+
+### Testing and docs gates before merge
+
+- Conformance coverage for each public subcomponent where applicable.
+- Docs snippets are syntactically valid and match real runtime behavior.
+- Accessibility guidance is explicit and verifiable (labeling, semantics, keyboard behavior).
+- Demo variant policy is explicit: either parity across variants or a documented rationale for single-variant demos.
+
+### Required verification
+
+- `pnpm eslint`
+- `pnpm typescript`
+- Relevant tests (`pnpm test:jsdom <Component> --no-watch`, plus browser tests when layout-dependent)
+- Regenerated docs/API references when component surface changes
 
 ---
 
