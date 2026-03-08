@@ -1034,7 +1034,7 @@ All components that use `useRenderElement` must preserve the `render` prop throu
    ```typescript
    // ❌ WRONG: Ignoring render prevents custom rendering
    const { render: _render, ...props } = componentProps;
-   
+
    // ✅ CORRECT: Preserve render for useRenderElement
    const { render, ...props } = componentProps;
    ```

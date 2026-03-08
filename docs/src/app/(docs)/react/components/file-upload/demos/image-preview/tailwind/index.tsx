@@ -59,13 +59,6 @@ export default function FileUploadImagePreviewTailwindDemo() {
         }
       </FileUpload.Dropzone>
 
-      <div className="mt-3 flex items-center justify-between gap-3">
-        <FileUpload.Trigger className="inline-flex rounded-md bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700">
-          Select images
-        </FileUpload.Trigger>
-        <span className="text-xs text-gray-500">Up to 10 images, 5MB each</span>
-      </div>
-
       <ImagePreviewList />
     </FileUpload.Root>
   );

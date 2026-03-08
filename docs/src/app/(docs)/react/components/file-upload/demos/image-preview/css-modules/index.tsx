@@ -58,11 +58,6 @@ export default function FileUploadImagePreviewDemo() {
           )}
         </FileUpload.Dropzone>
 
-        <div className={styles.actions}>
-          <FileUpload.Trigger className={styles.selectBtn}>Select images</FileUpload.Trigger>
-          <span className={styles.info}>Up to 10 images, 5MB each</span>
-        </div>
-
         <ImagePreviewList />
       </FileUpload.Root>
     </div>
