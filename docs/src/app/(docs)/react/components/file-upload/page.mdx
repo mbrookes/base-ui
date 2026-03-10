@@ -126,7 +126,7 @@ Control which files are accepted using `accept`, `maxSize`, `minSize`, and `maxF
 
 ### Custom validation
 
-Use `validator` for custom rules beyond size and type checks. Return an error message to reject the file:
+Use `validator` for custom rules beyond file size and type checks. Return an error message to reject the file:
 
 ```jsx title="Custom validation" "validator"
 <FileUpload.Root
@@ -194,6 +194,17 @@ Available helpers:
 - `getImageDimensions(file)` – returns `{ width, height }` for image files
 - `validateImageDimensions(file, constraints)` – validates image dimensions against min/max constraints
 - `getImageAspectRatio(file)` – returns `width / height`
+
+The `constraints` object supports:
+
+```ts
+{
+  minWidth?: number;
+  maxWidth?: number;
+  minHeight?: number;
+  maxHeight?: number;
+}
+```
 
 Use these helpers in your async upload pipeline (for example in `onFilesChange` or before submitting to your backend). Even with client-side checks, always validate again on the server.
 
