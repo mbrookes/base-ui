@@ -313,7 +313,9 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
   });
 
   const updateFile = useStableCallback((id: string, updates: FileUploadRootFileUpdates) => {
-    setFiles((prev) => prev.map((file) => (file.id === id ? { ...file, ...updates } : file)));
+    setFiles((prev) =>
+      prev.map((file) => (file.id === id ? Object.assign(file, updates) : file)),
+    );
   });
 
   const retryFile = useStableCallback((id: string) => {
@@ -322,12 +324,11 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
         if (file.id === id && file.status === 'error') {
           onRetry?.(file);
           setAnnouncement(messages.retryingUpload(file.name));
-          return {
-            ...file,
+          return Object.assign(file, {
             status: 'idle' as FileUploadRootFileStatus,
             progress: 0,
             error: undefined,
-          };
+          });
         }
         return file;
       });
@@ -343,11 +344,10 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
         return prev.map((file) => {
           if (file.id === id && file.status === 'uploading') {
             setAnnouncement(messages.uploadCanceled(file.name));
-            return {
-              ...file,
+            return Object.assign(file, {
               status: 'error' as FileUploadRootFileStatus,
               error: 'Upload canceled',
-            };
+            });
           }
           return file;
         });
@@ -366,11 +366,10 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
       return prev.map((file) => {
         if (file.id === id && file.status === 'uploading') {
           onFilePause?.(file);
-          return {
-            ...file,
+          return Object.assign(file, {
             status: 'paused' as FileUploadRootFileStatus,
             isPaused: true,
-          };
+          });
         }
         return file;
       });
@@ -382,11 +381,10 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
       return prev.map((file) => {
         if (file.id === id && file.status === 'paused') {
           onFileResume?.(file);
-          return {
-            ...file,
+          return Object.assign(file, {
             status: 'uploading' as FileUploadRootFileStatus,
             isPaused: false,
-          };
+          });
         }
         return file;
       });
