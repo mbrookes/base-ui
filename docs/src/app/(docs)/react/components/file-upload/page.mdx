@@ -183,8 +183,6 @@ File Upload also exports utility helpers for client-side file inspection and ima
 ```jsx title="FileUpload utility helpers"
 import {
   FileUpload,
-  detectFileType,
-  isValidFileType,
   getImageDimensions,
   getImageAspectRatio,
   validateImageDimensions,
@@ -193,8 +191,6 @@ import {
 
 Available helpers:
 
-- `detectFileType(file)` – detects the actual MIME type from magic numbers
-- `isValidFileType(file, acceptedTypes)` – validates the detected type against allowed MIME patterns
 - `getImageDimensions(file)` – returns `{ width, height }` for image files
 - `validateImageDimensions(file, constraints)` – validates image dimensions against min/max constraints
 - `getImageAspectRatio(file)` – returns `width / height`
@@ -1177,7 +1173,7 @@ const moveFile = (fromIndex: number, toIndex: number) => {
 
 ### Can I validate file content, not just extension?
 
-Yes. Use `detectFileType` / `isValidFileType` from `@base-ui/react/file-upload` for client-side checks based on file signatures (magic numbers), then validate again on your server:
+Use client-side checks for UX only, then validate again on your server:
 
 ```jsx title="Server-side validation"
 const handleUpload = async (file: File) => {
