@@ -148,7 +148,7 @@ Use `validator` for custom rules beyond size and type checks. Return an error me
 
 ### Image validation
 
-`validator` is synchronous. Use utility helpers that do not require async work:
+`validator` is synchronous. Use this for sync checks (for example file name/extension rules):
 
 ```jsx title="Image dimension validation" "getImageDimensions"
 import * as React from 'react';
@@ -175,6 +175,31 @@ export default function ImageUpload() {
 ```
 
 If you need async checks (for example image dimensions from file decoding), run those checks in your upload pipeline after file selection.
+
+### Utility helpers
+
+File Upload also exports utility helpers for client-side file inspection and image metadata checks:
+
+```jsx title="FileUpload utility helpers"
+import {
+  FileUpload,
+  detectFileType,
+  isValidFileType,
+  getImageDimensions,
+  getImageAspectRatio,
+  validateImageDimensions,
+} from '@base-ui/react/file-upload';
+```
+
+Available helpers:
+
+- `detectFileType(file)` – detects the actual MIME type from magic numbers
+- `isValidFileType(file, acceptedTypes)` – validates the detected type against allowed MIME patterns
+- `getImageDimensions(file)` – returns `{ width, height }` for image files
+- `validateImageDimensions(file, constraints)` – validates image dimensions against min/max constraints
+- `getImageAspectRatio(file)` – returns `width / height`
+
+Use these helpers in your async upload pipeline (for example in `onFilesChange` or before submitting to your backend). Even with client-side checks, always validate again on the server.
 
 ### Drag and drop state
 
@@ -1152,7 +1177,7 @@ const moveFile = (fromIndex: number, toIndex: number) => {
 
 ### Can I validate file content, not just extension?
 
-Currently, validation is limited to MIME type and extension matching. For deep file validation (magic numbers, actual format), validate on your server:
+Yes. Use `detectFileType` / `isValidFileType` from `@base-ui/react/file-upload` for client-side checks based on file signatures (magic numbers), then validate again on your server:
 
 ```jsx title="Server-side validation"
 const handleUpload = async (file: File) => {

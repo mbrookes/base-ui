@@ -8,3 +8,9 @@ export { FileUploadPreviewList as PreviewList } from './preview-list/FileUploadP
 export { FileUploadRoot as Root } from './root/FileUploadRoot';
 export { FileUploadTrigger as Trigger } from './trigger/FileUploadTrigger';
 export { useFileUploadContext } from './root/FileUploadContext';
+export { detectFileType, isValidFileType } from './utils/detectFileType';
+export {
+  getImageAspectRatio,
+  getImageDimensions,
+  validateImageDimensions,
+} from './utils/getImageDimensions';

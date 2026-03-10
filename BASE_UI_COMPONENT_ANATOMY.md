@@ -311,7 +311,7 @@ export namespace ComponentName {
   // Additional domain-specific types as needed
   export type Parameters = ComponentNameParameters;
   export type ExtendedType = ComponentNameExtendedType;
-  
+
   // For components with imperative methods
   export type Actions = ComponentNameActions;
 }
@@ -580,7 +580,7 @@ To prevent Base UI from handling a React event, use `preventBaseUIHandler()` on 
   onPaste={(event) => {
     // Prevent Base UI's default paste handling
     event.preventBaseUIHandler();
-    
+
     // Implement custom paste logic
     customPasteHandler(event);
   }}

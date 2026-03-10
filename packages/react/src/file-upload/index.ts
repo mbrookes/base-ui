@@ -1,4 +1,6 @@
 export * as FileUpload from './index.parts';
+export * from './utils/detectFileType';
+export * from './utils/getImageDimensions';
 
 export type * from './root/FileUploadRoot';
 export type * from './root/FileUploadContext';
