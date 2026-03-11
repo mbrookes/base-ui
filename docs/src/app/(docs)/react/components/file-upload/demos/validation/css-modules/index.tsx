@@ -67,8 +67,6 @@ export default function FileUploadValidationDemo() {
           rejectionTimeout.start(4000, () => setRejectedFile(null));
         }}
       >
-        <FileUpload.Input />
-
         <div className={styles.footer}>
           <FileUpload.Trigger className={styles.trigger} aria-describedby="file-validation-hint">
             Select files

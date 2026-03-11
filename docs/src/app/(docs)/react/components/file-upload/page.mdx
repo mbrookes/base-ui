@@ -28,7 +28,6 @@ File Upload is composed of several subcomponents that work together. Import them
 import { FileUpload } from '@base-ui/react/file-upload';
 
 <FileUpload.Root>
-  <FileUpload.Input />
   <FileUpload.Dropzone>Drag files here or click</FileUpload.Dropzone>
   <FileUpload.Trigger>Upload</FileUpload.Trigger>
   <FileUpload.PreviewList>
@@ -41,7 +40,7 @@ import { FileUpload } from '@base-ui/react/file-upload';
 
 ### Basic setup
 
-`FileUpload.Root` manages file state and provides context to child components. It accepts files through drag-and-drop, click-to-select, paste, or the hidden input element.
+`FileUpload.Root` manages file state and provides context to child components. It accepts files through drag-and-drop, click-to-select, paste, or the hidden input it renders automatically.
 
 ```jsx title="Basic file upload"
 import { FileUpload } from '@base-ui/react/file-upload';
@@ -59,7 +58,6 @@ function FileList() {
 export default function App() {
   return (
     <FileUpload.Root maxFiles={5}>
-      <FileUpload.Input />
       <FileUpload.Dropzone>Upload files</FileUpload.Dropzone>
       <FileUpload.Trigger>Select files</FileUpload.Trigger>
       <FileList />
@@ -85,7 +83,6 @@ export default function App() {
         setFiles(newFiles);
       }}
     >
-      <FileUpload.Input />
       <FileUpload.Dropzone>Upload files</FileUpload.Dropzone>
       <FileUpload.Trigger>Select files</FileUpload.Trigger>
     </FileUpload.Root>
@@ -111,7 +108,6 @@ Control which files are accepted using `accept`, `maxSize`, `minSize`, and `maxF
     console.log(`Rejected ${file.name}: ${reason}`, details.message);
   }}
 >
-  <FileUpload.Input />
   <FileUpload.Dropzone>Upload files</FileUpload.Dropzone>
   <FileUpload.Trigger>Select files</FileUpload.Trigger>
 </FileUpload.Root>
@@ -140,7 +136,6 @@ Use `validator` for custom rules beyond file size and type checks. Return an err
     console.log(`${file.name}: ${reason}`, details.message);
   }}
 >
-  <FileUpload.Input />
   <FileUpload.Dropzone>Upload files</FileUpload.Dropzone>
   <FileUpload.Trigger />
 </FileUpload.Root>
@@ -166,7 +161,6 @@ export default function ImageUpload() {
         return null;
       }}
     >
-      <FileUpload.Input />
       <FileUpload.Dropzone>Drop images here</FileUpload.Dropzone>
       <FileUpload.Trigger>Select images</FileUpload.Trigger>
     </FileUpload.Root>
@@ -228,7 +222,6 @@ Use `onCancel` to react when the user closes the file dialog without selecting f
 
 ```jsx title="Handle cancel" "onCancel"
 <FileUpload.Root onCancel={() => console.log('User canceled file selection')}>
-  <FileUpload.Input />
   <FileUpload.Trigger>Select files</FileUpload.Trigger>
 </FileUpload.Root>
 ```
@@ -239,7 +232,6 @@ Use `onDuplicateFile` to detect when a user selects the same file more than once
 
 ```jsx title="Duplicate detection" "onDuplicateFile"
 <FileUpload.Root onDuplicateFile={(file) => console.log('Duplicate:', file.name)}>
-  <FileUpload.Input />
   <FileUpload.Trigger>Select files</FileUpload.Trigger>
 </FileUpload.Root>
 ```
@@ -250,7 +242,6 @@ Use `onDuplicateFile` to detect when a user selects the same file more than once
 
 ```jsx title="Paste files"
 <FileUpload.Root>
-  <FileUpload.Input />
   <FileUpload.Dropzone>Paste or drop files here</FileUpload.Dropzone>
 </FileUpload.Root>
 ```
@@ -261,7 +252,6 @@ Enable directory selection with the `directory` prop. This uses `webkitdirectory
 
 ```jsx title="Folder upload" "directory"
 <FileUpload.Root directory>
-  <FileUpload.Input />
   <FileUpload.Trigger>Select folder</FileUpload.Trigger>
 </FileUpload.Root>
 ```
@@ -290,7 +280,6 @@ export default function App() {
 
   return (
     <FileUpload.Root>
-      <FileUpload.Input />
       <FileUpload.Dropzone>Upload files</FileUpload.Dropzone>
       <FileUpload.PreviewList>
         {files.map((file) => (
@@ -325,7 +314,6 @@ import { FileUpload } from '@base-ui/react/file-upload';
 <Field.Root>
   <Field.Label>Profile image</Field.Label>
   <FileUpload.Root accept="image/*">
-    <FileUpload.Input />
     <FileUpload.Dropzone>Drop image here</FileUpload.Dropzone>
     <FileUpload.Trigger>Select image</FileUpload.Trigger>
   </FileUpload.Root>
@@ -377,7 +365,6 @@ function FileUploadContent() {
 
   return (
     <>
-      <FileUpload.Input />
       <FileUpload.Dropzone>Drop files here</FileUpload.Dropzone>
       <FileUpload.Trigger>Select files</FileUpload.Trigger>
 
@@ -450,7 +437,6 @@ function FileUploadContent() {
 
   return (
     <>
-      <FileUpload.Input />
       <FileUpload.Dropzone>Drop files here</FileUpload.Dropzone>
 
       {files.length > 0 && (
@@ -617,7 +603,6 @@ function FileUploadContent() {
 
   return (
     <>
-      <FileUpload.Input />
       <FileUpload.Dropzone>Drop files here</FileUpload.Dropzone>
 
       {files.length > 0 && (
@@ -771,7 +756,6 @@ function FileUploadContent() {
 
   return (
     <>
-      <FileUpload.Input />
       <FileUpload.Dropzone>Drop files here</FileUpload.Dropzone>
 
       {files.length > 0 && (
@@ -866,7 +850,6 @@ function FileUploadContent() {
 
   return (
     <>
-      <FileUpload.Input />
       <FileUpload.Dropzone>Drop files here</FileUpload.Dropzone>
       <FileUpload.PreviewList>
         {files.map((file) => {
@@ -942,7 +925,6 @@ function FileUploadFormContent() {
         onChange={(e) => setFormData({ title: e.target.value })}
       />
 
-      <FileUpload.Input />
       <FileUpload.Dropzone>Drop files here</FileUpload.Dropzone>
       <FileUpload.Trigger>Select files</FileUpload.Trigger>
 
@@ -982,7 +964,6 @@ export default function FileUploadWithFiltering() {
 
   return (
     <FileUpload.Root>
-      <FileUpload.Input />
       <FileUpload.Dropzone>Drop files here</FileUpload.Dropzone>
       <FileUpload.Trigger>Select files</FileUpload.Trigger>
 
@@ -1026,7 +1007,6 @@ import { FileUpload } from '@base-ui/react/file-upload';
 export default function FileUploadLocale() {
   return (
     <FileUpload.Root locale="de-DE" maxSize={5 * 1024 * 1024}>
-      <FileUpload.Input />
       <FileUpload.Dropzone>Dateien hier ablegen</FileUpload.Dropzone>
       <FileUpload.Trigger>Dateien auswählen</FileUpload.Trigger>
     </FileUpload.Root>
@@ -1048,7 +1028,6 @@ export default function FileUploadCustomHandling() {
         console.log('Duplicate:', file.name);
       }}
     >
-      <FileUpload.Input />
       <FileUpload.Dropzone>Drop files here</FileUpload.Dropzone>
       <FileUpload.Trigger>Select files</FileUpload.Trigger>
     </FileUpload.Root>
@@ -1076,7 +1055,6 @@ The live region is visually hidden but available to screen readers:
 
 ```jsx title="Live region example" "aria-live"
 <FileUpload.Root>
-  <FileUpload.Input />
   <FileUpload.Dropzone>Upload files</FileUpload.Dropzone>
   {/* Live region announcements happen automatically */}
 </FileUpload.Root>
@@ -1097,7 +1075,6 @@ export default function FileUploadWithAnnouncements() {
         setAnnouncement(`${files.length} file(s) selected`);
       }}
     >
-      <FileUpload.Input />
       <FileUpload.Dropzone>Drop files here</FileUpload.Dropzone>
 
       {/* Optional: Custom live region for additional announcements */}
@@ -1207,7 +1184,7 @@ const handleUpload = async (file: File) => {
 
 <Reference
   component="FileUpload"
-  parts="Root, Input, Trigger, Dropzone, PreviewList, PreviewItem"
+  parts="Root, Trigger, Dropzone, PreviewList, PreviewItem"
 />
 
 export const metadata = {

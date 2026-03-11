@@ -4,6 +4,16 @@ import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi } from 'vitest';
 import { FileUpload } from '../index';
 
+function getFileInput() {
+  const input = document.querySelector('input[type="file"]');
+
+  if (!(input instanceof HTMLInputElement)) {
+    throw new Error('Expected hidden file input to be rendered');
+  }
+
+  return input;
+}
+
 const createDataTransfer = (files: File[]) => {
   if (typeof DataTransfer === 'undefined') {
     return { files } as unknown as DataTransfer;
@@ -48,13 +58,12 @@ describe('FileUpload.Dropzone', () => {
     const user = userEvent.setup();
     render(
       <FileUpload.Root>
-        <FileUpload.Input data-testid="file-input" />
         <FileUpload.Dropzone>Drop files here</FileUpload.Dropzone>
       </FileUpload.Root>,
     );
 
     const dropzone = screen.getByRole('button');
-    const input = screen.getByTestId('file-input') as HTMLInputElement;
+    const input = getFileInput();
     const clickSpy = vi.spyOn(input, 'click');
 
     await user.click(dropzone);
@@ -65,13 +74,12 @@ describe('FileUpload.Dropzone', () => {
   it('opens file dialog when Enter key is pressed', async () => {
     render(
       <FileUpload.Root>
-        <FileUpload.Input data-testid="file-input" />
         <FileUpload.Dropzone>Drop files here</FileUpload.Dropzone>
       </FileUpload.Root>,
     );
 
     const dropzone = screen.getByRole('button');
-    const input = screen.getByTestId('file-input') as HTMLInputElement;
+    const input = getFileInput();
     const clickSpy = vi.spyOn(input, 'click');
 
     dropzone.focus();
@@ -83,13 +91,12 @@ describe('FileUpload.Dropzone', () => {
   it('opens file dialog when Space key is pressed', async () => {
     render(
       <FileUpload.Root>
-        <FileUpload.Input data-testid="file-input" />
         <FileUpload.Dropzone>Drop files here</FileUpload.Dropzone>
       </FileUpload.Root>,
     );
 
     const dropzone = screen.getByRole('button');
-    const input = screen.getByTestId('file-input') as HTMLInputElement;
+    const input = getFileInput();
     const clickSpy = vi.spyOn(input, 'click');
 
     dropzone.focus();
@@ -125,13 +132,12 @@ describe('FileUpload.Dropzone', () => {
     const user = userEvent.setup();
     render(
       <FileUpload.Root disabled>
-        <FileUpload.Input data-testid="file-input" />
         <FileUpload.Dropzone>Drop files here</FileUpload.Dropzone>
       </FileUpload.Root>,
     );
 
     const dropzone = screen.getByRole('button');
-    const input = screen.getByTestId('file-input') as HTMLInputElement;
+    const input = getFileInput();
     const clickSpy = vi.spyOn(input, 'click');
 
     await user.click(dropzone);
@@ -178,14 +184,13 @@ describe('FileUpload.Dropzone', () => {
     const user = userEvent.setup();
     render(
       <FileUpload.Root>
-        <FileUpload.Input data-testid="file-input" />
         <FileUpload.Dropzone>
           <button type="button">Cancel</button>
         </FileUpload.Dropzone>
       </FileUpload.Root>,
     );
 
-    const input = screen.getByTestId('file-input') as HTMLInputElement;
+    const input = getFileInput();
     const clickSpy = vi.spyOn(input, 'click');
     const cancelButton = screen.getByRole('button', { name: 'Cancel' });
 
@@ -226,7 +231,6 @@ describe('FileUpload.Dropzone', () => {
     const customKeyDown = vi.fn();
     render(
       <FileUpload.Root>
-        <FileUpload.Input data-testid="file-input" />
         <FileUpload.Dropzone onClick={customClick} onKeyDown={customKeyDown}>
           Drop files here
         </FileUpload.Dropzone>
@@ -234,7 +238,7 @@ describe('FileUpload.Dropzone', () => {
     );
 
     const dropzone = screen.getByRole('button');
-    const input = screen.getByTestId('file-input') as HTMLInputElement;
+    const input = getFileInput();
     const clickSpy = vi.spyOn(input, 'click');
 
     await user.click(dropzone);
@@ -302,7 +306,6 @@ describe('FileUpload.Dropzone', () => {
 
     render(
       <FileUpload.Root>
-        <FileUpload.Input data-testid="file-input" />
         <FileUpload.Dropzone onDragEnter={customDragEnter} onDragLeave={customDragLeave}>
           Drop files
         </FileUpload.Dropzone>
@@ -384,7 +387,6 @@ describe('FileUpload.Dropzone', () => {
     it('resets isDragging to false after dragLeave', () => {
       render(
         <FileUpload.Root>
-          <FileUpload.Input data-testid="file-input" />
           <FileUpload.Dropzone data-testid="dropzone">
             {({ isDragging }) => (
               <div data-testid="dragging-state">{isDragging ? 'dragging' : 'idle'}</div>
@@ -410,7 +412,6 @@ describe('FileUpload.Dropzone', () => {
 
       render(
         <FileUpload.Root onFilesChange={onFilesChange}>
-          <FileUpload.Input data-testid="file-input" />
           <FileUpload.Dropzone data-testid="dropzone">Drop files</FileUpload.Dropzone>
         </FileUpload.Root>,
       );
@@ -436,7 +437,6 @@ describe('FileUpload.Dropzone', () => {
 
       render(
         <FileUpload.Root onFilesChange={onFilesChange}>
-          <FileUpload.Input data-testid="file-input" />
           <FileUpload.Dropzone data-testid="dropzone">Drop files</FileUpload.Dropzone>
         </FileUpload.Root>,
       );
@@ -579,7 +579,6 @@ describe('FileUpload.Dropzone', () => {
 
       render(
         <FileUpload.Root onFilesChange={onFilesChange}>
-          <FileUpload.Input data-testid="file-input" />
           <FileUpload.Dropzone data-testid="dropzone">
             {({ isDragging }) => <div data-testid="state">{isDragging ? 'dragging' : 'idle'}</div>}
           </FileUpload.Dropzone>

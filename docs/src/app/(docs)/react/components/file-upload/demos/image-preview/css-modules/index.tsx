@@ -44,8 +44,6 @@ export default function FileUploadImagePreviewDemo() {
   return (
     <div className={styles.root}>
       <FileUpload.Root accept="image/*" maxFiles={10} maxSize={5 * 1024 * 1024}>
-        <FileUpload.Input />
-
         <FileUpload.Dropzone className={styles.dropzone}>
           {({ isDragging }) => (
             <div className={`${styles.dropzoneContent} ${isDragging ? styles.isDragging : ''}`}>

@@ -122,8 +122,6 @@ export default function FileUploadDemo() {
           setErrorMessage(details.message);
         }}
       >
-        <FileUpload.Input />
-
         <FileUpload.Dropzone className={styles.dropzone}>
           {({ isDragging }) => (
             <div className={styles.dropzoneContent}>

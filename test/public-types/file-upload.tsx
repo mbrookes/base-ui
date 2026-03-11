@@ -6,9 +6,6 @@ export type FileUploadRootParameters = FileUpload.Root.Parameters;
 export type FileUploadRootExtendedFile = FileUpload.Root.ExtendedFile;
 export type FileUploadRootFileStatus = FileUpload.Root.FileStatus;
 
-export type FileUploadInputProps = FileUpload.Input.Props;
-export type FileUploadInputState = FileUpload.Input.State;
-
 export type FileUploadDropzoneProps = FileUpload.Dropzone.Props;
 export type FileUploadDropzoneState = FileUpload.Dropzone.State;
 

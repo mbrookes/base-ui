@@ -6,6 +6,16 @@ import { FileUpload } from '../index';
 import { useFileUploadPreviewItem } from './FileUploadPreviewItem';
 import { useFileUploadContext } from '../root/FileUploadContext';
 
+function getFileInput() {
+  const input = document.querySelector('input[type="file"]');
+
+  if (!(input instanceof HTMLInputElement)) {
+    throw new Error('Expected hidden file input to be rendered');
+  }
+
+  return input;
+}
+
 describe('FileUpload.PreviewItem', () => {
   const createMockFile = (name: string, type: string) =>
     Object.assign(new File(['content'], name, { type }), {
@@ -19,14 +29,13 @@ describe('FileUpload.PreviewItem', () => {
     const file = createMockFile('test.txt', 'text/plain');
     render(
       <FileUpload.Root>
-        <FileUpload.Input data-testid="file-input" />
         <FileUpload.PreviewList>
           <FileUpload.PreviewItem file={file}>File content</FileUpload.PreviewItem>
         </FileUpload.PreviewList>
       </FileUpload.Root>,
     );
 
-    const input = screen.getByTestId('file-input') as HTMLInputElement;
+    const input = getFileInput();
     const uploadFile = new File(['content'], 'test.txt', { type: 'text/plain' });
     await userEvent.upload(input, uploadFile);
 
@@ -44,7 +53,6 @@ describe('FileUpload.PreviewItem', () => {
 
     render(
       <FileUpload.Root>
-        <FileUpload.Input data-testid="file-input" />
         <FileUpload.PreviewList>
           <FileUpload.PreviewItem
             file={createMockFile('test.txt', 'text/plain')}
@@ -56,7 +64,7 @@ describe('FileUpload.PreviewItem', () => {
       </FileUpload.Root>,
     );
 
-    const input = screen.getByTestId('file-input') as HTMLInputElement;
+    const input = getFileInput();
     const uploadFile = new File(['content'], 'test.txt', { type: 'text/plain' });
     await userEvent.upload(input, uploadFile);
 
@@ -92,12 +100,11 @@ describe('FileUpload.PreviewItem', () => {
 
     render(
       <FileUpload.Root onFilesChange={onFilesChange}>
-        <FileUpload.Input data-testid="file-input" />
         <PreviewListWithFiles />
       </FileUpload.Root>,
     );
 
-    const input = screen.getByTestId('file-input') as HTMLInputElement;
+    const input = getFileInput();
     const uploadFile = new File(['content'], 'test.txt', { type: 'text/plain' });
     await userEvent.upload(input, uploadFile);
 
@@ -126,7 +133,6 @@ describe('FileUpload.PreviewItem', () => {
     const ref = React.createRef<HTMLLIElement>();
     render(
       <FileUpload.Root>
-        <FileUpload.Input data-testid="file-input" />
         <FileUpload.PreviewList>
           <FileUpload.PreviewItem ref={ref} file={createMockFile('test.txt', 'text/plain')}>
             Content
@@ -135,7 +141,7 @@ describe('FileUpload.PreviewItem', () => {
       </FileUpload.Root>,
     );
 
-    const input = screen.getByTestId('file-input') as HTMLInputElement;
+    const input = getFileInput();
     const uploadFile = new File(['content'], 'test.txt', { type: 'text/plain' });
     await userEvent.upload(input, uploadFile);
 
@@ -147,7 +153,6 @@ describe('FileUpload.PreviewItem', () => {
   it('applies custom props to li element', async () => {
     render(
       <FileUpload.Root>
-        <FileUpload.Input data-testid="file-input" />
         <FileUpload.PreviewList>
           <FileUpload.PreviewItem
             file={createMockFile('test.txt', 'text/plain')}
@@ -160,7 +165,7 @@ describe('FileUpload.PreviewItem', () => {
       </FileUpload.Root>,
     );
 
-    const input = screen.getByTestId('file-input') as HTMLInputElement;
+    const input = getFileInput();
     const uploadFile = new File(['content'], 'test.txt', { type: 'text/plain' });
     await userEvent.upload(input, uploadFile);
 
@@ -173,7 +178,6 @@ describe('FileUpload.PreviewItem', () => {
   it('renders multiple preview items', async () => {
     render(
       <FileUpload.Root multiple>
-        <FileUpload.Input data-testid="file-input" />
         <FileUpload.PreviewList>
           <FileUpload.PreviewItem
             file={createMockFile('file1.txt', 'text/plain')}
@@ -191,7 +195,7 @@ describe('FileUpload.PreviewItem', () => {
       </FileUpload.Root>,
     );
 
-    const input = screen.getByTestId('file-input') as HTMLInputElement;
+    const input = getFileInput();
     const file1 = new File(['content1'], 'file1.txt', { type: 'text/plain' });
     const file2 = new File(['content2'], 'file2.txt', { type: 'text/plain' });
     await userEvent.upload(input, [file1, file2]);
@@ -237,7 +241,6 @@ describe('FileUpload.PreviewItem', () => {
     const mockFile = createMockFile('test.txt', 'text/plain');
     render(
       <FileUpload.Root>
-        <FileUpload.Input data-testid="file-input" />
         <FileUpload.PreviewList>
           <FileUpload.PreviewItem file={mockFile}>
             <TestChild />
@@ -246,7 +249,7 @@ describe('FileUpload.PreviewItem', () => {
       </FileUpload.Root>,
     );
 
-    const input = screen.getByTestId('file-input') as HTMLInputElement;
+    const input = getFileInput();
     const uploadFile = new File(['content'], 'test.txt', { type: 'text/plain' });
     await userEvent.upload(input, uploadFile);
 
@@ -262,7 +265,6 @@ describe('FileUpload.PreviewItem', () => {
   it('resolves className callback', async () => {
     render(
       <FileUpload.Root>
-        <FileUpload.Input data-testid="file-input" />
         <FileUpload.PreviewList>
           <FileUpload.PreviewItem
             file={createMockFile('test.txt', 'text/plain')}
@@ -275,7 +277,7 @@ describe('FileUpload.PreviewItem', () => {
       </FileUpload.Root>,
     );
 
-    const input = screen.getByTestId('file-input') as HTMLInputElement;
+    const input = getFileInput();
     const uploadFile = new File(['content'], 'test.txt', { type: 'text/plain' });
     await userEvent.upload(input, uploadFile);
 

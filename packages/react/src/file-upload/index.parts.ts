@@ -1,5 +1,4 @@
 export { FileUploadDropzone as Dropzone } from './dropzone/FileUploadDropzone';
-export { FileUploadInput as Input } from './input/FileUploadInput';
 export {
   FileUploadPreviewItem as PreviewItem,
   useFileUploadPreviewItem,

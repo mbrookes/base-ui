@@ -4,6 +4,16 @@ import userEvent from '@testing-library/user-event';
 import { describe, it, expect } from 'vitest';
 import { FileUpload } from '../index';
 
+function getFileInput() {
+  const input = document.querySelector('input[type="file"]');
+
+  if (!(input instanceof HTMLInputElement)) {
+    throw new Error('Expected hidden file input to be rendered');
+  }
+
+  return input;
+}
+
 describe('FileUpload.PreviewList', () => {
   it('does not render when there are no files', () => {
     render(
@@ -20,14 +30,13 @@ describe('FileUpload.PreviewList', () => {
   it('renders when files are present', async () => {
     render(
       <FileUpload.Root>
-        <FileUpload.Input data-testid="file-input" />
         <FileUpload.PreviewList data-testid="preview-list">
           <li>Item</li>
         </FileUpload.PreviewList>
       </FileUpload.Root>,
     );
 
-    const input = screen.getByTestId('file-input') as HTMLInputElement;
+    const input = getFileInput();
     const file = new File(['content'], 'test.txt', { type: 'text/plain' });
 
     await userEvent.upload(input, file);
@@ -40,12 +49,11 @@ describe('FileUpload.PreviewList', () => {
   it('renders as ul element', async () => {
     render(
       <FileUpload.Root>
-        <FileUpload.Input data-testid="file-input" />
         <FileUpload.PreviewList data-testid="preview-list" />
       </FileUpload.Root>,
     );
 
-    const input = screen.getByTestId('file-input') as HTMLInputElement;
+    const input = getFileInput();
     const file = new File(['content'], 'test.txt', { type: 'text/plain' });
 
     await userEvent.upload(input, file);
@@ -58,14 +66,13 @@ describe('FileUpload.PreviewList', () => {
     const ref = React.createRef<HTMLUListElement>();
     render(
       <FileUpload.Root>
-        <FileUpload.Input data-testid="file-input" />
         <FileUpload.PreviewList ref={ref}>
           <li>Item</li>
         </FileUpload.PreviewList>
       </FileUpload.Root>,
     );
 
-    const input = screen.getByTestId('file-input') as HTMLInputElement;
+    const input = getFileInput();
     const file = new File(['content'], 'test.txt', { type: 'text/plain' });
 
     await userEvent.upload(input, file);
@@ -78,7 +85,6 @@ describe('FileUpload.PreviewList', () => {
   it('applies custom props to ul element', async () => {
     render(
       <FileUpload.Root>
-        <FileUpload.Input data-testid="file-input" />
         <FileUpload.PreviewList
           data-testid="custom-list"
           className="custom-class"
@@ -89,7 +95,7 @@ describe('FileUpload.PreviewList', () => {
       </FileUpload.Root>,
     );
 
-    const input = screen.getByTestId('file-input') as HTMLInputElement;
+    const input = getFileInput();
     const file = new File(['content'], 'test.txt', { type: 'text/plain' });
 
     await userEvent.upload(input, file);
@@ -102,7 +108,6 @@ describe('FileUpload.PreviewList', () => {
   it('renders children when files are present', async () => {
     render(
       <FileUpload.Root>
-        <FileUpload.Input data-testid="file-input" />
         <FileUpload.PreviewList>
           <li>Static Item 1</li>
           <li>Static Item 2</li>
@@ -110,7 +115,7 @@ describe('FileUpload.PreviewList', () => {
       </FileUpload.Root>,
     );
 
-    const input = screen.getByTestId('file-input') as HTMLInputElement;
+    const input = getFileInput();
     const file = new File(['content'], 'test.txt', { type: 'text/plain' });
 
     await userEvent.upload(input, file);
@@ -127,7 +132,6 @@ describe('FileUpload.PreviewList', () => {
 
       return (
         <FileUpload.Root onFilesChange={setFiles}>
-          <FileUpload.Input data-testid="file-input" />
           <FileUpload.PreviewList data-testid="preview-list">
             {files.map((file) => (
               <FileUpload.PreviewItem key={file.id} file={file}>
@@ -145,7 +149,7 @@ describe('FileUpload.PreviewList', () => {
     expect(screen.queryByTestId('preview-list')).not.toBeInTheDocument();
 
     // Upload file
-    const input = screen.getByTestId('file-input') as HTMLInputElement;
+    const input = getFileInput();
     const file = new File(['content'], 'test.txt', { type: 'text/plain' });
     await userEvent.upload(input, file);
 
@@ -157,14 +161,13 @@ describe('FileUpload.PreviewList', () => {
   it('works with multiple files', async () => {
     render(
       <FileUpload.Root multiple>
-        <FileUpload.Input data-testid="file-input" />
         <FileUpload.PreviewList data-testid="preview-list">
           <li>Items</li>
         </FileUpload.PreviewList>
       </FileUpload.Root>,
     );
 
-    const input = screen.getByTestId('file-input') as HTMLInputElement;
+    const input = getFileInput();
     const file1 = new File(['content1'], 'test1.txt', { type: 'text/plain' });
     const file2 = new File(['content2'], 'test2.txt', { type: 'text/plain' });
 
@@ -178,14 +181,13 @@ describe('FileUpload.PreviewList', () => {
   it('resolves className callback', async () => {
     render(
       <FileUpload.Root>
-        <FileUpload.Input data-testid="file-input" />
         <FileUpload.PreviewList data-testid="preview-list" className={() => 'preview-list-class'}>
           <li>Item</li>
         </FileUpload.PreviewList>
       </FileUpload.Root>,
     );
 
-    const input = screen.getByTestId('file-input') as HTMLInputElement;
+    const input = getFileInput();
     const file = new File(['content'], 'test.txt', { type: 'text/plain' });
 
     await userEvent.upload(input, file);
@@ -225,7 +227,6 @@ describe('FileUpload.PreviewList', () => {
 
         return (
           <React.Fragment>
-            <FileUpload.Input />
             <FileUpload.PreviewList
               data-testid="error-list"
               filter={(fileList) => fileList.filter((f) => f.status === 'error')}
@@ -284,7 +285,6 @@ describe('FileUpload.PreviewList', () => {
 
         return (
           <React.Fragment>
-            <FileUpload.Input />
             <FileUpload.PreviewList
               data-testid="uploading-list"
               filter={(allFiles) => allFiles.filter((f) => f.status === 'uploading')}
@@ -332,7 +332,6 @@ describe('FileUpload.PreviewList', () => {
 
         return (
           <React.Fragment>
-            <FileUpload.Input />
             <FileUpload.PreviewList
               data-testid="error-list"
               filter={(allFiles) => allFiles.filter((f) => f.status === 'error')}
@@ -384,7 +383,6 @@ describe('FileUpload.PreviewList', () => {
 
         return (
           <React.Fragment>
-            <FileUpload.Input />
             <FileUpload.PreviewList
               data-testid="filtered-list"
               filter={(allFiles) => allFiles.filter((f) => f.status === 'error')}

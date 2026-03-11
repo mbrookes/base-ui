@@ -4,6 +4,16 @@ import userEvent from '@testing-library/user-event';
 import { describe, it, expect } from 'vitest';
 import { FileUpload } from '../index';
 
+function getFileInput() {
+  const input = document.querySelector('input[type="file"]');
+
+  if (!(input instanceof HTMLInputElement)) {
+    throw new Error('Expected hidden file input to be rendered');
+  }
+
+  return input;
+}
+
 describe('FileUpload.Trigger', () => {
   it('renders a button element', () => {
     render(
@@ -32,13 +42,12 @@ describe('FileUpload.Trigger', () => {
     const user = userEvent.setup();
     render(
       <FileUpload.Root>
-        <FileUpload.Input data-testid="file-input" />
         <FileUpload.Trigger>Upload</FileUpload.Trigger>
       </FileUpload.Root>,
     );
 
     const button = screen.getByRole('button', { name: 'Upload' });
-    const input = screen.getByTestId('file-input') as HTMLInputElement;
+    const input = getFileInput();
     const clickSpy = vi.spyOn(input, 'click');
 
     await user.click(button);
@@ -61,13 +70,12 @@ describe('FileUpload.Trigger', () => {
     const user = userEvent.setup();
     render(
       <FileUpload.Root disabled>
-        <FileUpload.Input data-testid="file-input" />
         <FileUpload.Trigger>Upload</FileUpload.Trigger>
       </FileUpload.Root>,
     );
 
     const button = screen.getByRole('button', { name: 'Upload' });
-    const input = screen.getByTestId('file-input') as HTMLInputElement;
+    const input = getFileInput();
     const clickSpy = vi.spyOn(input, 'click');
 
     await user.click(button);
@@ -128,7 +136,6 @@ describe('FileUpload.Trigger', () => {
     const customClick = vi.fn();
     render(
       <FileUpload.Root>
-        <FileUpload.Input data-testid="file-input" />
         <FileUpload.Trigger onClick={customClick}>Upload</FileUpload.Trigger>
       </FileUpload.Root>,
     );

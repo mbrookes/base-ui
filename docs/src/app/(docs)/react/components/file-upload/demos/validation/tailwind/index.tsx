@@ -73,8 +73,6 @@ export default function FileUploadValidationTailwindDemo() {
           rejectionTimeout.start(4000, () => setRejectedFile(null));
         }}
       >
-        <FileUpload.Input />
-
         <div className="flex items-center justify-between gap-3">
           <FileUpload.Trigger
             className="inline-flex rounded-md bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-2 focus:outline-offset-2 focus:outline-blue-600"

@@ -125,8 +125,6 @@ export default function FileUploadDemo() {
           setErrorMessage(details.message);
         }}
       >
-        <FileUpload.Input />
-
         <FileUpload.Dropzone className="group relative mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10 transition-colors hover:bg-gray-50 hover:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 data-[dragging=true]:border-blue-500 data-[dragging=true]:bg-blue-50">
           {({ isDragging }) => (
             <div className="text-center">

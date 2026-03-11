@@ -10,35 +10,18 @@ describe('FileUpload conformance', () => {
     refInstanceof: window.HTMLDivElement,
   }));
 
-  describeConformance(<FileUpload.Input />, () => ({
-    refInstanceof: window.HTMLInputElement,
-    render(node) {
-      return render(<FileUpload.Root>{node}</FileUpload.Root>);
-    },
-  }));
-
   describeConformance(<FileUpload.Trigger>Upload</FileUpload.Trigger>, () => ({
     refInstanceof: window.HTMLButtonElement,
     button: true,
     render(node) {
-      return render(
-        <FileUpload.Root>
-          <FileUpload.Input />
-          {node}
-        </FileUpload.Root>,
-      );
+      return render(<FileUpload.Root>{node}</FileUpload.Root>);
     },
   }));
 
   describeConformance(<FileUpload.Dropzone>Drop files</FileUpload.Dropzone>, () => ({
     refInstanceof: window.HTMLDivElement,
     render(node) {
-      return render(
-        <FileUpload.Root>
-          <FileUpload.Input />
-          {node}
-        </FileUpload.Root>,
-      );
+      return render(<FileUpload.Root>{node}</FileUpload.Root>);
     },
   }));
 

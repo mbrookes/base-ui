@@ -62,11 +62,20 @@ const createClipboardData = (files: File[]) => {
   return dataTransfer;
 };
 
+function getFileInput() {
+  const input = document.querySelector('input[type="file"]');
+
+  if (!(input instanceof HTMLInputElement)) {
+    throw new Error('Expected hidden file input to be rendered');
+  }
+
+  return input;
+}
+
 describe('FileUpload', () => {
   it('renders the component', () => {
     render(
       <FileUpload.Root>
-        <FileUpload.Input />
         <FileUpload.Dropzone>Drag files here</FileUpload.Dropzone>
       </FileUpload.Root>,
     );
@@ -79,7 +88,6 @@ describe('FileUpload', () => {
 
     render(
       <FileUpload.Root>
-        <FileUpload.Input data-testid="file-input" />
         <FileUpload.Trigger>Upload</FileUpload.Trigger>
       </FileUpload.Root>,
     );
@@ -87,7 +95,7 @@ describe('FileUpload', () => {
     const button = screen.getByRole('button', { name: 'Upload' });
     await user.click(button);
 
-    expect(screen.getByTestId('file-input')).toBeInTheDocument();
+    expect(getFileInput()).toBeInTheDocument();
   });
 
   it('disables components when disabled prop is true', () => {
@@ -117,34 +125,28 @@ describe('FileUpload', () => {
 
   it('applies correct accept attribute to input', () => {
     render(
-      <FileUpload.Root accept="image/png,image/jpeg">
-        <FileUpload.Input data-testid="file-input" />
-      </FileUpload.Root>,
+      <FileUpload.Root accept="image/png,image/jpeg">{null}</FileUpload.Root>,
     );
 
-    const input = screen.getByTestId('file-input') as HTMLInputElement;
+    const input = getFileInput();
     expect(input.accept).toBe('image/png,image/jpeg');
   });
 
   it('applies multiple attribute to input when multiple is true', () => {
     render(
-      <FileUpload.Root multiple>
-        <FileUpload.Input data-testid="file-input" />
-      </FileUpload.Root>,
+      <FileUpload.Root multiple>{null}</FileUpload.Root>,
     );
 
-    const input = screen.getByTestId('file-input') as HTMLInputElement;
+    const input = getFileInput();
     expect(input.multiple).toBe(true);
   });
 
   it('does not apply multiple attribute when multiple is false', () => {
     render(
-      <FileUpload.Root multiple={false}>
-        <FileUpload.Input data-testid="file-input" />
-      </FileUpload.Root>,
+      <FileUpload.Root multiple={false}>{null}</FileUpload.Root>,
     );
 
-    const input = screen.getByTestId('file-input') as HTMLInputElement;
+    const input = getFileInput();
     expect(input.multiple).toBe(false);
   });
 
@@ -196,13 +198,9 @@ describe('FileUpload', () => {
   it('calls onCancel when file dialog is canceled', async () => {
     const onCancel = vi.fn();
 
-    render(
-      <FileUpload.Root onCancel={onCancel}>
-        <FileUpload.Input data-testid="file-input" />
-      </FileUpload.Root>,
-    );
+    render(<FileUpload.Root onCancel={onCancel}>{null}</FileUpload.Root>);
 
-    const input = screen.getByTestId('file-input') as HTMLInputElement;
+    const input = getFileInput();
 
     Object.defineProperty(input, 'files', {
       value: [],
@@ -217,13 +215,9 @@ describe('FileUpload', () => {
   it('calls onFileReject with DUPLICATE_FILE reason when the same file is selected again', async () => {
     const onFileReject = vi.fn();
 
-    render(
-      <FileUpload.Root onFileReject={onFileReject}>
-        <FileUpload.Input data-testid="file-input" />
-      </FileUpload.Root>,
-    );
+    render(<FileUpload.Root onFileReject={onFileReject}>{null}</FileUpload.Root>);
 
-    const input = screen.getByTestId('file-input') as HTMLInputElement;
+    const input = getFileInput();
     const file = new File(['content'], 'dup.txt', { type: 'text/plain' });
 
     await userEvent.upload(input, file);
@@ -243,13 +237,9 @@ describe('FileUpload', () => {
   it('calls onFileReject callback with rejected file', async () => {
     const onFileReject = vi.fn();
 
-    render(
-      <FileUpload.Root accept="image/*" onFileReject={onFileReject}>
-        <FileUpload.Input data-testid="file-input" />
-      </FileUpload.Root>,
-    );
+    render(<FileUpload.Root accept="image/*" onFileReject={onFileReject}>{null}</FileUpload.Root>);
 
-    const input = screen.getByTestId('file-input') as HTMLInputElement;
+    const input = getFileInput();
     const file = new File(['content'], 'test.txt', { type: 'text/plain' });
 
     // Simulate file input change
@@ -276,11 +266,11 @@ describe('FileUpload', () => {
 
     render(
       <FileUpload.Root accept=".txt" onFilesChange={onFilesChange} onFileReject={onFileReject}>
-        <FileUpload.Input data-testid="file-input" />
+        {null}
       </FileUpload.Root>,
     );
 
-    const input = screen.getByTestId('file-input') as HTMLInputElement;
+    const input = getFileInput();
     const file = new File(['content'], 'READme.TXT', { type: 'text/plain' });
 
     Object.defineProperty(input, 'files', {
@@ -306,11 +296,11 @@ describe('FileUpload', () => {
         onFileReject={onFileReject}
         validator={validator}
       >
-        <FileUpload.Input data-testid="file-input" />
+        {null}
       </FileUpload.Root>,
     );
 
-    const input = screen.getByTestId('file-input') as HTMLInputElement;
+    const input = getFileInput();
     const file = new File(['content'], 'notes.txt', { type: 'text/plain' });
 
     Object.defineProperty(input, 'files', {
@@ -339,11 +329,11 @@ describe('FileUpload', () => {
 
     render(
       <FileUpload.Root onFilesChange={onFilesChange} onFileReject={onFileReject} accept="*">
-        <FileUpload.Input data-testid="file-input" />
+        {null}
       </FileUpload.Root>,
     );
 
-    const input = screen.getByTestId('file-input') as HTMLInputElement;
+    const input = getFileInput();
     const largeFile = new File([new Uint8Array(6 * 1024 * 1024)], 'large.bin', {
       type: 'application/octet-stream',
     });
@@ -368,11 +358,11 @@ describe('FileUpload', () => {
 
     render(
       <FileUpload.Root maxSize={1024} onFileReject={onFileReject} onFilesChange={onFilesChange}>
-        <FileUpload.Input data-testid="file-input" />
+        {null}
       </FileUpload.Root>,
     );
 
-    const input = screen.getByTestId('file-input') as HTMLInputElement;
+    const input = getFileInput();
     const largeFile = new File([new Uint8Array(2048)], 'large.txt', { type: 'text/plain' });
 
     Object.defineProperty(input, 'files', {
@@ -399,11 +389,11 @@ describe('FileUpload', () => {
 
     render(
       <FileUpload.Root minSize={1024} onFileReject={onFileReject} onFilesChange={onFilesChange}>
-        <FileUpload.Input data-testid="file-input" />
+        {null}
       </FileUpload.Root>,
     );
 
-    const input = screen.getByTestId('file-input') as HTMLInputElement;
+    const input = getFileInput();
     const tinyFile = new File(['x'], 'tiny.txt', { type: 'text/plain' });
 
     Object.defineProperty(input, 'files', {
@@ -428,11 +418,11 @@ describe('FileUpload', () => {
 
     render(
       <FileUpload.Root maxFiles={1} multiple={false} onFilesChange={onFilesChange}>
-        <FileUpload.Input data-testid="file-input" />
+        {null}
       </FileUpload.Root>,
     );
 
-    const input = screen.getByTestId('file-input') as HTMLInputElement;
+    const input = getFileInput();
     const file = new File(['content'], 'test.txt', { type: 'text/plain' });
 
     await userEvent.upload(input, file);
@@ -449,13 +439,9 @@ describe('FileUpload', () => {
   });
 
   it('cleans up object URLs on unmount', async () => {
-    const { unmount } = render(
-      <FileUpload.Root>
-        <FileUpload.Input data-testid="file-input" />
-      </FileUpload.Root>,
-    );
+    const { unmount } = render(<FileUpload.Root>{null}</FileUpload.Root>);
 
-    const input = screen.getByTestId('file-input') as HTMLInputElement;
+    const input = getFileInput();
     const file = new File(['content'], 'test.txt', { type: 'text/plain' });
 
     const revokeObjectURLSpy = vi.spyOn(URL, 'revokeObjectURL');
@@ -476,7 +462,7 @@ describe('FileUpload', () => {
 
     function TestComponent() {
       contextValue = FileUpload.useFileUploadContext() as unknown as TestFileUploadContext;
-      return <FileUpload.Input data-testid="file-input" />;
+      return null;
     }
 
     render(
@@ -485,7 +471,7 @@ describe('FileUpload', () => {
       </FileUpload.Root>,
     );
 
-    const input = screen.getByTestId('file-input') as HTMLInputElement;
+    const input = getFileInput();
     const file = new File(['content'], 'test.txt', { type: 'text/plain' });
     const revokeObjectURLSpy = vi.spyOn(URL, 'revokeObjectURL');
 
@@ -551,13 +537,9 @@ describe('FileUpload', () => {
   });
 
   it('announces file rejection to screen readers', async () => {
-    render(
-      <FileUpload.Root accept="image/*">
-        <FileUpload.Input data-testid="file-input" />
-      </FileUpload.Root>,
-    );
+    render(<FileUpload.Root accept="image/*">{null}</FileUpload.Root>);
 
-    const input = screen.getByTestId('file-input') as HTMLInputElement;
+    const input = getFileInput();
     const file = new File(['content'], 'test.txt', { type: 'text/plain' });
 
     await userEvent.upload(input, file);
@@ -574,7 +556,6 @@ describe('FileUpload', () => {
 
       render(
         <FileUpload.Root onFilesChange={onFilesChange}>
-          <FileUpload.Input data-testid="file-input" />
           <FileUpload.Dropzone data-testid="dropzone">Drop files here or click</FileUpload.Dropzone>
           <FileUpload.PreviewList data-testid="preview-list">
             <FileUpload.PreviewItem
@@ -594,7 +575,7 @@ describe('FileUpload', () => {
         </FileUpload.Root>,
       );
 
-      const input = screen.getByTestId('file-input') as HTMLInputElement;
+      const input = getFileInput();
       const file = new File(['content'], 'test.txt', { type: 'text/plain' });
 
       await userEvent.upload(input, file);
@@ -612,12 +593,11 @@ describe('FileUpload', () => {
 
       render(
         <FileUpload.Root onFilesChange={onFilesChange}>
-          <FileUpload.Input data-testid="file-input" />
           <FileUpload.Trigger>Upload</FileUpload.Trigger>
         </FileUpload.Root>,
       );
 
-      const input = screen.getByTestId('file-input') as HTMLInputElement;
+      const input = getFileInput();
       const file1 = new File(['content1'], 'test1.txt', { type: 'text/plain' });
 
       await userEvent.upload(input, file1);
@@ -642,13 +622,9 @@ describe('FileUpload', () => {
     it('handles file rejection with error message', async () => {
       const onFileReject = vi.fn();
 
-      render(
-        <FileUpload.Root accept="image/*" onFileReject={onFileReject}>
-          <FileUpload.Input data-testid="file-input" />
-        </FileUpload.Root>,
-      );
+      render(<FileUpload.Root accept="image/*" onFileReject={onFileReject}>{null}</FileUpload.Root>);
 
-      const input = screen.getByTestId('file-input') as HTMLInputElement;
+      const input = getFileInput();
       const textFile = new File(['data'], 'test.txt', { type: 'text/plain' });
 
       Object.defineProperty(input, 'files', {
@@ -665,13 +641,9 @@ describe('FileUpload', () => {
     it('respects maxSize constraint', async () => {
       const onFileReject = vi.fn();
 
-      render(
-        <FileUpload.Root maxSize={100} onFileReject={onFileReject}>
-          <FileUpload.Input data-testid="file-input" />
-        </FileUpload.Root>,
-      );
+      render(<FileUpload.Root maxSize={100} onFileReject={onFileReject}>{null}</FileUpload.Root>);
 
-      const input = screen.getByTestId('file-input') as HTMLInputElement;
+      const input = getFileInput();
       const largeFile = new File([new Uint8Array(200)], 'large.txt', {
         type: 'text/plain',
       });
@@ -689,13 +661,9 @@ describe('FileUpload', () => {
     it('respects minSize constraint', async () => {
       const onFileReject = vi.fn();
 
-      render(
-        <FileUpload.Root minSize={100} onFileReject={onFileReject}>
-          <FileUpload.Input data-testid="file-input" />
-        </FileUpload.Root>,
-      );
+      render(<FileUpload.Root minSize={100} onFileReject={onFileReject}>{null}</FileUpload.Root>);
 
-      const input = screen.getByTestId('file-input') as HTMLInputElement;
+      const input = getFileInput();
       const smallFile = new File(['x'], 'small.txt', { type: 'text/plain' });
 
       Object.defineProperty(input, 'files', {
@@ -724,7 +692,6 @@ describe('FileUpload', () => {
 
         return (
           <div>
-            <FileUpload.Input />
             {signal && <div data-testid="has-signal">Has Signal</div>}
           </div>
         );
@@ -746,7 +713,6 @@ describe('FileUpload', () => {
 
         return (
           <div>
-            <FileUpload.Input />
             <button
               onClick={() => {
                 const signal = context.getAbortSignal('test-id');
@@ -983,12 +949,11 @@ describe('FileUpload', () => {
 
       render(
         <FileUpload.Root>
-          <FileUpload.Input data-testid="file-input" />
           <TestComponent />
         </FileUpload.Root>,
       );
 
-      const input = screen.getByTestId('file-input') as HTMLInputElement;
+      const input = getFileInput();
       const file1 = new File(['content1'], 'test1.txt', { type: 'text/plain' });
       const file2 = new File(['content2'], 'test2.txt', { type: 'text/plain' });
 
@@ -1014,13 +979,12 @@ describe('FileUpload', () => {
 
       render(
         <FileUpload.Root>
-          <FileUpload.Input data-testid="file-input" />
           <div role="status" aria-live="polite" aria-atomic="true" />
           <TestComponent />
         </FileUpload.Root>,
       );
 
-      const input = screen.getByTestId('file-input') as HTMLInputElement;
+      const input = getFileInput();
       const file = new File(['content'], 'test.txt', { type: 'text/plain' });
 
       fireEvent.change(input, { target: { files: [file] } });
@@ -1041,11 +1005,11 @@ describe('FileUpload', () => {
 
       render(
         <FileUpload.Root maxFiles={3} multiple onFilesChange={onFilesChange}>
-          <FileUpload.Input data-testid="file-input" />
+          {null}
         </FileUpload.Root>,
       );
 
-      const input = screen.getByTestId('file-input') as HTMLInputElement;
+      const input = getFileInput();
       const files = [
         new File(['content1'], 'test1.txt', { type: 'text/plain' }),
         new File(['content2'], 'test2.txt', { type: 'text/plain' }),
@@ -1082,13 +1046,12 @@ describe('FileUpload', () => {
 
       render(
         <FileUpload.Root maxFiles={2} multiple>
-          <FileUpload.Input data-testid="file-input" />
           <div role="status" aria-live="polite" aria-atomic="true" />
           <TestComponent />
         </FileUpload.Root>,
       );
 
-      const input = screen.getByTestId('file-input') as HTMLInputElement;
+      const input = getFileInput();
       const files = [
         new File(['content1'], 'test1.txt', { type: 'text/plain' }),
         new File(['content2'], 'test2.txt', { type: 'text/plain' }),
@@ -1117,11 +1080,11 @@ describe('FileUpload', () => {
 
       render(
         <FileUpload.Root maxFiles={2} multiple onFileReject={onFileReject}>
-          <FileUpload.Input data-testid="file-input" />
+          {null}
         </FileUpload.Root>,
       );
 
-      const input = screen.getByTestId('file-input') as HTMLInputElement;
+      const input = getFileInput();
       const files = [
         new File(['content1'], 'test1.txt', { type: 'text/plain' }),
         new File(['content2'], 'test2.txt', { type: 'text/plain' }),
@@ -1147,11 +1110,11 @@ describe('FileUpload', () => {
 
       render(
         <FileUpload.Root maxFiles={2} multiple onFileReject={onFileReject}>
-          <FileUpload.Input data-testid="file-input" />
+          {null}
         </FileUpload.Root>,
       );
 
-      const input = screen.getByTestId('file-input') as HTMLInputElement;
+      const input = getFileInput();
 
       fireEvent.change(input, {
         target: {
@@ -1187,11 +1150,11 @@ describe('FileUpload', () => {
 
       render(
         <FileUpload.Root maxFiles={5} multiple onFilesChange={onFilesChange}>
-          <FileUpload.Input data-testid="file-input" />
+          {null}
         </FileUpload.Root>,
       );
 
-      const input = screen.getByTestId('file-input') as HTMLInputElement;
+      const input = getFileInput();
 
       // Add 2 files
       const firstBatch = [
@@ -1241,13 +1204,9 @@ describe('FileUpload', () => {
     it('calls onFilesChange when files are added', async () => {
       const onFilesChange = vi.fn();
 
-      render(
-        <FileUpload.Root onFilesChange={onFilesChange}>
-          <FileUpload.Input data-testid="file-input" />
-        </FileUpload.Root>,
-      );
+      render(<FileUpload.Root onFilesChange={onFilesChange}>{null}</FileUpload.Root>);
 
-      const input = screen.getByTestId('file-input') as HTMLInputElement;
+      const input = getFileInput();
       const file = new File(['content'], 'test.txt', { type: 'text/plain' });
 
       fireEvent.change(input, { target: { files: [file] } });
@@ -1272,12 +1231,11 @@ describe('FileUpload', () => {
 
       render(
         <FileUpload.Root onFilesChange={onFilesChange}>
-          <FileUpload.Input data-testid="file-input" />
           <TestComponent />
         </FileUpload.Root>,
       );
 
-      const input = screen.getByTestId('file-input') as HTMLInputElement;
+      const input = getFileInput();
       const file = new File(['content'], 'test.txt', { type: 'text/plain' });
 
       fireEvent.change(input, { target: { files: [file] } });
@@ -1311,12 +1269,11 @@ describe('FileUpload', () => {
 
       render(
         <FileUpload.Root onFilesChange={onFilesChange}>
-          <FileUpload.Input data-testid="file-input" />
           <TestComponent />
         </FileUpload.Root>,
       );
 
-      const input = screen.getByTestId('file-input') as HTMLInputElement;
+      const input = getFileInput();
       const files = [
         new File(['content1'], 'test1.txt', { type: 'text/plain' }),
         new File(['content2'], 'test2.txt', { type: 'text/plain' }),
@@ -1342,13 +1299,9 @@ describe('FileUpload', () => {
     it('provides extended file properties in onFilesChange', async () => {
       const onFilesChange = vi.fn();
 
-      render(
-        <FileUpload.Root onFilesChange={onFilesChange}>
-          <FileUpload.Input data-testid="file-input" />
-        </FileUpload.Root>,
-      );
+      render(<FileUpload.Root onFilesChange={onFilesChange}>{null}</FileUpload.Root>);
 
-      const input = screen.getByTestId('file-input') as HTMLInputElement;
+      const input = getFileInput();
       const file = new File(['content'], 'test.txt', { type: 'text/plain' });
 
       fireEvent.change(input, { target: { files: [file] } });
@@ -1382,12 +1335,11 @@ describe('FileUpload', () => {
 
       render(
         <FileUpload.Root>
-          <FileUpload.Input data-testid="file-input" />
           <TestComponent />
         </FileUpload.Root>,
       );
 
-      const input = screen.getByTestId('file-input') as HTMLInputElement;
+      const input = getFileInput();
       const fileSize = 1024;
       const file = new File(['a'.repeat(fileSize)], 'test.txt', { type: 'text/plain' });
 
@@ -1413,12 +1365,11 @@ describe('FileUpload', () => {
 
       render(
         <FileUpload.Root>
-          <FileUpload.Input data-testid="file-input" />
           <TestComponent />
         </FileUpload.Root>,
       );
 
-      const input = screen.getByTestId('file-input') as HTMLInputElement;
+      const input = getFileInput();
       const file = new File(['content'], 'test.json', { type: 'application/json' });
 
       fireEvent.change(input, { target: { files: [file] } });
@@ -1443,12 +1394,11 @@ describe('FileUpload', () => {
 
       render(
         <FileUpload.Root>
-          <FileUpload.Input data-testid="file-input" />
           <TestComponent />
         </FileUpload.Root>,
       );
 
-      const input = screen.getByTestId('file-input') as HTMLInputElement;
+      const input = getFileInput();
       const lastModified = Date.now();
       const file = new File(['content'], 'test.txt', { type: 'text/plain', lastModified });
 

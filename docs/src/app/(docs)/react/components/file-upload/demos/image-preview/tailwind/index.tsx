@@ -51,8 +51,6 @@ function ImagePreviewList() {
 export default function FileUploadImagePreviewTailwindDemo() {
   return (
     <FileUpload.Root accept="image/*" maxFiles={10} maxSize={5 * 1024 * 1024}>
-      <FileUpload.Input />
-
       <FileUpload.Dropzone className="rounded-lg border border-dashed border-gray-300 px-4 py-8 text-center text-sm text-gray-600 hover:bg-gray-50">
         {({ isDragging }) =>
           isDragging ? 'Drop images here' : 'Drag images here or click to select'

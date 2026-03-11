@@ -57,7 +57,6 @@ export default function FileUploadExperiment() {
                 {isDragging ? 'Drop files here' : 'Drag & drop files here'}
               </p>
               <FileUpload.Trigger className={styles.Button}>Browse files</FileUpload.Trigger>
-              <FileUpload.Input />
             </div>
           )}
         </FileUpload.Dropzone>

@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import { useStableCallback } from '@base-ui/utils/useStableCallback';
+import { useIsoLayoutEffect } from '@base-ui/utils/useIsoLayoutEffect';
 import { visuallyHidden } from '@base-ui/utils/visuallyHidden';
 import { useRenderElement } from '../../utils/useRenderElement';
 import type { BaseUIComponentProps, HTMLProps } from '../../utils/types';
@@ -230,7 +231,6 @@ export interface FileUploadRootProps
  * ```tsx
  * <FileUpload.Root accept="image/*" maxSize={5242880} onFilesChange={handleFilesChange}>
  *   <FileUpload.Dropzone>Drop files here</FileUpload.Dropzone>
- *   <FileUpload.Input />
  *   <FileUpload.PreviewList>
  *     {files.map(file => <FileUpload.PreviewItem key={file.id} file={file} />)}
  *   </FileUpload.PreviewList>
@@ -310,6 +310,39 @@ export const FileUploadRoot = React.forwardRef<HTMLDivElement, FileUploadRootPro
     );
 
     const resolvedClassName = resolveClassName(className, state);
+    const inputRef = React.useRef<HTMLInputElement | null>(null);
+
+    const registerInputRef = useStableCallback((node: HTMLInputElement | null) => {
+      inputRef.current = node;
+      contextValue.registerInput(node);
+    });
+
+    useIsoLayoutEffect(() => {
+      const node = inputRef.current;
+      if (!node) {
+        return;
+      }
+
+      if (contextValue.directory) {
+        node.setAttribute('webkitdirectory', '');
+        node.setAttribute('directory', '');
+      } else {
+        node.removeAttribute('webkitdirectory');
+        node.removeAttribute('directory');
+      }
+    }, [contextValue.directory]);
+
+    const handleInputChange = useStableCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+      if (event.target.files && event.target.files.length > 0) {
+        addFiles(Array.from(event.target.files), event.nativeEvent);
+      } else {
+        onCancel?.();
+      }
+
+      if (inputRef.current) {
+        inputRef.current.value = '';
+      }
+    });
 
     const handleDragEnter = useStableCallback((event: React.DragEvent) => {
       if (contextValue.disabled) {
@@ -403,6 +436,16 @@ export const FileUploadRoot = React.forwardRef<HTMLDivElement, FileUploadRootPro
       style: { position: 'relative', ...style },
       children: (
         <React.Fragment>
+          <input
+            ref={registerInputRef}
+            id={contextValue.inputId}
+            type="file"
+            accept={contextValue.accept}
+            multiple={contextValue.directory || contextValue.multiple}
+            disabled={contextValue.disabled}
+            style={{ display: 'none' }}
+            onChange={handleInputChange}
+          />
           <div style={visuallyHidden} role="status" aria-live="polite">
             {announcement}
           </div>
