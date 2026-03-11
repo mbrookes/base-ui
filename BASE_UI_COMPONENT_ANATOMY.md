@@ -1,6 +1,6 @@
-# The Anatomy of a Base UI Component
+# The Anatomy of a Base UI Component
 
-This document provides a comprehensive guide for creating new Base UI components that follow established conventions and best practices. Use this as a reference when building new components to ensure consistency across the codebase.
+This document provides a comprehensive guide for creating new Base UI components that follow established conventions and best practices. Use this as a reference when building new components to ensure consistency across the codebase.
 
 ## Table of Contents
 
@@ -199,7 +199,7 @@ export namespace ComponentName {
 
 ### Critical Hook Usage
 
-**Base UI Utilities (always use these):**
+**Base UI Utilities (always use these):**
 
 ```typescript
 // CORRECT - Use Base UI wrapper utilities
@@ -571,9 +571,9 @@ const element = useRenderElement('button', componentProps, {
 });
 ```
 
-### Preventing Base UI Event Handling
+### Preventing Base UI Event Handling
 
-To prevent Base UI from handling a React event, use `preventBaseUIHandler()` on the event object:
+To prevent Base UI from handling a React event, use `preventBaseUIHandler()` on the event object:
 
 ```typescript
 <Component.Input
@@ -1210,4 +1210,4 @@ const state: ComponentName.State = React.useMemo(
 
 ---
 
-This document should serve as a comprehensive reference for creating Base UI components that follow all established conventions and best practices. When in doubt, find a similar existing component and follow its patterns.
+This document should serve as a comprehensive reference for creating Base UI components that follow all established conventions and best practices. When in doubt, find a similar existing component and follow its patterns.
