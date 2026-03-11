@@ -210,77 +210,109 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
     lastChangeReasonRef.current = FILE_UPLOAD_ROOT_CHANGE_REASONS.FILE_ADDED;
     lastChangeEventRef.current = event;
 
-    setFiles((prev) => {
-      const remainingSlots = maxFiles - prev.length;
-      if (remainingSlots <= 0) {
-        setAnnouncement(messages.maxFilesReached(maxFiles));
-        return prev;
-      }
+    const prev = files;
+    const remainingSlots = maxFiles - prev.length;
 
-      const candidates = multiple ? newFiles.slice(0, remainingSlots) : [newFiles[0]];
-      const validFiles: FileUploadRootExtendedFile[] = [];
-      const errors: string[] = [];
+    if (remainingSlots <= 0) {
+      const maxFilesReachedMessage = messages.maxFilesReached(maxFiles);
+      newFiles.forEach((file) => {
+        const eventDetails = createChangeEventDetails<FileUploadRootRejectReason, { message: string }>(
+          'MAX_FILES_REACHED',
+          event,
+          undefined,
+          { message: maxFilesReachedMessage },
+        );
 
-      const existingKeys = new Set(prev.map(getFileKey));
-
-      candidates.forEach((file) => {
-        const fileKey = getFileKey(file);
-        if (existingKeys.has(fileKey)) {
-          const eventDetails = createChangeEventDetails<
-            FileUploadRootRejectReason,
-            { message: string }
-          >('DUPLICATE_FILE', event, undefined, { message: messages.duplicateFile(file.name) });
-          onFileReject?.(file, 'DUPLICATE_FILE', eventDetails);
-          errors.push(messages.duplicateFile(file.name));
-          return;
-        }
-
-        const error = validateFile(file);
-        if (error) {
-          const eventDetails = createChangeEventDetails<
-            FileUploadRootRejectReason,
-            { message: string }
-          >(error.reason, event, undefined, { message: error.message });
-
-          onFileReject?.(file, error.reason, eventDetails);
-          errors.push(`${file.name}: ${error.message}`);
-        } else {
-          existingKeys.add(fileKey);
-
-          const id = generateId('file');
-          const preview = URL.createObjectURL(file);
-          previewUrlsRef.current.set(id, preview);
-
-          const extendedFile = Object.assign(file, {
-            id,
-            preview,
-            status: 'idle' as const,
-            progress: 0,
-          }) as FileUploadRootExtendedFile;
-
-          validFiles.push(extendedFile);
-        }
+        onFileReject?.(file, 'MAX_FILES_REACHED', eventDetails);
       });
 
-      const successMsg = validFiles.length > 0 ? messages.filesAdded(validFiles.length) : '';
-      const errorMsg = errors.length > 0 ? messages.filesRejected(errors.length, errors) : '';
+      setAnnouncement(maxFilesReachedMessage);
+      return;
+    }
 
-      setAnnouncement(`${successMsg}${errorMsg}`);
+    const candidates = multiple ? newFiles.slice(0, remainingSlots) : [newFiles[0]];
+    const validFiles: FileUploadRootExtendedFile[] = [];
+    const errors: string[] = [];
 
-      const nextFiles = multiple ? [...prev, ...validFiles] : validFiles;
+    const overflowFiles = multiple ? newFiles.slice(remainingSlots) : newFiles.slice(1);
+    if (overflowFiles.length > 0) {
+      const maxFilesReachedMessage = messages.maxFilesReached(maxFiles);
+      overflowFiles.forEach((file) => {
+        const eventDetails = createChangeEventDetails<FileUploadRootRejectReason, { message: string }>(
+          'MAX_FILES_REACHED',
+          event,
+          undefined,
+          { message: maxFilesReachedMessage },
+        );
 
-      if (!multiple) {
-        const nextIds = new Set(nextFiles.map((file) => file.id));
-        prev.forEach((file) => {
-          if (!nextIds.has(file.id)) {
-            URL.revokeObjectURL(file.preview);
-            previewUrlsRef.current.delete(file.id);
-          }
-        });
+        onFileReject?.(file, 'MAX_FILES_REACHED', eventDetails);
+        errors.push(`${file.name}: ${maxFilesReachedMessage}`);
+      });
+    }
+
+    const existingKeys = new Set(prev.map(getFileKey));
+
+    candidates.forEach((file) => {
+      const fileKey = getFileKey(file);
+      if (existingKeys.has(fileKey)) {
+        const eventDetails = createChangeEventDetails<FileUploadRootRejectReason, { message: string }>(
+          'DUPLICATE_FILE',
+          event,
+          undefined,
+          { message: messages.duplicateFile(file.name) },
+        );
+        onFileReject?.(file, 'DUPLICATE_FILE', eventDetails);
+        errors.push(messages.duplicateFile(file.name));
+        return;
       }
 
-      return nextFiles;
+      const error = validateFile(file);
+      if (error) {
+        const eventDetails = createChangeEventDetails<FileUploadRootRejectReason, { message: string }>(
+          error.reason,
+          event,
+          undefined,
+          { message: error.message },
+        );
+
+        onFileReject?.(file, error.reason, eventDetails);
+        errors.push(`${file.name}: ${error.message}`);
+      } else {
+        existingKeys.add(fileKey);
+
+        const id = generateId('file');
+        const preview = URL.createObjectURL(file);
+        previewUrlsRef.current.set(id, preview);
+
+        const extendedFile = Object.assign(file, {
+          id,
+          preview,
+          status: 'idle' as const,
+          progress: 0,
+        }) as FileUploadRootExtendedFile;
+
+        validFiles.push(extendedFile);
+      }
     });
+
+    const successMsg = validFiles.length > 0 ? messages.filesAdded(validFiles.length) : '';
+    const errorMsg = errors.length > 0 ? messages.filesRejected(errors.length, errors) : '';
+
+    setAnnouncement(`${successMsg}${errorMsg}`);
+
+    const nextFiles = multiple ? [...prev, ...validFiles] : validFiles;
+
+    if (!multiple) {
+      const nextIds = new Set(nextFiles.map((file) => file.id));
+      prev.forEach((file) => {
+        if (!nextIds.has(file.id)) {
+          URL.revokeObjectURL(file.preview);
+          previewUrlsRef.current.delete(file.id);
+        }
+      });
+    }
+
+    setFiles(nextFiles);
   });
 
   const removeFile = useStableCallback((id: string) => {

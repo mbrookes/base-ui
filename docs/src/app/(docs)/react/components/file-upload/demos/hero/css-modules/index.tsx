@@ -95,6 +95,9 @@ function FilePreviewItems() {
 }
 
 export default function FileUploadDemo() {
+  const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
+  const previousFileCountRef = React.useRef(0);
+
   return (
     <div className={styles.container}>
       <div className={styles.header}>
@@ -107,6 +110,17 @@ export default function FileUploadDemo() {
         maxSize={5 * 1024 * 1024}
         accept="image/png, image/jpeg, image/gif"
         multiple
+        onFilesChange={(files, eventDetails) => {
+          const previousFileCount = previousFileCountRef.current;
+          previousFileCountRef.current = files.length;
+
+          if (eventDetails.reason === 'file-added' && files.length > previousFileCount) {
+            setErrorMessage(null);
+          }
+        }}
+        onFileReject={(_, __, details) => {
+          setErrorMessage(details.message);
+        }}
       >
         <FileUpload.Input />
 
@@ -128,6 +142,12 @@ export default function FileUploadDemo() {
         <FileUpload.PreviewList className={styles.previewList}>
           <FilePreviewItems />
         </FileUpload.PreviewList>
+
+        {errorMessage ? (
+          <p role="alert" className={styles.errorMessage}>
+            {errorMessage}
+          </p>
+        ) : null}
       </FileUpload.Root>
     </div>
   );

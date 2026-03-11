@@ -98,6 +98,9 @@ function FilePreviewItems() {
 }
 
 export default function FileUploadDemo() {
+  const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
+  const previousFileCountRef = React.useRef(0);
+
   return (
     <div className="w-full rounded-xl border border-gray-200 bg-white p-8 shadow-sm">
       <div className="mb-6">
@@ -110,6 +113,17 @@ export default function FileUploadDemo() {
         maxSize={5 * 1024 * 1024}
         accept="image/png, image/jpeg, image/gif"
         multiple
+        onFilesChange={(files, eventDetails) => {
+          const previousFileCount = previousFileCountRef.current;
+          previousFileCountRef.current = files.length;
+
+          if (eventDetails.reason === 'file-added' && files.length > previousFileCount) {
+            setErrorMessage(null);
+          }
+        }}
+        onFileReject={(_, __, details) => {
+          setErrorMessage(details.message);
+        }}
       >
         <FileUpload.Input />
 
@@ -137,6 +151,12 @@ export default function FileUploadDemo() {
         <FileUpload.PreviewList className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <FilePreviewItems />
         </FileUpload.PreviewList>
+
+        {errorMessage ? (
+          <p role="alert" className="mt-4 text-sm text-red-600">
+            {errorMessage}
+          </p>
+        ) : null}
       </FileUpload.Root>
     </div>
   );

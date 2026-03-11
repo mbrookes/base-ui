@@ -1112,6 +1112,76 @@ describe('FileUpload', () => {
       expect(getTestContext(contextValue).files).toHaveLength(2);
     });
 
+    it('calls onFileReject with MAX_FILES_REACHED when selecting more than maxFiles at once', async () => {
+      const onFileReject = vi.fn();
+
+      render(
+        <FileUpload.Root maxFiles={2} multiple onFileReject={onFileReject}>
+          <FileUpload.Input data-testid="file-input" />
+        </FileUpload.Root>,
+      );
+
+      const input = screen.getByTestId('file-input') as HTMLInputElement;
+      const files = [
+        new File(['content1'], 'test1.txt', { type: 'text/plain' }),
+        new File(['content2'], 'test2.txt', { type: 'text/plain' }),
+        new File(['content3'], 'test3.txt', { type: 'text/plain' }),
+      ];
+
+      fireEvent.change(input, { target: { files } });
+
+      await waitFor(() => {
+        expect(onFileReject).toHaveBeenCalledWith(
+          expect.objectContaining({ name: 'test3.txt' }),
+          'MAX_FILES_REACHED',
+          expect.objectContaining({
+            reason: 'MAX_FILES_REACHED',
+            message: 'Cannot add files. Limit of 2 reached.',
+          }),
+        );
+      });
+    });
+
+    it('calls onFileReject with MAX_FILES_REACHED when trying to add files after reaching the limit', async () => {
+      const onFileReject = vi.fn();
+
+      render(
+        <FileUpload.Root maxFiles={2} multiple onFileReject={onFileReject}>
+          <FileUpload.Input data-testid="file-input" />
+        </FileUpload.Root>,
+      );
+
+      const input = screen.getByTestId('file-input') as HTMLInputElement;
+
+      fireEvent.change(input, {
+        target: {
+          files: [
+            new File(['content1'], 'test1.txt', { type: 'text/plain' }),
+            new File(['content2'], 'test2.txt', { type: 'text/plain' }),
+          ],
+        },
+      });
+
+      onFileReject.mockClear();
+
+      fireEvent.change(input, {
+        target: {
+          files: [new File(['content3'], 'test3.txt', { type: 'text/plain' })],
+        },
+      });
+
+      await waitFor(() => {
+        expect(onFileReject).toHaveBeenCalledWith(
+          expect.objectContaining({ name: 'test3.txt' }),
+          'MAX_FILES_REACHED',
+          expect.objectContaining({
+            reason: 'MAX_FILES_REACHED',
+            message: 'Cannot add files. Limit of 2 reached.',
+          }),
+        );
+      });
+    });
+
     it('allows adding files up to the limit in increments', async () => {
       const onFilesChange = vi.fn();
 
