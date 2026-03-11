@@ -226,18 +226,16 @@ describe('FileUpload.PreviewList', () => {
         }, [files, updateFile]);
 
         return (
-          <React.Fragment>
-            <FileUpload.PreviewList
-              data-testid="error-list"
-              filter={(fileList) => fileList.filter((f) => f.status === 'error')}
-            >
-              {files.map((file) => (
-                <FileUpload.PreviewItem key={file.id} file={file}>
-                  <span data-testid={`file-${file.id}`}>{file.id}</span>
-                </FileUpload.PreviewItem>
-              ))}
-            </FileUpload.PreviewList>
-          </React.Fragment>
+          <FileUpload.PreviewList
+            data-testid="error-list"
+            filter={(fileList) => fileList.filter((f) => f.status === 'error')}
+          >
+            {files.map((file) => (
+              <FileUpload.PreviewItem key={file.id} file={file}>
+                <span data-testid={`file-${file.id}`}>{file.id}</span>
+              </FileUpload.PreviewItem>
+            ))}
+          </FileUpload.PreviewList>
         );
       }
 
@@ -284,18 +282,16 @@ describe('FileUpload.PreviewList', () => {
         }, [files, updateFile]);
 
         return (
-          <React.Fragment>
-            <FileUpload.PreviewList
-              data-testid="uploading-list"
-              filter={(allFiles) => allFiles.filter((f) => f.status === 'uploading')}
-            >
-              {files.map((file) => (
-                <FileUpload.PreviewItem key={file.id} file={file}>
-                  <span data-testid={`file-${file.id}`}>{file.id}</span>
-                </FileUpload.PreviewItem>
-              ))}
-            </FileUpload.PreviewList>
-          </React.Fragment>
+          <FileUpload.PreviewList
+            data-testid="uploading-list"
+            filter={(allFiles) => allFiles.filter((f) => f.status === 'uploading')}
+          >
+            {files.map((file) => (
+              <FileUpload.PreviewItem key={file.id} file={file}>
+                <span data-testid={`file-${file.id}`}>{file.id}</span>
+              </FileUpload.PreviewItem>
+            ))}
+          </FileUpload.PreviewList>
         );
       }
 
@@ -331,14 +327,12 @@ describe('FileUpload.PreviewList', () => {
         }, [addFiles]);
 
         return (
-          <React.Fragment>
-            <FileUpload.PreviewList
-              data-testid="error-list"
-              filter={(allFiles) => allFiles.filter((f) => f.status === 'error')}
-            >
-              <li>Items</li>
-            </FileUpload.PreviewList>
-          </React.Fragment>
+          <FileUpload.PreviewList
+            data-testid="error-list"
+            filter={(allFiles) => allFiles.filter((f) => f.status === 'error')}
+          >
+            <li>Items</li>
+          </FileUpload.PreviewList>
         );
       }
 
@@ -382,15 +376,13 @@ describe('FileUpload.PreviewList', () => {
         }, [files, updateFile]);
 
         return (
-          <React.Fragment>
-            <FileUpload.PreviewList
-              data-testid="filtered-list"
-              filter={(allFiles) => allFiles.filter((f) => f.status === 'error')}
-              className={classNameFn}
-            >
-              <li>Items</li>
-            </FileUpload.PreviewList>
-          </React.Fragment>
+          <FileUpload.PreviewList
+            data-testid="filtered-list"
+            filter={(allFiles) => allFiles.filter((f) => f.status === 'error')}
+            className={classNameFn}
+          >
+            <li>Items</li>
+          </FileUpload.PreviewList>
         );
       }
 

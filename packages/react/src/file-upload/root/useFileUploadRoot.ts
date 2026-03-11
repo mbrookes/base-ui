@@ -216,12 +216,10 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
     if (remainingSlots <= 0) {
       const maxFilesReachedMessage = messages.maxFilesReached(maxFiles);
       newFiles.forEach((file) => {
-        const eventDetails = createChangeEventDetails<FileUploadRootRejectReason, { message: string }>(
-          'MAX_FILES_REACHED',
-          event,
-          undefined,
-          { message: maxFilesReachedMessage },
-        );
+        const eventDetails = createChangeEventDetails<
+          FileUploadRootRejectReason,
+          { message: string }
+        >('MAX_FILES_REACHED', event, undefined, { message: maxFilesReachedMessage });
 
         onFileReject?.(file, 'MAX_FILES_REACHED', eventDetails);
       });
@@ -238,12 +236,10 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
     if (overflowFiles.length > 0) {
       const maxFilesReachedMessage = messages.maxFilesReached(maxFiles);
       overflowFiles.forEach((file) => {
-        const eventDetails = createChangeEventDetails<FileUploadRootRejectReason, { message: string }>(
-          'MAX_FILES_REACHED',
-          event,
-          undefined,
-          { message: maxFilesReachedMessage },
-        );
+        const eventDetails = createChangeEventDetails<
+          FileUploadRootRejectReason,
+          { message: string }
+        >('MAX_FILES_REACHED', event, undefined, { message: maxFilesReachedMessage });
 
         onFileReject?.(file, 'MAX_FILES_REACHED', eventDetails);
         errors.push(`${file.name}: ${maxFilesReachedMessage}`);
@@ -255,12 +251,10 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
     candidates.forEach((file) => {
       const fileKey = getFileKey(file);
       if (existingKeys.has(fileKey)) {
-        const eventDetails = createChangeEventDetails<FileUploadRootRejectReason, { message: string }>(
-          'DUPLICATE_FILE',
-          event,
-          undefined,
-          { message: messages.duplicateFile(file.name) },
-        );
+        const eventDetails = createChangeEventDetails<
+          FileUploadRootRejectReason,
+          { message: string }
+        >('DUPLICATE_FILE', event, undefined, { message: messages.duplicateFile(file.name) });
         onFileReject?.(file, 'DUPLICATE_FILE', eventDetails);
         errors.push(messages.duplicateFile(file.name));
         return;
@@ -268,12 +262,10 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
 
       const error = validateFile(file);
       if (error) {
-        const eventDetails = createChangeEventDetails<FileUploadRootRejectReason, { message: string }>(
-          error.reason,
-          event,
-          undefined,
-          { message: error.message },
-        );
+        const eventDetails = createChangeEventDetails<
+          FileUploadRootRejectReason,
+          { message: string }
+        >(error.reason, event, undefined, { message: error.message });
 
         onFileReject?.(file, error.reason, eventDetails);
         errors.push(`${file.name}: ${error.message}`);
@@ -345,9 +337,7 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
   });
 
   const updateFile = useStableCallback((id: string, updates: FileUploadRootFileUpdates) => {
-    setFiles((prev) =>
-      prev.map((file) => (file.id === id ? Object.assign(file, updates) : file)),
-    );
+    setFiles((prev) => prev.map((file) => (file.id === id ? Object.assign(file, updates) : file)));
   });
 
   const retryFile = useStableCallback((id: string) => {

@@ -124,27 +124,21 @@ describe('FileUpload', () => {
   });
 
   it('applies correct accept attribute to input', () => {
-    render(
-      <FileUpload.Root accept="image/png,image/jpeg">{null}</FileUpload.Root>,
-    );
+    render(<FileUpload.Root accept="image/png,image/jpeg">{null}</FileUpload.Root>);
 
     const input = getFileInput();
     expect(input.accept).toBe('image/png,image/jpeg');
   });
 
   it('applies multiple attribute to input when multiple is true', () => {
-    render(
-      <FileUpload.Root multiple>{null}</FileUpload.Root>,
-    );
+    render(<FileUpload.Root multiple>{null}</FileUpload.Root>);
 
     const input = getFileInput();
     expect(input.multiple).toBe(true);
   });
 
   it('does not apply multiple attribute when multiple is false', () => {
-    render(
-      <FileUpload.Root multiple={false}>{null}</FileUpload.Root>,
-    );
+    render(<FileUpload.Root multiple={false}>{null}</FileUpload.Root>);
 
     const input = getFileInput();
     expect(input.multiple).toBe(false);
@@ -237,7 +231,11 @@ describe('FileUpload', () => {
   it('calls onFileReject callback with rejected file', async () => {
     const onFileReject = vi.fn();
 
-    render(<FileUpload.Root accept="image/*" onFileReject={onFileReject}>{null}</FileUpload.Root>);
+    render(
+      <FileUpload.Root accept="image/*" onFileReject={onFileReject}>
+        {null}
+      </FileUpload.Root>,
+    );
 
     const input = getFileInput();
     const file = new File(['content'], 'test.txt', { type: 'text/plain' });
@@ -380,7 +378,10 @@ describe('FileUpload', () => {
         message: expect.stringContaining('too large'),
       }),
     );
-    expect(onFilesChange).toHaveBeenCalledWith([], expect.objectContaining({ reason: expect.any(String) }));
+    expect(onFilesChange).toHaveBeenCalledWith(
+      [],
+      expect.objectContaining({ reason: expect.any(String) }),
+    );
   });
 
   it('respects minSize constraint and rejects undersized files', async () => {
@@ -622,7 +623,11 @@ describe('FileUpload', () => {
     it('handles file rejection with error message', async () => {
       const onFileReject = vi.fn();
 
-      render(<FileUpload.Root accept="image/*" onFileReject={onFileReject}>{null}</FileUpload.Root>);
+      render(
+        <FileUpload.Root accept="image/*" onFileReject={onFileReject}>
+          {null}
+        </FileUpload.Root>,
+      );
 
       const input = getFileInput();
       const textFile = new File(['data'], 'test.txt', { type: 'text/plain' });
@@ -641,7 +646,11 @@ describe('FileUpload', () => {
     it('respects maxSize constraint', async () => {
       const onFileReject = vi.fn();
 
-      render(<FileUpload.Root maxSize={100} onFileReject={onFileReject}>{null}</FileUpload.Root>);
+      render(
+        <FileUpload.Root maxSize={100} onFileReject={onFileReject}>
+          {null}
+        </FileUpload.Root>,
+      );
 
       const input = getFileInput();
       const largeFile = new File([new Uint8Array(200)], 'large.txt', {
@@ -661,7 +670,11 @@ describe('FileUpload', () => {
     it('respects minSize constraint', async () => {
       const onFileReject = vi.fn();
 
-      render(<FileUpload.Root minSize={100} onFileReject={onFileReject}>{null}</FileUpload.Root>);
+      render(
+        <FileUpload.Root minSize={100} onFileReject={onFileReject}>
+          {null}
+        </FileUpload.Root>,
+      );
 
       const input = getFileInput();
       const smallFile = new File(['x'], 'small.txt', { type: 'text/plain' });
@@ -690,11 +703,7 @@ describe('FileUpload', () => {
           }
         }, [getAbortSignal]);
 
-        return (
-          <div>
-            {signal && <div data-testid="has-signal">Has Signal</div>}
-          </div>
-        );
+        return <div>{signal && <div data-testid="has-signal">Has Signal</div>}</div>;
       }
 
       render(
@@ -1253,7 +1262,10 @@ describe('FileUpload', () => {
       });
 
       await waitFor(() => {
-        expect(onFilesChange).toHaveBeenCalledWith([], expect.objectContaining({ reason: expect.any(String) }));
+        expect(onFilesChange).toHaveBeenCalledWith(
+          [],
+          expect.objectContaining({ reason: expect.any(String) }),
+        );
       });
     });
 
@@ -1292,7 +1304,10 @@ describe('FileUpload', () => {
       });
 
       await waitFor(() => {
-        expect(onFilesChange).toHaveBeenCalledWith([], expect.objectContaining({ reason: expect.any(String) }));
+        expect(onFilesChange).toHaveBeenCalledWith(
+          [],
+          expect.objectContaining({ reason: expect.any(String) }),
+        );
       });
     });
 
