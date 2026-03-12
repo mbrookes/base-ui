@@ -66,7 +66,10 @@ export default function FileUploadValidationTailwindDemo() {
       </FileUpload.Root>
 
       {errorMessages.length > 0 ? (
-        <ul role="alert" className="list-disc space-y-1 rounded-md border border-red-200 bg-red-50 px-7 py-3 text-sm text-red-700">
+        <ul
+          role="alert"
+          className="list-disc space-y-1 rounded-md border border-red-200 bg-red-50 px-7 py-3 text-sm text-red-700"
+        >
           {errorMessages.map((message) => (
             <li key={message}>{message}</li>
           ))}

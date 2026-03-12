@@ -6,7 +6,9 @@ type OnFileReject = NonNullable<FileUploadRootProps['onFileReject']>;
 
 const formatFileMessage = (fileName: string, reason: string, message: string) => {
   const readableMessage =
-    reason === 'MIME_TYPE_NOT_ALLOWED' ? 'File type not allowed. Only images are accepted.' : message;
+    reason === 'MIME_TYPE_NOT_ALLOWED'
+      ? 'File type not allowed. Only images are accepted.'
+      : message;
 
   const prefix = `${fileName}: `;
   if (readableMessage.startsWith(prefix)) {
