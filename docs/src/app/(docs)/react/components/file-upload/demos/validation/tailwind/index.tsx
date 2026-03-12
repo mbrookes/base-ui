@@ -8,11 +8,11 @@ function FileList() {
   const { files, removeFile } = FileUpload.useFileUploadContext();
 
   if (files.length === 0) {
-    return <p className="text-sm text-gray-500">No files selected.</p>;
+    return <p className="mt-4 text-sm text-gray-500">No files selected.</p>;
   }
 
   return (
-    <FileUpload.PreviewList className="mt-4 space-y-2">
+    <FileUpload.PreviewList className="mt-4 space-y-2 list-none p-0 m-0">
       {files.map((file) => (
         <FileUpload.PreviewItem
           key={file.id}

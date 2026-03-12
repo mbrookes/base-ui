@@ -9,7 +9,7 @@ function FileList() {
   const { files, removeFile } = FileUpload.useFileUploadContext();
 
   if (files.length === 0) {
-    return <p>No files selected.</p>;
+    return <p className={styles.emptyState}>No files selected.</p>;
   }
 
   return (
