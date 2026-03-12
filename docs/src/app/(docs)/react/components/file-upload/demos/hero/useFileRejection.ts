@@ -29,10 +29,12 @@ export function useFileRejection() {
     (files, eventDetails) => {
       const didAddFiles =
         eventDetails.reason === 'file-added' && files.length > previousFileCountRef.current;
+      const didRemoveFiles =
+        eventDetails.reason === 'file-removed' && files.length < previousFileCountRef.current;
 
       previousFileCountRef.current = files.length;
 
-      if (eventDetails.reason === 'files-cleared') {
+      if (eventDetails.reason === 'files-cleared' || didRemoveFiles) {
         resetCurrentAction();
         setErrorMessages([]);
         return;
