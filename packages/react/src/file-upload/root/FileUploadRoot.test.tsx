@@ -1207,6 +1207,68 @@ describe('FileUpload', () => {
 
       expect(onFilesChange.mock.calls[onFilesChange.mock.calls.length - 1][0]).toHaveLength(5);
     });
+
+    it('fills remaining slots with later valid files when earlier files are rejected', async () => {
+      const onFilesChange = vi.fn();
+      const onFileReject = vi.fn();
+
+      render(
+        <FileUpload.Root
+          maxFiles={3}
+          maxSize={1024}
+          multiple
+          onFilesChange={onFilesChange}
+          onFileReject={onFileReject}
+        >
+          {null}
+        </FileUpload.Root>,
+      );
+
+      const input = getFileInput();
+
+      fireEvent.change(input, {
+        target: {
+          files: [new File(['ok'], 'existing.txt', { type: 'text/plain' })],
+        },
+      });
+
+      await waitFor(() => {
+        expect(onFilesChange).toHaveBeenCalledWith(
+          expect.arrayContaining([expect.objectContaining({ name: 'existing.txt' })]),
+          expect.objectContaining({ reason: expect.any(String) }),
+        );
+      });
+
+      onFilesChange.mockClear();
+
+      const oversized = new File([new Uint8Array(2048)], 'too-large.txt', { type: 'text/plain' });
+      const validA = new File(['a'], 'valid-a.txt', { type: 'text/plain' });
+      const validB = new File(['b'], 'valid-b.txt', { type: 'text/plain' });
+
+      fireEvent.change(input, {
+        target: {
+          files: [oversized, validA, validB],
+        },
+      });
+
+      await waitFor(() => {
+        const latestFiles = onFilesChange.mock.calls.at(-1)?.[0] ?? [];
+        expect(latestFiles).toHaveLength(3);
+        expect(latestFiles).toEqual(
+          expect.arrayContaining([
+            expect.objectContaining({ name: 'existing.txt' }),
+            expect.objectContaining({ name: 'valid-a.txt' }),
+            expect.objectContaining({ name: 'valid-b.txt' }),
+          ]),
+        );
+      });
+
+      expect(onFileReject).toHaveBeenCalledWith(
+        expect.objectContaining({ name: 'too-large.txt' }),
+        'FILE_TOO_LARGE',
+        expect.objectContaining({ reason: 'FILE_TOO_LARGE' }),
+      );
+    });
   });
 
   describe('onFilesChange callback', () => {

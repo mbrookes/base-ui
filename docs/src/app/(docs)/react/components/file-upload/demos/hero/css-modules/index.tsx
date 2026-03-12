@@ -5,6 +5,7 @@ import { UploadCloud, X, CheckCircle2, AlertCircle } from 'lucide-react';
 import { FileUpload } from '@base-ui/react/file-upload';
 import { Progress } from '@base-ui/react/progress';
 import styles from './index.module.css';
+import { useUploadRejectionMessages } from '../useUploadRejectionMessages';
 
 function formatBytes(bytes?: number) {
   if (bytes === undefined || bytes === null) {
@@ -95,8 +96,7 @@ function FilePreviewItems() {
 }
 
 export default function FileUploadDemo() {
-  const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
-  const previousFileCountRef = React.useRef(0);
+  const { errorMessages, handleFilesChange, handleFileReject } = useUploadRejectionMessages();
 
   return (
     <div className={styles.container}>
@@ -110,17 +110,8 @@ export default function FileUploadDemo() {
         maxSize={5 * 1024 * 1024}
         accept="image/png, image/jpeg, image/gif"
         multiple
-        onFilesChange={(files, eventDetails) => {
-          const previousFileCount = previousFileCountRef.current;
-          previousFileCountRef.current = files.length;
-
-          if (eventDetails.reason === 'file-added' && files.length > previousFileCount) {
-            setErrorMessage(null);
-          }
-        }}
-        onFileReject={(_, __, details) => {
-          setErrorMessage(details.message);
-        }}
+        onFilesChange={handleFilesChange}
+        onFileReject={handleFileReject}
       >
         <FileUpload.Dropzone className={styles.dropzone}>
           {({ isDragging }) => (
@@ -141,10 +132,12 @@ export default function FileUploadDemo() {
           <FilePreviewItems />
         </FileUpload.PreviewList>
 
-        {errorMessage ? (
-          <p role="alert" className={styles.errorMessage}>
-            {errorMessage}
-          </p>
+        {errorMessages.length > 0 ? (
+          <ul role="alert" className={styles.errorMessageList}>
+            {errorMessages.map((message) => (
+              <li key={message}>{message}</li>
+            ))}
+          </ul>
         ) : null}
       </FileUpload.Root>
     </div>

@@ -2,23 +2,7 @@
 
 import * as React from 'react';
 import { FileUpload } from '@base-ui/react/file-upload';
-import { useTimeout } from '@base-ui/utils/useTimeout';
-
-function RejectionMessage({ reason }: { reason?: string }) {
-  if (reason === 'FILE_TOO_LARGE') {
-    return <p>File is too large. Maximum size is 2MB.</p>;
-  }
-
-  if (reason === 'MIME_TYPE_NOT_ALLOWED') {
-    return <p>File type not allowed. Only images are accepted.</p>;
-  }
-
-  if (reason === 'FILE_TOO_SMALL') {
-    return <p>File is too small. Minimum size is 1KB.</p>;
-  }
-
-  return <p>File was rejected.</p>;
-}
+import { useValidationRejectionMessages } from '../useValidationRejectionMessages';
 
 function FileList() {
   const { files, removeFile } = FileUpload.useFileUploadContext();
@@ -54,11 +38,7 @@ function FileList() {
 }
 
 export default function FileUploadValidationTailwindDemo() {
-  const rejectionTimeout = useTimeout();
-  const [rejectedFile, setRejectedFile] = React.useState<{
-    file: File;
-    reason: string;
-  } | null>(null);
+  const { errorMessages, handleFilesChange, handleFileReject } = useValidationRejectionMessages();
 
   return (
     <div className="space-y-3">
@@ -67,11 +47,8 @@ export default function FileUploadValidationTailwindDemo() {
         maxSize={2 * 1024 * 1024}
         minSize={1024}
         maxFiles={5}
-        onFileReject={(file, reason) => {
-          setRejectedFile({ file, reason });
-          rejectionTimeout.clear();
-          rejectionTimeout.start(4000, () => setRejectedFile(null));
-        }}
+        onFilesChange={handleFilesChange}
+        onFileReject={handleFileReject}
       >
         <div className="flex items-center justify-between gap-3">
           <FileUpload.Trigger
@@ -88,15 +65,13 @@ export default function FileUploadValidationTailwindDemo() {
         <FileList />
       </FileUpload.Root>
 
-      {rejectedFile && (
-        <div
-          className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700"
-          role="alert"
-        >
-          <strong>Rejected: {rejectedFile.file.name}</strong>
-          <RejectionMessage reason={rejectedFile.reason} />
-        </div>
-      )}
+      {errorMessages.length > 0 ? (
+        <ul role="alert" className="list-disc space-y-1 rounded-md border border-red-200 bg-red-50 px-7 py-3 text-sm text-red-700">
+          {errorMessages.map((message) => (
+            <li key={message}>{message}</li>
+          ))}
+        </ul>
+      ) : null}
     </div>
   );
 }

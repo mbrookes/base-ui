@@ -228,14 +228,20 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
       return;
     }
 
-    const candidates = multiple ? newFiles.slice(0, remainingSlots) : [newFiles[0]];
+    const candidates = multiple ? newFiles : [newFiles[0]];
     const validFiles: FileUploadRootExtendedFile[] = [];
     const errors: string[] = [];
 
-    const overflowFiles = multiple ? newFiles.slice(remainingSlots) : newFiles.slice(1);
-    if (overflowFiles.length > 0) {
-      const maxFilesReachedMessage = messages.maxFilesReached(maxFiles);
-      overflowFiles.forEach((file) => {
+    const existingKeys = new Set(prev.map(getFileKey));
+    const maxFilesReachedMessage = messages.maxFilesReached(maxFiles);
+    let acceptedCount = 0;
+
+    candidates.forEach((file) => {
+      if (!file) {
+        return;
+      }
+
+      if (acceptedCount >= remainingSlots) {
         const eventDetails = createChangeEventDetails<
           FileUploadRootRejectReason,
           { message: string }
@@ -243,12 +249,9 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
 
         onFileReject?.(file, 'MAX_FILES_REACHED', eventDetails);
         errors.push(`${file.name}: ${maxFilesReachedMessage}`);
-      });
-    }
+        return;
+      }
 
-    const existingKeys = new Set(prev.map(getFileKey));
-
-    candidates.forEach((file) => {
       const fileKey = getFileKey(file);
       if (existingKeys.has(fileKey)) {
         const eventDetails = createChangeEventDetails<
@@ -284,6 +287,7 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
         }) as FileUploadRootExtendedFile;
 
         validFiles.push(extendedFile);
+        acceptedCount += 1;
       }
     });
 

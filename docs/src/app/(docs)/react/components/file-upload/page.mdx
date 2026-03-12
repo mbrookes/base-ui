@@ -17,7 +17,7 @@ import { DemoFileUploadValidation } from './demos/validation';
 ## Usage guidelines
 
 - **Ideal for custom workflows**: Perfect for applications that need specific upload flows, preview displays, validation feedback, or integration with custom upload services.
-- **No built-in upload**: File Upload handles file selection and validation only. **You must implement the actual file upload** using fetch, axios, or your HTTP client. See [Uploading Files](#uploading-files) below.
+- **No built-in upload**: File Upload handles file selection and validation only. You must implement the actual file upload using fetch, axios, or your HTTP client. See [Uploading Files](#uploading-files) below.
 - **Form controls must have an accessible name**: Ensure file upload dropzones and triggers are properly labeled. Use the [`Field` component](/react/components/field) or native `<label>` elements for accessibility.
 
 ## Anatomy
@@ -98,7 +98,7 @@ export default function App() {
 
 Control which files are accepted using `accept`, `maxSize`, `minSize`, and `maxFiles` props:
 
-```jsx title="File validation" "accept" "maxSize" "maxFiles"
+```jsx title="File validation" "accept" "maxSize" "minsize" "maxFiles"
 <FileUpload.Root
   accept="image/png, image/jpeg, .pdf"
   maxSize={10 * 1024 * 1024}
@@ -117,7 +117,7 @@ Control which files are accepted using `accept`, `maxSize`, `minSize`, and `maxF
 
 - `accept` mirrors the native file input: use MIME types like `image/png` or file extensions like `.png`.
 - File extensions are matched against the file name (case-insensitive).
-- For image previews, always provide meaningful `alt` text on preview images for screen reader users.
+- For image previews, always provide meaningful `alt` text for screen reader users.
 - File size limits are in bytes. The example above limits files to 10MB and a minimum of 1KB.
 
 ### Custom validation
