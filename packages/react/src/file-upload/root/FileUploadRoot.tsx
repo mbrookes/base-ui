@@ -133,7 +133,7 @@ export interface FileUploadRootParameters {
   /**
    * Callback when files are added or removed.
    */
-  onFilesChange?:
+  onFileChange?:
     | ((
         files: FileUploadRootExtendedFile[],
         eventDetails: FileUploadRootChangeEventDetails,
@@ -229,7 +229,7 @@ export interface FileUploadRootProps
  * @component
  * @example
  * ```tsx
- * <FileUpload.Root accept="image/*" maxSize={5242880} onFilesChange={handleFilesChange}>
+ * <FileUpload.Root accept="image/*" maxSize={5242880} onFileChange={handleFileChange}>
  *   <FileUpload.Dropzone>Drop files here</FileUpload.Dropzone>
  *   <FileUpload.PreviewList>
  *     {files.map(file => <FileUpload.PreviewItem key={file.id} file={file} />)}
@@ -245,7 +245,7 @@ export interface FileUploadRootProps
  * @param multiple - Allow multiple file selection (default: true)
  * @param directory - Allow selecting directories (default: false)
  * @param disabled - Disable file upload (default: false)
- * @param onFilesChange - Callback when files are added/removed
+ * @param onFileChange - Callback when files are added/removed
  * @param onFileReject - Callback when a file is rejected (`reason` + `eventDetails`)
  * @param onCancel - Callback when the file dialog is canceled
  * @param onRetry - Callback when a file retry is initiated
@@ -266,7 +266,7 @@ export const FileUploadRoot = React.forwardRef<HTMLDivElement, FileUploadRootPro
       multiple,
       directory,
       disabled,
-      onFilesChange,
+      onFileChange,
       onFileReject,
       onCancel,
       onRetry,
@@ -292,7 +292,7 @@ export const FileUploadRoot = React.forwardRef<HTMLDivElement, FileUploadRootPro
       multiple,
       directory,
       disabled,
-      onFilesChange,
+      onFileChange,
       onFileReject,
       onCancel,
       onRetry,

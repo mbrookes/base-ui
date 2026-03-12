@@ -408,10 +408,10 @@ describe('FileUpload.Dropzone', () => {
 
   describe('Drop event with actual files', () => {
     it('handles drop event with dataTransfer.files', () => {
-      const onFilesChange = vi.fn();
+      const onFileChange = vi.fn();
 
       render(
-        <FileUpload.Root onFilesChange={onFilesChange}>
+        <FileUpload.Root onFileChange={onFileChange}>
           <FileUpload.Dropzone data-testid="dropzone">Drop files</FileUpload.Dropzone>
         </FileUpload.Root>,
       );
@@ -426,17 +426,17 @@ describe('FileUpload.Dropzone', () => {
         dataTransfer,
       });
 
-      expect(onFilesChange).toHaveBeenCalledWith(
+      expect(onFileChange).toHaveBeenCalledWith(
         expect.arrayContaining([expect.objectContaining({ name: 'test.txt' })]),
         expect.objectContaining({ reason: expect.any(String) }),
       );
     });
 
     it('handles drop with multiple files', () => {
-      const onFilesChange = vi.fn();
+      const onFileChange = vi.fn();
 
       render(
-        <FileUpload.Root onFilesChange={onFilesChange}>
+        <FileUpload.Root onFileChange={onFileChange}>
           <FileUpload.Dropzone data-testid="dropzone">Drop files</FileUpload.Dropzone>
         </FileUpload.Root>,
       );
@@ -452,7 +452,7 @@ describe('FileUpload.Dropzone', () => {
         dataTransfer,
       });
 
-      expect(onFilesChange).toHaveBeenCalledWith(
+      expect(onFileChange).toHaveBeenCalledWith(
         expect.arrayContaining([
           expect.objectContaining({ name: 'file1.txt' }),
           expect.objectContaining({ name: 'file2.txt' }),
@@ -575,10 +575,10 @@ describe('FileUpload.Dropzone', () => {
 
   describe('Full drag-drop workflow', () => {
     it('completes full dragEnter → dragOver → drop sequence', () => {
-      const onFilesChange = vi.fn();
+      const onFileChange = vi.fn();
 
       render(
-        <FileUpload.Root onFilesChange={onFilesChange}>
+        <FileUpload.Root onFileChange={onFileChange}>
           <FileUpload.Dropzone data-testid="dropzone">
             {({ isDragging }) => <div data-testid="state">{isDragging ? 'dragging' : 'idle'}</div>}
           </FileUpload.Dropzone>
@@ -606,7 +606,7 @@ describe('FileUpload.Dropzone', () => {
         dataTransfer,
       });
 
-      expect(onFilesChange).toHaveBeenCalledWith(
+      expect(onFileChange).toHaveBeenCalledWith(
         expect.arrayContaining([expect.objectContaining({ name: 'file.txt' })]),
         expect.objectContaining({ reason: expect.any(String) }),
       );
@@ -636,10 +636,10 @@ describe('FileUpload.Dropzone', () => {
     });
 
     it('rejects drop when disabled', () => {
-      const onFilesChange = vi.fn();
+      const onFileChange = vi.fn();
 
       render(
-        <FileUpload.Root onFilesChange={onFilesChange} disabled>
+        <FileUpload.Root onFileChange={onFileChange} disabled>
           <FileUpload.Dropzone data-testid="dropzone">Drop files</FileUpload.Dropzone>
         </FileUpload.Root>,
       );
@@ -652,7 +652,7 @@ describe('FileUpload.Dropzone', () => {
         dataTransfer,
       });
 
-      expect(onFilesChange).not.toHaveBeenCalled();
+      expect(onFileChange).not.toHaveBeenCalled();
     });
   });
 });

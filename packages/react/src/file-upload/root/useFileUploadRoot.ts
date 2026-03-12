@@ -91,7 +91,7 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
     multiple = true,
     directory = false,
     disabled = false,
-    onFilesChange,
+    onFileChange,
     onFileReject,
     onCancel,
     onRetry,
@@ -154,8 +154,8 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
       lastChangeReasonRef.current,
       lastChangeEventRef.current,
     );
-    onFilesChange?.(files, eventDetails);
-  }, [files, onFilesChange]);
+    onFileChange?.(files, eventDetails);
+  }, [files, onFileChange]);
 
   const validateFile = useStableCallback((file: File): ValidationResult => {
     const hasMaxSizeLimit = Number.isFinite(maxSize);

@@ -131,7 +131,7 @@ describe('FileUpload.PreviewList', () => {
       const [files, setFiles] = React.useState<any[]>([]);
 
       return (
-        <FileUpload.Root onFilesChange={setFiles}>
+        <FileUpload.Root onFileChange={setFiles}>
           <FileUpload.PreviewList data-testid="preview-list">
             {files.map((file) => (
               <FileUpload.PreviewItem key={file.id} file={file}>

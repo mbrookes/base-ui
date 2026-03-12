@@ -68,9 +68,9 @@ export default function App() {
 
 ### Controlled state
 
-Control file state using `onFilesChange` callback:
+Control file state using `onFileChange` callback:
 
-```jsx title="Handling file changes" "onFilesChange"
+```jsx title="Handling file changes" "onFileChange"
 import * as React from 'react';
 import { FileUpload } from '@base-ui/react/file-upload';
 
@@ -79,7 +79,7 @@ export default function App() {
 
   return (
     <FileUpload.Root
-      onFilesChange={(newFiles) => {
+      onFileChange={(newFiles) => {
         setFiles(newFiles);
       }}
     >
@@ -200,7 +200,7 @@ The `constraints` object supports:
 }
 ```
 
-Use these helpers in your async upload pipeline (for example in `onFilesChange` or before submitting to your backend). Even with client-side checks, always validate again on the server.
+Use these helpers in your async upload pipeline (for example in `onFileChange` or before submitting to your backend). Even with client-side checks, always validate again on the server.
 
 ### Drag and drop state
 
@@ -1071,7 +1071,7 @@ export default function FileUploadWithAnnouncements() {
 
   return (
     <FileUpload.Root
-      onFilesChange={(files) => {
+      onFileChange={(files) => {
         setAnnouncement(`${files.length} file(s) selected`);
       }}
     >
@@ -1119,7 +1119,7 @@ This design follows Base UI's philosophy of minimal, focused components.
 
 ### How do I integrate with my backend?
 
-See the [Uploading Files](#uploading-files) section above. Use `fetch`, `axios`, or any HTTP client with the `onFilesChange` callback to send files when ready.
+See the [Uploading Files](#uploading-files) section above. Use `fetch`, `axios`, or any HTTP client with the `onFileChange` callback to send files when ready.
 
 ### Can I crop or resize images?
 

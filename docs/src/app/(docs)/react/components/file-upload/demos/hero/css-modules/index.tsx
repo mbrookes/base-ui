@@ -110,7 +110,7 @@ export default function FileUploadDemo() {
         maxSize={5 * 1024 * 1024}
         accept="image/png, image/jpeg, image/gif"
         multiple
-        onFilesChange={handleFileChange}
+        onFileChange={handleFileChange}
         onFileReject={handleFileReject}
       >
         <FileUpload.Dropzone className={styles.dropzone}>

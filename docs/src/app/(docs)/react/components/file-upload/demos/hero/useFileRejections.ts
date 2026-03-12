@@ -1,7 +1,7 @@
 import * as React from 'react';
 import type { FileUploadRootProps } from '@base-ui/react/file-upload';
 
-type OnFilesChange = NonNullable<FileUploadRootProps['onFilesChange']>;
+type OnFileChange = NonNullable<FileUploadRootProps['onFileChange']>;
 type OnFileReject = NonNullable<FileUploadRootProps['onFileReject']>;
 
 const formatFileMessage = (fileName: string, message: string) => {
@@ -25,7 +25,7 @@ export function useFileRejections() {
     currentActionEventRef.current = undefined;
   }, []);
 
-  const handleFileChange = React.useCallback<OnFilesChange>(
+  const handleFileChange = React.useCallback<OnFileChange>(
     (files, eventDetails) => {
       const didAddFiles =
         eventDetails.reason === 'file-added' && files.length > previousFileCountRef.current;

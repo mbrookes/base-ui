@@ -46,7 +46,7 @@ export default function FileUploadValidationDemo() {
         maxSize={2 * 1024 * 1024}
         minSize={1024}
         maxFiles={5}
-        onFilesChange={handleFileChange}
+        onFileChange={handleFileChange}
         onFileReject={handleFileReject}
       >
         <div className={styles.footer}>

@@ -47,6 +47,11 @@
       "description": "Callback when the file dialog is canceled.",
       "detailedType": "(() => void) | undefined"
     },
+    "onFileChange": {
+      "type": "((files: FileUpload.Root.ExtendedFile[], eventDetails: FileUpload.Root.ChangeEventDetails) => void)",
+      "description": "Callback when files are added or removed.",
+      "detailedType": "| ((\n    files: FileUpload.Root.ExtendedFile[],\n    eventDetails: FileUpload.Root.ChangeEventDetails,\n  ) => void)\n| undefined"
+    },
     "onFilePause": {
       "type": "((file: FileUpload.Root.ExtendedFile) => void)",
       "description": "Callback when a file upload is paused.",
@@ -61,11 +66,6 @@
       "type": "((file: FileUpload.Root.ExtendedFile) => void)",
       "description": "Callback when a paused file upload is resumed.",
       "detailedType": "| ((file: FileUpload.Root.ExtendedFile) => void)\n| undefined"
-    },
-    "onFilesChange": {
-      "type": "((files: FileUpload.Root.ExtendedFile[], eventDetails: FileUpload.Root.ChangeEventDetails) => void)",
-      "description": "Callback when files are added or removed.",
-      "detailedType": "| ((\n    files: FileUpload.Root.ExtendedFile[],\n    eventDetails: FileUpload.Root.ChangeEventDetails,\n  ) => void)\n| undefined"
     },
     "onRetry": {
       "type": "((file: FileUpload.Root.ExtendedFile) => void)",

@@ -74,7 +74,7 @@ describe('FileUpload.PreviewItem', () => {
   });
 
   it('provides onRemove callback through context', async () => {
-    const onFilesChange = vi.fn();
+    const onFileChange = vi.fn();
 
     function TestChild() {
       const { file, onRemove } = useFileUploadPreviewItem();
@@ -99,7 +99,7 @@ describe('FileUpload.PreviewItem', () => {
     }
 
     render(
-      <FileUpload.Root onFilesChange={onFilesChange}>
+      <FileUpload.Root onFileChange={onFileChange}>
         <PreviewListWithFiles />
       </FileUpload.Root>,
     );
@@ -112,9 +112,9 @@ describe('FileUpload.PreviewItem', () => {
       expect(screen.getByRole('button', { name: /Remove test.txt/ })).toBeInTheDocument();
     });
 
-    // onFilesChange should have been called once with the uploaded file
-    expect(onFilesChange).toHaveBeenCalledTimes(1);
-    const firstCall = onFilesChange.mock.calls[0][0];
+    // onFileChange should have been called once with the uploaded file
+    expect(onFileChange).toHaveBeenCalledTimes(1);
+    const firstCall = onFileChange.mock.calls[0][0];
     expect(firstCall).toHaveLength(1);
     expect(firstCall[0].name).toBe('test.txt');
 
@@ -122,9 +122,9 @@ describe('FileUpload.PreviewItem', () => {
     await userEvent.click(removeButton);
 
     await waitFor(() => {
-      // After removal, onFilesChange should be called with empty array
-      expect(onFilesChange).toHaveBeenCalledTimes(2);
-      const secondCall = onFilesChange.mock.calls[1][0];
+      // After removal, onFileChange should be called with empty array
+      expect(onFileChange).toHaveBeenCalledTimes(2);
+      const secondCall = onFileChange.mock.calls[1][0];
       expect(secondCall).toHaveLength(0);
     });
   });
