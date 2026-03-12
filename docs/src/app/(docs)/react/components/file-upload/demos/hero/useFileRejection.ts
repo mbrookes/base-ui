@@ -4,19 +4,17 @@ import type { FileUploadRootProps } from '@base-ui/react/file-upload';
 type OnFileChange = NonNullable<FileUploadRootProps['onFileChange']>;
 type OnFileReject = NonNullable<FileUploadRootProps['onFileReject']>;
 
-const formatFileMessage = (fileName: string, reason: string, message: string) => {
-  const readableMessage =
-    reason === 'MIME_TYPE_NOT_ALLOWED' ? 'File type not allowed. Only images are accepted.' : message;
-
+const formatFileMessage = (fileName: string, message: string) => {
   const prefix = `${fileName}: `;
-  if (readableMessage.startsWith(prefix)) {
-    return readableMessage;
+
+  if (message.startsWith(prefix)) {
+    return message;
   }
 
-  return `${fileName}: ${readableMessage}`;
+  return `${fileName}: ${message}`;
 };
 
-export function useFileRejections() {
+export function useFileRejection() {
   const [errorMessages, setErrorMessages] = React.useState<string[]>([]);
   const previousFileCountRef = React.useRef(0);
   const currentActionEventRef = React.useRef<Event | undefined>(undefined);
@@ -54,13 +52,13 @@ export function useFileRejections() {
     [resetCurrentAction],
   );
 
-  const handleFileReject = React.useCallback<OnFileReject>((file, reason, eventDetails) => {
+  const handleFileReject = React.useCallback<OnFileReject>((file, _reason, eventDetails) => {
     if (eventDetails.event !== currentActionEventRef.current) {
       currentActionEventRef.current = eventDetails.event;
       currentActionMessagesRef.current = [];
     }
 
-    const message = formatFileMessage(file.name, reason, eventDetails.message);
+    const message = formatFileMessage(file.name, eventDetails.message);
     if (!currentActionMessagesRef.current.includes(message)) {
       currentActionMessagesRef.current = [...currentActionMessagesRef.current, message];
       setErrorMessages([...currentActionMessagesRef.current]);

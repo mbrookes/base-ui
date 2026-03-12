@@ -5,7 +5,7 @@ import { UploadCloud, X, CheckCircle2, AlertCircle } from 'lucide-react';
 import { FileUpload } from '@base-ui/react/file-upload';
 import { Progress } from '@base-ui/react/progress';
 import styles from './index.module.css';
-import { useFileRejections } from '../useFileRejections';
+import { useFileRejection } from '../useFileRejection';
 
 function formatBytes(bytes?: number) {
   if (bytes === undefined || bytes === null) {
@@ -96,7 +96,7 @@ function FilePreviewItems() {
 }
 
 export default function FileUploadDemo() {
-  const { errorMessages, handleFileChange, handleFileReject } = useFileRejections();
+  const { errorMessages, handleFileChange, handleFileReject } = useFileRejection();
 
   return (
     <div className={styles.container}>

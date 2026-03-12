@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { FileUpload } from '@base-ui/react/file-upload';
-import { useFileRejections } from '../useFileRejections';
+import { useFileRejection } from '../useFileRejection';
 
 function FileList() {
   const { files, removeFile } = FileUpload.useFileUploadContext();
@@ -38,7 +38,7 @@ function FileList() {
 }
 
 export default function FileUploadValidationTailwindDemo() {
-  const { errorMessages, handleFileChange, handleFileReject } = useFileRejections();
+  const { errorMessages, handleFileChange, handleFileReject } = useFileRejection();
 
   return (
     <div className="space-y-3">
