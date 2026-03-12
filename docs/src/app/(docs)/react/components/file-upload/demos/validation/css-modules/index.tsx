@@ -3,7 +3,7 @@
 import * as React from 'react';
 import { FileUpload } from '@base-ui/react/file-upload';
 import styles from './index.module.css';
-import { useValidationRejectionMessages } from '../useValidationRejectionMessages';
+import { useFileRejections } from '../useFileRejections';
 
 function FileList() {
   const { files, removeFile } = FileUpload.useFileUploadContext();
@@ -37,7 +37,7 @@ function FileList() {
 }
 
 export default function FileUploadValidationDemo() {
-  const { errorMessages, handleFilesChange, handleFileReject } = useValidationRejectionMessages();
+  const { errorMessages, handleFileChange, handleFileReject } = useFileRejections();
 
   return (
     <div className={styles.root}>
@@ -46,7 +46,7 @@ export default function FileUploadValidationDemo() {
         maxSize={2 * 1024 * 1024}
         minSize={1024}
         maxFiles={5}
-        onFilesChange={handleFilesChange}
+        onFilesChange={handleFileChange}
         onFileReject={handleFileReject}
       >
         <div className={styles.footer}>

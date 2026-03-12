@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { FileUpload } from '@base-ui/react/file-upload';
-import { useValidationRejectionMessages } from '../useValidationRejectionMessages';
+import { useFileRejections } from '../useFileRejections';
 
 function FileList() {
   const { files, removeFile } = FileUpload.useFileUploadContext();
@@ -38,7 +38,7 @@ function FileList() {
 }
 
 export default function FileUploadValidationTailwindDemo() {
-  const { errorMessages, handleFilesChange, handleFileReject } = useValidationRejectionMessages();
+  const { errorMessages, handleFileChange, handleFileReject } = useFileRejections();
 
   return (
     <div className="space-y-3">
@@ -47,7 +47,7 @@ export default function FileUploadValidationTailwindDemo() {
         maxSize={2 * 1024 * 1024}
         minSize={1024}
         maxFiles={5}
-        onFilesChange={handleFilesChange}
+        onFilesChange={handleFileChange}
         onFileReject={handleFileReject}
       >
         <div className="flex items-center justify-between gap-3">

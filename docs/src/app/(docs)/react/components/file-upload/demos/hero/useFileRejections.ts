@@ -14,7 +14,7 @@ const formatFileMessage = (fileName: string, message: string) => {
   return `${fileName}: ${message}`;
 };
 
-export function useUploadRejectionMessages() {
+export function useFileRejections() {
   const [errorMessages, setErrorMessages] = React.useState<string[]>([]);
   const previousFileCountRef = React.useRef(0);
   const currentActionEventRef = React.useRef<Event | undefined>(undefined);
@@ -25,7 +25,7 @@ export function useUploadRejectionMessages() {
     currentActionEventRef.current = undefined;
   }, []);
 
-  const handleFilesChange = React.useCallback<OnFilesChange>(
+  const handleFileChange = React.useCallback<OnFilesChange>(
     (files, eventDetails) => {
       const didAddFiles =
         eventDetails.reason === 'file-added' && files.length > previousFileCountRef.current;
@@ -67,7 +67,7 @@ export function useUploadRejectionMessages() {
 
   return {
     errorMessages,
-    handleFilesChange,
+    handleFileChange,
     handleFileReject,
   };
 }

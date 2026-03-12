@@ -16,7 +16,7 @@ const formatFileMessage = (fileName: string, reason: string, message: string) =>
   return `${fileName}: ${readableMessage}`;
 };
 
-export function useValidationRejectionMessages() {
+export function useFileRejections() {
   const [errorMessages, setErrorMessages] = React.useState<string[]>([]);
   const previousFileCountRef = React.useRef(0);
   const currentActionEventRef = React.useRef<Event | undefined>(undefined);
@@ -27,7 +27,7 @@ export function useValidationRejectionMessages() {
     currentActionEventRef.current = undefined;
   }, []);
 
-  const handleFilesChange = React.useCallback<OnFilesChange>(
+  const handleFileChange = React.useCallback<OnFilesChange>(
     (files, eventDetails) => {
       const didAddFiles =
         eventDetails.reason === 'file-added' && files.length > previousFileCountRef.current;
@@ -69,7 +69,7 @@ export function useValidationRejectionMessages() {
 
   return {
     errorMessages,
-    handleFilesChange,
+    handleFileChange,
     handleFileReject,
   };
 }

@@ -4,7 +4,7 @@ import * as React from 'react';
 import { UploadCloud, X, CheckCircle2, AlertCircle } from 'lucide-react';
 import { FileUpload } from '@base-ui/react/file-upload';
 import { Progress } from '@base-ui/react/progress';
-import { useUploadRejectionMessages } from '../useUploadRejectionMessages';
+import { useFileRejections } from '../useFileRejections';
 
 function formatBytes(bytes?: number) {
   if (bytes === undefined || bytes === null) {
@@ -99,7 +99,7 @@ function FilePreviewItems() {
 }
 
 export default function FileUploadDemo() {
-  const { errorMessages, handleFilesChange, handleFileReject } = useUploadRejectionMessages();
+  const { errorMessages, handleFileChange, handleFileReject } = useFileRejections();
 
   return (
     <div className="w-full rounded-xl border border-gray-200 bg-white p-8 shadow-sm">
@@ -113,7 +113,7 @@ export default function FileUploadDemo() {
         maxSize={5 * 1024 * 1024}
         accept="image/png, image/jpeg, image/gif"
         multiple
-        onFilesChange={handleFilesChange}
+        onFilesChange={handleFileChange}
         onFileReject={handleFileReject}
       >
         <FileUpload.Dropzone className="group relative mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10 transition-colors hover:bg-gray-50 hover:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 data-[dragging=true]:border-blue-500 data-[dragging=true]:bg-blue-50">
