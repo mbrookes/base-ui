@@ -1246,6 +1246,73 @@ describe('FileUpload', () => {
         expect.objectContaining({ reason: 'FILE_TOO_LARGE' }),
       );
     });
+
+    it('does not exceed maxFiles when addFiles is called concurrently before a render', async () => {
+      // Both addFiles calls happen in the same act() before React commits, so
+      // filesRef.current is stale for the second call. The setFiles updater must
+      // re-check latestPrev.length to keep the maxFiles invariant.
+      let contextValue: TestFileUploadContext | null = null;
+
+      function TestComponent() {
+        const ctx = FileUpload.useFileUploadContext();
+        contextValue = ctx as unknown as TestFileUploadContext;
+        return null;
+      }
+
+      render(
+        <FileUpload.Root maxFiles={3} multiple>
+          <TestComponent />
+        </FileUpload.Root>,
+      );
+
+      const fileA = new File(['a'], 'a.txt', { type: 'text/plain' });
+      const fileB = new File(['b'], 'b.txt', { type: 'text/plain' });
+      const fileC = new File(['c'], 'c.txt', { type: 'text/plain' });
+      const fileD = new File(['d'], 'd.txt', { type: 'text/plain' });
+
+      // Call addFiles twice in one act() so both run before React commits state.
+      // First call adds [a, b], second call adds [c, d].
+      // Without the cap in the updater both would see remainingSlots = 3 and
+      // collectively add 4 files, exceeding maxFiles.
+      act(() => {
+        getTestContext(contextValue).addFiles([fileA, fileB]);
+        getTestContext(contextValue).addFiles([fileC, fileD]);
+      });
+
+      await waitFor(() => {
+        expect(getTestContext(contextValue).files.length).toBeLessThanOrEqual(3);
+      });
+    });
+
+    it('accepts all files when concurrent addFiles calls together stay within maxFiles', async () => {
+      let contextValue: TestFileUploadContext | null = null;
+
+      function TestComponent() {
+        const ctx = FileUpload.useFileUploadContext();
+        contextValue = ctx as unknown as TestFileUploadContext;
+        return null;
+      }
+
+      render(
+        <FileUpload.Root maxFiles={4} multiple>
+          <TestComponent />
+        </FileUpload.Root>,
+      );
+
+      const fileA = new File(['a'], 'a.txt', { type: 'text/plain' });
+      const fileB = new File(['b'], 'b.txt', { type: 'text/plain' });
+      const fileC = new File(['c'], 'c.txt', { type: 'text/plain' });
+
+      // Two concurrent calls that together add 3 files, which is within maxFiles=4.
+      act(() => {
+        getTestContext(contextValue).addFiles([fileA, fileB]);
+        getTestContext(contextValue).addFiles([fileC]);
+      });
+
+      await waitFor(() => {
+        expect(getTestContext(contextValue).files).toHaveLength(3);
+      });
+    });
   });
 
   describe('onFileChange callback', () => {
