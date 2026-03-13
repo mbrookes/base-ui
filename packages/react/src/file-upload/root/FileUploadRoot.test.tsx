@@ -1316,6 +1316,47 @@ describe('FileUpload', () => {
   });
 
   describe('onFileChange callback', () => {
+    it('calls onFileChange with reason file-updated when updateFile is called', async () => {
+      const onFileChange = vi.fn();
+      let contextValue: TestFileUploadContext | null = null;
+
+      function TestComponent() {
+        const ctx = FileUpload.useFileUploadContext();
+        contextValue = ctx as unknown as TestFileUploadContext;
+        return null;
+      }
+
+      render(
+        <FileUpload.Root onFileChange={onFileChange}>
+          <TestComponent />
+        </FileUpload.Root>,
+      );
+
+      const input = getFileInput();
+      const file = new File(['content'], 'test.txt', { type: 'text/plain' });
+
+      fireEvent.change(input, { target: { files: [file] } });
+
+      await waitFor(() => {
+        expect(getTestContext(contextValue).files).toHaveLength(1);
+      });
+
+      onFileChange.mockClear();
+
+      const fileId = getTestContext(contextValue).files[0].id;
+
+      act(() => {
+        getTestContext(contextValue).updateFile(fileId, { status: 'uploading', progress: 50 });
+      });
+
+      await waitFor(() => {
+        expect(onFileChange).toHaveBeenCalledWith(
+          expect.arrayContaining([expect.objectContaining({ name: 'test.txt', status: 'uploading', progress: 50 })]),
+          expect.objectContaining({ reason: 'file-updated' }),
+        );
+      });
+    });
+
     it('calls onFileChange when files are added', async () => {
       const onFileChange = vi.fn();
 

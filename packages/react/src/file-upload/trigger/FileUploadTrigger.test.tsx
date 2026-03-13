@@ -147,6 +147,22 @@ describe('FileUpload.Trigger', () => {
     expect(customClick).toHaveBeenCalled();
   });
 
+  it('calls custom onClick exactly once per click', async () => {
+    const user = userEvent.setup();
+    const customClick = vi.fn();
+    render(
+      <FileUpload.Root>
+        <FileUpload.Trigger onClick={customClick}>Upload</FileUpload.Trigger>
+      </FileUpload.Root>,
+    );
+
+    const button = screen.getByRole('button', { name: 'Upload' });
+
+    await user.click(button);
+
+    expect(customClick).toHaveBeenCalledTimes(1);
+  });
+
   it('renders children correctly', () => {
     render(
       <FileUpload.Root>
