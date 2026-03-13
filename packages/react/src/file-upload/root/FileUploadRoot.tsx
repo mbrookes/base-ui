@@ -7,7 +7,7 @@ import { visuallyHidden } from '@base-ui/utils/visuallyHidden';
 import { useRenderElement } from '../../utils/useRenderElement';
 import type { BaseUIComponentProps, HTMLProps } from '../../utils/types';
 import { resolveClassName } from '../../utils/resolveClassName';
-import { composeEventHandlers } from '../../utils/composeEventHandlers';
+import { composeEventHandlers } from '../utils/composeEventHandlers';
 import type { BaseUIChangeEventDetails } from '../../utils/createBaseUIEventDetails';
 import { FileUploadContext } from './FileUploadContext';
 import { fileUploadRootStateAttributesMapping } from './stateAttributesMapping';

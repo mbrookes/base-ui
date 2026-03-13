@@ -5,7 +5,7 @@ import { useStableCallback } from '@base-ui/utils/useStableCallback';
 import type { BaseUIComponentProps, NativeButtonProps } from '../../utils/types';
 import { useRenderElement } from '../../utils/useRenderElement';
 import { resolveClassName } from '../../utils/resolveClassName';
-import { composeEventHandlers } from '../../utils/composeEventHandlers';
+import { composeEventHandlers } from '../utils/composeEventHandlers';
 import { useFileUploadContext } from '../root/FileUploadContext';
 import { fileUploadTriggerStateAttributesMapping } from './stateAttributesMapping';
 
