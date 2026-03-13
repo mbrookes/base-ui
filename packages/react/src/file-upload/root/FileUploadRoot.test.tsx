@@ -57,6 +57,22 @@ const createClipboardData = (files: File[]) => {
   return dataTransfer;
 };
 
+const createDataTransfer = (files: File[]) => {
+  if (typeof DataTransfer === 'undefined') {
+    return { files } as unknown as DataTransfer;
+  }
+
+  const dataTransfer = new DataTransfer();
+  files.forEach((file) => {
+    dataTransfer.items.add(file);
+  });
+  Object.defineProperty(dataTransfer, 'files', {
+    value: files,
+    configurable: true,
+  });
+  return dataTransfer;
+};
+
 function getFileInput() {
   const input = document.querySelector('input[type="file"]');
 
@@ -159,6 +175,61 @@ describe('FileUpload', () => {
     fireEvent.dragEnter(dropzone);
 
     expect(dropzone).toHaveAttribute('data-dragging', '');
+  });
+
+  describe('preventBaseUIHandler', () => {
+    it('does not set dragging state when onDragEnter calls preventBaseUIHandler', () => {
+      const customDragEnter = vi.fn((event) => event.preventBaseUIHandler());
+      render(
+        <FileUpload.Root onDragEnter={customDragEnter}>
+          <FileUpload.Dropzone data-testid="dropzone">Drop files here</FileUpload.Dropzone>
+        </FileUpload.Root>,
+      );
+
+      const dropzone = screen.getByTestId('dropzone');
+      fireEvent.dragEnter(dropzone);
+
+      expect(customDragEnter).toHaveBeenCalled();
+      expect(dropzone).not.toHaveAttribute('data-dragging');
+    });
+
+    it('does not add files when onDrop calls preventBaseUIHandler', () => {
+      const onFileChange = vi.fn();
+      const customDrop = vi.fn((event) => event.preventBaseUIHandler());
+      render(
+        <FileUpload.Root onFileChange={onFileChange} onDrop={customDrop} data-testid="root">
+          <FileUpload.Dropzone data-testid="dropzone">Drop files here</FileUpload.Dropzone>
+        </FileUpload.Root>,
+      );
+
+      const dropzone = screen.getByTestId('dropzone');
+      const file = new File(['content'], 'test.txt', { type: 'text/plain' });
+      const dataTransfer = createDataTransfer([file]);
+
+      fireEvent.drop(dropzone, { dataTransfer });
+
+      expect(customDrop).toHaveBeenCalled();
+      expect(onFileChange).not.toHaveBeenCalled();
+    });
+
+    it('does not add files when onPaste calls preventBaseUIHandler', () => {
+      const onFileChange = vi.fn();
+      const customPaste = vi.fn((event) => event.preventBaseUIHandler());
+      render(
+        <FileUpload.Root onFileChange={onFileChange} onPaste={customPaste} data-testid="root">
+          <FileUpload.Dropzone>Drop files here</FileUpload.Dropzone>
+        </FileUpload.Root>,
+      );
+
+      const root = screen.getByTestId('root');
+      const file = new File(['content'], 'paste.txt', { type: 'text/plain' });
+      const clipboardData = createClipboardData([file]);
+
+      fireEvent.paste(root, { clipboardData });
+
+      expect(customPaste).toHaveBeenCalled();
+      expect(onFileChange).not.toHaveBeenCalled();
+    });
   });
 
   it('adds files when pasting files onto the root', async () => {

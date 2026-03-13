@@ -7,7 +7,6 @@ import { visuallyHidden } from '@base-ui/utils/visuallyHidden';
 import { useRenderElement } from '../../utils/useRenderElement';
 import type { BaseUIComponentProps, HTMLProps } from '../../utils/types';
 import { resolveClassName } from '../../utils/resolveClassName';
-import { composeEventHandlers } from '../utils/composeEventHandlers';
 import type { BaseUIChangeEventDetails } from '../../utils/createBaseUIEventDetails';
 import { FileUploadContext } from './FileUploadContext';
 import { fileUploadRootStateAttributesMapping } from './stateAttributesMapping';
@@ -252,11 +251,6 @@ export const FileUploadRoot = React.forwardRef<HTMLDivElement, FileUploadRootPro
       onFilePause,
       onFileResume,
       locale,
-      onPaste,
-      onDragEnter,
-      onDragLeave,
-      onDrop,
-      onDragOver,
       style,
       className,
       ...other
@@ -407,11 +401,11 @@ export const FileUploadRoot = React.forwardRef<HTMLDivElement, FileUploadRootPro
 
     const defaultProps: HTMLProps = {
       className: resolvedClassName,
-      onDragEnter: composeEventHandlers(onDragEnter, handleDragEnter),
-      onDragLeave: composeEventHandlers(onDragLeave, handleDragLeave),
-      onDrop: composeEventHandlers(onDrop, handleDrop),
-      onDragOver: composeEventHandlers(onDragOver, handleDragOver),
-      onPaste: composeEventHandlers(onPaste, handlePaste),
+      onDragEnter: handleDragEnter,
+      onDragLeave: handleDragLeave,
+      onDrop: handleDrop,
+      onDragOver: handleDragOver,
+      onPaste: handlePaste,
       style: { position: 'relative', ...style },
       children: (
         <React.Fragment>
