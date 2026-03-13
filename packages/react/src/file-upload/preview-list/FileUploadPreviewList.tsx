@@ -6,26 +6,31 @@ import { useRenderElement } from '../../utils/useRenderElement';
 import { resolveClassName } from '../../utils/resolveClassName';
 import { useFileUploadContext } from '../root/FileUploadContext';
 import type { FileUploadRoot } from '../root/FileUploadRoot';
+import { fileUploadPreviewListStateAttributesMapping } from './stateAttributesMapping';
 
 export interface FileUploadPreviewListState {
   /**
    * The filtered files being displayed in the list.
    */
   files: FileUploadRoot.ExtendedFile[];
+  /**
+   * Whether there are no files in the list.
+   */
+  empty: boolean;
 }
 
 export interface FileUploadPreviewListParameters {
   /**
-   * Function to control which files determine the visibility of the list and the
+   * Function to control which files determine the `data-empty` state and the
    * `state.files` value passed to the `className` callback.
    *
-   * The list is hidden (returns `null`) when the filtered result is empty.
+   * The list receives the `data-empty` attribute when the filtered result is empty.
    * Note: this function does not automatically filter `children` — you must
    * independently filter the files rendered inside the list using the context.
    *
    * @example
    * ```tsx
-   * // Hide the list unless there are error files
+   * // Show data-empty unless there are error files
    * <FileUpload.PreviewList filter={(files) => files.filter(f => f.status === 'error')}>
    *   {/* children must also filter independently *\/}
    *   {files.filter(f => f.status === 'error').map(file => (
@@ -43,8 +48,8 @@ export interface FileUploadPreviewListProps
 /**
  * Container list for displaying uploaded files.
  *
- * The PreviewList component renders as an unordered list and automatically hides
- * itself when there are no files. It should contain PreviewItem components for
+ * The PreviewList component renders as an unordered list and adds a `data-empty`
+ * attribute when there are no files. It should contain PreviewItem components for
  * each file being managed by the Root component.
  *
  * @component
@@ -89,13 +94,14 @@ export const FileUploadPreviewList = React.forwardRef<HTMLUListElement, FileUplo
     const state: FileUploadPreviewListState = React.useMemo(
       () => ({
         files: filteredFiles,
+        empty: filteredFiles.length === 0,
       }),
       [filteredFiles],
     );
 
     const resolvedClassName = resolveClassName(className, state);
 
-    const element = useRenderElement('ul', props, {
+    return useRenderElement('ul', props, {
       state,
       ref,
       props: [
@@ -105,13 +111,8 @@ export const FileUploadPreviewList = React.forwardRef<HTMLUListElement, FileUplo
         },
         elementProps,
       ],
+      stateAttributesMapping: fileUploadPreviewListStateAttributesMapping,
     });
-
-    if (filteredFiles.length === 0) {
-      return null;
-    }
-
-    return element;
   },
 );
 

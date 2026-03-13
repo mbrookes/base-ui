@@ -15,7 +15,7 @@ function getFileInput() {
 }
 
 describe('FileUpload.PreviewList', () => {
-  it('does not render when there are no files', () => {
+  it('renders with data-empty attribute when there are no files', () => {
     render(
       <FileUpload.Root>
         <FileUpload.PreviewList data-testid="preview-list">
@@ -24,10 +24,12 @@ describe('FileUpload.PreviewList', () => {
       </FileUpload.Root>,
     );
 
-    expect(screen.queryByTestId('preview-list')).not.toBeInTheDocument();
+    const list = screen.getByTestId('preview-list');
+    expect(list).toBeInTheDocument();
+    expect(list).toHaveAttribute('data-empty');
   });
 
-  it('renders when files are present', async () => {
+  it('removes data-empty attribute when files are present', async () => {
     render(
       <FileUpload.Root>
         <FileUpload.PreviewList data-testid="preview-list">
@@ -42,7 +44,9 @@ describe('FileUpload.PreviewList', () => {
     await userEvent.upload(input, file);
 
     await waitFor(() => {
-      expect(screen.getByTestId('preview-list')).toBeInTheDocument();
+      const list = screen.getByTestId('preview-list');
+      expect(list).toBeInTheDocument();
+      expect(list).not.toHaveAttribute('data-empty');
     });
   });
 
@@ -126,7 +130,7 @@ describe('FileUpload.PreviewList', () => {
     });
   });
 
-  it('dynamically shows/hides based on file count', async () => {
+  it('dynamically updates data-empty based on file count', async () => {
     function TestComponent() {
       const [files, setFiles] = React.useState<any[]>([]);
 
@@ -145,16 +149,20 @@ describe('FileUpload.PreviewList', () => {
 
     render(<TestComponent />);
 
-    // Initially no list
-    expect(screen.queryByTestId('preview-list')).not.toBeInTheDocument();
+    // Initially empty - list is in DOM with data-empty
+    const list = screen.getByTestId('preview-list');
+    expect(list).toBeInTheDocument();
+    expect(list).toHaveAttribute('data-empty');
 
     // Upload file
     const input = getFileInput();
     const file = new File(['content'], 'test.txt', { type: 'text/plain' });
     await userEvent.upload(input, file);
 
-    // List appears
-    await screen.findByTestId('preview-list');
+    // data-empty is removed when files are present
+    await waitFor(() => {
+      expect(list).not.toHaveAttribute('data-empty');
+    });
     expect(screen.getByText('test.txt')).toBeInTheDocument();
   });
 
@@ -313,7 +321,7 @@ describe('FileUpload.PreviewList', () => {
       });
     });
 
-    it('hides list when filter returns empty array', async () => {
+    it('shows data-empty attribute when filter returns empty array', async () => {
       function TestComponent() {
         const { addFiles } = FileUpload.useFileUploadContext();
         const initRef = React.useRef(false);
@@ -343,7 +351,9 @@ describe('FileUpload.PreviewList', () => {
       );
 
       await waitFor(() => {
-        expect(screen.queryByTestId('error-list')).not.toBeInTheDocument();
+        const list = screen.getByTestId('error-list');
+        expect(list).toBeInTheDocument();
+        expect(list).toHaveAttribute('data-empty');
       });
     });
 
