@@ -19,21 +19,16 @@ type TestFileUploadContext = {
   addFiles: (files: File[]) => void;
   removeFile: (id: string) => void;
   clearFiles: () => void;
-  setFiles: React.Dispatch<
-    React.SetStateAction<
-      Array<{
-        name: string;
-        size: number;
-        type: string;
-        lastModified: number;
-        id: string;
-        status: 'idle' | 'uploading' | 'success' | 'error' | 'paused';
-        isPaused?: boolean;
-        uploadedBytes?: number;
-        progress?: number;
-      }>
-    >
-  >;
+  updateFile: (
+    id: string,
+    updates: {
+      status?: 'idle' | 'uploading' | 'success' | 'error' | 'paused';
+      progress?: number;
+      error?: string;
+      isPaused?: boolean;
+      uploadedBytes?: number;
+    },
+  ) => void;
   pauseFile: (id: string) => void;
   resumeFile: (id: string) => void;
 };
@@ -481,13 +476,7 @@ describe('FileUpload', () => {
     const firstFile = getTestContext(contextValue).files[0];
 
     act(() => {
-      getTestContext(contextValue).setFiles((prev) =>
-        prev.map((existing) =>
-          existing.id === firstFile.id
-            ? { ...existing, progress: 30, status: 'uploading' }
-            : existing,
-        ),
-      );
+      getTestContext(contextValue).updateFile(firstFile.id, { progress: 30, status: 'uploading' });
     });
 
     expect(revokeObjectURLSpy).not.toHaveBeenCalled();
@@ -790,17 +779,15 @@ describe('FileUpload', () => {
 
       const file = new File(['test content'], 'test.txt', { type: 'text/plain' });
       expect(contextValue).not.toBeNull();
-      const fileId = 'test-file-id';
 
       act(() => {
-        getTestContext(contextValue).setFiles(() => [
-          { ...file, id: fileId, status: 'idle', progress: 0 },
-        ]);
+        getTestContext(contextValue).addFiles([file]);
       });
 
       act(() => {
+        const fileId = getTestContext(contextValue).files[0].id;
         const latestContext = getTestContext(contextValue);
-        latestContext.setFiles((prev) => prev.map((f) => ({ ...f, status: 'uploading' as const })));
+        latestContext.updateFile(fileId, { status: 'uploading' });
         latestContext.pauseFile(fileId);
       });
 
@@ -824,17 +811,15 @@ describe('FileUpload', () => {
 
       const file = new File(['test'], 'test.txt', { type: 'text/plain' });
       expect(contextValue).not.toBeNull();
-      const fileId = 'test-file-id';
 
       act(() => {
-        getTestContext(contextValue).setFiles(() => [
-          { ...file, id: fileId, status: 'idle', progress: 0 },
-        ]);
+        getTestContext(contextValue).addFiles([file]);
       });
 
       act(() => {
+        const fileId = getTestContext(contextValue).files[0].id;
         const latestContext = getTestContext(contextValue);
-        latestContext.setFiles((prev) => prev.map((f) => ({ ...f, status: 'uploading' as const })));
+        latestContext.updateFile(fileId, { status: 'uploading' });
         latestContext.pauseFile(fileId);
         latestContext.resumeFile(fileId);
       });
@@ -859,18 +844,14 @@ describe('FileUpload', () => {
 
       const file = new File(['0123456789'], 'test.txt', { type: 'text/plain' });
       expect(contextValue).not.toBeNull();
-      const fileId = 'test-file-id';
 
       act(() => {
-        getTestContext(contextValue).setFiles(() => [
-          { ...file, id: fileId, status: 'idle', progress: 0 },
-        ]);
+        getTestContext(contextValue).addFiles([file]);
       });
 
       act(() => {
-        getTestContext(contextValue).setFiles((prev) =>
-          prev.map((f) => (f.id === fileId ? { ...f, uploadedBytes: 5, progress: 50 } : f)),
-        );
+        const fileId = getTestContext(contextValue).files[0].id;
+        getTestContext(contextValue).updateFile(fileId, { uploadedBytes: 5, progress: 50 });
       });
 
       expect(getTestContext(contextValue).files[0].uploadedBytes).toBe(5);
@@ -895,15 +876,13 @@ describe('FileUpload', () => {
 
       const file = new File(['test'], 'test.txt', { type: 'text/plain' });
       expect(contextValue).not.toBeNull();
-      const fileId = 'test-file-id';
 
       act(() => {
-        getTestContext(contextValue).setFiles(() => [
-          { ...file, id: fileId, status: 'idle', progress: 0 },
-        ]);
+        getTestContext(contextValue).addFiles([file]);
       });
 
       act(() => {
+        const fileId = getTestContext(contextValue).files[0].id;
         getTestContext(contextValue).pauseFile(fileId);
       });
 
@@ -929,15 +908,13 @@ describe('FileUpload', () => {
 
       const file = new File(['test'], 'test.txt', { type: 'text/plain' });
       expect(contextValue).not.toBeNull();
-      const fileId = 'test-file-id';
 
       act(() => {
-        getTestContext(contextValue).setFiles(() => [
-          { ...file, id: fileId, status: 'idle', progress: 0 },
-        ]);
+        getTestContext(contextValue).addFiles([file]);
       });
 
       act(() => {
+        const fileId = getTestContext(contextValue).files[0].id;
         getTestContext(contextValue).resumeFile(fileId);
       });
 
@@ -1269,9 +1246,117 @@ describe('FileUpload', () => {
         expect.objectContaining({ reason: 'FILE_TOO_LARGE' }),
       );
     });
+
+    it('does not exceed maxFiles when addFiles is called concurrently before a render', async () => {
+      // Both addFiles calls happen in the same act() before React commits, so
+      // filesRef.current is stale for the second call. The setFiles updater must
+      // re-check latestPrev.length to keep the maxFiles invariant.
+      let contextValue: TestFileUploadContext | null = null;
+
+      function TestComponent() {
+        const ctx = FileUpload.useFileUploadContext();
+        contextValue = ctx as unknown as TestFileUploadContext;
+        return null;
+      }
+
+      render(
+        <FileUpload.Root maxFiles={3} multiple>
+          <TestComponent />
+        </FileUpload.Root>,
+      );
+
+      const fileA = new File(['a'], 'a.txt', { type: 'text/plain' });
+      const fileB = new File(['b'], 'b.txt', { type: 'text/plain' });
+      const fileC = new File(['c'], 'c.txt', { type: 'text/plain' });
+      const fileD = new File(['d'], 'd.txt', { type: 'text/plain' });
+
+      // Call addFiles twice in one act() so both run before React commits state.
+      // First call adds [a, b], second call adds [c, d].
+      // Without the cap in the updater both would see remainingSlots = 3 and
+      // collectively add 4 files, exceeding maxFiles.
+      act(() => {
+        getTestContext(contextValue).addFiles([fileA, fileB]);
+        getTestContext(contextValue).addFiles([fileC, fileD]);
+      });
+
+      await waitFor(() => {
+        expect(getTestContext(contextValue).files.length).toBeLessThanOrEqual(3);
+      });
+    });
+
+    it('accepts all files when concurrent addFiles calls together stay within maxFiles', async () => {
+      let contextValue: TestFileUploadContext | null = null;
+
+      function TestComponent() {
+        const ctx = FileUpload.useFileUploadContext();
+        contextValue = ctx as unknown as TestFileUploadContext;
+        return null;
+      }
+
+      render(
+        <FileUpload.Root maxFiles={4} multiple>
+          <TestComponent />
+        </FileUpload.Root>,
+      );
+
+      const fileA = new File(['a'], 'a.txt', { type: 'text/plain' });
+      const fileB = new File(['b'], 'b.txt', { type: 'text/plain' });
+      const fileC = new File(['c'], 'c.txt', { type: 'text/plain' });
+
+      // Two concurrent calls that together add 3 files, which is within maxFiles=4.
+      act(() => {
+        getTestContext(contextValue).addFiles([fileA, fileB]);
+        getTestContext(contextValue).addFiles([fileC]);
+      });
+
+      await waitFor(() => {
+        expect(getTestContext(contextValue).files).toHaveLength(3);
+      });
+    });
   });
 
   describe('onFileChange callback', () => {
+    it('calls onFileChange with reason file-updated when updateFile is called', async () => {
+      const onFileChange = vi.fn();
+      let contextValue: TestFileUploadContext | null = null;
+
+      function TestComponent() {
+        const ctx = FileUpload.useFileUploadContext();
+        contextValue = ctx as unknown as TestFileUploadContext;
+        return null;
+      }
+
+      render(
+        <FileUpload.Root onFileChange={onFileChange}>
+          <TestComponent />
+        </FileUpload.Root>,
+      );
+
+      const input = getFileInput();
+      const file = new File(['content'], 'test.txt', { type: 'text/plain' });
+
+      fireEvent.change(input, { target: { files: [file] } });
+
+      await waitFor(() => {
+        expect(getTestContext(contextValue).files).toHaveLength(1);
+      });
+
+      onFileChange.mockClear();
+
+      const fileId = getTestContext(contextValue).files[0].id;
+
+      act(() => {
+        getTestContext(contextValue).updateFile(fileId, { status: 'uploading', progress: 50 });
+      });
+
+      await waitFor(() => {
+        expect(onFileChange).toHaveBeenCalledWith(
+          expect.arrayContaining([expect.objectContaining({ name: 'test.txt', status: 'uploading', progress: 50 })]),
+          expect.objectContaining({ reason: 'file-updated' }),
+        );
+      });
+    });
+
     it('calls onFileChange when files are added', async () => {
       const onFileChange = vi.fn();
 

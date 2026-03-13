@@ -226,10 +226,16 @@ Use `onCancel` to react when the user closes the file dialog without selecting f
 
 ### Detecting duplicate files
 
-Use `onDuplicateFile` to detect when a user selects the same file more than once. Duplicates are ignored by default:
+Use `onFileReject` with reason `DUPLICATE_FILE` to detect when a user selects the same file more than once. Duplicates are ignored by default:
 
-```jsx title="Duplicate detection" "onDuplicateFile"
-<FileUpload.Root onDuplicateFile={(file) => console.log('Duplicate:', file.name)}>
+```jsx title="Duplicate detection" "onFileReject" "DUPLICATE_FILE"
+<FileUpload.Root
+  onFileReject={(file, reason) => {
+    if (reason === 'DUPLICATE_FILE') {
+      console.log('Duplicate:', file.name);
+    }
+  }}
+>
   <FileUpload.Trigger>Select files</FileUpload.Trigger>
 </FileUpload.Root>
 ```
@@ -331,7 +337,7 @@ import { FileUpload } from '@base-ui/react/file-upload';
 function FileUploadContent() {
   const { files, removeFile } = FileUpload.useFileUploadContext();
   const [isUploading, setIsUploading] = React.useState(false);
-  const [uploadError, setUploadError] = (React.useState < string) | (null > null);
+  const [uploadError, setUploadError] = React.useState<string | null>(null);
 
   const handleUpload = async () => {
     setIsUploading(true);
@@ -828,16 +834,16 @@ function FileUploadContent() {
   const { files, pauseFile, resumeFile } = FileUpload.useFileUploadContext();
   const [pauses, setPauses] = React.useState<Map<string, boolean>>(new Map());
 
-  const togglePause = async (fileId: string) => {
+  const togglePause = (fileId: string) => {
     if (pauses.get(fileId)) {
-      await resumeFile(fileId);
+      resumeFile(fileId);
       setPauses((prev) => {
         const next = new Map(prev);
         next.set(fileId, false);
         return next;
       });
     } else {
-      await pauseFile(fileId);
+      pauseFile(fileId);
       setPauses((prev) => {
         const next = new Map(prev);
         next.set(fileId, true);
@@ -996,7 +1002,7 @@ The `filter` function receives the full array of files and should return a filte
 File Upload follows the same pattern as other components:
 
 - use `locale` for `Intl` formatting in built-in messages (for example file sizes), and
-- use targeted callbacks (`onFileReject`, `onDuplicateFile`, `onRetry`, etc.) to customize behavior.
+- use targeted callbacks (`onFileReject`, `onRetry`, etc.) to customize behavior.
 
 ```jsx title="Locale formatting" "locale"
 import * as React from 'react';
@@ -1012,7 +1018,7 @@ export default function FileUploadLocale() {
 }
 ```
 
-```jsx title="Callback-based customization" "onFileReject" "onDuplicateFile"
+```jsx title="Callback-based customization" "onFileReject"
 import * as React from 'react';
 import { FileUpload } from '@base-ui/react/file-upload';
 
@@ -1021,9 +1027,6 @@ export default function FileUploadCustomHandling() {
     <FileUpload.Root
       onFileReject={(file, reason) => {
         console.log('Rejected:', file.name, reason);
-      }}
-      onDuplicateFile={(file) => {
-        console.log('Duplicate:', file.name);
       }}
     >
       <FileUpload.Dropzone>Drop files here</FileUpload.Dropzone>

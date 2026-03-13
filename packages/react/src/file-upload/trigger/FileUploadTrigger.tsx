@@ -5,7 +5,7 @@ import { useStableCallback } from '@base-ui/utils/useStableCallback';
 import type { BaseUIComponentProps, NativeButtonProps } from '../../utils/types';
 import { useRenderElement } from '../../utils/useRenderElement';
 import { resolveClassName } from '../../utils/resolveClassName';
-import { composeEventHandlers } from '../../utils/composeEventHandlers';
+import { composeEventHandlers } from '../utils/composeEventHandlers';
 import { useFileUploadContext } from '../root/FileUploadContext';
 import { fileUploadTriggerStateAttributesMapping } from './stateAttributesMapping';
 
@@ -42,7 +42,7 @@ export interface FileUploadTriggerProps
  */
 export const FileUploadTrigger = React.forwardRef<HTMLButtonElement, FileUploadTriggerProps>(
   function FileUploadTriggerComponent(componentProps, ref) {
-    const { className, render, nativeButton, ...elementProps } = componentProps;
+    const { className, render, nativeButton, onClick: userOnClick, ...elementProps } = componentProps;
     const { openFileDialog, disabled } = useFileUploadContext();
 
     const state: FileUploadTriggerState = React.useMemo(
@@ -55,6 +55,9 @@ export const FileUploadTrigger = React.forwardRef<HTMLButtonElement, FileUploadT
     const resolvedClassName = resolveClassName(className, state);
 
     const handleClick = useStableCallback((event: React.MouseEvent<HTMLButtonElement>) => {
+      if (disabled) {
+        return;
+      }
       event.preventDefault();
       openFileDialog();
     });
@@ -67,7 +70,7 @@ export const FileUploadTrigger = React.forwardRef<HTMLButtonElement, FileUploadT
           type: 'button',
           className: resolvedClassName,
           disabled,
-          onClick: composeEventHandlers(elementProps.onClick, handleClick),
+          onClick: composeEventHandlers(userOnClick, handleClick),
         },
         elementProps,
       ],
