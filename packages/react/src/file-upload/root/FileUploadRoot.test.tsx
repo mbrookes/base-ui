@@ -373,10 +373,8 @@ describe('FileUpload', () => {
         message: expect.stringContaining('too large'),
       }),
     );
-    expect(onFileChange).toHaveBeenCalledWith(
-      [],
-      expect.objectContaining({ reason: expect.any(String) }),
-    );
+    // onFileChange should not be called when all files are rejected (files state unchanged)
+    expect(onFileChange).not.toHaveBeenCalled();
   });
 
   it('respects minSize constraint and rejects undersized files', async () => {
@@ -537,6 +535,33 @@ describe('FileUpload', () => {
     await waitFor(() => {
       const liveRegion = screen.getByRole('status');
       expect(liveRegion).toBeInTheDocument();
+    });
+  });
+
+  it('separates success and rejection messages in announcement with a space', async () => {
+    render(
+      <FileUpload.Root accept="image/*">
+        {null}
+      </FileUpload.Root>,
+    );
+
+    const input = getFileInput();
+    const validFile = new File(['content'], 'photo.jpg', { type: 'image/jpeg' });
+    const invalidFile = new File(['content'], 'doc.txt', { type: 'text/plain' });
+
+    Object.defineProperty(input, 'files', {
+      value: [validFile, invalidFile],
+      configurable: true,
+    });
+
+    fireEvent.change(input);
+
+    await waitFor(() => {
+      const liveRegion = screen.getByRole('status');
+      const text = liveRegion.textContent ?? '';
+      // "Added 1 file." followed by a space then "1 rejected: ..."
+      // Without the fix this would be "Added 1 file.1 rejected: ..."
+      expect(text).toMatch(/^Added 1 file\. 1 rejected:/);
     });
   });
 
