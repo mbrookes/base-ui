@@ -42,6 +42,7 @@ export interface FileUploadTriggerProps
 export const FileUploadTrigger = React.forwardRef<HTMLButtonElement, FileUploadTriggerProps>(
   function FileUploadTriggerComponent(componentProps, ref) {
     const { className, render, nativeButton, ...elementProps } = componentProps;
+    const { onClick: userOnClick, ...elementPropsWithoutOnClick } = elementProps;
     const { openFileDialog, disabled } = useFileUploadContext();
 
     const state: FileUploadTriggerState = React.useMemo(
@@ -57,6 +58,21 @@ export const FileUploadTrigger = React.forwardRef<HTMLButtonElement, FileUploadT
       if (disabled) {
         return;
       }
+
+      let baseUIHandlerPrevented = false;
+
+      (event as any).preventBaseUIHandler = () => {
+        baseUIHandlerPrevented = true;
+      };
+
+      if (typeof userOnClick === 'function') {
+        userOnClick(event);
+      }
+
+      if (baseUIHandlerPrevented) {
+        return;
+      }
+
       event.preventDefault();
       openFileDialog();
     });
@@ -71,7 +87,7 @@ export const FileUploadTrigger = React.forwardRef<HTMLButtonElement, FileUploadT
           disabled,
           onClick: handleClick,
         },
-        elementProps,
+        elementPropsWithoutOnClick,
       ],
       stateAttributesMapping: fileUploadTriggerStateAttributesMapping,
     });
