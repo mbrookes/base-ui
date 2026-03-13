@@ -161,7 +161,7 @@ describe('FileUpload.PreviewList', () => {
 
     // data-empty is removed when files are present
     await waitFor(() => {
-      expect(list).not.toHaveAttribute('data-empty');
+      expect(screen.getByTestId('preview-list')).not.toHaveAttribute('data-empty');
     });
     expect(screen.getByText('test.txt')).toBeInTheDocument();
   });
