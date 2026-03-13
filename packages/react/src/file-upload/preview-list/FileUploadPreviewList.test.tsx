@@ -19,7 +19,7 @@ describe('FileUpload.PreviewList', () => {
     render(
       <FileUpload.Root>
         <FileUpload.PreviewList data-testid="preview-list">
-          <li>Item</li>
+          {/* No files have been uploaded; list should be in empty state */}
         </FileUpload.PreviewList>
       </FileUpload.Root>,
     );
