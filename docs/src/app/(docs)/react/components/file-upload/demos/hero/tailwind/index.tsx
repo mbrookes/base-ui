@@ -99,7 +99,19 @@ function FilePreviewItems() {
 }
 
 export default function FileUploadDemo() {
+  const maxFiles = 5;
+  const [isUploadDisabled, setIsUploadDisabled] = React.useState(false);
   const { errorMessages, handleFileChange, handleFileReject } = useFileRejection();
+
+  const handleDemoFileChange = React.useCallback<
+    NonNullable<React.ComponentProps<typeof FileUpload.Root>['onFileChange']>
+  >(
+    (files, eventDetails) => {
+      handleFileChange(files, eventDetails);
+      setIsUploadDisabled(files.length >= maxFiles);
+    },
+    [handleFileChange, maxFiles],
+  );
 
   return (
     <div className="w-full rounded-xl border border-gray-200 bg-white p-8 shadow-sm">
@@ -109,14 +121,15 @@ export default function FileUploadDemo() {
       </div>
 
       <FileUpload.Root
-        maxFiles={5}
+        maxFiles={maxFiles}
         maxSize={5 * 1024 * 1024}
         accept="image/png, image/jpeg, image/gif"
         multiple
-        onFileChange={handleFileChange}
+        disabled={isUploadDisabled}
+        onFileChange={handleDemoFileChange}
         onFileReject={handleFileReject}
       >
-        <FileUpload.Dropzone className="group relative mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10 transition-colors hover:bg-gray-50 hover:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 data-[dragging=true]:border-blue-500 data-[dragging=true]:bg-blue-50">
+        <FileUpload.Dropzone className="group relative mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10 transition-colors hover:bg-gray-50 hover:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 data-[dragging]:border-blue-500 data-[dragging]:bg-blue-50 data-[disabled]:cursor-not-allowed data-[disabled]:opacity-60 data-[disabled]:!bg-transparent data-[disabled]:!border-gray-900/25 data-[disabled]:hover:!bg-transparent data-[disabled]:hover:!border-gray-900/25 data-[disabled]:focus:!outline-none data-[disabled]:focus:!ring-0 data-[disabled]:focus:!ring-offset-0">
           {({ isDragging }) => (
             <div className="text-center">
               <div
@@ -127,12 +140,22 @@ export default function FileUploadDemo() {
                 <UploadCloud className="h-6 w-6 text-gray-600" aria-hidden="true" />
               </div>
               <div className="mt-4 flex text-sm leading-6 text-gray-600 justify-center">
-                <span className="font-semibold text-blue-600 hover:text-blue-500">
-                  Click to upload
-                </span>
-                <p className="pl-1">or drag and drop</p>
+                {isUploadDisabled ? (
+                  <span className="font-semibold text-gray-700">Upload limit reached</span>
+                ) : (
+                  <React.Fragment>
+                    <span className="font-semibold text-blue-600 hover:text-blue-500">
+                      Click to upload
+                    </span>
+                    <p className="pl-1">or drag and drop</p>
+                  </React.Fragment>
+                )}
               </div>
-              <p className="text-xs leading-5 text-gray-500">up to 5 images, max 5MB each</p>
+              <p className="text-xs leading-5 text-gray-500" role="status" aria-live="polite">
+                {isUploadDisabled
+                  ? 'Remove a file to upload more'
+                  : 'up to 5 images, max 5MB each'}
+              </p>
             </div>
           )}
         </FileUpload.Dropzone>

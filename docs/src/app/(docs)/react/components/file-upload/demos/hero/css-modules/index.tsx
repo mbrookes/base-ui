@@ -96,7 +96,19 @@ function FilePreviewItems() {
 }
 
 export default function FileUploadDemo() {
+  const maxFiles = 5;
+  const [isUploadDisabled, setIsUploadDisabled] = React.useState(false);
   const { errorMessages, handleFileChange, handleFileReject } = useFileRejection();
+
+  const handleDemoFileChange = React.useCallback<
+    NonNullable<React.ComponentProps<typeof FileUpload.Root>['onFileChange']>
+  >(
+    (files, eventDetails) => {
+      handleFileChange(files, eventDetails);
+      setIsUploadDisabled(files.length >= maxFiles);
+    },
+    [handleFileChange, maxFiles],
+  );
 
   return (
     <div className={styles.container}>
@@ -106,11 +118,12 @@ export default function FileUploadDemo() {
       </div>
 
       <FileUpload.Root
-        maxFiles={5}
+        maxFiles={maxFiles}
         maxSize={5 * 1024 * 1024}
         accept="image/png, image/jpeg, image/gif"
         multiple
-        onFileChange={handleFileChange}
+        disabled={isUploadDisabled}
+        onFileChange={handleDemoFileChange}
         onFileReject={handleFileReject}
       >
         <FileUpload.Dropzone className={styles.dropzone}>
@@ -120,10 +133,20 @@ export default function FileUploadDemo() {
                 <UploadCloud className={styles.icon} aria-hidden="true" />
               </div>
               <div className={styles.dropzoneText}>
-                <span className={styles.dropzoneAction}>Click to upload</span>
-                <p className={styles.dropzoneOr}>or drag and drop</p>
+                {isUploadDisabled ? (
+                  <span className={styles.dropzoneDisabledText}>Upload limit reached</span>
+                ) : (
+                  <React.Fragment>
+                    <span className={styles.dropzoneAction}>Click to upload</span>
+                    <p className={styles.dropzoneOr}>or drag and drop</p>
+                  </React.Fragment>
+                )}
               </div>
-              <p className={styles.dropzoneHint}>up to 5 images, max 5MB each</p>
+              <p className={styles.dropzoneHint} role="status" aria-live="polite">
+                {isUploadDisabled
+                  ? 'Remove a file to upload more'
+                  : 'up to 5 images, max 5MB each'}
+              </p>
             </div>
           )}
         </FileUpload.Dropzone>
