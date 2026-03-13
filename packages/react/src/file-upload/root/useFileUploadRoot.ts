@@ -305,12 +305,18 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
     // state, preventing concurrent rapid calls from losing earlier additions.
     setFiles((latestPrev) => {
       if (multiple) {
+        // Re-enforce maxFiles cap using the actual latest committed state.
+        // This prevents concurrent addFiles calls from collectively exceeding
+        // maxFiles when they both validated against a stale filesRef.current.
+        const actualRemaining = Math.max(0, maxFiles - latestPrev.length);
+        const filesToAdd = validFiles.slice(0, actualRemaining);
+
         if (latestPrev === prev) {
-          return [...prev, ...validFiles];
+          return filesToAdd.length > 0 ? [...latestPrev, ...filesToAdd] : latestPrev;
         }
-        // A concurrent update has already been applied; merge our validFiles on top.
+        // A concurrent update has already been applied; merge our filesToAdd on top.
         const latestIds = new Set(latestPrev.map((f) => f.id));
-        const uniqueFiles = validFiles.filter((f) => !latestIds.has(f.id));
+        const uniqueFiles = filesToAdd.filter((f) => !latestIds.has(f.id));
         return uniqueFiles.length > 0 ? [...latestPrev, ...uniqueFiles] : latestPrev;
       }
       // single-file mode: replace with the newly selected file
