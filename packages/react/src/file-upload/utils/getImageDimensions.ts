@@ -72,19 +72,19 @@ export async function validateImageDimensions(
     return 'Unable to determine image dimensions';
   }
 
-  if (constraints.minWidth && dimensions.width < constraints.minWidth) {
+  if (constraints.minWidth != null && dimensions.width < constraints.minWidth) {
     return `Image width must be at least ${constraints.minWidth}px`;
   }
 
-  if (constraints.maxWidth && dimensions.width > constraints.maxWidth) {
+  if (constraints.maxWidth != null && dimensions.width > constraints.maxWidth) {
     return `Image width must not exceed ${constraints.maxWidth}px`;
   }
 
-  if (constraints.minHeight && dimensions.height < constraints.minHeight) {
+  if (constraints.minHeight != null && dimensions.height < constraints.minHeight) {
     return `Image height must be at least ${constraints.minHeight}px`;
   }
 
-  if (constraints.maxHeight && dimensions.height > constraints.maxHeight) {
+  if (constraints.maxHeight != null && dimensions.height > constraints.maxHeight) {
     return `Image height must not exceed ${constraints.maxHeight}px`;
   }
 
