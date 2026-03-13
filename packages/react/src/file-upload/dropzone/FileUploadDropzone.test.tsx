@@ -250,6 +250,46 @@ describe('FileUpload.Dropzone', () => {
     expect(customKeyDown).toHaveBeenCalled();
   });
 
+  describe('preventBaseUIHandler', () => {
+    it('does not open file dialog when onClick calls preventBaseUIHandler', async () => {
+      const user = userEvent.setup();
+      const customClick = vi.fn((event) => event.preventBaseUIHandler());
+      render(
+        <FileUpload.Root>
+          <FileUpload.Dropzone onClick={customClick}>Drop files here</FileUpload.Dropzone>
+        </FileUpload.Root>,
+      );
+
+      const dropzone = screen.getByRole('button');
+      const input = getFileInput();
+      const clickSpy = vi.spyOn(input, 'click');
+
+      await user.click(dropzone);
+
+      expect(customClick).toHaveBeenCalled();
+      expect(clickSpy).not.toHaveBeenCalled();
+    });
+
+    it('does not open file dialog when onKeyDown calls preventBaseUIHandler', () => {
+      const customKeyDown = vi.fn((event) => event.preventBaseUIHandler());
+      render(
+        <FileUpload.Root>
+          <FileUpload.Dropzone onKeyDown={customKeyDown}>Drop files here</FileUpload.Dropzone>
+        </FileUpload.Root>,
+      );
+
+      const dropzone = screen.getByRole('button');
+      const input = getFileInput();
+      const clickSpy = vi.spyOn(input, 'click');
+
+      dropzone.focus();
+      fireEvent.keyDown(dropzone, { key: 'Enter' });
+
+      expect(customKeyDown).toHaveBeenCalled();
+      expect(clickSpy).not.toHaveBeenCalled();
+    });
+  });
+
   it('has default aria-label for screen readers', () => {
     render(
       <FileUpload.Root>
