@@ -9,9 +9,8 @@ import type { BaseUIComponentProps, HTMLProps } from '../../utils/types';
 import { resolveClassName } from '../../utils/resolveClassName';
 import { composeEventHandlers } from '../../utils/composeEventHandlers';
 import type { BaseUIChangeEventDetails } from '../../utils/createBaseUIEventDetails';
-import type { StateAttributesMapping } from '../../utils/getStateAttributesProps';
 import { FileUploadContext } from './FileUploadContext';
-import { FileUploadRootDataAttributes } from './FileUploadRootDataAttributes';
+import { fileUploadRootStateAttributesMapping } from './stateAttributesMapping';
 import { useFileUploadRoot } from './useFileUploadRoot';
 
 export const FILE_UPLOAD_ROOT_REJECT_REASONS = {
@@ -30,6 +29,7 @@ export const FILE_UPLOAD_ROOT_CHANGE_REASONS = {
   FILE_ADDED: 'file-added',
   FILE_REMOVED: 'file-removed',
   FILES_CLEARED: 'files-cleared',
+  FILE_UPDATED: 'file-updated',
 } as const;
 
 export type FileUploadRootChangeReason =
@@ -52,27 +52,6 @@ export interface FileUploadRootState {
    */
   disabled: boolean;
 }
-
-const fileUploadRootStateAttributesMapping: StateAttributesMapping<FileUploadRootState> = {
-  dragging(value): Record<string, string> | null {
-    if (!value) {
-      return null;
-    }
-
-    return {
-      [FileUploadRootDataAttributes.dragging]: '',
-    };
-  },
-  disabled(value): Record<string, string> | null {
-    if (!value) {
-      return null;
-    }
-
-    return {
-      [FileUploadRootDataAttributes.disabled]: '',
-    };
-  },
-};
 
 export interface FileUploadRootParameters {
   /**

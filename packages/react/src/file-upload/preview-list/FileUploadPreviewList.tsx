@@ -16,20 +16,22 @@ export interface FileUploadPreviewListState {
 
 export interface FileUploadPreviewListParameters {
   /**
-   * Function to filter which files should be displayed.
-   * Receives the full list of files and should return the filtered list.
-   * Useful for showing only uploading files, only errors, etc.
+   * Function to control which files determine the visibility of the list and the
+   * `state.files` value passed to the `className` callback.
+   *
+   * The list is hidden (returns `null`) when the filtered result is empty.
+   * Note: this function does not automatically filter `children` — you must
+   * independently filter the files rendered inside the list using the context.
    *
    * @example
    * ```tsx
-   * // Show only uploading files
-   * <FileUpload.PreviewList filter={(files) => files.filter(f => f.status === 'uploading')}>
-   *
-   * // Show only errors
+   * // Hide the list unless there are error files
    * <FileUpload.PreviewList filter={(files) => files.filter(f => f.status === 'error')}>
-   *
-   * // Show files by status
-   * <FileUpload.PreviewList filter={(files) => files.filter(f => ['uploading', 'error'].includes(f.status))}>
+   *   {/* children must also filter independently *\/}
+   *   {files.filter(f => f.status === 'error').map(file => (
+   *     <FileUpload.PreviewItem key={file.id} file={file}>{file.name}</FileUpload.PreviewItem>
+   *   ))}
+   * </FileUpload.PreviewList>
    * ```
    */
   filter?: ((files: FileUploadRoot.ExtendedFile[]) => FileUploadRoot.ExtendedFile[]) | undefined;

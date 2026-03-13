@@ -123,6 +123,9 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
   const [files, setFiles] = React.useState<FileUploadRootExtendedFile[]>([]);
   const [isDragging, setIsDragging] = React.useState(false);
   const [announcement, setAnnouncement] = React.useState('');
+  // Mirror of `files` in a ref so addFiles can read the latest value synchronously.
+  const filesRef = React.useRef<FileUploadRootExtendedFile[]>([]);
+  filesRef.current = files;
   const inputRef = React.useRef<HTMLInputElement | null>(null);
   const abortControllersRef = React.useRef<Map<string, AbortController>>(new Map());
   const previewUrlsRef = React.useRef<Map<string, string>>(new Map());
@@ -210,7 +213,8 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
     lastChangeReasonRef.current = FILE_UPLOAD_ROOT_CHANGE_REASONS.FILE_ADDED;
     lastChangeEventRef.current = event;
 
-    const prev = files;
+    // Use the ref so rapid successive calls always see the up-to-date list.
+    const prev = filesRef.current;
     const remainingSlots = maxFiles - prev.length;
 
     if (remainingSlots <= 0) {
@@ -293,22 +297,42 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
 
     const successMsg = validFiles.length > 0 ? messages.filesAdded(validFiles.length) : '';
     const errorMsg = errors.length > 0 ? messages.filesRejected(errors.length, errors) : '';
+    const separator = successMsg && errorMsg ? ' ' : '';
 
-    setAnnouncement(`${successMsg}${errorMsg}`);
+    setAnnouncement(`${successMsg}${separator}${errorMsg}`);
 
-    const nextFiles = multiple ? [...prev, ...validFiles] : validFiles;
+    // Use a functional update to merge our changes on top of the latest committed
+    // state, preventing concurrent rapid calls from losing earlier additions.
+    setFiles((latestPrev) => {
+      if (multiple) {
+        if (latestPrev === prev) {
+          return [...prev, ...validFiles];
+        }
+        // A concurrent update has already been applied; merge our validFiles on top.
+        const latestIds = new Set(latestPrev.map((f) => f.id));
+        const uniqueFiles = validFiles.filter((f) => !latestIds.has(f.id));
+        return uniqueFiles.length > 0 ? [...latestPrev, ...uniqueFiles] : latestPrev;
+      }
+      // single-file mode: replace with the newly selected file
+      if (latestPrev !== prev) {
+        prev.forEach((f) => {
+          URL.revokeObjectURL(f.preview);
+          previewUrlsRef.current.delete(f.id);
+        });
+      }
+      return validFiles;
+    });
 
     if (!multiple) {
-      const nextIds = new Set(nextFiles.map((file) => file.id));
-      prev.forEach((file) => {
-        if (!nextIds.has(file.id)) {
-          URL.revokeObjectURL(file.preview);
-          previewUrlsRef.current.delete(file.id);
+      // Revoke URLs for files that are being replaced.
+      const nextIds = new Set(validFiles.map((f) => f.id));
+      prev.forEach((f) => {
+        if (!nextIds.has(f.id)) {
+          URL.revokeObjectURL(f.preview);
+          previewUrlsRef.current.delete(f.id);
         }
       });
     }
-
-    setFiles(nextFiles);
   });
 
   const removeFile = useStableCallback((id: string) => {
@@ -341,6 +365,8 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
   });
 
   const updateFile = useStableCallback((id: string, updates: FileUploadRootFileUpdates) => {
+    lastChangeReasonRef.current = FILE_UPLOAD_ROOT_CHANGE_REASONS.FILE_UPDATED;
+    lastChangeEventRef.current = undefined;
     setFiles((prev) => prev.map((file) => (file.id === id ? Object.assign(file, updates) : file)));
   });
 
@@ -453,7 +479,6 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
       onFilePause,
       onFileResume,
       openFileDialog,
-      setFiles,
       registerInput,
     }),
     [
@@ -481,7 +506,6 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
       onFilePause,
       onFileResume,
       openFileDialog,
-      setFiles,
       registerInput,
     ],
   );

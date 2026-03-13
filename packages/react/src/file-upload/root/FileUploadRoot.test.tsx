@@ -19,21 +19,16 @@ type TestFileUploadContext = {
   addFiles: (files: File[]) => void;
   removeFile: (id: string) => void;
   clearFiles: () => void;
-  setFiles: React.Dispatch<
-    React.SetStateAction<
-      Array<{
-        name: string;
-        size: number;
-        type: string;
-        lastModified: number;
-        id: string;
-        status: 'idle' | 'uploading' | 'success' | 'error' | 'paused';
-        isPaused?: boolean;
-        uploadedBytes?: number;
-        progress?: number;
-      }>
-    >
-  >;
+  updateFile: (
+    id: string,
+    updates: {
+      status?: 'idle' | 'uploading' | 'success' | 'error' | 'paused';
+      progress?: number;
+      error?: string;
+      isPaused?: boolean;
+      uploadedBytes?: number;
+    },
+  ) => void;
   pauseFile: (id: string) => void;
   resumeFile: (id: string) => void;
 };
@@ -481,13 +476,7 @@ describe('FileUpload', () => {
     const firstFile = getTestContext(contextValue).files[0];
 
     act(() => {
-      getTestContext(contextValue).setFiles((prev) =>
-        prev.map((existing) =>
-          existing.id === firstFile.id
-            ? { ...existing, progress: 30, status: 'uploading' }
-            : existing,
-        ),
-      );
+      getTestContext(contextValue).updateFile(firstFile.id, { progress: 30, status: 'uploading' });
     });
 
     expect(revokeObjectURLSpy).not.toHaveBeenCalled();
@@ -790,17 +779,15 @@ describe('FileUpload', () => {
 
       const file = new File(['test content'], 'test.txt', { type: 'text/plain' });
       expect(contextValue).not.toBeNull();
-      const fileId = 'test-file-id';
 
       act(() => {
-        getTestContext(contextValue).setFiles(() => [
-          { ...file, id: fileId, status: 'idle', progress: 0 },
-        ]);
+        getTestContext(contextValue).addFiles([file]);
       });
 
       act(() => {
+        const fileId = getTestContext(contextValue).files[0].id;
         const latestContext = getTestContext(contextValue);
-        latestContext.setFiles((prev) => prev.map((f) => ({ ...f, status: 'uploading' as const })));
+        latestContext.updateFile(fileId, { status: 'uploading' });
         latestContext.pauseFile(fileId);
       });
 
@@ -824,17 +811,15 @@ describe('FileUpload', () => {
 
       const file = new File(['test'], 'test.txt', { type: 'text/plain' });
       expect(contextValue).not.toBeNull();
-      const fileId = 'test-file-id';
 
       act(() => {
-        getTestContext(contextValue).setFiles(() => [
-          { ...file, id: fileId, status: 'idle', progress: 0 },
-        ]);
+        getTestContext(contextValue).addFiles([file]);
       });
 
       act(() => {
+        const fileId = getTestContext(contextValue).files[0].id;
         const latestContext = getTestContext(contextValue);
-        latestContext.setFiles((prev) => prev.map((f) => ({ ...f, status: 'uploading' as const })));
+        latestContext.updateFile(fileId, { status: 'uploading' });
         latestContext.pauseFile(fileId);
         latestContext.resumeFile(fileId);
       });
@@ -859,18 +844,14 @@ describe('FileUpload', () => {
 
       const file = new File(['0123456789'], 'test.txt', { type: 'text/plain' });
       expect(contextValue).not.toBeNull();
-      const fileId = 'test-file-id';
 
       act(() => {
-        getTestContext(contextValue).setFiles(() => [
-          { ...file, id: fileId, status: 'idle', progress: 0 },
-        ]);
+        getTestContext(contextValue).addFiles([file]);
       });
 
       act(() => {
-        getTestContext(contextValue).setFiles((prev) =>
-          prev.map((f) => (f.id === fileId ? { ...f, uploadedBytes: 5, progress: 50 } : f)),
-        );
+        const fileId = getTestContext(contextValue).files[0].id;
+        getTestContext(contextValue).updateFile(fileId, { uploadedBytes: 5, progress: 50 });
       });
 
       expect(getTestContext(contextValue).files[0].uploadedBytes).toBe(5);
@@ -895,15 +876,13 @@ describe('FileUpload', () => {
 
       const file = new File(['test'], 'test.txt', { type: 'text/plain' });
       expect(contextValue).not.toBeNull();
-      const fileId = 'test-file-id';
 
       act(() => {
-        getTestContext(contextValue).setFiles(() => [
-          { ...file, id: fileId, status: 'idle', progress: 0 },
-        ]);
+        getTestContext(contextValue).addFiles([file]);
       });
 
       act(() => {
+        const fileId = getTestContext(contextValue).files[0].id;
         getTestContext(contextValue).pauseFile(fileId);
       });
 
@@ -929,15 +908,13 @@ describe('FileUpload', () => {
 
       const file = new File(['test'], 'test.txt', { type: 'text/plain' });
       expect(contextValue).not.toBeNull();
-      const fileId = 'test-file-id';
 
       act(() => {
-        getTestContext(contextValue).setFiles(() => [
-          { ...file, id: fileId, status: 'idle', progress: 0 },
-        ]);
+        getTestContext(contextValue).addFiles([file]);
       });
 
       act(() => {
+        const fileId = getTestContext(contextValue).files[0].id;
         getTestContext(contextValue).resumeFile(fileId);
       });
 

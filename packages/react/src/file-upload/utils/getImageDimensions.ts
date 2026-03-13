@@ -15,6 +15,10 @@
 export async function getImageDimensions(
   file: File | Blob,
 ): Promise<{ width: number; height: number } | null> {
+  if (typeof window === 'undefined' || typeof Image === 'undefined') {
+    return null;
+  }
+
   return new Promise((resolve) => {
     const url = URL.createObjectURL(file);
     const img = new Image();

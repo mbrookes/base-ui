@@ -4,8 +4,8 @@
   "props": {
     "filter": {
       "type": "((files: FileUpload.Root.ExtendedFile[]) => FileUpload.Root.ExtendedFile[])",
-      "description": "Function to filter which files should be displayed.\nReceives the full list of files and should return the filtered list.\nUseful for showing only uploading files, only errors, etc.",
-      "example": "```tsx\n// Show only uploading files\n<FileUpload.PreviewList filter={(files) => files.filter(f => f.status === 'uploading')}>\n\n// Show only errors\n<FileUpload.PreviewList filter={(files) => files.filter(f => f.status === 'error')}>\n\n// Show files by status\n<FileUpload.PreviewList filter={(files) => files.filter(f => ['uploading', 'error'].includes(f.status))}>\n```",
+      "description": "Function to control which files determine the visibility of the list and the\n`state.files` value passed to the `className` callback.\n\nThe list is hidden (returns `null`) when the filtered result is empty.\nNote: this function does not automatically filter `children` — you must\nindependently filter the files rendered inside the list using the context.",
+      "example": "```tsx\n// Hide the list unless there are error files\n<FileUpload.PreviewList filter={(files) => files.filter(f => f.status === 'error')}>\n  {/* children must also filter independently *\\/}\n  {files.filter(f => f.status === 'error').map(file => (\n    <FileUpload.PreviewItem key={file.id} file={file}>{file.name}</FileUpload.PreviewItem>\n  ))}\n</FileUpload.PreviewList>\n```",
       "detailedType": "| ((\n    files: FileUpload.Root.ExtendedFile[],\n  ) => FileUpload.Root.ExtendedFile[])\n| undefined"
     },
     "className": {
@@ -23,10 +23,6 @@
       "detailedType": "| ReactElement\n| ((\n    props: HTMLProps,\n    state: FileUpload.PreviewList.State,\n  ) => ReactElement)"
     }
   },
-  "dataAttributes": {
-    "data-empty": {
-      "description": "Present when the preview list is empty."
-    }
-  },
+  "dataAttributes": {},
   "cssVariables": {}
 }
