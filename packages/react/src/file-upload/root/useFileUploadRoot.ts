@@ -315,7 +315,7 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
       }
       // single-file mode: replace with the newly selected file
       if (latestPrev !== prev) {
-        prev.forEach((f) => {
+        latestPrev.forEach((f) => {
           URL.revokeObjectURL(f.preview);
           previewUrlsRef.current.delete(f.id);
         });
