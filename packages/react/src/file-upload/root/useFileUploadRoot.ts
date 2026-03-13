@@ -377,6 +377,8 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
   });
 
   const retryFile = useStableCallback((id: string) => {
+    lastChangeReasonRef.current = FILE_UPLOAD_ROOT_CHANGE_REASONS.FILE_UPDATED;
+    lastChangeEventRef.current = undefined;
     setFiles((prev) => {
       return prev.map((file) => {
         if (file.id === id && file.status === 'error') {
@@ -396,6 +398,8 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
   const abortUpload = useStableCallback((id: string) => {
     const controller = abortControllersRef.current.get(id);
     if (controller) {
+      lastChangeReasonRef.current = FILE_UPLOAD_ROOT_CHANGE_REASONS.FILE_UPDATED;
+      lastChangeEventRef.current = undefined;
       controller.abort();
       abortControllersRef.current.delete(id);
       setFiles((prev) => {
@@ -420,6 +424,8 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
   });
 
   const pauseFile = useStableCallback((id: string) => {
+    lastChangeReasonRef.current = FILE_UPLOAD_ROOT_CHANGE_REASONS.FILE_UPDATED;
+    lastChangeEventRef.current = undefined;
     setFiles((prev) => {
       return prev.map((file) => {
         if (file.id === id && file.status === 'uploading') {
@@ -435,6 +441,8 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
   });
 
   const resumeFile = useStableCallback((id: string) => {
+    lastChangeReasonRef.current = FILE_UPLOAD_ROOT_CHANGE_REASONS.FILE_UPDATED;
+    lastChangeEventRef.current = undefined;
     setFiles((prev) => {
       return prev.map((file) => {
         if (file.id === id && file.status === 'paused') {
