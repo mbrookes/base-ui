@@ -4,7 +4,7 @@ import * as React from 'react';
 import { useStableCallback } from '@base-ui/utils/useStableCallback';
 import type { BaseUIComponentProps, NativeButtonProps } from '../../utils/types';
 import { useRenderElement } from '../../utils/useRenderElement';
-import { resolveClassName } from '../../utils/resolveClassName';
+import { useButton } from '../../use-button/useButton';
 import { useFileUploadContext } from '../root/FileUploadContext';
 import { fileUploadTriggerStateAttributesMapping } from './stateAttributesMapping';
 
@@ -39,60 +39,37 @@ export interface FileUploadTriggerProps
  *
  * @see [File Upload Documentation](https://base-ui.com/react/components/file-upload)
  */
-export const FileUploadTrigger = React.forwardRef<HTMLButtonElement, FileUploadTriggerProps>(
-  function FileUploadTriggerComponent(componentProps, ref) {
-    const { className, render, nativeButton, ...elementProps } = componentProps;
-    const { onClick: userOnClick, ...elementPropsWithoutOnClick } = elementProps;
-    const { openFileDialog, disabled } = useFileUploadContext();
+export const FileUploadTrigger = React.forwardRef(function FileUploadTriggerComponent(
+  componentProps: FileUploadTriggerProps,
+  ref: React.ForwardedRef<HTMLElement>,
+) {
+  const { render, className, nativeButton = true, ...elementProps } = componentProps;
+  const { openFileDialog, disabled } = useFileUploadContext();
 
-    const state: FileUploadTriggerState = React.useMemo(
-      () => ({
-        disabled,
-      }),
-      [disabled],
-    );
+  const { getButtonProps, buttonRef } = useButton({
+    disabled,
+    native: nativeButton,
+  });
 
-    const resolvedClassName = resolveClassName(className, state);
+  const state: FileUploadTriggerState = React.useMemo(
+    () => ({
+      disabled,
+    }),
+    [disabled],
+  );
 
-    const handleClick = useStableCallback((event: React.MouseEvent<HTMLButtonElement>) => {
-      if (disabled) {
-        return;
-      }
+  const handleClick = useStableCallback((event: React.SyntheticEvent<HTMLElement>) => {
+    event.preventDefault();
+    openFileDialog();
+  });
 
-      let baseUIHandlerPrevented = false;
-
-      (event as any).preventBaseUIHandler = () => {
-        baseUIHandlerPrevented = true;
-      };
-
-      if (typeof userOnClick === 'function') {
-        userOnClick(event);
-      }
-
-      if (baseUIHandlerPrevented) {
-        return;
-      }
-
-      event.preventDefault();
-      openFileDialog();
-    });
-
-    return useRenderElement('button', componentProps, {
-      state,
-      ref,
-      props: [
-        {
-          type: 'button',
-          className: resolvedClassName,
-          disabled,
-          onClick: handleClick,
-        },
-        elementPropsWithoutOnClick,
-      ],
-      stateAttributesMapping: fileUploadTriggerStateAttributesMapping,
-    });
-  },
-);
+  return useRenderElement('button', componentProps, {
+    state,
+    ref: [ref, buttonRef],
+    props: [{ onClick: handleClick }, elementProps, getButtonProps],
+    stateAttributesMapping: fileUploadTriggerStateAttributesMapping,
+  });
+});
 
 export namespace FileUploadTrigger {
   export type State = FileUploadTriggerState;

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi } from 'vitest';
 import { FileUpload } from '../index';
@@ -212,5 +212,94 @@ describe('FileUpload.Trigger', () => {
 
     button = screen.getByRole('button');
     expect(button).toHaveClass('disabled');
+  });
+
+  describe('nativeButton={false}', () => {
+    it('renders role="button" without type="button" on a non-button element', () => {
+      render(
+        <FileUpload.Root>
+          <FileUpload.Trigger render={<div />} nativeButton={false}>
+            Upload
+          </FileUpload.Trigger>
+        </FileUpload.Root>,
+      );
+
+      const trigger = screen.getByRole('button', { name: 'Upload' });
+      expect(trigger.tagName).toBe('DIV');
+      expect(trigger).not.toHaveAttribute('type');
+    });
+
+    it('uses aria-disabled instead of disabled attribute when disabled', () => {
+      render(
+        <FileUpload.Root disabled>
+          <FileUpload.Trigger render={<div />} nativeButton={false}>
+            Upload
+          </FileUpload.Trigger>
+        </FileUpload.Root>,
+      );
+
+      const trigger = screen.getByRole('button', { name: 'Upload' });
+      expect(trigger).toHaveAttribute('aria-disabled', 'true');
+      expect(trigger).not.toHaveAttribute('disabled');
+    });
+
+    it('opens file dialog when Enter key is pressed', () => {
+      render(
+        <FileUpload.Root>
+          <FileUpload.Trigger render={<div />} nativeButton={false}>
+            Upload
+          </FileUpload.Trigger>
+        </FileUpload.Root>,
+      );
+
+      const trigger = screen.getByRole('button', { name: 'Upload' });
+      const input = getFileInput();
+      const clickSpy = vi.spyOn(input, 'click');
+
+      trigger.focus();
+      fireEvent.keyDown(trigger, { key: 'Enter' });
+
+      expect(clickSpy).toHaveBeenCalled();
+    });
+
+    it('opens file dialog when Space key is released', () => {
+      render(
+        <FileUpload.Root>
+          <FileUpload.Trigger render={<div />} nativeButton={false}>
+            Upload
+          </FileUpload.Trigger>
+        </FileUpload.Root>,
+      );
+
+      const trigger = screen.getByRole('button', { name: 'Upload' });
+      const input = getFileInput();
+      const clickSpy = vi.spyOn(input, 'click');
+
+      trigger.focus();
+      fireEvent.keyUp(trigger, { key: ' ' });
+
+      expect(clickSpy).toHaveBeenCalled();
+    });
+  });
+
+  describe('preventBaseUIHandler', () => {
+    it('does not open file dialog when onClick calls preventBaseUIHandler', async () => {
+      const user = userEvent.setup();
+      const customClick = vi.fn((event) => event.preventBaseUIHandler());
+      render(
+        <FileUpload.Root>
+          <FileUpload.Trigger onClick={customClick}>Upload</FileUpload.Trigger>
+        </FileUpload.Root>,
+      );
+
+      const trigger = screen.getByRole('button', { name: 'Upload' });
+      const input = getFileInput();
+      const clickSpy = vi.spyOn(input, 'click');
+
+      await user.click(trigger);
+
+      expect(customClick).toHaveBeenCalled();
+      expect(clickSpy).not.toHaveBeenCalled();
+    });
   });
 });
