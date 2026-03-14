@@ -44,7 +44,7 @@ const formatBytes = (bytes: number, locale?: Intl.LocalesArgument) => {
   }
 
   const k = 1024;
-  const sizes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
+  const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
   const i = Math.min(Math.floor(Math.log(bytes) / Math.log(k)), sizes.length - 1);
 
   const value = bytes / Math.pow(k, i);
