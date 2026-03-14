@@ -301,11 +301,6 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
 
     setAnnouncement(`${successMsg}${separator}${errorMsg}`);
 
-    // Collect files whose preview URLs must be revoked because they were not
-    // ultimately added to state (dropped by the maxFiles cap or deduplicated by
-    // a concurrent update).
-    let filesToRevoke: FileUploadRootExtendedFile[] = [];
-
     // Use a functional update to merge our changes on top of the latest committed
     // state, preventing concurrent rapid calls from losing earlier additions.
     setFiles((latestPrev) => {
@@ -316,8 +311,12 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
         const actualRemaining = Math.max(0, maxFiles - latestPrev.length);
         const filesToAdd = validFiles.slice(0, actualRemaining);
 
-        // Files beyond the cap will not be added; schedule their URLs for revocation.
-        filesToRevoke = validFiles.slice(actualRemaining);
+        // Files beyond the cap will not be added; revoke their URLs immediately.
+        const droppedByCap = validFiles.slice(actualRemaining);
+        droppedByCap.forEach((f) => {
+          URL.revokeObjectURL(f.preview);
+          previewUrlsRef.current.delete(f.id);
+        });
 
         if (latestPrev === prev) {
           return filesToAdd.length > 0 ? [...latestPrev, ...filesToAdd] : latestPrev;
@@ -325,8 +324,12 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
         // A concurrent update has already been applied; merge our filesToAdd on top.
         const latestIds = new Set(latestPrev.map((f) => f.id));
         const uniqueFiles = filesToAdd.filter((f) => !latestIds.has(f.id));
-        // Files already present due to a concurrent update are also not added.
-        filesToRevoke = [...filesToRevoke, ...filesToAdd.filter((f) => latestIds.has(f.id))];
+        // Files already present due to a concurrent update are also not added; revoke their URLs.
+        const duplicates = filesToAdd.filter((f) => latestIds.has(f.id));
+        duplicates.forEach((f) => {
+          URL.revokeObjectURL(f.preview);
+          previewUrlsRef.current.delete(f.id);
+        });
         return uniqueFiles.length > 0 ? [...latestPrev, ...uniqueFiles] : latestPrev;
       }
       // single-file mode: replace with the newly selected file
@@ -337,12 +340,6 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
         });
       }
       return validFiles;
-    });
-
-    // Revoke preview URLs for any files that were not ultimately added to state.
-    filesToRevoke.forEach((f) => {
-      URL.revokeObjectURL(f.preview);
-      previewUrlsRef.current.delete(f.id);
     });
 
     if (!multiple) {
