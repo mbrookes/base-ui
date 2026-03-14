@@ -6,7 +6,6 @@ import { useIsoLayoutEffect } from '@base-ui/utils/useIsoLayoutEffect';
 import { visuallyHidden } from '@base-ui/utils/visuallyHidden';
 import { useRenderElement } from '../../utils/useRenderElement';
 import type { BaseUIComponentProps, HTMLProps } from '../../utils/types';
-import { resolveClassName } from '../../utils/resolveClassName';
 import type { BaseUIChangeEventDetails } from '../../utils/createBaseUIEventDetails';
 import { FileUploadContext } from './FileUploadContext';
 import { fileUploadRootStateAttributesMapping } from './stateAttributesMapping';
@@ -282,7 +281,6 @@ export const FileUploadRoot = React.forwardRef<HTMLDivElement, FileUploadRootPro
       [contextValue.isDragging, contextValue.disabled],
     );
 
-    const resolvedClassName = resolveClassName(className, state);
     const inputRef = React.useRef<HTMLInputElement | null>(null);
 
     const registerInputRef = useStableCallback((node: HTMLInputElement | null) => {
@@ -400,7 +398,6 @@ export const FileUploadRoot = React.forwardRef<HTMLDivElement, FileUploadRootPro
     });
 
     const defaultProps: HTMLProps = {
-      className: resolvedClassName,
       onDragEnter: handleDragEnter,
       onDragLeave: handleDragLeave,
       onDrop: handleDrop,

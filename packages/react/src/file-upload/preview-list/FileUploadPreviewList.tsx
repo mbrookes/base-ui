@@ -3,7 +3,6 @@
 import * as React from 'react';
 import type { BaseUIComponentProps } from '../../utils/types';
 import { useRenderElement } from '../../utils/useRenderElement';
-import { resolveClassName } from '../../utils/resolveClassName';
 import { useFileUploadContext } from '../root/FileUploadContext';
 import type { FileUploadRoot } from '../root/FileUploadRoot';
 import { fileUploadPreviewListStateAttributesMapping } from './stateAttributesMapping';
@@ -99,14 +98,11 @@ export const FileUploadPreviewList = React.forwardRef<HTMLUListElement, FileUplo
       [filteredFiles],
     );
 
-    const resolvedClassName = resolveClassName(className, state);
-
     return useRenderElement('ul', props, {
       state,
       ref,
       props: [
         {
-          className: resolvedClassName,
           children,
         },
         elementProps,
