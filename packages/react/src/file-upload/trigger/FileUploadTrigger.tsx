@@ -39,38 +39,37 @@ export interface FileUploadTriggerProps
  *
  * @see [File Upload Documentation](https://base-ui.com/react/components/file-upload)
  */
-export const FileUploadTrigger = React.forwardRef<HTMLButtonElement, FileUploadTriggerProps>(
-  function FileUploadTriggerComponent(componentProps, ref) {
-    const { render, className, nativeButton = true, ...elementProps } = componentProps;
-    const { openFileDialog, disabled } = useFileUploadContext();
+export const FileUploadTrigger = React.forwardRef(function FileUploadTriggerComponent(
+  componentProps: FileUploadTriggerProps,
+  ref: React.ForwardedRef<HTMLElement>,
+) {
+  const { render, className, nativeButton = true, ...elementProps } = componentProps;
+  const { openFileDialog, disabled } = useFileUploadContext();
 
-    const { getButtonProps, buttonRef } = useButton({
+  const { getButtonProps, buttonRef } = useButton({
+    disabled,
+    native: nativeButton,
+  });
+
+  const state: FileUploadTriggerState = React.useMemo(
+    () => ({
       disabled,
-      native: nativeButton,
-    });
+    }),
+    [disabled],
+  );
 
-    const state: FileUploadTriggerState = React.useMemo(
-      () => ({
-        disabled,
-      }),
-      [disabled],
-    );
+  const handleClick = useStableCallback((event: React.SyntheticEvent<HTMLElement>) => {
+    event.preventDefault();
+    openFileDialog();
+  });
 
-    const handleClick = useStableCallback(
-      (event: React.SyntheticEvent<HTMLElement>) => {
-        event.preventDefault();
-        openFileDialog();
-      },
-    );
-
-    return useRenderElement('button', componentProps, {
-      state,
-      ref: [ref, buttonRef],
-      props: [{ onClick: handleClick }, elementProps, getButtonProps],
-      stateAttributesMapping: fileUploadTriggerStateAttributesMapping,
-    });
-  },
-);
+  return useRenderElement('button', componentProps, {
+    state,
+    ref: [ref, buttonRef],
+    props: [{ onClick: handleClick }, elementProps, getButtonProps],
+    stateAttributesMapping: fileUploadTriggerStateAttributesMapping,
+  });
+});
 
 export namespace FileUploadTrigger {
   export type State = FileUploadTriggerState;
