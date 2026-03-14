@@ -318,20 +318,20 @@ export const FileUploadRoot = React.forwardRef<HTMLDivElement, FileUploadRootPro
     });
 
     const handleDragEnter = useStableCallback((event: React.DragEvent) => {
+      event.preventDefault();
+      event.stopPropagation();
       if (contextValue.disabled) {
         return;
       }
-      event.preventDefault();
-      event.stopPropagation();
       setIsDragging(true);
     });
 
     const handleDragLeave = useStableCallback((event: React.DragEvent) => {
+      event.preventDefault();
+      event.stopPropagation();
       if (contextValue.disabled) {
         return;
       }
-      event.preventDefault();
-      event.stopPropagation();
       if (event.currentTarget.contains(event.relatedTarget as Node)) {
         return;
       }
@@ -339,11 +339,11 @@ export const FileUploadRoot = React.forwardRef<HTMLDivElement, FileUploadRootPro
     });
 
     const handleDrop = useStableCallback((event: React.DragEvent) => {
+      event.preventDefault();
+      event.stopPropagation();
       if (contextValue.disabled) {
         return;
       }
-      event.preventDefault();
-      event.stopPropagation();
       setIsDragging(false);
 
       if (event.dataTransfer.files && event.dataTransfer.files.length > 0) {
@@ -352,11 +352,11 @@ export const FileUploadRoot = React.forwardRef<HTMLDivElement, FileUploadRootPro
     });
 
     const handleDragOver = useStableCallback((event: React.DragEvent) => {
+      event.preventDefault();
+      event.stopPropagation();
       if (contextValue.disabled) {
         return;
       }
-      event.preventDefault();
-      event.stopPropagation();
       // Set dropEffect to indicate valid drop target
       if (event.dataTransfer) {
         event.dataTransfer.dropEffect = 'copy';
