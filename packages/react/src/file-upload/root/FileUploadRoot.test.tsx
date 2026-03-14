@@ -122,7 +122,7 @@ describe('FileUpload', () => {
     expect(dropzone).toHaveAttribute('aria-disabled', 'true');
   });
 
-  it('does not render preview list when there are no files', () => {
+  it('applies data-empty attribute to preview list when there are no files', () => {
     render(
       <FileUpload.Root>
         <FileUpload.PreviewList data-testid="preview-list">
@@ -131,7 +131,7 @@ describe('FileUpload', () => {
       </FileUpload.Root>,
     );
 
-    expect(screen.queryByTestId('preview-list')).not.toBeInTheDocument();
+    expect(screen.getByTestId('preview-list')).toHaveAttribute('data-empty');
   });
 
   it('applies correct accept attribute to input', () => {

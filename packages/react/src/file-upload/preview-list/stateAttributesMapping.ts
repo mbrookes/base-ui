@@ -4,7 +4,7 @@ import { FileUploadPreviewListDataAttributes } from './FileUploadPreviewListData
 
 export const fileUploadPreviewListStateAttributesMapping: StateAttributesMapping<FileUploadPreviewList.State> =
   {
-    files(value): Record<string, string> | null {
+    files(): Record<string, string> | null {
       return null;
     },
     empty(value): Record<string, string> | null {

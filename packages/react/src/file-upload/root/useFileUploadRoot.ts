@@ -356,28 +356,25 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
     lastChangeReasonRef.current = FILE_UPLOAD_ROOT_CHANGE_REASONS.FILE_REMOVED;
     lastChangeEventRef.current = undefined;
 
-    setFiles((prev) => {
-      const fileToRemove = prev.find((f) => f.id === id);
-      if (fileToRemove) {
-        setAnnouncement(messages.fileRemoved(fileToRemove.name));
-        URL.revokeObjectURL(fileToRemove.preview);
-        previewUrlsRef.current.delete(id);
-      }
-      return prev.filter((f) => f.id !== id);
-    });
+    const fileToRemove = filesRef.current.find((f) => f.id === id);
+    if (fileToRemove) {
+      setAnnouncement(messages.fileRemoved(fileToRemove.name));
+      URL.revokeObjectURL(fileToRemove.preview);
+      previewUrlsRef.current.delete(id);
+    }
+
+    setFiles((prev) => prev.filter((f) => f.id !== id));
   });
 
   const clearFiles = useStableCallback(() => {
     lastChangeReasonRef.current = FILE_UPLOAD_ROOT_CHANGE_REASONS.FILES_CLEARED;
     lastChangeEventRef.current = undefined;
 
-    setFiles((prev) => {
-      prev.forEach((file) => {
-        URL.revokeObjectURL(file.preview);
-        previewUrlsRef.current.delete(file.id);
-      });
-      return [];
+    filesRef.current.forEach((file) => {
+      URL.revokeObjectURL(file.preview);
+      previewUrlsRef.current.delete(file.id);
     });
+    setFiles([]);
     setAnnouncement(messages.allFilesRemoved());
   });
 
@@ -390,18 +387,23 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
   const retryFile = useStableCallback((id: string) => {
     lastChangeReasonRef.current = FILE_UPLOAD_ROOT_CHANGE_REASONS.FILE_UPDATED;
     lastChangeEventRef.current = undefined;
+
+    const file = filesRef.current.find((f) => f.id === id && f.status === 'error');
+    if (file) {
+      onRetry?.(file);
+      setAnnouncement(messages.retryingUpload(file.name));
+    }
+
     setFiles((prev) => {
-      return prev.map((file) => {
-        if (file.id === id && file.status === 'error') {
-          onRetry?.(file);
-          setAnnouncement(messages.retryingUpload(file.name));
-          return Object.assign(file, {
+      return prev.map((f) => {
+        if (f.id === id && f.status === 'error') {
+          return Object.assign(f, {
             status: 'idle' as FileUploadRootFileStatus,
             progress: 0,
             error: undefined,
           });
         }
-        return file;
+        return f;
       });
     });
   });
@@ -413,16 +415,21 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
       lastChangeEventRef.current = undefined;
       controller.abort();
       abortControllersRef.current.delete(id);
+
+      const file = filesRef.current.find((f) => f.id === id && f.status === 'uploading');
+      if (file) {
+        setAnnouncement(messages.uploadCanceled(file.name));
+      }
+
       setFiles((prev) => {
-        return prev.map((file) => {
-          if (file.id === id && file.status === 'uploading') {
-            setAnnouncement(messages.uploadCanceled(file.name));
-            return Object.assign(file, {
+        return prev.map((f) => {
+          if (f.id === id && f.status === 'uploading') {
+            return Object.assign(f, {
               status: 'error' as FileUploadRootFileStatus,
               error: 'Upload canceled',
             });
           }
-          return file;
+          return f;
         });
       });
     }
@@ -437,16 +444,21 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
   const pauseFile = useStableCallback((id: string) => {
     lastChangeReasonRef.current = FILE_UPLOAD_ROOT_CHANGE_REASONS.FILE_UPDATED;
     lastChangeEventRef.current = undefined;
+
+    const file = filesRef.current.find((f) => f.id === id && f.status === 'uploading');
+    if (file) {
+      onFilePause?.(file);
+    }
+
     setFiles((prev) => {
-      return prev.map((file) => {
-        if (file.id === id && file.status === 'uploading') {
-          onFilePause?.(file);
-          return Object.assign(file, {
+      return prev.map((f) => {
+        if (f.id === id && f.status === 'uploading') {
+          return Object.assign(f, {
             status: 'paused' as FileUploadRootFileStatus,
             isPaused: true,
           });
         }
-        return file;
+        return f;
       });
     });
   });
@@ -454,16 +466,21 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
   const resumeFile = useStableCallback((id: string) => {
     lastChangeReasonRef.current = FILE_UPLOAD_ROOT_CHANGE_REASONS.FILE_UPDATED;
     lastChangeEventRef.current = undefined;
+
+    const file = filesRef.current.find((f) => f.id === id && f.status === 'paused');
+    if (file) {
+      onFileResume?.(file);
+    }
+
     setFiles((prev) => {
-      return prev.map((file) => {
-        if (file.id === id && file.status === 'paused') {
-          onFileResume?.(file);
-          return Object.assign(file, {
+      return prev.map((f) => {
+        if (f.id === id && f.status === 'paused') {
+          return Object.assign(f, {
             status: 'uploading' as FileUploadRootFileStatus,
             isPaused: false,
           });
         }
-        return file;
+        return f;
       });
     });
   });
