@@ -321,10 +321,10 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
           return filesToAdd.length > 0 ? [...latestPrev, ...filesToAdd] : latestPrev;
         }
         // A concurrent update has already been applied; merge our filesToAdd on top.
-        const latestIds = new Set(latestPrev.map((f) => f.id));
-        const uniqueFiles = filesToAdd.filter((f) => !latestIds.has(f.id));
+        const latestKeys = new Set(latestPrev.map((f) => getFileKey(f.file)));
+        const uniqueFiles = filesToAdd.filter((f) => !latestKeys.has(getFileKey(f.file)));
         // Files already present due to a concurrent update are also not added; queue their ids for cleanup.
-        const duplicates = filesToAdd.filter((f) => latestIds.has(f.id));
+        const duplicates = filesToAdd.filter((f) => latestKeys.has(getFileKey(f.file)));
         duplicates.forEach((f) => {
           filesToRevoke.add(f.id);
         });
