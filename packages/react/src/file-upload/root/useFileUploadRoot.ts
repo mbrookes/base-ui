@@ -311,11 +311,10 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
         const actualRemaining = Math.max(0, maxFiles - latestPrev.length);
         const filesToAdd = validFiles.slice(0, actualRemaining);
 
-        // Files beyond the cap will not be added; revoke their URLs immediately.
+        // Files beyond the cap will not be added; queue their ids for cleanup.
         const droppedByCap = validFiles.slice(actualRemaining);
         droppedByCap.forEach((f) => {
-          URL.revokeObjectURL(f.preview);
-          previewUrlsRef.current.delete(f.id);
+          filesToRevokeRef.current.add(f.id);
         });
 
         if (latestPrev === prev) {
@@ -324,19 +323,17 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
         // A concurrent update has already been applied; merge our filesToAdd on top.
         const latestIds = new Set(latestPrev.map((f) => f.id));
         const uniqueFiles = filesToAdd.filter((f) => !latestIds.has(f.id));
-        // Files already present due to a concurrent update are also not added; revoke their URLs.
+        // Files already present due to a concurrent update are also not added; queue their ids for cleanup.
         const duplicates = filesToAdd.filter((f) => latestIds.has(f.id));
         duplicates.forEach((f) => {
-          URL.revokeObjectURL(f.preview);
-          previewUrlsRef.current.delete(f.id);
+          filesToRevokeRef.current.add(f.id);
         });
         return uniqueFiles.length > 0 ? [...latestPrev, ...uniqueFiles] : latestPrev;
       }
       // single-file mode: replace with the newly selected file
       if (latestPrev !== prev) {
         latestPrev.forEach((f) => {
-          URL.revokeObjectURL(f.preview);
-          previewUrlsRef.current.delete(f.id);
+          filesToRevokeRef.current.add(f.id);
         });
       }
       return validFiles;
