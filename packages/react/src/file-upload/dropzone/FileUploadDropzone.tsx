@@ -102,7 +102,11 @@ export const FileUploadDropzone = React.forwardRef<HTMLDivElement, FileUploadDro
       props: [
         {
           'aria-disabled': state.disabled || undefined,
-          'aria-label': elementProps['aria-label'] || 'Drop files here or click to select',
+          'aria-label':
+            elementProps['aria-label'] ??
+            (elementProps['aria-labelledby'] == null
+              ? 'Drop files here or click to select'
+              : undefined),
           role: 'button',
           tabIndex: state.disabled ? -1 : 0,
           className: resolvedClassName,
