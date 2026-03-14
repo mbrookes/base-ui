@@ -314,7 +314,7 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
         // Files beyond the cap will not be added; queue their ids for cleanup.
         const droppedByCap = validFiles.slice(actualRemaining);
         droppedByCap.forEach((f) => {
-          filesToRevokeRef.current.add(f.id);
+          filesToRevoke.add(f.id);
         });
 
         if (latestPrev === prev) {
@@ -326,14 +326,14 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
         // Files already present due to a concurrent update are also not added; queue their ids for cleanup.
         const duplicates = filesToAdd.filter((f) => latestIds.has(f.id));
         duplicates.forEach((f) => {
-          filesToRevokeRef.current.add(f.id);
+          filesToRevoke.add(f.id);
         });
         return uniqueFiles.length > 0 ? [...latestPrev, ...uniqueFiles] : latestPrev;
       }
       // single-file mode: replace with the newly selected file
       if (latestPrev !== prev) {
         latestPrev.forEach((f) => {
-          filesToRevokeRef.current.add(f.id);
+          filesToRevoke.add(f.id);
         });
       }
       return validFiles;
