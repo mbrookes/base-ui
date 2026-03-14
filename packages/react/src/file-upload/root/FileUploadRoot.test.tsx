@@ -1409,6 +1409,46 @@ describe('FileUpload', () => {
         expect(getTestContext(contextValue).files).toHaveLength(3);
       });
     });
+
+    it('revokes preview URLs for files dropped by maxFiles cap during concurrent addFiles', async () => {
+      // Both addFiles calls happen before React commits, so both see remainingSlots = 2.
+      // First updater commits [A, B]. Second updater then sees actualRemaining = 0
+      // and drops C and D; their preview URLs must be revoked to avoid a memory leak.
+      let contextValue: TestFileUploadContext | null = null;
+
+      function TestComponent() {
+        const ctx = FileUpload.useFileUploadContext();
+        contextValue = ctx as unknown as TestFileUploadContext;
+        return null;
+      }
+
+      render(
+        <FileUpload.Root maxFiles={2} multiple>
+          <TestComponent />
+        </FileUpload.Root>,
+      );
+
+      const fileA = new File(['a'], 'a.txt', { type: 'text/plain' });
+      const fileB = new File(['b'], 'b.txt', { type: 'text/plain' });
+      const fileC = new File(['c'], 'c.txt', { type: 'text/plain' });
+      const fileD = new File(['d'], 'd.txt', { type: 'text/plain' });
+
+      const revokeObjectURLSpy = vi.spyOn(URL, 'revokeObjectURL');
+
+      act(() => {
+        getTestContext(contextValue).addFiles([fileA, fileB]);
+        getTestContext(contextValue).addFiles([fileC, fileD]);
+      });
+
+      await waitFor(() => {
+        expect(getTestContext(contextValue).files).toHaveLength(2);
+      });
+
+      // C and D were validated (preview URLs created) but dropped by the cap.
+      expect(revokeObjectURLSpy).toHaveBeenCalledTimes(2);
+
+      revokeObjectURLSpy.mockRestore();
+    });
   });
 
   describe('onFileChange callback', () => {

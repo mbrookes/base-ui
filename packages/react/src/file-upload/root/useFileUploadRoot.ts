@@ -311,46 +311,34 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
         const actualRemaining = Math.max(0, maxFiles - latestPrev.length);
         const filesToAdd = validFiles.slice(0, actualRemaining);
 
-        // Files beyond the cap will not be added; queue their ids for cleanup.
-        const droppedByCap = validFiles.slice(actualRemaining);
-        droppedByCap.forEach((f) => {
-          filesToRevoke.add(f.id);
+        // Files beyond the cap will not be added; revoke their preview URLs now.
+        validFiles.slice(actualRemaining).forEach((f) => {
+          URL.revokeObjectURL(f.preview);
+          previewUrlsRef.current.delete(f.id);
         });
 
         if (latestPrev === prev) {
           return filesToAdd.length > 0 ? [...latestPrev, ...filesToAdd] : latestPrev;
         }
         // A concurrent update has already been applied; merge our filesToAdd on top.
-        const latestKeys = new Set(latestPrev.map((f) => getFileKey(f.file)));
-        const uniqueFiles = filesToAdd.filter((f) => !latestKeys.has(getFileKey(f.file)));
-        // Files already present due to a concurrent update are also not added; queue their ids for cleanup.
-        const duplicates = filesToAdd.filter((f) => latestKeys.has(getFileKey(f.file)));
-        duplicates.forEach((f) => {
-          filesToRevoke.add(f.id);
+        const latestKeys = new Set(latestPrev.map((f) => getFileKey(f)));
+        const uniqueFiles = filesToAdd.filter((f) => !latestKeys.has(getFileKey(f)));
+        // Files already present due to a concurrent update are also not added; revoke their URLs.
+        filesToAdd.filter((f) => latestKeys.has(getFileKey(f))).forEach((f) => {
+          URL.revokeObjectURL(f.preview);
+          previewUrlsRef.current.delete(f.id);
         });
         return uniqueFiles.length > 0 ? [...latestPrev, ...uniqueFiles] : latestPrev;
       }
       // single-file mode: replace with the newly selected file
       if (latestPrev !== prev) {
         latestPrev.forEach((f) => {
-          filesToRevoke.add(f.id);
+          URL.revokeObjectURL(f.preview);
+          previewUrlsRef.current.delete(f.id);
         });
       }
       return validFiles;
     });
-
-    // Flush any queued previews that should be revoked.
-    if (filesToRevokeRef.current.size > 0) {
-      const idsToRevoke = Array.from(filesToRevokeRef.current);
-      idsToRevoke.forEach((id) => {
-        const previewUrl = previewUrlsRef.current.get(id);
-        if (previewUrl) {
-          URL.revokeObjectURL(previewUrl);
-          previewUrlsRef.current.delete(id);
-        }
-      });
-      filesToRevokeRef.current.clear();
-    }
 
     if (!multiple) {
       // Revoke URLs for files that are being replaced.
