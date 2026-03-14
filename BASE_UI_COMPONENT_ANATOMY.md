@@ -24,7 +24,12 @@ This document provides a comprehensive guide for creating new Base UI component
 
 ### Component Root Directory
 
-Every component has its own directory under `packages/react/src/` with this structure:
+Every component has its own directory under `packages/react/src/`, but there are two common shapes:
+
+1. Compound components (multiple parts)
+2. Single-part components (one public primitive)
+
+Typical structures:
 
 ```plaintext
 component-name/
@@ -41,15 +46,21 @@ component-name/
 │   └── SubcomponentBDataAttributes.ts
 └── utils/                            # Component-specific utilities (optional)
     └── helper.ts
+
+  single-part-component/
+  ├── index.ts                          # Main export file
+  ├── ComponentName.tsx                 # Component implementation
+  ├── ComponentName.test.tsx            # Component tests
+  └── ComponentNameDataAttributes.tsx   # Optional; only when explicit enum is used
 ```
 
 **Key Rules:**
 
-- Each subcomponent gets its own subdirectory
-- Directory names use kebab-case: `file-upload`, `checkbox-root`
+- Compound components usually place each part in its own subdirectory
+- Directory names use kebab-case for component folders: `file-upload`, `number-field`, `context-menu`
 - File names use PascalCase matching the component: `FileUploadRoot.tsx`
 - Test files are co-located with their components: `FileUploadRoot.test.tsx`
-- For each component or subcomponent that uses data attributes, a corresponding DataAttributes file is present: `SubcomponentNameDataAttributes.ts`
+- `DataAttributes` enum files are common but optional; some parts rely on default state-to-data-attribute mapping instead
 
 ---
 
@@ -57,7 +68,7 @@ component-name/
 
 ### Main Export File (`index.ts`)
 
-Purpose: Main entry point that exports the component namespace and type definitions.
+Purpose: Main entry point that exports either a namespace (compound components) or direct primitives (single-part components), plus type definitions.
 
 ```typescript
 export * as ComponentName from './index.parts';
@@ -67,10 +78,11 @@ export type * from './subcomponent/Subcomponent';
 // ... export types from all subcomponents
 ```
 
-**Pattern:**
+**Patterns:**
 
-1. Export namespace using `* as ComponentName` from `index.parts`
-2. Export all type definitions with `export type *` from each subcomponent
+1. Compound components export a namespace using `* as ComponentName` from `index.parts`
+2. Single-part components export the primitive directly from `index.ts`
+3. Export type definitions with `export type *` as applicable
 
 ### Namespace Export File (`index.parts.ts`)
 
@@ -94,7 +106,7 @@ export { ComponentTrigger as Trigger } from './trigger/ComponentTrigger';
 
 ### Component File Structure
 
-Every component follows this structure:
+Many part components follow this structure (especially parts that render a DOM node):
 
 ```typescript
 'use client';
@@ -190,16 +202,16 @@ export namespace ComponentName {
 1. **'use client' directive**: Always first line for client components
 2. **React namespace import**: `import * as React from 'react'`
 3. **Never import hooks directly**: Use `React.useState`, `React.useRef`, etc.
-4. **forwardRef**: All components use `React.forwardRef`
+4. **forwardRef**: Most DOM-rendering parts use `React.forwardRef`; root/provider wrappers may be plain functions
 5. **Named function**: Use function name matching component: `function ComponentName`
 6. **Props typing**: Props parameter typed as `ComponentName.Props`
-7. **Ref typing**: Ref parameter typed as `React.ForwardedRef<HTMLElement>`
-8. **State object**: Always memoized with `React.useMemo`
+7. **Ref typing**: Use the concrete element type where applicable (`HTMLButtonElement`, `HTMLDivElement`, etc.)
+8. **State object**: Memoize derived state objects passed to `useRenderElement`/context when useful
 9. **Namespace pattern**: Export State and Props through namespace
 
 ### Critical Hook Usage
 
-**Base UI Utilities (always use these):**
+**Base UI Utilities (use these when relevant):**
 
 ```typescript
 // CORRECT - Use Base UI wrapper utilities
@@ -346,7 +358,7 @@ function handleChange(
 
 **What to export in namespaces:**
 
-1. **Always export:** `State`, `Props`
+1. **Usually export:** `State`, `Props` for public parts
 2. **Export if component has change events:** `ChangeEventDetails`, `ChangeReason`
 3. **Export if component has parameters:** `Parameters` interface
 4. **Export if component has imperative methods:** `Actions` interface
@@ -357,8 +369,8 @@ function handleChange(
 1. All optional props MUST include `| undefined` in the type union
 2. Use JSDoc comments for all public interfaces
 3. Include `@default` tags for props with defaults
-4. State interfaces never extend other interfaces (compose with spread)
-5. Props interfaces ALWAYS extend `BaseUIComponentProps<Element, State>`
+4. State interfaces are typically explicit and local to the part; avoid unnecessary inheritance
+5. Public renderable parts typically extend `BaseUIComponentProps<Element, State>`
 6. Boolean props default to `false` unless stated otherwise
 
 ---
@@ -372,7 +384,11 @@ function handleChange(
 import * as React from 'react';
 import type { ComponentRoot } from './ComponentRoot';
 
-export type ComponentRootContext = ComponentRoot.State;
+export interface ComponentRootContext {
+  // Include only fields required by child parts
+  disabled: boolean;
+  // Additional actions/refs/state as needed
+}
 
 export const ComponentRootContext = React.createContext<ComponentRootContext | undefined>(
   undefined,
@@ -392,10 +408,10 @@ export function useComponentRootContext() {
 
 **Pattern Rules:**
 
-1. Context type aliases the component's State type
+1. Context shape is purpose-built for consumers (it may be a subset/superset of root state)
 2. Context default value is `undefined` (not `null`)
 3. Hook throws descriptive error when context is missing
-4. Error message format: `'Base UI: ContextName is missing. Parts must be placed within <Component.Root>.'`
+4. Error messages should follow the `Base UI: ...` format and clearly explain required parent placement
 5. Hook name follows pattern: `use[ComponentName]Context`
 
 ### Context Provider Usage
@@ -454,7 +470,7 @@ const [value, setValue] = useControlled({
 
 ### State Object Pattern
 
-Always create a memoized state object for child components:
+When a part exposes render-state or data attributes, create a state object for child components:
 
 ```typescript
 const state: ComponentName.State = React.useMemo(
@@ -470,8 +486,8 @@ const state: ComponentName.State = React.useMemo(
 
 **Rules:**
 
-1. State object must include all properties from State interface
-2. Always memoize with `React.useMemo`
+1. State object should match the public `State` interface for that part
+2. Memoize when derived values would otherwise recreate unnecessarily
 3. Include all state values in dependency array
 4. Use this state object for context provider and render element
 
@@ -517,8 +533,8 @@ onValueChange?: ((
 
 **Critical Rules:**
 
-1. Always use `useStableCallback` for event handlers
-2. Always create change event details
+1. Use `useStableCallback` for handlers that must remain stable across renders/effects
+2. Create change event details for cancellable/metadata-rich public change callbacks
 3. Check `details.isCanceled` before updating state
 4. Pass both value and details to parent callback
 5. Include optional `nativeEvent` when available
@@ -644,7 +660,7 @@ export { ComponentContent as Content } from './content/ComponentContent';
 
 ### DataAttributes Enum
 
-Every subcomponent has a DataAttributes file:
+Many parts have a `DataAttributes` enum file:
 
 ```typescript
 // ComponentNameDataAttributes.ts
@@ -663,6 +679,8 @@ export enum ComponentNameDataAttributes {
   open = 'data-open',
 }
 ```
+
+Some parts rely on explicit enum mapping, while others use default mapping from `useRenderElement` (`stateKey: true` -> `data-statekey`).
 
 **Common Data Attributes:**
 
@@ -697,8 +715,8 @@ import type { StateAttributesMapping } from '../../utils/getStateAttributesProps
 
 const stateAttributesMapping: StateAttributesMapping<ComponentName.State> = React.useMemo(
   () => ({
-    disabled: (state) => (state.disabled ? '' : null),
-    open: (state) => (state.open ? '' : null),
+    disabled: (value) => (value ? { 'data-disabled': '' } : null),
+    open: (value) => (value ? { 'data-open': '' } : null),
     // Map each state property to data attribute
   }),
   [],
@@ -766,7 +784,7 @@ describe('Component.SubcomponentName', () => {
     );
 
     const element = screen.getByTestId('test');
-    expect(element).toHaveAttribute('data-disabled', 'true');
+    expect(element).toHaveAttribute('data-disabled');
   });
 
   it('forwards ref correctly', () => {
@@ -810,6 +828,7 @@ describe('Component.SubcomponentName', () => {
 - Use `vitest` for test runner: `describe`, `it`, `expect`, `vi`
 - Use `@testing-library/react` for rendering: `render`, `screen`, `waitFor`
 - Use `@testing-library/user-event` for interactions
+- Use shared conformance helpers where applicable (`describeConformance`)
 - Never use `container.querySelector` when `screen` queries work
 - Prefer `getByRole` over other queries for accessibility
 
@@ -952,7 +971,7 @@ Use these gates for any component PR, not just File Upload.
 
 ```typescript
 'use client';
-// 1. React import (always first after 'use client')
+// 1. React import (typically first after 'use client')
 import * as React from 'react';
 
 // 2. Base UI utility imports (from @base-ui/utils)
@@ -966,7 +985,7 @@ import type { BaseUIComponentProps } from '../../utils/types';
 // 4. Component-specific imports (contexts, other components)
 import { useParentContext } from '../parent/ParentContext';
 
-// 5. Type-only imports at the end
+// 5. Type-only imports grouped consistently (often near related imports)
 import type { SomeType } from './types';
 ```
 
@@ -1040,24 +1059,24 @@ When creating a new component, verify:
 ### Structure
 
 - [ ] Created directory: `packages/react/src/component-name/`
-- [ ] Created `index.ts` with namespace export
-- [ ] Created `index.parts.ts` with short aliases
-- [ ] Each subcomponent in its own subdirectory
-- [ ] Each subcomponent has DataAttributes file
+- [ ] Created `index.ts` with appropriate exports (namespace for compound components; direct export for single-part components)
+- [ ] Created `index.parts.ts` with short aliases (compound components only)
+- [ ] Each subcomponent in its own subdirectory (compound components only)
+- [ ] Added DataAttributes enum files where explicit state mapping is needed
 - [ ] Tests co-located with components
 
 ### Implementation
 
 - [ ] `'use client'` directive first line
 - [ ] `import * as React from 'react'` (not destructured)
-- [ ] Used `React.forwardRef` with named function
+- [ ] Used `React.forwardRef` for DOM-rendering parts
 - [ ] Props typed as `ComponentName.Props`
-- [ ] Ref typed as `React.ForwardedRef<HTMLElement>`
-- [ ] State object created with `React.useMemo`
-- [ ] Used `useStableCallback` for event handlers
-- [ ] Used `useIsoLayoutEffect` instead of `useLayoutEffect`
+- [ ] Ref typed with the concrete element type where applicable
+- [ ] Memoized derived state objects when needed
+- [ ] Used `useStableCallback` for handlers requiring stable identity
+- [ ] Used `useIsoLayoutEffect` instead of `useLayoutEffect` when layout effect is required
 - [ ] Context pattern implemented correctly
-- [ ] Change events use `createChangeEventDetails`
+- [ ] Change events use `createChangeEventDetails` when exposing cancellable change details
 
 ### Types
 
