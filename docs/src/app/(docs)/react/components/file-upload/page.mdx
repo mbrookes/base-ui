@@ -995,7 +995,7 @@ export default function FileUploadWithFiltering() {
 }
 ```
 
-The `filter` function receives the full array of files and returns a filtered array. Only the filtered files are rendered in the preview list.
+The `filter` function receives the full array of files and returns a filtered array. The filtered result is used to determine the `data-empty` state and is passed as `state.files` to the `className` function; it does not automatically filter the `children` you render inside `PreviewList`.
 
 ### Locale-based formatting
 
