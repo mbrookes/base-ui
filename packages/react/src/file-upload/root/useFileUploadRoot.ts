@@ -339,6 +339,19 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
       return validFiles;
     });
 
+    // Flush any queued previews that should be revoked.
+    if (filesToRevokeRef.current.size > 0) {
+      const idsToRevoke = Array.from(filesToRevokeRef.current);
+      idsToRevoke.forEach((id) => {
+        const previewUrl = previewUrlsRef.current.get(id);
+        if (previewUrl) {
+          URL.revokeObjectURL(previewUrl);
+          previewUrlsRef.current.delete(id);
+        }
+      });
+      filesToRevokeRef.current.clear();
+    }
+
     if (!multiple) {
       // Revoke URLs for files that are being replaced.
       const nextIds = new Set(validFiles.map((f) => f.id));
