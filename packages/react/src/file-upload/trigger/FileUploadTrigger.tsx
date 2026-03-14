@@ -57,7 +57,7 @@ export const FileUploadTrigger = React.forwardRef<HTMLButtonElement, FileUploadT
     );
 
     const handleClick = useStableCallback(
-      (event: React.SyntheticEvent<HTMLButtonElement>) => {
+      (event: React.SyntheticEvent<HTMLElement>) => {
         event.preventDefault();
         openFileDialog();
       },
