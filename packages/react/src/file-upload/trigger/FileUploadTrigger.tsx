@@ -62,8 +62,6 @@ export const FileUploadTrigger = React.forwardRef<HTMLButtonElement, FileUploadT
         openFileDialog();
       },
     );
-      },
-    );
 
     return useRenderElement('button', componentProps, {
       state,
