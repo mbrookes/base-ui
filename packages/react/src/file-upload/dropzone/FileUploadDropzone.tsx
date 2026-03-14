@@ -4,7 +4,6 @@ import * as React from 'react';
 import { useStableCallback } from '@base-ui/utils/useStableCallback';
 import type { BaseUIComponentProps } from '../../utils/types';
 import { useRenderElement } from '../../utils/useRenderElement';
-import { resolveClassName } from '../../utils/resolveClassName';
 import { useFileUploadContext } from '../root/FileUploadContext';
 import { fileUploadDropzoneStateAttributesMapping } from './stateAttributesMapping';
 
@@ -54,7 +53,7 @@ export interface FileUploadDropzoneProps extends Omit<
  */
 export const FileUploadDropzone = React.forwardRef<HTMLDivElement, FileUploadDropzoneProps>(
   function FileUploadDropzoneComponent(props, ref) {
-    const { children, className, ...elementProps } = props;
+    const { children, ...elementProps } = props;
     const { isDragging, disabled, openFileDialog } = useFileUploadContext();
 
     const state: FileUploadDropzoneState = React.useMemo(
@@ -64,8 +63,6 @@ export const FileUploadDropzone = React.forwardRef<HTMLDivElement, FileUploadDro
       }),
       [isDragging, disabled],
     );
-
-    const resolvedClassName = resolveClassName(className, state);
 
     const handleClick = useStableCallback((event: React.MouseEvent<HTMLDivElement>) => {
       if (disabled) {
@@ -109,7 +106,6 @@ export const FileUploadDropzone = React.forwardRef<HTMLDivElement, FileUploadDro
               : undefined),
           role: 'button',
           tabIndex: state.disabled ? -1 : 0,
-          className: resolvedClassName,
           onClick: handleClick,
           onKeyDown: handleKeyDown,
           children: typeof children === 'function' ? children({ isDragging }) : children,
