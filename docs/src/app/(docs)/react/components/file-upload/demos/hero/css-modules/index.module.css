@@ -152,13 +152,6 @@
   }
 }
 
-.errorMessage {
-  margin-top: 1rem;
-  margin-bottom: 0;
-  font-size: 0.875rem;
-  color: #dc2626;
-}
-
 .errorMessageList {
   margin-top: 1rem;
   margin-bottom: 0;
