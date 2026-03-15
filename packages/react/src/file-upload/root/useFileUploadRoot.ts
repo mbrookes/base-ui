@@ -356,15 +356,15 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
     lastChangeReasonRef.current = FILE_UPLOAD_ROOT_CHANGE_REASONS.FILE_REMOVED;
     lastChangeEventRef.current = undefined;
 
-    // Capture the name inside the updater so we use the correct `prev` snapshot
-    // (handles batched addFiles + removeFile in the same flush).
-    let removedFileName: string | null = null;
+    // Read the name before setFiles so the announcement fires reliably —
+    // functional updaters don't run synchronously before setState returns.
+    const removedFileName = filesRef.current.find((f) => f.id === id)?.name ?? null;
 
     setFiles((prev) => {
+      // URL revocation stays inside the updater so it uses the correct `prev`
+      // snapshot and handles batched addFiles + removeFile correctly.
       const fileToRemove = prev.find((f) => f.id === id);
       if (fileToRemove) {
-        removedFileName = fileToRemove.name;
-        // URL.revokeObjectURL is idempotent — safe to call inside the updater.
         URL.revokeObjectURL(fileToRemove.preview);
         previewUrlsRef.current.delete(id);
       }

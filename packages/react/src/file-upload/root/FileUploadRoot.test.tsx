@@ -1204,6 +1204,40 @@ describe('FileUpload', () => {
     });
   });
 
+  describe('removeFile', () => {
+    it('announces to screen readers when a file is removed', async () => {
+      let contextValue: TestFileUploadContext | null = null;
+
+      function TestComponent() {
+        const ctx = FileUpload.useFileUploadContext();
+        contextValue = ctx as unknown as TestFileUploadContext;
+        return null;
+      }
+
+      render(
+        <FileUpload.Root>
+          <div role="status" aria-live="polite" aria-atomic="true" />
+          <TestComponent />
+        </FileUpload.Root>,
+      );
+
+      const input = getFileInput();
+      const file = new File(['content'], 'photo.jpg', { type: 'image/jpeg' });
+
+      fireEvent.change(input, { target: { files: [file] } });
+
+      const fileId = getTestContext(contextValue).files[0].id;
+
+      act(() => {
+        getTestContext(contextValue).removeFile(fileId);
+      });
+
+      await waitFor(() => {
+        expect(screen.getByText(/photo\.jpg/)).toBeInTheDocument();
+      });
+    });
+  });
+
   describe('clearFiles', () => {
     it('removes all files from the list', async () => {
       let contextValue: TestFileUploadContext | null = null;
