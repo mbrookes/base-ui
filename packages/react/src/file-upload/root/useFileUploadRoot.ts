@@ -457,11 +457,14 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
 
       const next = prev.map((f) => {
         if (f.id === id && f.status === 'uploading') {
+          // Capture the pre-transition file so the callback observes the uploading state.
           fileToPause = f;
-          return Object.assign(f, {
+          // Return a new object to avoid mutating React state in place.
+          return {
+            ...f,
             status: 'paused' as FileUploadRootFileStatus,
             isPaused: true,
-          });
+          };
         }
         return f;
       });
@@ -483,11 +486,14 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
 
       const next = prev.map((f) => {
         if (f.id === id && f.status === 'paused') {
+          // Capture the pre-transition file so the callback observes the paused state.
           fileToResume = f;
-          return Object.assign(f, {
+          // Return a new object to avoid mutating React state in place.
+          return {
+            ...f,
             status: 'uploading' as FileUploadRootFileStatus,
             isPaused: false,
-          });
+          };
         }
         return f;
       });
