@@ -356,21 +356,32 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
     lastChangeReasonRef.current = FILE_UPLOAD_ROOT_CHANGE_REASONS.FILE_REMOVED;
     lastChangeEventRef.current = undefined;
 
+    // Read the name before setFiles so the announcement fires reliably —
+    // functional updaters don't run synchronously before setState returns.
+    const removedFileName = filesRef.current.find((f) => f.id === id)?.name ?? null;
+
     setFiles((prev) => {
+      // URL revocation stays inside the updater so it uses the correct `prev`
+      // snapshot and handles batched addFiles + removeFile correctly.
       const fileToRemove = prev.find((f) => f.id === id);
       if (fileToRemove) {
-        setAnnouncement(messages.fileRemoved(fileToRemove.name));
         URL.revokeObjectURL(fileToRemove.preview);
         previewUrlsRef.current.delete(id);
       }
       return prev.filter((f) => f.id !== id);
     });
+
+    if (removedFileName) {
+      setAnnouncement(messages.fileRemoved(removedFileName));
+    }
   });
 
   const clearFiles = useStableCallback(() => {
     lastChangeReasonRef.current = FILE_UPLOAD_ROOT_CHANGE_REASONS.FILES_CLEARED;
     lastChangeEventRef.current = undefined;
 
+    // URL.revokeObjectURL is idempotent — safe to call inside the updater so we
+    // always use the correct `prev` snapshot (handles batched addFiles + clearFiles).
     setFiles((prev) => {
       prev.forEach((file) => {
         URL.revokeObjectURL(file.preview);
@@ -390,20 +401,28 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
   const retryFile = useStableCallback((id: string) => {
     lastChangeReasonRef.current = FILE_UPLOAD_ROOT_CHANGE_REASONS.FILE_UPDATED;
     lastChangeEventRef.current = undefined;
-    setFiles((prev) => {
-      return prev.map((file) => {
-        if (file.id === id && file.status === 'error') {
-          onRetry?.(file);
-          setAnnouncement(messages.retryingUpload(file.name));
-          return Object.assign(file, {
-            status: 'idle' as FileUploadRootFileStatus,
-            progress: 0,
-            error: undefined,
-          });
-        }
-        return file;
-      });
-    });
+
+    const fileToRetry =
+      filesRef.current.find((f) => f.id === id && f.status === 'error') ?? null;
+
+    // Call onRetry before setFiles so the callback observes the file in its
+    // error state, not the post-mutation idle state produced by Object.assign.
+    if (fileToRetry) {
+      onRetry?.(fileToRetry);
+      setAnnouncement(messages.retryingUpload(fileToRetry.name));
+    }
+
+    setFiles((prev) =>
+      prev.map((f) =>
+        f.id === id && f.status === 'error'
+          ? Object.assign(f, {
+              status: 'idle' as FileUploadRootFileStatus,
+              progress: 0,
+              error: undefined,
+            })
+          : f,
+      ),
+    );
   });
 
   const abortUpload = useStableCallback((id: string) => {
@@ -413,18 +432,25 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
       lastChangeEventRef.current = undefined;
       controller.abort();
       abortControllersRef.current.delete(id);
+
+      const canceledFileName: string | null =
+        filesRef.current.find((f) => f.id === id && f.status === 'uploading')?.name ?? null;
+
       setFiles((prev) => {
-        return prev.map((file) => {
-          if (file.id === id && file.status === 'uploading') {
-            setAnnouncement(messages.uploadCanceled(file.name));
-            return Object.assign(file, {
+        return prev.map((f) => {
+          if (f.id === id && f.status === 'uploading') {
+            return Object.assign(f, {
               status: 'error' as FileUploadRootFileStatus,
               error: 'Upload canceled',
             });
           }
-          return file;
+          return f;
         });
       });
+
+      if (canceledFileName) {
+        setAnnouncement(messages.uploadCanceled(canceledFileName));
+      }
     }
   });
 
@@ -437,35 +463,53 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
   const pauseFile = useStableCallback((id: string) => {
     lastChangeReasonRef.current = FILE_UPLOAD_ROOT_CHANGE_REASONS.FILE_UPDATED;
     lastChangeEventRef.current = undefined;
-    setFiles((prev) => {
-      return prev.map((file) => {
-        if (file.id === id && file.status === 'uploading') {
-          onFilePause?.(file);
-          return Object.assign(file, {
+
+    const fileToPause =
+      filesRef.current.find((f) => f.id === id && f.status === 'uploading') ?? null;
+
+    // Call onFilePause before setFiles so the callback observes the file in its
+    // uploading state, not the post-mutation paused state.
+    if (fileToPause) {
+      onFilePause?.(fileToPause);
+    }
+
+    setFiles((prev) =>
+      prev.map((f) => {
+        if (f.id === id && f.status === 'uploading') {
+          Object.assign(f, {
             status: 'paused' as FileUploadRootFileStatus,
             isPaused: true,
           });
         }
-        return file;
-      });
-    });
+        return f;
+      }),
+    );
   });
 
   const resumeFile = useStableCallback((id: string) => {
     lastChangeReasonRef.current = FILE_UPLOAD_ROOT_CHANGE_REASONS.FILE_UPDATED;
     lastChangeEventRef.current = undefined;
-    setFiles((prev) => {
-      return prev.map((file) => {
-        if (file.id === id && file.status === 'paused') {
-          onFileResume?.(file);
-          return Object.assign(file, {
+
+    const fileToResume =
+      filesRef.current.find((f) => f.id === id && f.status === 'paused') ?? null;
+
+    // Call onFileResume before setFiles so the callback observes the file in its
+    // paused state, not the post-mutation uploading state.
+    if (fileToResume) {
+      onFileResume?.(fileToResume);
+    }
+
+    setFiles((prev) =>
+      prev.map((f) => {
+        if (f.id === id && f.status === 'paused') {
+          Object.assign(f, {
             status: 'uploading' as FileUploadRootFileStatus,
             isPaused: false,
           });
         }
-        return file;
-      });
-    });
+        return f;
+      }),
+    );
   });
 
   const openFileDialog = useStableCallback(() => {
