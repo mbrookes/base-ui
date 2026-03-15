@@ -356,30 +356,26 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
     lastChangeReasonRef.current = FILE_UPLOAD_ROOT_CHANGE_REASONS.FILE_REMOVED;
     lastChangeEventRef.current = undefined;
 
-    setFiles((prev) => {
-      const fileToRemove = prev.find((f) => f.id === id);
-      if (fileToRemove) {
-        setAnnouncement(messages.fileRemoved(fileToRemove.name));
-        URL.revokeObjectURL(fileToRemove.preview);
-        previewUrlsRef.current.delete(id);
-      }
+    const fileToRemove = filesRef.current.find((f) => f.id === id) ?? null;
+    if (fileToRemove) {
+      setAnnouncement(messages.fileRemoved(fileToRemove.name));
+      URL.revokeObjectURL(fileToRemove.preview);
+      previewUrlsRef.current.delete(id);
+    }
 
-      return prev.filter((f) => f.id !== id);
-    });
+    setFiles((prev) => prev.filter((f) => f.id !== id));
   });
 
   const clearFiles = useStableCallback(() => {
     lastChangeReasonRef.current = FILE_UPLOAD_ROOT_CHANGE_REASONS.FILES_CLEARED;
     lastChangeEventRef.current = undefined;
 
-    setFiles((prev) => {
-      prev.forEach((file) => {
-        URL.revokeObjectURL(file.preview);
-        previewUrlsRef.current.delete(file.id);
-      });
-      return [];
+    filesRef.current.forEach((file) => {
+      URL.revokeObjectURL(file.preview);
+      previewUrlsRef.current.delete(file.id);
     });
     setAnnouncement(messages.allFilesRemoved());
+    setFiles([]);
   });
 
   const updateFile = useStableCallback((id: string, updates: FileUploadRootFileUpdates) => {

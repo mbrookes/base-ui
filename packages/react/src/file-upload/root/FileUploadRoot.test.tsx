@@ -31,6 +31,7 @@ type TestFileUploadContext = {
   ) => void;
   pauseFile: (id: string) => void;
   resumeFile: (id: string) => void;
+  retryFile: (id: string) => void;
 };
 
 function getTestContext(contextValue: TestFileUploadContext | null): TestFileUploadContext {
@@ -834,6 +835,111 @@ describe('FileUpload', () => {
     });
   });
 
+  describe('retryFile', () => {
+    it('resets a file from error status back to idle', () => {
+      let contextValue: TestFileUploadContext | null = null;
+
+      function TestComponent() {
+        contextValue = FileUpload.useFileUploadContext() as unknown as TestFileUploadContext;
+        return null;
+      }
+
+      render(
+        <FileUpload.Root>
+          <TestComponent />
+        </FileUpload.Root>,
+      );
+
+      const input = getFileInput();
+      const file = new File(['content'], 'test.txt', { type: 'text/plain' });
+
+      fireEvent.change(input, { target: { files: [file] } });
+
+      const fileId = getTestContext(contextValue).files[0].id;
+
+      act(() => {
+        getTestContext(contextValue).updateFile(fileId, { status: 'error', error: 'Upload failed' });
+      });
+
+      expect(getTestContext(contextValue).files[0].status).toBe('error');
+
+      act(() => {
+        getTestContext(contextValue).retryFile(fileId);
+      });
+
+      expect(getTestContext(contextValue).files[0].status).toBe('idle');
+      expect(getTestContext(contextValue).files[0].progress).toBe(0);
+      expect(getTestContext(contextValue).files[0].error).toBeUndefined();
+    });
+
+    it('does not retry a file that is not in error state', () => {
+      const onRetry = vi.fn();
+      let contextValue: TestFileUploadContext | null = null;
+
+      function TestComponent() {
+        contextValue = FileUpload.useFileUploadContext() as unknown as TestFileUploadContext;
+        return null;
+      }
+
+      render(
+        <FileUpload.Root onRetry={onRetry}>
+          <TestComponent />
+        </FileUpload.Root>,
+      );
+
+      const input = getFileInput();
+      const file = new File(['content'], 'test.txt', { type: 'text/plain' });
+
+      fireEvent.change(input, { target: { files: [file] } });
+
+      const fileId = getTestContext(contextValue).files[0].id;
+
+      act(() => {
+        getTestContext(contextValue).retryFile(fileId);
+      });
+
+      expect(onRetry).not.toHaveBeenCalled();
+      expect(getTestContext(contextValue).files[0].status).toBe('idle');
+    });
+
+    it('calls onRetry with the file in its error state', () => {
+      let statusAtCallTime: string | undefined;
+      const onRetry = vi.fn((f) => {
+        statusAtCallTime = f.status;
+      });
+      let contextValue: TestFileUploadContext | null = null;
+
+      function TestComponent() {
+        contextValue = FileUpload.useFileUploadContext() as unknown as TestFileUploadContext;
+        return null;
+      }
+
+      render(
+        <FileUpload.Root onRetry={onRetry}>
+          <TestComponent />
+        </FileUpload.Root>,
+      );
+
+      const input = getFileInput();
+      const file = new File(['content'], 'test.txt', { type: 'text/plain' });
+
+      fireEvent.change(input, { target: { files: [file] } });
+
+      const fileId = getTestContext(contextValue).files[0].id;
+
+      act(() => {
+        getTestContext(contextValue).updateFile(fileId, { status: 'error', error: 'Upload failed' });
+      });
+
+      act(() => {
+        getTestContext(contextValue).retryFile(fileId);
+      });
+
+      expect(onRetry).toHaveBeenCalledOnce();
+      expect(statusAtCallTime).toBe('error');
+    });
+  });
+
   describe('Resumable uploads (pause/resume)', () => {
     it('exposes pauseFile and resumeFile methods in context', () => {
       let contextValue: TestFileUploadContext | null = null;
@@ -1014,6 +1120,86 @@ describe('FileUpload', () => {
 
       expect(onFileResume).not.toHaveBeenCalled();
       expect(getTestContext(contextValue).files[0].status).toBe('idle');
+    });
+
+    it('calls onFilePause with the file in its uploading state', () => {
+      let statusAtCallTime: string | undefined;
+      const onFilePause = vi.fn((f) => {
+        statusAtCallTime = f.status;
+      });
+      let contextValue: TestFileUploadContext | null = null;
+
+      function TestComponent() {
+        contextValue = FileUpload.useFileUploadContext() as unknown as TestFileUploadContext;
+        return null;
+      }
+
+      render(
+        <FileUpload.Root onFilePause={onFilePause}>
+          <TestComponent />
+        </FileUpload.Root>,
+      );
+
+      const file = new File(['test'], 'test.txt', { type: 'text/plain' });
+
+      act(() => {
+        getTestContext(contextValue).addFiles([file]);
+      });
+
+      const fileId = getTestContext(contextValue).files[0].id;
+
+      act(() => {
+        getTestContext(contextValue).updateFile(fileId, { status: 'uploading' });
+      });
+
+      act(() => {
+        getTestContext(contextValue).pauseFile(fileId);
+      });
+
+      expect(onFilePause).toHaveBeenCalledOnce();
+      expect(statusAtCallTime).toBe('uploading');
+    });
+
+    it('calls onFileResume with the file in its paused state', () => {
+      let statusAtCallTime: string | undefined;
+      const onFileResume = vi.fn((f) => {
+        statusAtCallTime = f.status;
+      });
+      let contextValue: TestFileUploadContext | null = null;
+
+      function TestComponent() {
+        contextValue = FileUpload.useFileUploadContext() as unknown as TestFileUploadContext;
+        return null;
+      }
+
+      render(
+        <FileUpload.Root onFileResume={onFileResume}>
+          <TestComponent />
+        </FileUpload.Root>,
+      );
+
+      const file = new File(['test'], 'test.txt', { type: 'text/plain' });
+
+      act(() => {
+        getTestContext(contextValue).addFiles([file]);
+      });
+
+      const fileId = getTestContext(contextValue).files[0].id;
+
+      act(() => {
+        getTestContext(contextValue).updateFile(fileId, { status: 'uploading' });
+      });
+
+      act(() => {
+        getTestContext(contextValue).pauseFile(fileId);
+      });
+
+      act(() => {
+        getTestContext(contextValue).resumeFile(fileId);
+      });
+
+      expect(onFileResume).toHaveBeenCalledOnce();
+      expect(statusAtCallTime).toBe('paused');
     });
   });
 
@@ -1707,6 +1893,56 @@ describe('FileUpload', () => {
       const uploadedFile = getTestContext(contextValue).files[0];
       expect(uploadedFile).toHaveProperty('lastModified');
       expect(uploadedFile.lastModified).toBe(lastModified);
+    });
+
+    it('preserves File prototype (instanceof File) after pause, resume, and retry', () => {
+      let contextValue: TestFileUploadContext | null = null;
+
+      function TestComponent() {
+        const ctx = FileUpload.useFileUploadContext();
+        contextValue = ctx as unknown as TestFileUploadContext;
+        return null;
+      }
+
+      render(
+        <FileUpload.Root>
+          <TestComponent />
+        </FileUpload.Root>,
+      );
+
+      const input = getFileInput();
+      const file = new File(['content'], 'test.txt', { type: 'text/plain' });
+
+      fireEvent.change(input, { target: { files: [file] } });
+
+      expect(getTestContext(contextValue).files).toHaveLength(1);
+      expect(getTestContext(contextValue).files[0]).toBeInstanceOf(File);
+
+      const fileId = getTestContext(contextValue).files[0].id;
+
+      act(() => {
+        getTestContext(contextValue).updateFile(fileId, { status: 'uploading' });
+      });
+      expect(getTestContext(contextValue).files[0]).toBeInstanceOf(File);
+
+      act(() => {
+        getTestContext(contextValue).pauseFile(fileId);
+      });
+      expect(getTestContext(contextValue).files[0]).toBeInstanceOf(File);
+
+      act(() => {
+        getTestContext(contextValue).resumeFile(fileId);
+      });
+      expect(getTestContext(contextValue).files[0]).toBeInstanceOf(File);
+
+      act(() => {
+        getTestContext(contextValue).updateFile(fileId, { status: 'error' });
+      });
+
+      act(() => {
+        getTestContext(contextValue).retryFile(fileId);
+      });
+      expect(getTestContext(contextValue).files[0]).toBeInstanceOf(File);
     });
   });
 });
