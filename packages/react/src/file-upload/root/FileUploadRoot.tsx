@@ -255,7 +255,7 @@ export const FileUploadRoot = React.forwardRef<HTMLDivElement, FileUploadRootPro
       ...other
     } = props;
 
-    const { contextValue, setIsDragging, addFiles, announcement } = useFileUploadRoot({
+    const { contextValue, inputRef, setIsDragging, addFiles, announcement } = useFileUploadRoot({
       maxFiles,
       maxSize,
       minSize,
@@ -281,13 +281,6 @@ export const FileUploadRoot = React.forwardRef<HTMLDivElement, FileUploadRootPro
       [contextValue.isDragging, contextValue.disabled],
     );
 
-    const inputRef = React.useRef<HTMLInputElement | null>(null);
-
-    const registerInputRef = useStableCallback((node: HTMLInputElement | null) => {
-      inputRef.current = node;
-      contextValue.registerInput(node);
-    });
-
     useIsoLayoutEffect(() => {
       const node = inputRef.current;
       if (!node) {
@@ -301,6 +294,7 @@ export const FileUploadRoot = React.forwardRef<HTMLDivElement, FileUploadRootPro
         node.removeAttribute('webkitdirectory');
         node.removeAttribute('directory');
       }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- inputRef is a stable React ref
     }, [contextValue.directory]);
 
     const handleInputChange = useStableCallback((event: React.ChangeEvent<HTMLInputElement>) => {
@@ -407,7 +401,7 @@ export const FileUploadRoot = React.forwardRef<HTMLDivElement, FileUploadRootPro
       children: (
         <React.Fragment>
           <input
-            ref={registerInputRef}
+            ref={inputRef}
             id={contextValue.inputId}
             type="file"
             accept={contextValue.accept}

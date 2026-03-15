@@ -57,8 +57,6 @@ export interface FileUploadContextValue {
   onFileResume?: ((file: FileUploadRoot.ExtendedFile) => void) | undefined;
   /** Trigger the file selection dialog */
   openFileDialog: () => void;
-  /** Register the hidden file input element */
-  registerInput: (node: HTMLInputElement | null) => void;
 }
 
 export const FileUploadContext = React.createContext<FileUploadContextValue | undefined>(undefined);

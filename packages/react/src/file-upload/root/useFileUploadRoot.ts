@@ -56,6 +56,23 @@ const formatBytes = (bytes: number, locale?: Intl.LocalesArgument) => {
   return `${formattedValue} ${sizes[i]}`;
 };
 
+// Screen reader announcement and error messages (pure functions — no hook dependencies)
+const messages = {
+  fileTooLarge: (maxSizeFormatted: string) => `File too large (max ${maxSizeFormatted})`,
+  fileTooSmall: (minSizeFormatted: string) => `File too small (min ${minSizeFormatted})`,
+  fileTypeNotAccepted: () => 'File type not accepted',
+  asyncValidatorNotSupported: () =>
+    'Async validators are not supported. Return a string or null synchronously.',
+  maxFilesReached: (count: number) => `Cannot add files. Limit of ${count} reached.`,
+  duplicateFile: (fileName: string) => `${fileName}: duplicate file`,
+  filesAdded: (count: number) => `Added ${count} file${count !== 1 ? 's' : ''}.`,
+  filesRejected: (count: number, errors: string[]) => `${count} rejected: ${errors.join(', ')}`,
+  fileRemoved: (fileName: string) => `Removed file ${fileName}`,
+  allFilesRemoved: () => 'All files removed',
+  retryingUpload: (fileName: string) => `Retrying upload for ${fileName}`,
+  uploadCanceled: (fileName: string) => `Upload canceled for ${fileName}`,
+};
+
 // Check if a file type matches the accept string
 const isFileTypeAccepted = (file: File, accept: string): boolean => {
   if (!accept || accept === '*') {
@@ -99,26 +116,6 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
     onFileResume,
     locale,
   } = params;
-
-  // Screen reader announcement messages
-  const messages = React.useMemo(
-    () => ({
-      fileTooLarge: (maxSizeFormatted: string) => `File too large (max ${maxSizeFormatted})`,
-      fileTooSmall: (minSizeFormatted: string) => `File too small (min ${minSizeFormatted})`,
-      fileTypeNotAccepted: () => 'File type not accepted',
-      asyncValidatorNotSupported: () =>
-        'Async validators are not supported. Return a string or null synchronously.',
-      maxFilesReached: (count: number) => `Cannot add files. Limit of ${count} reached.`,
-      duplicateFile: (fileName: string) => `${fileName}: duplicate file`,
-      filesAdded: (count: number) => `Added ${count} file${count !== 1 ? 's' : ''}.`,
-      filesRejected: (count: number, errors: string[]) => `${count} rejected: ${errors.join(', ')}`,
-      fileRemoved: (fileName: string) => `Removed file ${fileName}`,
-      allFilesRemoved: () => 'All files removed',
-      retryingUpload: (fileName: string) => `Retrying upload for ${fileName}`,
-      uploadCanceled: (fileName: string) => `Upload canceled for ${fileName}`,
-    }),
-    [],
-  );
 
   const [files, setFiles] = React.useState<FileUploadRootExtendedFile[]>([]);
   const [isDragging, setIsDragging] = React.useState(false);
@@ -217,17 +214,21 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
     const prev = filesRef.current;
     const remainingSlots = maxFiles - prev.length;
 
+    // Helper to build reject event details with a message payload.
+    const rejectDetails = (reason: FileUploadRootRejectReason, msg: string) =>
+      createChangeEventDetails<FileUploadRootRejectReason, { message: string }>(
+        reason,
+        event,
+        undefined,
+        { message: msg },
+      );
+
+    const maxFilesReachedMessage = messages.maxFilesReached(maxFiles);
+
     if (remainingSlots <= 0) {
-      const maxFilesReachedMessage = messages.maxFilesReached(maxFiles);
       newFiles.forEach((file) => {
-        const eventDetails = createChangeEventDetails<
-          FileUploadRootRejectReason,
-          { message: string }
-        >('MAX_FILES_REACHED', event, undefined, { message: maxFilesReachedMessage });
-
-        onFileReject?.(file, 'MAX_FILES_REACHED', eventDetails);
+        onFileReject?.(file, 'MAX_FILES_REACHED', rejectDetails('MAX_FILES_REACHED', maxFilesReachedMessage));
       });
-
       setAnnouncement(maxFilesReachedMessage);
       return;
     }
@@ -237,7 +238,6 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
     const errors: string[] = [];
 
     const existingKeys = new Set(prev.map(getFileKey));
-    const maxFilesReachedMessage = messages.maxFilesReached(maxFiles);
     let acceptedCount = 0;
 
     candidates.forEach((file) => {
@@ -246,35 +246,22 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
       }
 
       if (acceptedCount >= remainingSlots) {
-        const eventDetails = createChangeEventDetails<
-          FileUploadRootRejectReason,
-          { message: string }
-        >('MAX_FILES_REACHED', event, undefined, { message: maxFilesReachedMessage });
-
-        onFileReject?.(file, 'MAX_FILES_REACHED', eventDetails);
+        onFileReject?.(file, 'MAX_FILES_REACHED', rejectDetails('MAX_FILES_REACHED', maxFilesReachedMessage));
         errors.push(`${file.name}: ${maxFilesReachedMessage}`);
         return;
       }
 
       const fileKey = getFileKey(file);
       if (existingKeys.has(fileKey)) {
-        const eventDetails = createChangeEventDetails<
-          FileUploadRootRejectReason,
-          { message: string }
-        >('DUPLICATE_FILE', event, undefined, { message: messages.duplicateFile(file.name) });
-        onFileReject?.(file, 'DUPLICATE_FILE', eventDetails);
-        errors.push(messages.duplicateFile(file.name));
+        const dupMessage = messages.duplicateFile(file.name);
+        onFileReject?.(file, 'DUPLICATE_FILE', rejectDetails('DUPLICATE_FILE', dupMessage));
+        errors.push(dupMessage);
         return;
       }
 
       const error = validateFile(file);
       if (error) {
-        const eventDetails = createChangeEventDetails<
-          FileUploadRootRejectReason,
-          { message: string }
-        >(error.reason, event, undefined, { message: error.message });
-
-        onFileReject?.(file, error.reason, eventDetails);
+        onFileReject?.(file, error.reason, rejectDetails(error.reason, error.message));
         errors.push(`${file.name}: ${error.message}`);
       } else {
         existingKeys.add(fileKey);
@@ -474,15 +461,11 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
     }
 
     setFiles((prev) =>
-      prev.map((f) => {
-        if (f.id === id && f.status === 'uploading') {
-          Object.assign(f, {
-            status: 'paused' as FileUploadRootFileStatus,
-            isPaused: true,
-          });
-        }
-        return f;
-      }),
+      prev.map((f) =>
+        f.id === id && f.status === 'uploading'
+          ? Object.assign(f, { status: 'paused' as FileUploadRootFileStatus, isPaused: true })
+          : f,
+      ),
     );
   });
 
@@ -500,15 +483,11 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
     }
 
     setFiles((prev) =>
-      prev.map((f) => {
-        if (f.id === id && f.status === 'paused') {
-          Object.assign(f, {
-            status: 'uploading' as FileUploadRootFileStatus,
-            isPaused: false,
-          });
-        }
-        return f;
-      }),
+      prev.map((f) =>
+        f.id === id && f.status === 'paused'
+          ? Object.assign(f, { status: 'uploading' as FileUploadRootFileStatus, isPaused: false })
+          : f,
+      ),
     );
   });
 
@@ -516,10 +495,6 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
     if (!disabled && inputRef.current) {
       inputRef.current.click();
     }
-  });
-
-  const registerInput = useStableCallback((node: HTMLInputElement | null) => {
-    inputRef.current = node;
   });
 
   const contextValue: FileUploadContextValue = React.useMemo(
@@ -548,7 +523,6 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
       onFilePause,
       onFileResume,
       openFileDialog,
-      registerInput,
     }),
     [
       files,
@@ -575,12 +549,12 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
       onFilePause,
       onFileResume,
       openFileDialog,
-      registerInput,
     ],
   );
 
   return {
     contextValue,
+    inputRef,
     isDragging,
     setIsDragging,
     disabled,
