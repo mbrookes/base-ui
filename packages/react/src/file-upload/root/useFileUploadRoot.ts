@@ -421,14 +421,12 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
       controller.abort();
       abortControllersRef.current.delete(id);
 
-      let canceledFileName: string | null = null;
+      const canceledFileName: string | null =
+        filesRef.current?.find((f) => f.id === id && f.status === 'uploading')?.name ?? null;
 
       setFiles((prev) => {
         return prev.map((f) => {
           if (f.id === id && f.status === 'uploading') {
-            if (canceledFileName === null) {
-              canceledFileName = f.name;
-            }
             return Object.assign(f, {
               status: 'error' as FileUploadRootFileStatus,
               error: 'Upload canceled',
