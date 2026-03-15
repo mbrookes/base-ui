@@ -4,9 +4,6 @@ import { FileUploadPreviewListDataAttributes } from './FileUploadPreviewListData
 
 export const fileUploadPreviewListStateAttributesMapping: StateAttributesMapping<FileUploadPreviewList.State> =
   {
-    files(value): Record<string, string> | null {
-      return null;
-    },
     empty(value): Record<string, string> | null {
       if (!value) {
         return null;
@@ -15,5 +12,10 @@ export const fileUploadPreviewListStateAttributesMapping: StateAttributesMapping
       return {
         [FileUploadPreviewListDataAttributes.empty]: '',
       };
+    },
+    // Suppresses the default `data-files` attribute that getStateAttributesProps
+    // would otherwise emit for this non-boolean array value.
+    files(_files): Record<string, string> | null {
+      return null;
     },
   };
