@@ -15,6 +15,7 @@ type TestFileUploadContext = {
     isPaused?: boolean;
     uploadedBytes?: number;
     progress?: number;
+    error?: string;
   }>;
   addFiles: (files: File[]) => void;
   removeFile: (id: string) => void;

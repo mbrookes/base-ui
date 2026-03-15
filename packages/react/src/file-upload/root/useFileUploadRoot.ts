@@ -356,26 +356,40 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
     lastChangeReasonRef.current = FILE_UPLOAD_ROOT_CHANGE_REASONS.FILE_REMOVED;
     lastChangeEventRef.current = undefined;
 
-    const fileToRemove = filesRef.current.find((f) => f.id === id) ?? null;
-    if (fileToRemove) {
-      setAnnouncement(messages.fileRemoved(fileToRemove.name));
-      URL.revokeObjectURL(fileToRemove.preview);
-      previewUrlsRef.current.delete(id);
-    }
+    // Capture the name inside the updater so we use the correct `prev` snapshot
+    // (handles batched addFiles + removeFile in the same flush).
+    let removedFileName: string | null = null;
 
-    setFiles((prev) => prev.filter((f) => f.id !== id));
+    setFiles((prev) => {
+      const fileToRemove = prev.find((f) => f.id === id);
+      if (fileToRemove) {
+        removedFileName = fileToRemove.name;
+        // URL.revokeObjectURL is idempotent — safe to call inside the updater.
+        URL.revokeObjectURL(fileToRemove.preview);
+        previewUrlsRef.current.delete(id);
+      }
+      return prev.filter((f) => f.id !== id);
+    });
+
+    if (removedFileName) {
+      setAnnouncement(messages.fileRemoved(removedFileName));
+    }
   });
 
   const clearFiles = useStableCallback(() => {
     lastChangeReasonRef.current = FILE_UPLOAD_ROOT_CHANGE_REASONS.FILES_CLEARED;
     lastChangeEventRef.current = undefined;
 
-    filesRef.current.forEach((file) => {
-      URL.revokeObjectURL(file.preview);
-      previewUrlsRef.current.delete(file.id);
+    // URL.revokeObjectURL is idempotent — safe to call inside the updater so we
+    // always use the correct `prev` snapshot (handles batched addFiles + clearFiles).
+    setFiles((prev) => {
+      prev.forEach((file) => {
+        URL.revokeObjectURL(file.preview);
+        previewUrlsRef.current.delete(file.id);
+      });
+      return [];
     });
     setAnnouncement(messages.allFilesRemoved());
-    setFiles([]);
   });
 
   const updateFile = useStableCallback((id: string, updates: FileUploadRootFileUpdates) => {
@@ -420,7 +434,7 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
       abortControllersRef.current.delete(id);
 
       const canceledFileName: string | null =
-        filesRef.current?.find((f) => f.id === id && f.status === 'uploading')?.name ?? null;
+        filesRef.current.find((f) => f.id === id && f.status === 'uploading')?.name ?? null;
 
       setFiles((prev) => {
         return prev.map((f) => {
@@ -450,11 +464,11 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
     lastChangeReasonRef.current = FILE_UPLOAD_ROOT_CHANGE_REASONS.FILE_UPDATED;
     lastChangeEventRef.current = undefined;
 
-    // Call onFilePause before setFiles so the callback observes the file in its
-    // uploading state, not the post-mutation paused state.
     const fileToPause =
       filesRef.current.find((f) => f.id === id && f.status === 'uploading') ?? null;
 
+    // Call onFilePause before setFiles so the callback observes the file in its
+    // uploading state, not the post-mutation paused state.
     if (fileToPause) {
       onFilePause?.(fileToPause);
     }
@@ -476,11 +490,11 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
     lastChangeReasonRef.current = FILE_UPLOAD_ROOT_CHANGE_REASONS.FILE_UPDATED;
     lastChangeEventRef.current = undefined;
 
-    // Call onFileResume before setFiles so the callback observes the file in its
-    // paused state, not the post-mutation uploading state.
     const fileToResume =
       filesRef.current.find((f) => f.id === id && f.status === 'paused') ?? null;
 
+    // Call onFileResume before setFiles so the callback observes the file in its
+    // paused state, not the post-mutation uploading state.
     if (fileToResume) {
       onFileResume?.(fileToResume);
     }
