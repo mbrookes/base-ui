@@ -461,14 +461,12 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
     lastChangeReasonRef.current = FILE_UPLOAD_ROOT_CHANGE_REASONS.FILE_UPDATED;
     lastChangeEventRef.current = undefined;
 
-    const file = filesRef.current.find((f) => f.id === id && f.status === 'uploading');
-    if (file) {
-      onFilePause?.(file);
-    }
-
     setFiles((prev) => {
-      return prev.map((f) => {
+      let fileToPause: FileUploadRootExtendedFile | undefined;
+
+      const next = prev.map((f) => {
         if (f.id === id && f.status === 'uploading') {
+          fileToPause = f;
           return Object.assign(f, {
             status: 'paused' as FileUploadRootFileStatus,
             isPaused: true,
@@ -476,6 +474,12 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
         }
         return f;
       });
+
+      if (fileToPause) {
+        onFilePause?.(fileToPause);
+      }
+
+      return next;
     });
   });
 
@@ -483,14 +487,12 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
     lastChangeReasonRef.current = FILE_UPLOAD_ROOT_CHANGE_REASONS.FILE_UPDATED;
     lastChangeEventRef.current = undefined;
 
-    const file = filesRef.current.find((f) => f.id === id && f.status === 'paused');
-    if (file) {
-      onFileResume?.(file);
-    }
-
     setFiles((prev) => {
-      return prev.map((f) => {
+      let fileToResume: FileUploadRootExtendedFile | undefined;
+
+      const next = prev.map((f) => {
         if (f.id === id && f.status === 'paused') {
+          fileToResume = f;
           return Object.assign(f, {
             status: 'uploading' as FileUploadRootFileStatus,
             isPaused: false,
@@ -498,6 +500,12 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
         }
         return f;
       });
+
+      if (fileToResume) {
+        onFileResume?.(fileToResume);
+      }
+
+      return next;
     });
   });
 
