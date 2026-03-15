@@ -16,4 +16,9 @@ export const fileUploadPreviewListStateAttributesMapping: StateAttributesMapping
         [FileUploadPreviewListDataAttributes.empty]: '',
       };
     },
+    // Suppresses the default `data-files` attribute that getStateAttributesProps
+    // would otherwise emit for this non-boolean array value.
+    files(_files): Record<string, string> | null {
+      return null;
+    },
   };
