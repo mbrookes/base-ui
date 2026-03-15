@@ -392,31 +392,24 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
     lastChangeReasonRef.current = FILE_UPLOAD_ROOT_CHANGE_REASONS.FILE_UPDATED;
     lastChangeEventRef.current = undefined;
 
-    let retriedFileForCallback: FileUploadRootExtendedFile | null = null;
-    let retriedFileName: string | null = null;
+    const retriedFileForCallback =
+      filesRef.current.find((f) => f.id === id && f.status === 'error') ?? null;
 
-    setFiles((prev) => {
-      return prev.map((f) => {
-        if (f.id === id && f.status === 'error') {
-          if (retriedFileForCallback === null) {
-            retriedFileForCallback = f;
-            retriedFileName = f.name;
-          }
-          return Object.assign(f, {
-            status: 'idle' as FileUploadRootFileStatus,
-            progress: 0,
-            error: undefined,
-          });
-        }
-        return f;
-      });
-    });
+    setFiles((prev) =>
+      prev.map((f) =>
+        f.id === id && f.status === 'error'
+          ? Object.assign(f, {
+              status: 'idle' as FileUploadRootFileStatus,
+              progress: 0,
+              error: undefined,
+            })
+          : f,
+      ),
+    );
 
     if (retriedFileForCallback) {
       onRetry?.(retriedFileForCallback);
-    }
-    if (retriedFileName) {
-      setAnnouncement(messages.retryingUpload(retriedFileName));
+      setAnnouncement(messages.retryingUpload(retriedFileForCallback.name));
     }
   });
 
