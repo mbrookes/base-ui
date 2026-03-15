@@ -392,15 +392,16 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
     lastChangeReasonRef.current = FILE_UPLOAD_ROOT_CHANGE_REASONS.FILE_UPDATED;
     lastChangeEventRef.current = undefined;
 
-    const file = filesRef.current.find((f) => f.id === id && f.status === 'error');
-    if (file) {
-      onRetry?.(file);
-      setAnnouncement(messages.retryingUpload(file.name));
-    }
+    let retriedFileForCallback: FileUploadRootExtendedFile | null = null;
+    let retriedFileName: string | null = null;
 
     setFiles((prev) => {
       return prev.map((f) => {
         if (f.id === id && f.status === 'error') {
+          if (retriedFileForCallback === null) {
+            retriedFileForCallback = f;
+            retriedFileName = f.name;
+          }
           return Object.assign(f, {
             status: 'idle' as FileUploadRootFileStatus,
             progress: 0,
@@ -410,6 +411,13 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
         return f;
       });
     });
+
+    if (retriedFileForCallback) {
+      onRetry?.(retriedFileForCallback);
+    }
+    if (retriedFileName) {
+      setAnnouncement(messages.retryingUpload(retriedFileName));
+    }
   });
 
   const abortUpload = useStableCallback((id: string) => {
@@ -420,14 +428,14 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
       controller.abort();
       abortControllersRef.current.delete(id);
 
-      const file = filesRef.current.find((f) => f.id === id && f.status === 'uploading');
-      if (file) {
-        setAnnouncement(messages.uploadCanceled(file.name));
-      }
+      let canceledFileName: string | null = null;
 
       setFiles((prev) => {
         return prev.map((f) => {
           if (f.id === id && f.status === 'uploading') {
+            if (canceledFileName === null) {
+              canceledFileName = f.name;
+            }
             return Object.assign(f, {
               status: 'error' as FileUploadRootFileStatus,
               error: 'Upload canceled',
@@ -436,6 +444,10 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
           return f;
         });
       });
+
+      if (canceledFileName) {
+        setAnnouncement(messages.uploadCanceled(canceledFileName));
+      }
     }
   });
 
