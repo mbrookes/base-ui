@@ -454,58 +454,44 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
     lastChangeReasonRef.current = FILE_UPLOAD_ROOT_CHANGE_REASONS.FILE_UPDATED;
     lastChangeEventRef.current = undefined;
 
-    setFiles((prev) => {
-      let fileToPause: FileUploadRootExtendedFile | undefined;
+    // Call onFilePause before setFiles so the callback observes the file in its
+    // uploading state, not the post-mutation paused state.
+    const fileToPause =
+      filesRef.current.find((f) => f.id === id && f.status === 'uploading') ?? null;
 
-      const next = prev.map((f) => {
-        if (f.id === id && f.status === 'uploading') {
-          // Capture the pre-transition file so the callback observes the uploading state.
-          fileToPause = f;
-          // Return a new object to avoid mutating React state in place.
-          return {
-            ...f,
-            status: 'paused' as FileUploadRootFileStatus,
-            isPaused: true,
-          };
-        }
-        return f;
-      });
+    if (fileToPause) {
+      onFilePause?.(fileToPause);
+    }
 
-      if (fileToPause) {
-        onFilePause?.(fileToPause);
-      }
-
-      return next;
-    });
+    setFiles((prev) =>
+      prev.map((f) =>
+        f.id === id && f.status === 'uploading'
+          ? { ...f, status: 'paused' as FileUploadRootFileStatus, isPaused: true }
+          : f,
+      ),
+    );
   });
 
   const resumeFile = useStableCallback((id: string) => {
     lastChangeReasonRef.current = FILE_UPLOAD_ROOT_CHANGE_REASONS.FILE_UPDATED;
     lastChangeEventRef.current = undefined;
 
-    setFiles((prev) => {
-      let fileToResume: FileUploadRootExtendedFile | undefined;
+    // Call onFileResume before setFiles so the callback observes the file in its
+    // paused state, not the post-mutation uploading state.
+    const fileToResume =
+      filesRef.current.find((f) => f.id === id && f.status === 'paused') ?? null;
 
-      const next = prev.map((f) => {
-        if (f.id === id && f.status === 'paused') {
-          // Capture the pre-transition file so the callback observes the paused state.
-          fileToResume = f;
-          // Return a new object to avoid mutating React state in place.
-          return {
-            ...f,
-            status: 'uploading' as FileUploadRootFileStatus,
-            isPaused: false,
-          };
-        }
-        return f;
-      });
+    if (fileToResume) {
+      onFileResume?.(fileToResume);
+    }
 
-      if (fileToResume) {
-        onFileResume?.(fileToResume);
-      }
-
-      return next;
-    });
+    setFiles((prev) =>
+      prev.map((f) =>
+        f.id === id && f.status === 'paused'
+          ? { ...f, status: 'uploading' as FileUploadRootFileStatus, isPaused: false }
+          : f,
+      ),
+    );
   });
 
   const openFileDialog = useStableCallback(() => {
