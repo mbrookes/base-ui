@@ -392,8 +392,15 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
     lastChangeReasonRef.current = FILE_UPLOAD_ROOT_CHANGE_REASONS.FILE_UPDATED;
     lastChangeEventRef.current = undefined;
 
-    const retriedFileForCallback =
+    const fileToRetry =
       filesRef.current.find((f) => f.id === id && f.status === 'error') ?? null;
+
+    // Call onRetry before setFiles so the callback observes the file in its
+    // error state, not the post-mutation idle state produced by Object.assign.
+    if (fileToRetry) {
+      onRetry?.(fileToRetry);
+      setAnnouncement(messages.retryingUpload(fileToRetry.name));
+    }
 
     setFiles((prev) =>
       prev.map((f) =>
@@ -406,11 +413,6 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
           : f,
       ),
     );
-
-    if (retriedFileForCallback) {
-      onRetry?.(retriedFileForCallback);
-      setAnnouncement(messages.retryingUpload(retriedFileForCallback.name));
-    }
   });
 
   const abortUpload = useStableCallback((id: string) => {
