@@ -125,9 +125,7 @@ describe('FileUpload', () => {
   it('applies data-empty attribute to preview list when there are no files', () => {
     render(
       <FileUpload.Root>
-        <FileUpload.PreviewList data-testid="preview-list">
-          <div>File list</div>
-        </FileUpload.PreviewList>
+        <FileUpload.PreviewList data-testid="preview-list" />
       </FileUpload.Root>,
     );
 
