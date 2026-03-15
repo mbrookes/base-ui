@@ -312,6 +312,19 @@ describe('FileUpload.Dropzone', () => {
     expect(dropzone).toHaveAttribute('aria-label', 'Upload your documents');
   });
 
+  it('does not set default aria-label when aria-labelledby is provided', () => {
+    render(
+      <FileUpload.Root>
+        <label id="dropzone-label">Upload area</label>
+        <FileUpload.Dropzone aria-labelledby="dropzone-label">Custom content</FileUpload.Dropzone>
+      </FileUpload.Root>,
+    );
+
+    const dropzone = screen.getByRole('button');
+    expect(dropzone).not.toHaveAttribute('aria-label');
+    expect(dropzone).toHaveAttribute('aria-labelledby', 'dropzone-label');
+  });
+
   it('does not have aria-disabled when enabled', () => {
     render(
       <FileUpload.Root>
