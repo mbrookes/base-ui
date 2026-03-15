@@ -473,10 +473,6 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
         }
         return f;
       }),
-          });
-        }
-        return f;
-      }),
     );
   });
 
@@ -490,15 +486,11 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
       filesRef.current.find((f) => f.id === id && f.status === 'paused') ?? null;
 
     if (fileToResume) {
+      onFileResume?.(fileToResume);
+    }
+
+    setFiles((prev) =>
       prev.map((f) => {
-        if (f.id === id && f.status === 'paused') {
-          Object.assign(f, {
-            status: 'uploading' as FileUploadRootFileStatus,
-            isPaused: false,
-          });
-        }
-        return f;
-      }),
         if (f.id === id && f.status === 'paused') {
           Object.assign(f, {
             status: 'uploading' as FileUploadRootFileStatus,
