@@ -13,4 +13,7 @@ export const fileUploadPreviewListStateAttributesMapping: StateAttributesMapping
         [FileUploadPreviewListDataAttributes.empty]: '',
       };
     },
+    files(_files): Record<string, string> | null {
+      return null;
+    },
   };
