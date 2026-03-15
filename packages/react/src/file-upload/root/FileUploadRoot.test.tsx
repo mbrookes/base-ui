@@ -639,22 +639,21 @@ describe('FileUpload', () => {
   describe('Full workflow integration', () => {
     it('supports select via dropzone, view in preview list, and remove', async () => {
       const onFileChange = vi.fn();
+      const staticPreviewFile: FileUpload.Root.ExtendedFile = Object.assign(
+        new File(['content'], 'test.txt', { type: 'text/plain' }),
+        {
+          id: 'test-1',
+          preview: 'blob:test',
+          status: 'idle' as const,
+          progress: 0,
+        },
+      );
 
       render(
         <FileUpload.Root onFileChange={onFileChange}>
           <FileUpload.Dropzone data-testid="dropzone">Drop files here or click</FileUpload.Dropzone>
           <FileUpload.PreviewList data-testid="preview-list">
-            <FileUpload.PreviewItem
-              file={
-                {
-                  id: 'test-1',
-                  name: 'test.txt',
-                  type: 'text/plain',
-                  size: 100,
-                  preview: 'blob:test',
-                } as any
-              }
-            >
+            <FileUpload.PreviewItem file={staticPreviewFile}>
               <span data-testid="file-name">test.txt</span>
             </FileUpload.PreviewItem>
           </FileUpload.PreviewList>
@@ -1546,14 +1545,16 @@ describe('FileUpload', () => {
       await waitFor(() => {
         const latestFiles = onFileChange.mock.calls.at(-1)?.[0] ?? [];
         expect(latestFiles).toHaveLength(3);
-        expect(latestFiles).toEqual(
-          expect.arrayContaining([
-            expect.objectContaining({ name: 'existing.txt' }),
-            expect.objectContaining({ name: 'valid-a.txt' }),
-            expect.objectContaining({ name: 'valid-b.txt' }),
-          ]),
-        );
       });
+
+      const latestFiles = onFileChange.mock.calls.at(-1)?.[0] ?? [];
+      expect(latestFiles).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ name: 'existing.txt' }),
+          expect.objectContaining({ name: 'valid-a.txt' }),
+          expect.objectContaining({ name: 'valid-b.txt' }),
+        ]),
+      );
 
       expect(onFileReject).toHaveBeenCalledWith(
         expect.objectContaining({ name: 'too-large.txt' }),
