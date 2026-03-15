@@ -464,11 +464,15 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
     }
 
     setFiles((prev) =>
-      prev.map((f) =>
-        f.id === id && f.status === 'uploading'
-          ? { ...f, status: 'paused' as FileUploadRootFileStatus, isPaused: true }
-          : f,
-      ),
+      prev.map((f) => {
+        if (f.id === id && f.status === 'uploading') {
+          Object.assign(f, {
+            status: 'paused' as FileUploadRootFileStatus,
+            isPaused: true,
+          });
+        }
+        return f;
+      }),
     );
   });
 
@@ -486,11 +490,15 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
     }
 
     setFiles((prev) =>
-      prev.map((f) =>
-        f.id === id && f.status === 'paused'
-          ? { ...f, status: 'uploading' as FileUploadRootFileStatus, isPaused: false }
-          : f,
-      ),
+      prev.map((f) => {
+        if (f.id === id && f.status === 'paused') {
+          Object.assign(f, {
+            status: 'uploading' as FileUploadRootFileStatus,
+            isPaused: false,
+          });
+        }
+        return f;
+      }),
     );
   });
 
