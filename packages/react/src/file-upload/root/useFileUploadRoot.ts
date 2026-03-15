@@ -372,11 +372,13 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
     lastChangeReasonRef.current = FILE_UPLOAD_ROOT_CHANGE_REASONS.FILES_CLEARED;
     lastChangeEventRef.current = undefined;
 
-    filesRef.current.forEach((file) => {
-      URL.revokeObjectURL(file.preview);
-      previewUrlsRef.current.delete(file.id);
+    setFiles((prev) => {
+      prev.forEach((file) => {
+        URL.revokeObjectURL(file.preview);
+        previewUrlsRef.current.delete(file.id);
+      });
+      return [];
     });
-    setFiles([]);
     setAnnouncement(messages.allFilesRemoved());
   });
 
