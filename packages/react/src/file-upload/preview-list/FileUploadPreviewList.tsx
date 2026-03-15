@@ -38,6 +38,7 @@ export interface FileUploadPreviewListParameters {
    * </FileUpload.PreviewList>
    * ```
    */
+  // eslint-disable-next-line react/no-unused-prop-types -- false positive, used in component logic
   filter?: ((files: FileUploadRoot.ExtendedFile[]) => FileUploadRoot.ExtendedFile[]) | undefined;
 }
 
