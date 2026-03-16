@@ -101,7 +101,7 @@ function FilePreviewItems() {
 export default function FileUploadDemo() {
   const maxFiles = 5;
   const [isUploadDisabled, setIsUploadDisabled] = React.useState(false);
-  const { errorMessages, handleFileChange, handleFileReject } = useFileRejection();
+  const { errorMessages, handleFileDrop, handleFileChange } = useFileRejection();
 
   const handleDemoFileChange = React.useCallback<
     NonNullable<React.ComponentProps<typeof FileUpload.Root>['onFileChange']>
@@ -127,7 +127,7 @@ export default function FileUploadDemo() {
         multiple
         disabled={isUploadDisabled}
         onFileChange={handleDemoFileChange}
-        onFileReject={handleFileReject}
+        onFileDrop={handleFileDrop}
       >
         <FileUpload.Dropzone className="group relative mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10 transition-colors hover:bg-gray-50 hover:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 data-[dragging]:border-blue-500 data-[dragging]:bg-blue-50 data-[disabled]:cursor-not-allowed data-[disabled]:opacity-60 data-[disabled]:!bg-transparent data-[disabled]:!border-gray-900/25 data-[disabled]:hover:!bg-transparent data-[disabled]:hover:!border-gray-900/25 data-[disabled]:focus:!outline-none data-[disabled]:focus:!ring-0 data-[disabled]:focus:!ring-offset-0">
           {({ isDragging }) => (

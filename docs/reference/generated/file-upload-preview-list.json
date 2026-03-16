@@ -1,11 +1,11 @@
 {
   "name": "FileUploadPreviewList",
-  "description": "Container list for displaying uploaded files.\n\nThe PreviewList component renders as an unordered list and automatically hides\nitself when there are no files. It should contain PreviewItem components for\neach file being managed by the Root component.",
+  "description": "Container list for displaying uploaded files.\n\nThe PreviewList component renders as an unordered list and adds a `data-empty`\nattribute when there are no files. It should contain PreviewItem components for\neach file being managed by the Root component.",
   "props": {
     "filter": {
       "type": "((files: FileUpload.Root.ExtendedFile[]) => FileUpload.Root.ExtendedFile[])",
-      "description": "Function to control which files determine the visibility of the list and the\n`state.files` value passed to the `className` callback.\n\nThe list is hidden (returns `null`) when the filtered result is empty.\nNote: this function does not automatically filter `children` — you must\nindependently filter the files rendered inside the list using the context.",
-      "example": "```tsx\n// Hide the list unless there are error files\n<FileUpload.PreviewList filter={(files) => files.filter(f => f.status === 'error')}>\n  {/* children must also filter independently *\\/}\n  {files.filter(f => f.status === 'error').map(file => (\n    <FileUpload.PreviewItem key={file.id} file={file}>{file.name}</FileUpload.PreviewItem>\n  ))}\n</FileUpload.PreviewList>\n```",
+      "description": "Function to control which files determine the `data-empty` state and the\n`state.files` value passed to the `className` callback.\n\nThe list receives the `data-empty` attribute when the filtered result is empty.\nNote: this function does not automatically filter `children` — you must\nindependently filter the files rendered inside the list using the context.",
+      "example": "```tsx\n// Show data-empty unless there are error files\n<FileUpload.PreviewList filter={(files) => files.filter(f => f.status === 'error')}>\n  {/* children must also filter independently *\\/}\n  {files.filter(f => f.status === 'error').map(file => (\n    <FileUpload.PreviewItem key={file.id} file={file}>{file.name}</FileUpload.PreviewItem>\n  ))}\n</FileUpload.PreviewList>\n```",
       "detailedType": "| ((\n    files: FileUpload.Root.ExtendedFile[],\n  ) => FileUpload.Root.ExtendedFile[])\n| undefined"
     },
     "className": {
@@ -23,6 +23,10 @@
       "detailedType": "| ReactElement\n| ((\n    props: HTMLProps,\n    state: FileUpload.PreviewList.State,\n  ) => ReactElement)"
     }
   },
-  "dataAttributes": {},
+  "dataAttributes": {
+    "data-empty": {
+      "description": "Present when there are no files in the list."
+    }
+  },
   "cssVariables": {}
 }

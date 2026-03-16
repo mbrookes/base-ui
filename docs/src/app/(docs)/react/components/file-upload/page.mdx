@@ -102,8 +102,10 @@ Control which files are accepted using `accept`, `maxSize`, `minSize`, and `maxF
   maxSize={10 * 1024 * 1024}
   minSize={1024}
   maxFiles={5}
-  onFileReject={(file, reason, details) => {
-    console.log(`Rejected ${file.name}: ${reason}`, details.message);
+  onFileDrop={(acceptedFiles, fileRejections) => {
+    fileRejections.forEach(({ file, reason, eventDetails }) => {
+      console.log(`Rejected ${file.name}: ${reason}`, eventDetails.message);
+    });
   }}
 >
   <FileUpload.Dropzone>Upload files</FileUpload.Dropzone>
@@ -130,8 +132,10 @@ Use `validator` for custom rules beyond file size and type checks. Return an err
     }
     return null;
   }}
-  onFileReject={(file, reason, details) => {
-    console.log(`${file.name}: ${reason}`, details.message);
+  onFileDrop={(acceptedFiles, fileRejections) => {
+    fileRejections.forEach(({ file, reason, eventDetails }) => {
+      console.log(`${file.name}: ${reason}`, eventDetails.message);
+    });
   }}
 >
   <FileUpload.Dropzone>Upload files</FileUpload.Dropzone>
@@ -226,19 +230,71 @@ Use `onCancel` to react when the user closes the file dialog without selecting f
 
 ### Detecting duplicate files
 
-Use `onFileReject` with reason `DUPLICATE_FILE` to detect when a user selects the same file more than once. Duplicates are ignored by default:
+Duplicate files are silently ignored by default. Use `onFileDrop` to detect when a user selects the same file more than once:
 
-```jsx title="Duplicate detection" "onFileReject" "DUPLICATE_FILE"
+```jsx title="Duplicate detection" "DUPLICATE_FILE"
 <FileUpload.Root
-  onFileReject={(file, reason) => {
-    if (reason === 'DUPLICATE_FILE') {
+  onFileDrop={(acceptedFiles, fileRejections) => {
+    const duplicates = fileRejections.filter((r) => r.reason === 'DUPLICATE_FILE');
+    duplicates.forEach(({ file }) => {
       console.log('Duplicate:', file.name);
-    }
+    });
   }}
 >
   <FileUpload.Trigger>Select files</FileUpload.Trigger>
 </FileUpload.Root>
 ```
+
+### Collecting accepted and rejected files together
+
+`onFileDrop` fires once per drop, paste, or file-dialog selection with both accepted files and all rejections in a single callback:
+
+```jsx title="onFileDrop" "onFileDrop"
+import * as React from 'react';
+import { FileUpload } from '@base-ui/react/file-upload';
+
+export default function App() {
+  const [rejections, setRejections] = React.useState([]);
+
+  return (
+    <div>
+      <FileUpload.Root
+        accept="image/*"
+        maxSize={2 * 1024 * 1024}
+        maxFiles={5}
+        onFileDrop={(acceptedFiles, fileRejections) => {
+          // Replace rejection messages each time files are added
+          setRejections(fileRejections);
+        }}
+        onFileChange={(files, eventDetails) => {
+          // Clear rejections when files are removed
+          if (
+            eventDetails.reason === 'file-removed' ||
+            eventDetails.reason === 'files-cleared'
+          ) {
+            setRejections([]);
+          }
+        }}
+      >
+        <FileUpload.Dropzone>Upload images</FileUpload.Dropzone>
+        <FileUpload.Trigger>Select images</FileUpload.Trigger>
+      </FileUpload.Root>
+
+      {rejections.length > 0 && (
+        <ul role="alert">
+          {rejections.map(({ file, eventDetails }) => (
+            <li key={file.name}>
+              {file.name}: {eventDetails.message}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+```
+
+Each entry in `fileRejections` is a `FileUpload.Rejection` with `file`, `reason`, and `eventDetails` fields. `acceptedFiles` contains the files that passed validation and were added to the list.
 
 ### Paste from clipboard
 
@@ -1002,7 +1058,7 @@ The `filter` function receives the full array of files and returns a filtered ar
 File Upload follows the same pattern as other components:
 
 - use `locale` for `Intl` formatting in built-in messages (for example file sizes), and
-- use targeted callbacks (`onFileReject`, `onRetry`, etc.) to customize behavior.
+- use targeted callbacks (`onFileDrop`, `onRetry`, etc.) to customize behavior.
 
 ```jsx title="Locale formatting" "locale"
 import * as React from 'react';
@@ -1018,15 +1074,17 @@ export default function FileUploadLocale() {
 }
 ```
 
-```jsx title="Callback-based customization" "onFileReject"
+```jsx title="Callback-based customization" "onFileDrop"
 import * as React from 'react';
 import { FileUpload } from '@base-ui/react/file-upload';
 
 export default function FileUploadCustomHandling() {
   return (
     <FileUpload.Root
-      onFileReject={(file, reason) => {
-        console.log('Rejected:', file.name, reason);
+      onFileDrop={(acceptedFiles, fileRejections) => {
+        fileRejections.forEach(({ file, reason }) => {
+          console.log('Rejected:', file.name, reason);
+        });
       }}
     >
       <FileUpload.Dropzone>Drop files here</FileUpload.Dropzone>

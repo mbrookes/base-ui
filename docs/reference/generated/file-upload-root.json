@@ -52,15 +52,15 @@
       "description": "Callback when files are added or removed.",
       "detailedType": "| ((\n    files: FileUpload.Root.ExtendedFile[],\n    eventDetails: FileUpload.Root.ChangeEventDetails,\n  ) => void)\n| undefined"
     },
+    "onFileDrop": {
+      "type": "((acceptedFiles: FileUpload.Root.ExtendedFile[], fileRejections: FileUpload.Root.Rejection[], eventDetails: FileUpload.Root.ChangeEventDetails) => void)",
+      "description": "Callback fired once per add/drop/paste/input attempt with accepted and rejected files.\nThis fires even when no files are accepted.",
+      "detailedType": "| ((\n    acceptedFiles: FileUpload.Root.ExtendedFile[],\n    fileRejections: FileUpload.Root.Rejection[],\n    eventDetails: FileUpload.Root.ChangeEventDetails,\n  ) => void)\n| undefined"
+    },
     "onFilePause": {
       "type": "((file: FileUpload.Root.ExtendedFile) => void)",
       "description": "Callback when a file upload is paused.",
       "detailedType": "| ((file: FileUpload.Root.ExtendedFile) => void)\n| undefined"
-    },
-    "onFileReject": {
-      "type": "((file: File, reason: FileUpload.Root.RejectReason, eventDetails: FileUpload.Root.RejectEventDetails) => void)",
-      "description": "Callback when a file is rejected.\nReceives a machine-readable reason code and detailed event metadata.",
-      "detailedType": "| ((\n    file: File,\n    reason: FileUpload.Root.RejectReason,\n    eventDetails: FileUpload.Root.RejectEventDetails,\n  ) => void)\n| undefined"
     },
     "onFileResume": {
       "type": "((file: FileUpload.Root.ExtendedFile) => void)",

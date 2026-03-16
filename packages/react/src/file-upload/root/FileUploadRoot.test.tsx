@@ -272,10 +272,10 @@ describe('FileUpload', () => {
     await waitFor(() => expect(onCancel).toHaveBeenCalled());
   });
 
-  it('calls onFileReject with DUPLICATE_FILE reason when the same file is selected again', async () => {
-    const onFileReject = vi.fn();
+  it('reports DUPLICATE_FILE reason via onFileDrop when the same file is selected again', async () => {
+    const onFileDrop = vi.fn();
 
-    render(<FileUpload.Root onFileReject={onFileReject}>{null}</FileUpload.Root>);
+    render(<FileUpload.Root onFileDrop={onFileDrop}>{null}</FileUpload.Root>);
 
     const input = getFileInput();
     const file = new File(['content'], 'dup.txt', { type: 'text/plain' });
@@ -284,21 +284,23 @@ describe('FileUpload', () => {
     await userEvent.upload(input, file);
 
     await waitFor(() => {
-      expect(onFileReject).toHaveBeenCalledWith(
-        expect.any(File),
-        'DUPLICATE_FILE',
-        expect.objectContaining({
-          reason: 'DUPLICATE_FILE',
-        }),
-      );
+      expect(onFileDrop).toHaveBeenCalledTimes(2);
+    });
+
+    const [, fileRejections] = onFileDrop.mock.calls[1];
+    expect(fileRejections).toHaveLength(1);
+    expect(fileRejections[0]).toMatchObject({
+      reason: 'DUPLICATE_FILE',
+      file: expect.any(File),
+      eventDetails: expect.objectContaining({ reason: 'DUPLICATE_FILE' }),
     });
   });
 
-  it('calls onFileReject callback with rejected file', async () => {
-    const onFileReject = vi.fn();
+  it('reports rejected file via onFileDrop fileRejections', async () => {
+    const onFileDrop = vi.fn();
 
     render(
-      <FileUpload.Root accept="image/*" onFileReject={onFileReject}>
+      <FileUpload.Root accept="image/*" onFileDrop={onFileDrop}>
         {null}
       </FileUpload.Root>,
     );
@@ -306,7 +308,6 @@ describe('FileUpload', () => {
     const input = getFileInput();
     const file = new File(['content'], 'test.txt', { type: 'text/plain' });
 
-    // Simulate file input change
     Object.defineProperty(input, 'files', {
       value: [file],
       configurable: true,
@@ -314,22 +315,102 @@ describe('FileUpload', () => {
 
     fireEvent.change(input);
 
-    await waitFor(() => expect(onFileReject).toHaveBeenCalled());
-    expect(onFileReject).toHaveBeenCalledWith(
+    await waitFor(() => expect(onFileDrop).toHaveBeenCalled());
+    const [acceptedFiles, fileRejections] = onFileDrop.mock.calls[0];
+    expect(acceptedFiles).toHaveLength(0);
+    expect(fileRejections).toHaveLength(1);
+    expect(fileRejections[0]).toMatchObject({
       file,
-      'MIME_TYPE_NOT_ALLOWED',
-      expect.objectContaining({
+      reason: 'MIME_TYPE_NOT_ALLOWED',
+      eventDetails: expect.objectContaining({
         message: expect.any(String),
+      }),
+    });
+  });
+
+  it('calls onFileDrop with accepted and rejected files for a mixed selection', async () => {
+    const onFileDrop = vi.fn();
+
+    render(
+      <FileUpload.Root accept="image/*" onFileDrop={onFileDrop}>
+        {null}
+      </FileUpload.Root>,
+    );
+
+    const input = getFileInput();
+    const acceptedFile = new File(['content'], 'photo.jpg', { type: 'image/jpeg' });
+    const rejectedFile = new File(['content'], 'notes.txt', { type: 'text/plain' });
+
+    Object.defineProperty(input, 'files', {
+      value: [acceptedFile, rejectedFile],
+      configurable: true,
+    });
+
+    fireEvent.change(input);
+
+    await waitFor(() => expect(onFileDrop).toHaveBeenCalled());
+
+    expect(onFileDrop).toHaveBeenCalledWith(
+      expect.arrayContaining([expect.objectContaining({ name: 'photo.jpg' })]),
+      expect.arrayContaining([
+        expect.objectContaining({
+          file: rejectedFile,
+          reason: 'MIME_TYPE_NOT_ALLOWED',
+          eventDetails: expect.objectContaining({
+            reason: 'MIME_TYPE_NOT_ALLOWED',
+          }),
+        }),
+      ]),
+      expect.objectContaining({
+        reason: 'file-added',
+      }),
+    );
+  });
+
+  it('calls onFileDrop when all selected files are rejected', async () => {
+    const onFileDrop = vi.fn();
+
+    render(
+      <FileUpload.Root accept="image/*" onFileDrop={onFileDrop}>
+        {null}
+      </FileUpload.Root>,
+    );
+
+    const input = getFileInput();
+    const rejectedFile = new File(['content'], 'notes.txt', { type: 'text/plain' });
+
+    Object.defineProperty(input, 'files', {
+      value: [rejectedFile],
+      configurable: true,
+    });
+
+    fireEvent.change(input);
+
+    await waitFor(() => expect(onFileDrop).toHaveBeenCalled());
+
+    expect(onFileDrop).toHaveBeenCalledWith(
+      [],
+      expect.arrayContaining([
+        expect.objectContaining({
+          file: rejectedFile,
+          reason: 'MIME_TYPE_NOT_ALLOWED',
+          eventDetails: expect.objectContaining({
+            reason: 'MIME_TYPE_NOT_ALLOWED',
+          }),
+        }),
+      ]),
+      expect.objectContaining({
+        reason: 'file-added',
       }),
     );
   });
 
   it('accepts files when accept includes file extensions', async () => {
     const onFileChange = vi.fn();
-    const onFileReject = vi.fn();
+    const onFileDrop = vi.fn();
 
     render(
-      <FileUpload.Root accept=".txt" onFileChange={onFileChange} onFileReject={onFileReject}>
+      <FileUpload.Root accept=".txt" onFileChange={onFileChange} onFileDrop={onFileDrop}>
         {null}
       </FileUpload.Root>,
     );
@@ -345,19 +426,20 @@ describe('FileUpload', () => {
     fireEvent.change(input);
 
     await waitFor(() => expect(onFileChange).toHaveBeenCalled());
-    expect(onFileReject).not.toHaveBeenCalled();
+    const [, fileRejections] = onFileDrop.mock.calls[0];
+    expect(fileRejections).toHaveLength(0);
   });
 
   it('uses custom validator to reject files', async () => {
     const onFileChange = vi.fn();
-    const onFileReject = vi.fn();
+    const onFileDrop = vi.fn();
     const validator = vi.fn().mockReturnValue('Blocked by policy');
 
     render(
       <FileUpload.Root
         accept="*"
         onFileChange={onFileChange}
-        onFileReject={onFileReject}
+        onFileDrop={onFileDrop}
         validator={validator}
       >
         {null}
@@ -374,14 +456,14 @@ describe('FileUpload', () => {
 
     fireEvent.change(input);
 
-    await waitFor(() => expect(onFileReject).toHaveBeenCalled());
-    expect(onFileReject).toHaveBeenCalledWith(
+    await waitFor(() => expect(onFileDrop).toHaveBeenCalled());
+    const [, fileRejections] = onFileDrop.mock.calls[0];
+    expect(fileRejections).toHaveLength(1);
+    expect(fileRejections[0]).toMatchObject({
       file,
-      'CUSTOM_VALIDATION_FAILED',
-      expect.objectContaining({
-        message: 'Blocked by policy',
-      }),
-    );
+      reason: 'CUSTOM_VALIDATION_FAILED',
+      eventDetails: expect.objectContaining({ message: 'Blocked by policy' }),
+    });
     const latestFiles = onFileChange.mock.calls.at(-1)?.[0] ?? [];
     expect(latestFiles).not.toEqual(expect.arrayContaining([file]));
     expect(validator).toHaveBeenCalledWith(file);
@@ -389,10 +471,10 @@ describe('FileUpload', () => {
 
   it('does not enforce a max file size by default', async () => {
     const onFileChange = vi.fn();
-    const onFileReject = vi.fn();
+    const onFileDrop = vi.fn();
 
     render(
-      <FileUpload.Root onFileChange={onFileChange} onFileReject={onFileReject} accept="*">
+      <FileUpload.Root onFileChange={onFileChange} onFileDrop={onFileDrop} accept="*">
         {null}
       </FileUpload.Root>,
     );
@@ -411,17 +493,18 @@ describe('FileUpload', () => {
 
     await waitFor(() => expect(onFileChange).toHaveBeenCalled());
 
-    expect(onFileReject).not.toHaveBeenCalled();
+    const [, fileRejections] = onFileDrop.mock.calls[0];
+    expect(fileRejections).toHaveLength(0);
     const latestFiles = onFileChange.mock.calls.at(-1)?.[0];
     expect(latestFiles?.[0].name).toBe('large.bin');
   });
 
   it('respects maxSize constraint and rejects oversized files', async () => {
-    const onFileReject = vi.fn();
+    const onFileDrop = vi.fn();
     const onFileChange = vi.fn();
 
     render(
-      <FileUpload.Root maxSize={1024} onFileReject={onFileReject} onFileChange={onFileChange}>
+      <FileUpload.Root maxSize={1024} onFileDrop={onFileDrop} onFileChange={onFileChange}>
         {null}
       </FileUpload.Root>,
     );
@@ -436,24 +519,23 @@ describe('FileUpload', () => {
 
     fireEvent.change(input);
 
-    await waitFor(() => expect(onFileReject).toHaveBeenCalled());
-    expect(onFileReject).toHaveBeenCalledWith(
-      largeFile,
-      'FILE_TOO_LARGE',
-      expect.objectContaining({
-        message: expect.stringContaining('too large'),
-      }),
-    );
+    await waitFor(() => expect(onFileDrop).toHaveBeenCalled());
+    const [, fileRejections] = onFileDrop.mock.calls[0];
+    expect(fileRejections[0]).toMatchObject({
+      file: largeFile,
+      reason: 'FILE_TOO_LARGE',
+      eventDetails: expect.objectContaining({ message: expect.stringContaining('too large') }),
+    });
     // onFileChange should not be called when all files are rejected (files state unchanged)
     expect(onFileChange).not.toHaveBeenCalled();
   });
 
   it('respects minSize constraint and rejects undersized files', async () => {
-    const onFileReject = vi.fn();
+    const onFileDrop = vi.fn();
     const onFileChange = vi.fn();
 
     render(
-      <FileUpload.Root minSize={1024} onFileReject={onFileReject} onFileChange={onFileChange}>
+      <FileUpload.Root minSize={1024} onFileDrop={onFileDrop} onFileChange={onFileChange}>
         {null}
       </FileUpload.Root>,
     );
@@ -468,14 +550,13 @@ describe('FileUpload', () => {
 
     fireEvent.change(input);
 
-    await waitFor(() => expect(onFileReject).toHaveBeenCalled());
-    expect(onFileReject).toHaveBeenCalledWith(
-      tinyFile,
-      'FILE_TOO_SMALL',
-      expect.objectContaining({
-        message: expect.stringContaining('too small'),
-      }),
-    );
+    await waitFor(() => expect(onFileDrop).toHaveBeenCalled());
+    const [, fileRejections] = onFileDrop.mock.calls[0];
+    expect(fileRejections[0]).toMatchObject({
+      file: tinyFile,
+      reason: 'FILE_TOO_SMALL',
+      eventDetails: expect.objectContaining({ message: expect.stringContaining('too small') }),
+    });
   });
 
   it('respects maxFiles constraint in single file mode', async () => {
@@ -506,7 +587,7 @@ describe('FileUpload', () => {
   it('keeps existing file in single-file mode when replacement is rejected', async () => {
     let contextValue: TestFileUploadContext | null = null;
     const onFileChange = vi.fn();
-    const onFileReject = vi.fn();
+    const onFileDrop = vi.fn();
 
     function TestComponent() {
       contextValue = FileUpload.useFileUploadContext() as unknown as TestFileUploadContext;
@@ -514,7 +595,7 @@ describe('FileUpload', () => {
     }
 
     render(
-      <FileUpload.Root multiple={false} accept="image/*" onFileChange={onFileChange} onFileReject={onFileReject}>
+      <FileUpload.Root multiple={false} accept="image/*" onFileChange={onFileChange} onFileDrop={onFileDrop}>
         <TestComponent />
       </FileUpload.Root>,
     );
@@ -532,14 +613,13 @@ describe('FileUpload', () => {
       getTestContext(contextValue).addFiles([invalidFile]);
     });
 
-    await waitFor(() => {
-      expect(onFileReject).toHaveBeenCalledWith(
-        invalidFile,
-        'MIME_TYPE_NOT_ALLOWED',
-        expect.objectContaining({
-          reason: 'MIME_TYPE_NOT_ALLOWED',
-        }),
-      );
+    await waitFor(() => expect(onFileDrop).toHaveBeenCalledTimes(2));
+    const [, fileRejections] = onFileDrop.mock.calls[1];
+    expect(fileRejections).toHaveLength(1);
+    expect(fileRejections[0]).toMatchObject({
+      file: invalidFile,
+      reason: 'MIME_TYPE_NOT_ALLOWED',
+      eventDetails: expect.objectContaining({ reason: 'MIME_TYPE_NOT_ALLOWED' }),
     });
 
     const latestFiles = onFileChange.mock.calls.at(-1)?.[0];
@@ -749,10 +829,10 @@ describe('FileUpload', () => {
 
   describe('Error scenarios', () => {
     it('handles file rejection with error message', async () => {
-      const onFileReject = vi.fn();
+      const onFileDrop = vi.fn();
 
       render(
-        <FileUpload.Root accept="image/*" onFileReject={onFileReject}>
+        <FileUpload.Root accept="image/*" onFileDrop={onFileDrop}>
           {null}
         </FileUpload.Root>,
       );
@@ -767,15 +847,16 @@ describe('FileUpload', () => {
 
       fireEvent.change(input);
 
-      await waitFor(() => expect(onFileReject).toHaveBeenCalled());
-      expect(onFileReject.mock.calls[0][0]).toBe(textFile);
+      await waitFor(() => expect(onFileDrop).toHaveBeenCalled());
+      const [, fileRejections] = onFileDrop.mock.calls[0];
+      expect(fileRejections[0].file).toBe(textFile);
     });
 
     it('respects maxSize constraint', async () => {
-      const onFileReject = vi.fn();
+      const onFileDrop = vi.fn();
 
       render(
-        <FileUpload.Root maxSize={100} onFileReject={onFileReject}>
+        <FileUpload.Root maxSize={100} onFileDrop={onFileDrop}>
           {null}
         </FileUpload.Root>,
       );
@@ -792,14 +873,16 @@ describe('FileUpload', () => {
 
       fireEvent.change(input);
 
-      await waitFor(() => expect(onFileReject).toHaveBeenCalled());
+      await waitFor(() => expect(onFileDrop).toHaveBeenCalled());
+      const [, fileRejections] = onFileDrop.mock.calls[0];
+      expect(fileRejections).toHaveLength(1);
     });
 
     it('respects minSize constraint', async () => {
-      const onFileReject = vi.fn();
+      const onFileDrop = vi.fn();
 
       render(
-        <FileUpload.Root minSize={100} onFileReject={onFileReject}>
+        <FileUpload.Root minSize={100} onFileDrop={onFileDrop}>
           {null}
         </FileUpload.Root>,
       );
@@ -814,7 +897,9 @@ describe('FileUpload', () => {
 
       fireEvent.change(input);
 
-      await waitFor(() => expect(onFileReject).toHaveBeenCalled());
+      await waitFor(() => expect(onFileDrop).toHaveBeenCalled());
+      const [, fileRejections] = onFileDrop.mock.calls[0];
+      expect(fileRejections).toHaveLength(1);
     });
   });
 
@@ -1444,11 +1529,11 @@ describe('FileUpload', () => {
       expect(getTestContext(contextValue).files).toHaveLength(2);
     });
 
-    it('calls onFileReject with MAX_FILES_REACHED when selecting more than maxFiles at once', async () => {
-      const onFileReject = vi.fn();
+    it('reports MAX_FILES_REACHED via onFileDrop when selecting more than maxFiles at once', async () => {
+      const onFileDrop = vi.fn();
 
       render(
-        <FileUpload.Root maxFiles={2} multiple onFileReject={onFileReject}>
+        <FileUpload.Root maxFiles={2} multiple onFileDrop={onFileDrop}>
           {null}
         </FileUpload.Root>,
       );
@@ -1462,23 +1547,24 @@ describe('FileUpload', () => {
 
       fireEvent.change(input, { target: { files } });
 
-      await waitFor(() => {
-        expect(onFileReject).toHaveBeenCalledWith(
-          expect.objectContaining({ name: 'test3.txt' }),
-          'MAX_FILES_REACHED',
-          expect.objectContaining({
-            reason: 'MAX_FILES_REACHED',
-            message: 'Cannot add files. Limit of 2 reached.',
-          }),
-        );
+      await waitFor(() => expect(onFileDrop).toHaveBeenCalled());
+      const [, fileRejections] = onFileDrop.mock.calls[0];
+      expect(fileRejections).toHaveLength(1);
+      expect(fileRejections[0]).toMatchObject({
+        file: expect.objectContaining({ name: 'test3.txt' }),
+        reason: 'MAX_FILES_REACHED',
+        eventDetails: expect.objectContaining({
+          reason: 'MAX_FILES_REACHED',
+          message: 'Cannot add files. Limit of 2 reached.',
+        }),
       });
     });
 
-    it('calls onFileReject with MAX_FILES_REACHED when trying to add files after reaching the limit', async () => {
-      const onFileReject = vi.fn();
+    it('reports MAX_FILES_REACHED via onFileDrop when trying to add files after reaching the limit', async () => {
+      const onFileDrop = vi.fn();
 
       render(
-        <FileUpload.Root maxFiles={2} multiple onFileReject={onFileReject}>
+        <FileUpload.Root maxFiles={2} multiple onFileDrop={onFileDrop}>
           {null}
         </FileUpload.Root>,
       );
@@ -1494,7 +1580,8 @@ describe('FileUpload', () => {
         },
       });
 
-      onFileReject.mockClear();
+      await waitFor(() => expect(onFileDrop).toHaveBeenCalledTimes(1));
+      onFileDrop.mockClear();
 
       fireEvent.change(input, {
         target: {
@@ -1502,15 +1589,16 @@ describe('FileUpload', () => {
         },
       });
 
-      await waitFor(() => {
-        expect(onFileReject).toHaveBeenCalledWith(
-          expect.objectContaining({ name: 'test3.txt' }),
-          'MAX_FILES_REACHED',
-          expect.objectContaining({
-            reason: 'MAX_FILES_REACHED',
-            message: 'Cannot add files. Limit of 2 reached.',
-          }),
-        );
+      await waitFor(() => expect(onFileDrop).toHaveBeenCalled());
+      const [, fileRejections] = onFileDrop.mock.calls[0];
+      expect(fileRejections).toHaveLength(1);
+      expect(fileRejections[0]).toMatchObject({
+        file: expect.objectContaining({ name: 'test3.txt' }),
+        reason: 'MAX_FILES_REACHED',
+        eventDetails: expect.objectContaining({
+          reason: 'MAX_FILES_REACHED',
+          message: 'Cannot add files. Limit of 2 reached.',
+        }),
       });
     });
 
@@ -1570,7 +1658,7 @@ describe('FileUpload', () => {
 
     it('fills remaining slots with later valid files when earlier files are rejected', async () => {
       const onFileChange = vi.fn();
-      const onFileReject = vi.fn();
+      const onFileDrop = vi.fn();
 
       render(
         <FileUpload.Root
@@ -1578,7 +1666,7 @@ describe('FileUpload', () => {
           maxSize={1024}
           multiple
           onFileChange={onFileChange}
-          onFileReject={onFileReject}
+          onFileDrop={onFileDrop}
         >
           {null}
         </FileUpload.Root>,
@@ -1625,11 +1713,13 @@ describe('FileUpload', () => {
         ]),
       );
 
-      expect(onFileReject).toHaveBeenCalledWith(
-        expect.objectContaining({ name: 'too-large.txt' }),
-        'FILE_TOO_LARGE',
-        expect.objectContaining({ reason: 'FILE_TOO_LARGE' }),
-      );
+      const [, fileRejections] = onFileDrop.mock.calls.at(-1) ?? [];
+      expect(fileRejections).toHaveLength(1);
+      expect(fileRejections[0]).toMatchObject({
+        file: expect.objectContaining({ name: 'too-large.txt' }),
+        reason: 'FILE_TOO_LARGE',
+        eventDetails: expect.objectContaining({ reason: 'FILE_TOO_LARGE' }),
+      });
     });
 
     it('does not exceed maxFiles when addFiles is called concurrently before a render', async () => {

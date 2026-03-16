@@ -98,7 +98,7 @@ function FilePreviewItems() {
 export default function FileUploadDemo() {
   const maxFiles = 5;
   const [isUploadDisabled, setIsUploadDisabled] = React.useState(false);
-  const { errorMessages, handleFileChange, handleFileReject } = useFileRejection();
+  const { errorMessages, handleFileDrop, handleFileChange } = useFileRejection();
 
   const handleDemoFileChange = React.useCallback<
     NonNullable<React.ComponentProps<typeof FileUpload.Root>['onFileChange']>
@@ -124,7 +124,7 @@ export default function FileUploadDemo() {
         multiple
         disabled={isUploadDisabled}
         onFileChange={handleDemoFileChange}
-        onFileReject={handleFileReject}
+        onFileDrop={handleFileDrop}
       >
         <FileUpload.Dropzone className={styles.dropzone}>
           {({ isDragging }) => (

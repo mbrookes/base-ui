@@ -37,7 +37,7 @@ function FileList() {
 }
 
 export default function FileUploadValidationDemo() {
-  const { errorMessages, handleFileChange, handleFileReject } = useFileRejection();
+  const { errorMessages, handleFileDrop, handleFileChange } = useFileRejection();
 
   return (
     <div className={styles.root}>
@@ -47,7 +47,7 @@ export default function FileUploadValidationDemo() {
         minSize={1024}
         maxFiles={5}
         onFileChange={handleFileChange}
-        onFileReject={handleFileReject}
+        onFileDrop={handleFileDrop}
       >
         <div className={styles.footer}>
           <FileUpload.Trigger className={styles.trigger} aria-describedby="file-validation-hint">

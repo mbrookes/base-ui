@@ -38,7 +38,7 @@ function FileList() {
 }
 
 export default function FileUploadValidationTailwindDemo() {
-  const { errorMessages, handleFileChange, handleFileReject } = useFileRejection();
+  const { errorMessages, handleFileDrop, handleFileChange } = useFileRejection();
 
   return (
     <div className="space-y-3">
@@ -48,7 +48,7 @@ export default function FileUploadValidationTailwindDemo() {
         minSize={1024}
         maxFiles={5}
         onFileChange={handleFileChange}
-        onFileReject={handleFileReject}
+        onFileDrop={handleFileDrop}
       >
         <div className="flex items-center justify-between gap-3">
           <FileUpload.Trigger

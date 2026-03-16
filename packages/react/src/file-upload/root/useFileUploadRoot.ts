@@ -13,6 +13,7 @@ import type {
   FileUploadRootFileUpdates,
   FileUploadRootParameters,
   FileUploadRootFileStatus,
+  FileUploadRootRejection,
 } from './FileUploadRoot';
 import type { FileUploadContextValue } from './FileUploadContext';
 
@@ -109,7 +110,7 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
     directory = false,
     disabled = false,
     onFileChange,
-    onFileReject,
+    onFileDrop,
     onCancel,
     onRetry,
     onFilePause,
@@ -226,15 +227,34 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
     const maxFilesReachedMessage = messages.maxFilesReached(maxFiles);
 
     if (remainingSlots <= 0) {
+      const fileRejections: FileUploadRootRejection[] = [];
+
       newFiles.forEach((file) => {
-        onFileReject?.(file, 'MAX_FILES_REACHED', rejectDetails('MAX_FILES_REACHED', maxFilesReachedMessage));
+        const eventDetails = rejectDetails('MAX_FILES_REACHED', maxFilesReachedMessage);
+        fileRejections.push({
+          file,
+          reason: 'MAX_FILES_REACHED',
+          eventDetails,
+        });
       });
+
       setAnnouncement(maxFilesReachedMessage);
+
+      onFileDrop?.(
+        [],
+        fileRejections,
+        createChangeEventDetails<FileUploadRootChangeReason>(
+          FILE_UPLOAD_ROOT_CHANGE_REASONS.FILE_ADDED,
+          event,
+        ),
+      );
+
       return;
     }
 
     const candidates = multiple ? newFiles : [newFiles[0]];
     const validFiles: FileUploadRootExtendedFile[] = [];
+    const fileRejections: FileUploadRootRejection[] = [];
     const errors: string[] = [];
 
     const existingKeys = new Set(prev.map(getFileKey));
@@ -246,7 +266,12 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
       }
 
       if (acceptedCount >= remainingSlots) {
-        onFileReject?.(file, 'MAX_FILES_REACHED', rejectDetails('MAX_FILES_REACHED', maxFilesReachedMessage));
+        const eventDetails = rejectDetails('MAX_FILES_REACHED', maxFilesReachedMessage);
+        fileRejections.push({
+          file,
+          reason: 'MAX_FILES_REACHED',
+          eventDetails,
+        });
         errors.push(`${file.name}: ${maxFilesReachedMessage}`);
         return;
       }
@@ -254,14 +279,24 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
       const fileKey = getFileKey(file);
       if (existingKeys.has(fileKey)) {
         const dupMessage = messages.duplicateFile(file.name);
-        onFileReject?.(file, 'DUPLICATE_FILE', rejectDetails('DUPLICATE_FILE', dupMessage));
+        const eventDetails = rejectDetails('DUPLICATE_FILE', dupMessage);
+        fileRejections.push({
+          file,
+          reason: 'DUPLICATE_FILE',
+          eventDetails,
+        });
         errors.push(dupMessage);
         return;
       }
 
       const error = validateFile(file);
       if (error) {
-        onFileReject?.(file, error.reason, rejectDetails(error.reason, error.message));
+        const eventDetails = rejectDetails(error.reason, error.message);
+        fileRejections.push({
+          file,
+          reason: error.reason,
+          eventDetails,
+        });
         errors.push(`${file.name}: ${error.message}`);
       } else {
         existingKeys.add(fileKey);
@@ -285,6 +320,15 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
     const successMsg = validFiles.length > 0 ? messages.filesAdded(validFiles.length) : '';
     const errorMsg = errors.length > 0 ? messages.filesRejected(errors.length, errors) : '';
     const separator = successMsg && errorMsg ? ' ' : '';
+
+    onFileDrop?.(
+      validFiles,
+      fileRejections,
+      createChangeEventDetails<FileUploadRootChangeReason>(
+        FILE_UPLOAD_ROOT_CHANGE_REASONS.FILE_ADDED,
+        event,
+      ),
+    );
 
     setAnnouncement(`${successMsg}${separator}${errorMsg}`);
 

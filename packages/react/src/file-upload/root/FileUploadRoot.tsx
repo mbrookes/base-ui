@@ -40,6 +40,21 @@ export type FileUploadRootRejectEventDetails = BaseUIChangeEventDetails<
   { message: string }
 >;
 
+export interface FileUploadRootRejection {
+  /**
+   * The rejected file.
+   */
+  file: File;
+  /**
+   * Machine-readable reason code for rejection.
+   */
+  reason: FileUploadRootRejectReason;
+  /**
+   * Event metadata containing rejection details such as message.
+   */
+  eventDetails: FileUploadRootRejectEventDetails;
+}
+
 export interface FileUploadRootState {
   /**
    * Whether files are currently being dragged over the dropzone.
@@ -117,14 +132,14 @@ export interface FileUploadRootParameters {
       ) => void)
     | undefined;
   /**
-   * Callback when a file is rejected.
-   * Receives a machine-readable reason code and detailed event metadata.
+   * Callback fired once per add/drop/paste/input attempt with accepted and rejected files.
+   * This fires even when no files are accepted.
    */
-  onFileReject?:
+  onFileDrop?:
     | ((
-        file: File,
-        reason: FileUploadRootRejectReason,
-        eventDetails: FileUploadRootRejectEventDetails,
+        acceptedFiles: FileUploadRootExtendedFile[],
+        fileRejections: FileUploadRootRejection[],
+        eventDetails: FileUploadRootChangeEventDetails,
       ) => void)
     | undefined;
   /**
@@ -223,7 +238,7 @@ export interface FileUploadRootProps
  * @param directory - Allow selecting directories (default: false)
  * @param disabled - Disable file upload (default: false)
  * @param onFileChange - Callback when files are added/removed
- * @param onFileReject - Callback when a file is rejected (`reason` + `eventDetails`)
+ * @param onFileDrop - Callback fired once per add/drop/paste/input attempt with accepted and rejected files
  * @param onCancel - Callback when the file dialog is canceled
  * @param onRetry - Callback when a file retry is initiated
  * @param onFilePause - Callback when a file upload is paused
@@ -244,7 +259,7 @@ export const FileUploadRoot = React.forwardRef<HTMLDivElement, FileUploadRootPro
       directory,
       disabled,
       onFileChange,
-      onFileReject,
+      onFileDrop,
       onCancel,
       onRetry,
       onFilePause,
@@ -265,7 +280,7 @@ export const FileUploadRoot = React.forwardRef<HTMLDivElement, FileUploadRootPro
       directory,
       disabled,
       onFileChange,
-      onFileReject,
+      onFileDrop,
       onCancel,
       onRetry,
       onFilePause,
@@ -437,6 +452,7 @@ export namespace FileUploadRoot {
   export type FileUpdates = FileUploadRootFileUpdates;
   export type FileStatus = FileUploadRootFileStatus;
   export type RejectReason = FileUploadRootRejectReason;
+  export type Rejection = FileUploadRootRejection;
   export type RejectEventDetails = FileUploadRootRejectEventDetails;
   export type ChangeEventDetails = FileUploadRootChangeEventDetails;
   export type ChangeReason = FileUploadRootChangeReason;
