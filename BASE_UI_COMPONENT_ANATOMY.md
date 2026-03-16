@@ -16,7 +16,7 @@ Purpose: high-signal implementation rules for coding agents working on `packages
    - pass original `componentProps` as arg 2
    - do not drop/rename-away `render`
 6. Avoid `as any` unless unavoidable and justified.
-7. Optional public props follow repository conventions, not a hard global rule: prefer `?: T | undefined` for most explicit public API props; `?: T` is acceptable when already common in nearby components (especially `children` props); keep consistency with the surrounding component family and avoid type-only churn solely to add or remove `| undefined`.
+7. Optional public props should be `?: T | undefined`.
 8. Data attributes are presence-based (`data-disabled`, not `data-disabled="true"`).
 
 ## 2. Choose Component Shape

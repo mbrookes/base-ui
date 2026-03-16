@@ -503,6 +503,50 @@ describe('FileUpload', () => {
     expect(uploadedFiles?.length).toBe(1);
   });
 
+  it('keeps existing file in single-file mode when replacement is rejected', async () => {
+    let contextValue: TestFileUploadContext | null = null;
+    const onFileChange = vi.fn();
+    const onFileReject = vi.fn();
+
+    function TestComponent() {
+      contextValue = FileUpload.useFileUploadContext() as unknown as TestFileUploadContext;
+      return null;
+    }
+
+    render(
+      <FileUpload.Root multiple={false} accept="image/*" onFileChange={onFileChange} onFileReject={onFileReject}>
+        <TestComponent />
+      </FileUpload.Root>,
+    );
+
+    const validFile = new File(['content'], 'photo.jpg', { type: 'image/jpeg' });
+    const invalidFile = new File(['content'], 'notes.txt', { type: 'text/plain' });
+
+    act(() => {
+      getTestContext(contextValue).addFiles([validFile]);
+    });
+
+    await waitFor(() => expect(onFileChange).toHaveBeenCalled());
+
+    act(() => {
+      getTestContext(contextValue).addFiles([invalidFile]);
+    });
+
+    await waitFor(() => {
+      expect(onFileReject).toHaveBeenCalledWith(
+        invalidFile,
+        'MIME_TYPE_NOT_ALLOWED',
+        expect.objectContaining({
+          reason: 'MIME_TYPE_NOT_ALLOWED',
+        }),
+      );
+    });
+
+    const latestFiles = onFileChange.mock.calls.at(-1)?.[0];
+    expect(latestFiles).toHaveLength(1);
+    expect(latestFiles?.[0].name).toBe('photo.jpg');
+  });
+
   it('cleans up object URLs on unmount', async () => {
     const { unmount } = render(<FileUpload.Root>{null}</FileUpload.Root>);
 
@@ -797,6 +841,31 @@ describe('FileUpload', () => {
       );
 
       expect(screen.getByTestId('has-signal')).toBeInTheDocument();
+    });
+
+    it('returns the same abort signal for the same file id', async () => {
+      function TestComponent() {
+        const { getAbortSignal } = FileUpload.useFileUploadContext();
+        const [sameSignal, setSameSignal] = React.useState(false);
+
+        React.useEffect(() => {
+          const signalA = getAbortSignal('test-id');
+          const signalB = getAbortSignal('test-id');
+          setSameSignal(signalA === signalB);
+        }, [getAbortSignal]);
+
+        return <div>{sameSignal && <div data-testid="same-signal">Same Signal</div>}</div>;
+      }
+
+      render(
+        <FileUpload.Root>
+          <TestComponent />
+        </FileUpload.Root>,
+      );
+
+      await waitFor(() => {
+        expect(screen.getByTestId('same-signal')).toBeInTheDocument();
+      });
     });
 
     it('aborts upload when abortUpload is called', async () => {

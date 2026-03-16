@@ -317,6 +317,11 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
         });
         return uniqueFiles.length > 0 ? [...latestPrev, ...uniqueFiles] : latestPrev;
       }
+
+      if (validFiles.length === 0) {
+        return latestPrev;
+      }
+
       // single-file mode: replace with the newly selected file
       if (latestPrev !== prev) {
         latestPrev.forEach((f) => {
@@ -328,6 +333,10 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
     });
 
     if (!multiple) {
+      if (validFiles.length === 0) {
+        return;
+      }
+
       // Revoke URLs for files that are being replaced.
       const nextIds = new Set(validFiles.map((f) => f.id));
       prev.forEach((f) => {
@@ -442,6 +451,11 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
   });
 
   const getAbortSignal = useStableCallback((id: string): AbortSignal => {
+    const existingController = abortControllersRef.current.get(id);
+    if (existingController) {
+      return existingController.signal;
+    }
+
     const controller = new AbortController();
     abortControllersRef.current.set(id, controller);
     return controller.signal;
