@@ -4,7 +4,7 @@ import { FileUpload } from '@base-ui/react/file-upload';
 import {
   SettingsMetadata,
   useExperimentSettings,
-} from '../../../components/Experiments/SettingsPanel';
+} from './_components/SettingsPanel';
 import styles from './file-upload.module.css';
 
 interface Settings {

@@ -53,7 +53,7 @@ export interface FileUploadDropzoneProps extends Omit<
  */
 export const FileUploadDropzone = React.forwardRef<HTMLDivElement, FileUploadDropzoneProps>(
   function FileUploadDropzoneComponent(props, ref) {
-    const { children, ...elementProps } = props;
+    const { render, className, children, ...elementProps } = props;
     const { isDragging, disabled, openFileDialog } = useFileUploadContext();
 
     const state: FileUploadDropzoneState = React.useMemo(
