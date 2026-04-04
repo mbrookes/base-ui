@@ -91,8 +91,7 @@ export interface ComponentPartState {
   disabled: boolean;
 }
 
-export interface ComponentPartProps
-  extends BaseUIComponentProps<'button', ComponentPartState> {
+export interface ComponentPartProps extends BaseUIComponentProps<'button', ComponentPartState> {
   disabled?: boolean | undefined;
 }
 
@@ -100,10 +99,7 @@ export const ComponentPart = React.forwardRef<HTMLButtonElement, ComponentPartPr
   function ComponentPart(componentProps, forwardedRef) {
     const { render, className, disabled = false, ...elementProps } = componentProps;
 
-    const state: ComponentPartState = React.useMemo(
-      () => ({ disabled }),
-      [disabled],
-    );
+    const state: ComponentPartState = React.useMemo(() => ({ disabled }), [disabled]);
 
     const onClick = useStableCallback((event: React.MouseEvent) => {
       if (disabled) {

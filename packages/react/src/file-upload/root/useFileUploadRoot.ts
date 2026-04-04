@@ -12,7 +12,6 @@ import type {
   FileUploadRootExtendedFile,
   FileUploadRootFileUpdates,
   FileUploadRootParameters,
-  FileUploadRootFileStatus,
   FileUploadRootRejection,
 } from './FileUploadRoot';
 import type { FileUploadContextValue } from './FileUploadContext';
@@ -70,8 +69,6 @@ const messages = {
   filesRejected: (count: number, errors: string[]) => `${count} rejected: ${errors.join(', ')}`,
   fileRemoved: (fileName: string) => `Removed file ${fileName}`,
   allFilesRemoved: () => 'All files removed',
-  retryingUpload: (fileName: string) => `Retrying upload for ${fileName}`,
-  uploadCanceled: (fileName: string) => `Upload canceled for ${fileName}`,
 };
 
 // Check if a file type matches the accept string
@@ -109,12 +106,9 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
     multiple = true,
     directory = false,
     disabled = false,
-    onFileChange,
-    onFileDrop,
+    onFilesChange,
+    onFilesAdd,
     onCancel,
-    onRetry,
-    onFilePause,
-    onFileResume,
     locale,
   } = params;
 
@@ -125,23 +119,19 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
   const filesRef = React.useRef<FileUploadRootExtendedFile[]>([]);
   filesRef.current = files;
   const inputRef = React.useRef<HTMLInputElement | null>(null);
-  const abortControllersRef = React.useRef<Map<string, AbortController>>(new Map());
   const previewUrlsRef = React.useRef<Map<string, string>>(new Map());
   const inputId = useBaseUIId();
   const isInitialRender = React.useRef(true);
   const lastChangeReasonRef = React.useRef<FileUploadRootChangeReason>('file-added');
   const lastChangeEventRef = React.useRef<Event | undefined>(undefined);
 
-  // Cleanup object URLs and abort controllers to prevent memory leaks
+  // Cleanup object URLs to prevent memory leaks
   React.useEffect(() => {
-    const controllers = abortControllersRef.current;
     const previewUrls = previewUrlsRef.current;
 
     return () => {
       previewUrls.forEach((previewUrl) => URL.revokeObjectURL(previewUrl));
       previewUrls.clear();
-      controllers.forEach((controller) => controller.abort());
-      controllers.clear();
     };
   }, []);
 
@@ -155,8 +145,8 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
       lastChangeReasonRef.current,
       lastChangeEventRef.current,
     );
-    onFileChange?.(files, eventDetails);
-  }, [files, onFileChange]);
+    onFilesChange?.(files, eventDetails);
+  }, [files, onFilesChange]);
 
   const validateFile = useStableCallback((file: File): ValidationResult => {
     const hasMaxSizeLimit = Number.isFinite(maxSize);
@@ -240,7 +230,7 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
 
       setAnnouncement(maxFilesReachedMessage);
 
-      onFileDrop?.(
+      onFilesAdd?.(
         [],
         fileRejections,
         createChangeEventDetails<FileUploadRootChangeReason>(
@@ -321,7 +311,7 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
     const errorMsg = errors.length > 0 ? messages.filesRejected(errors.length, errors) : '';
     const separator = successMsg && errorMsg ? ' ' : '';
 
-    onFileDrop?.(
+    onFilesAdd?.(
       validFiles,
       fileRejections,
       createChangeEventDetails<FileUploadRootChangeReason>(
@@ -355,10 +345,12 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
         const latestKeys = new Set(latestPrev.map((f) => getFileKey(f)));
         const uniqueFiles = filesToAdd.filter((f) => !latestKeys.has(getFileKey(f)));
         // Files already present due to a concurrent update are also not added; revoke their URLs.
-        filesToAdd.filter((f) => latestKeys.has(getFileKey(f))).forEach((f) => {
-          URL.revokeObjectURL(f.preview);
-          previewUrlsRef.current.delete(f.id);
-        });
+        filesToAdd
+          .filter((f) => latestKeys.has(getFileKey(f)))
+          .forEach((f) => {
+            URL.revokeObjectURL(f.preview);
+            previewUrlsRef.current.delete(f.id);
+          });
         return uniqueFiles.length > 0 ? [...latestPrev, ...uniqueFiles] : latestPrev;
       }
 
@@ -438,127 +430,31 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
     setFiles((prev) => prev.map((file) => (file.id === id ? Object.assign(file, updates) : file)));
   });
 
-  const retryFile = useStableCallback((id: string) => {
-    lastChangeReasonRef.current = FILE_UPLOAD_ROOT_CHANGE_REASONS.FILE_UPDATED;
-    lastChangeEventRef.current = undefined;
-
-    const fileToRetry =
-      filesRef.current.find((f) => f.id === id && f.status === 'error') ?? null;
-
-    // Call onRetry before setFiles so the callback observes the file in its
-    // error state, not the post-mutation idle state produced by Object.assign.
-    if (fileToRetry) {
-      onRetry?.(fileToRetry);
-      setAnnouncement(messages.retryingUpload(fileToRetry.name));
-    }
-
-    setFiles((prev) =>
-      prev.map((f) =>
-        f.id === id && f.status === 'error'
-          ? Object.assign(f, {
-              status: 'idle' as FileUploadRootFileStatus,
-              progress: 0,
-              error: undefined,
-            })
-          : f,
-      ),
-    );
-  });
-
-  const abortUpload = useStableCallback((id: string) => {
-    const controller = abortControllersRef.current.get(id);
-    if (controller) {
-      lastChangeReasonRef.current = FILE_UPLOAD_ROOT_CHANGE_REASONS.FILE_UPDATED;
-      lastChangeEventRef.current = undefined;
-      controller.abort();
-      abortControllersRef.current.delete(id);
-
-      const canceledFileName: string | null =
-        filesRef.current.find((f) => f.id === id && f.status === 'uploading')?.name ?? null;
-
-      setFiles((prev) => {
-        return prev.map((f) => {
-          if (f.id === id && f.status === 'uploading') {
-            return Object.assign(f, {
-              status: 'error' as FileUploadRootFileStatus,
-              error: 'Upload canceled',
-            });
-          }
-          return f;
-        });
-      });
-
-      if (canceledFileName) {
-        setAnnouncement(messages.uploadCanceled(canceledFileName));
-      }
-    }
-  });
-
-  const getAbortSignal = useStableCallback((id: string): AbortSignal => {
-    const existingController = abortControllersRef.current.get(id);
-    if (existingController) {
-      return existingController.signal;
-    }
-
-    const controller = new AbortController();
-    abortControllersRef.current.set(id, controller);
-    return controller.signal;
-  });
-
-  const pauseFile = useStableCallback((id: string) => {
-    lastChangeReasonRef.current = FILE_UPLOAD_ROOT_CHANGE_REASONS.FILE_UPDATED;
-    lastChangeEventRef.current = undefined;
-
-    const fileToPause =
-      filesRef.current.find((f) => f.id === id && f.status === 'uploading') ?? null;
-
-    // Call onFilePause before setFiles so the callback observes the file in its
-    // uploading state, not the post-mutation paused state.
-    if (fileToPause) {
-      onFilePause?.(fileToPause);
-    }
-
-    setFiles((prev) =>
-      prev.map((f) =>
-        f.id === id && f.status === 'uploading'
-          ? Object.assign(f, { status: 'paused' as FileUploadRootFileStatus, isPaused: true })
-          : f,
-      ),
-    );
-  });
-
-  const resumeFile = useStableCallback((id: string) => {
-    lastChangeReasonRef.current = FILE_UPLOAD_ROOT_CHANGE_REASONS.FILE_UPDATED;
-    lastChangeEventRef.current = undefined;
-
-    const fileToResume =
-      filesRef.current.find((f) => f.id === id && f.status === 'paused') ?? null;
-
-    // Call onFileResume before setFiles so the callback observes the file in its
-    // paused state, not the post-mutation uploading state.
-    if (fileToResume) {
-      onFileResume?.(fileToResume);
-    }
-
-    setFiles((prev) =>
-      prev.map((f) =>
-        f.id === id && f.status === 'paused'
-          ? Object.assign(f, { status: 'uploading' as FileUploadRootFileStatus, isPaused: false })
-          : f,
-      ),
-    );
-  });
-
   const openFileDialog = useStableCallback(() => {
     if (!disabled && inputRef.current) {
       inputRef.current.click();
     }
   });
 
+  const setInputElement = useStableCallback((node: HTMLInputElement | null) => {
+    inputRef.current = node;
+  });
+
+  const onInputChange = useStableCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files.length > 0) {
+      addFiles(Array.from(event.target.files), event.nativeEvent);
+    } else {
+      onCancel?.();
+    }
+
+    if (inputRef.current) {
+      inputRef.current.value = '';
+    }
+  });
+
   const contextValue: FileUploadContextValue = React.useMemo(
     () => ({
       files,
-      isDragging,
       maxFiles,
       maxSize,
       minSize,
@@ -571,20 +467,13 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
       clearFiles,
       addFiles,
       updateFile,
-      retryFile,
-      abortUpload,
-      getAbortSignal,
-      pauseFile,
-      resumeFile,
       onCancel,
-      onRetry,
-      onFilePause,
-      onFileResume,
       openFileDialog,
+      setInputElement,
+      onInputChange,
     }),
     [
       files,
-      isDragging,
       maxFiles,
       maxSize,
       minSize,
@@ -597,26 +486,17 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
       clearFiles,
       addFiles,
       updateFile,
-      retryFile,
-      abortUpload,
-      getAbortSignal,
-      pauseFile,
-      resumeFile,
       onCancel,
-      onRetry,
-      onFilePause,
-      onFileResume,
       openFileDialog,
+      setInputElement,
+      onInputChange,
     ],
   );
 
   return {
     contextValue,
-    inputRef,
     isDragging,
     setIsDragging,
-    disabled,
-    addFiles,
     announcement,
   };
 };

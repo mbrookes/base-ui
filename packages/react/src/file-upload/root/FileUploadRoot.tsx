@@ -2,7 +2,6 @@
 
 import * as React from 'react';
 import { useStableCallback } from '@base-ui/utils/useStableCallback';
-import { useIsoLayoutEffect } from '@base-ui/utils/useIsoLayoutEffect';
 import { visuallyHidden } from '@base-ui/utils/visuallyHidden';
 import { useRenderElement } from '../../utils/useRenderElement';
 import type { BaseUIComponentProps, HTMLProps } from '../../utils/types';
@@ -125,7 +124,7 @@ export interface FileUploadRootParameters {
   /**
    * Callback when files are added or removed.
    */
-  onFileChange?:
+  onFilesChange?:
     | ((
         files: FileUploadRootExtendedFile[],
         eventDetails: FileUploadRootChangeEventDetails,
@@ -135,7 +134,7 @@ export interface FileUploadRootParameters {
    * Callback fired once per add/drop/paste/input attempt with accepted and rejected files.
    * This fires even when no files are accepted.
    */
-  onFileDrop?:
+  onFilesAdd?:
     | ((
         acceptedFiles: FileUploadRootExtendedFile[],
         fileRejections: FileUploadRootRejection[],
@@ -146,18 +145,6 @@ export interface FileUploadRootParameters {
    * Callback when the file dialog is canceled.
    */
   onCancel?: (() => void) | undefined;
-  /**
-   * Callback when a file retry is initiated.
-   */
-  onRetry?: ((file: FileUploadRootExtendedFile) => void) | undefined;
-  /**
-   * Callback when a file upload is paused.
-   */
-  onFilePause?: ((file: FileUploadRootExtendedFile) => void) | undefined;
-  /**
-   * Callback when a paused file upload is resumed.
-   */
-  onFileResume?: ((file: FileUploadRootExtendedFile) => void) | undefined;
   /**
    * The locale used by `Intl.NumberFormat` when formatting values in default messages.
    * Defaults to the user's runtime locale.
@@ -186,25 +173,15 @@ export interface FileUploadRootExtendedFile extends File {
    * Error message if the file failed to upload.
    */
   error?: string | undefined;
-  /**
-   * Whether the file upload is currently paused.
-   */
-  isPaused?: boolean | undefined;
-  /**
-   * Number of bytes already uploaded (for resumable uploads).
-   */
-  uploadedBytes?: number | undefined;
 }
 
 export interface FileUploadRootFileUpdates {
   status?: FileUploadRootFileStatus | undefined;
   progress?: number | undefined;
   error?: string | undefined;
-  isPaused?: boolean | undefined;
-  uploadedBytes?: number | undefined;
 }
 
-export type FileUploadRootFileStatus = 'idle' | 'uploading' | 'success' | 'error' | 'paused';
+export type FileUploadRootFileStatus = 'idle' | 'uploading' | 'success' | 'error';
 
 export interface FileUploadRootProps
   extends BaseUIComponentProps<'div', FileUploadRootState>, FileUploadRootParameters {
@@ -221,11 +198,12 @@ export interface FileUploadRootProps
  * @component
  * @example
  * ```tsx
- * <FileUpload.Root accept="image/*" maxSize={5242880} onFileChange={handleFileChange}>
- *   <FileUpload.Dropzone>Drop files here</FileUpload.Dropzone>
- *   <FileUpload.PreviewList>
- *     {files.map(file => <FileUpload.PreviewItem key={file.id} file={file} />)}
- *   </FileUpload.PreviewList>
+ * import { Dropzone } from '@base-ui/react/dropzone';
+ *
+ * <FileUpload.Root accept="image/*" maxSize={5242880} onFilesChange={handleFileChange}>
+ *   <FileUpload.HiddenInput />
+ *   <Dropzone>Drop files here</Dropzone>
+ *   <FileUpload.Trigger>Select files</FileUpload.Trigger>
  * </FileUpload.Root>
  * ```
  *
@@ -237,12 +215,9 @@ export interface FileUploadRootProps
  * @param multiple - Allow multiple file selection (default: true)
  * @param directory - Allow selecting directories (default: false)
  * @param disabled - Disable file upload (default: false)
- * @param onFileChange - Callback when files are added/removed
- * @param onFileDrop - Callback fired once per add/drop/paste/input attempt with accepted and rejected files
+ * @param onFilesChange - Callback when files are added/removed
+ * @param onFilesAdd - Callback fired once per add/drop/paste/input attempt with accepted and rejected files
  * @param onCancel - Callback when the file dialog is canceled
- * @param onRetry - Callback when a file retry is initiated
- * @param onFilePause - Callback when a file upload is paused
- * @param onFileResume - Callback when a paused file upload is resumed
  *
  * @see [File Upload Documentation](https://base-ui.com/react/components/file-upload)
  */
@@ -258,19 +233,17 @@ export const FileUploadRoot = React.forwardRef<HTMLDivElement, FileUploadRootPro
       multiple,
       directory,
       disabled,
-      onFileChange,
-      onFileDrop,
+      onFilesChange,
+      onFilesAdd,
       onCancel,
-      onRetry,
-      onFilePause,
-      onFileResume,
       locale,
+      render,
       style,
       className,
       ...other
     } = props;
 
-    const { contextValue, inputRef, setIsDragging, addFiles, announcement } = useFileUploadRoot({
+    const { contextValue, isDragging, setIsDragging, announcement } = useFileUploadRoot({
       maxFiles,
       maxSize,
       minSize,
@@ -279,50 +252,19 @@ export const FileUploadRoot = React.forwardRef<HTMLDivElement, FileUploadRootPro
       multiple,
       directory,
       disabled,
-      onFileChange,
-      onFileDrop,
+      onFilesChange,
+      onFilesAdd,
       onCancel,
-      onRetry,
-      onFilePause,
-      onFileResume,
       locale,
     });
 
     const state: FileUploadRootState = React.useMemo(
       () => ({
-        dragging: contextValue.isDragging,
+        dragging: isDragging,
         disabled: contextValue.disabled,
       }),
-      [contextValue.isDragging, contextValue.disabled],
+      [isDragging, contextValue.disabled],
     );
-
-    useIsoLayoutEffect(() => {
-      const node = inputRef.current;
-      if (!node) {
-        return;
-      }
-
-      if (contextValue.directory) {
-        node.setAttribute('webkitdirectory', '');
-        node.setAttribute('directory', '');
-      } else {
-        node.removeAttribute('webkitdirectory');
-        node.removeAttribute('directory');
-      }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- inputRef is a stable React ref
-    }, [contextValue.directory]);
-
-    const handleInputChange = useStableCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-      if (event.target.files && event.target.files.length > 0) {
-        addFiles(Array.from(event.target.files), event.nativeEvent);
-      } else {
-        onCancel?.();
-      }
-
-      if (inputRef.current) {
-        inputRef.current.value = '';
-      }
-    });
 
     const handleDragEnter = useStableCallback((event: React.DragEvent) => {
       event.preventDefault();
@@ -354,7 +296,7 @@ export const FileUploadRoot = React.forwardRef<HTMLDivElement, FileUploadRootPro
       setIsDragging(false);
 
       if (event.dataTransfer.files && event.dataTransfer.files.length > 0) {
-        addFiles(Array.from(event.dataTransfer.files), event.nativeEvent);
+        contextValue.addFiles(Array.from(event.dataTransfer.files), event.nativeEvent);
       }
     });
 
@@ -403,7 +345,7 @@ export const FileUploadRoot = React.forwardRef<HTMLDivElement, FileUploadRootPro
 
       event.preventDefault();
       event.stopPropagation();
-      addFiles(pastedFiles, event.nativeEvent);
+      contextValue.addFiles(pastedFiles, event.nativeEvent);
     });
 
     const defaultProps: HTMLProps = {
@@ -415,16 +357,6 @@ export const FileUploadRoot = React.forwardRef<HTMLDivElement, FileUploadRootPro
       style: { position: 'relative', ...style },
       children: (
         <React.Fragment>
-          <input
-            ref={inputRef}
-            id={contextValue.inputId}
-            type="file"
-            accept={contextValue.accept}
-            multiple={contextValue.directory || contextValue.multiple}
-            disabled={contextValue.disabled}
-            style={{ display: 'none' }}
-            onChange={handleInputChange}
-          />
           <div style={visuallyHidden} role="status" aria-live="polite">
             {announcement}
           </div>

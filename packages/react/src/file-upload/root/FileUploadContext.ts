@@ -11,8 +11,6 @@ import type { FileUploadRoot } from './FileUploadRoot';
 export interface FileUploadContextValue {
   /** Array of files currently managed by the upload component */
   files: FileUploadRoot.ExtendedFile[];
-  /** Whether files are currently being dragged over a dropzone */
-  isDragging: boolean;
   /** Maximum number of files allowed */
   maxFiles: number;
   /** Maximum file size in bytes */
@@ -37,26 +35,14 @@ export interface FileUploadContextValue {
   addFiles: (files: File[], event?: Event) => void;
   /** Update a file's upload metadata without replacing the full files array */
   updateFile: (id: string, updates: FileUploadRoot.FileUpdates) => void;
-  /** Retry a file that failed to upload */
-  retryFile: (id: string) => void;
-  /** Abort an in-progress upload */
-  abortUpload: (id: string) => void;
-  /** Get an AbortSignal for tracking upload cancellation */
-  getAbortSignal: (id: string) => AbortSignal;
-  /** Pause an in-progress upload */
-  pauseFile: (id: string) => void;
-  /** Resume a paused upload */
-  resumeFile: (id: string) => void;
   /** Callback fired when the file dialog is canceled */
   onCancel?: (() => void) | undefined;
-  /** Callback fired when a file retry is initiated */
-  onRetry?: ((file: FileUploadRoot.ExtendedFile) => void) | undefined;
-  /** Callback fired when a file upload is paused */
-  onFilePause?: ((file: FileUploadRoot.ExtendedFile) => void) | undefined;
-  /** Callback fired when a paused file upload is resumed */
-  onFileResume?: ((file: FileUploadRoot.ExtendedFile) => void) | undefined;
   /** Trigger the file selection dialog */
   openFileDialog: () => void;
+  /** Internal: register the hidden input element used by `FileUpload.HiddenInput` */
+  setInputElement: (node: HTMLInputElement | null) => void;
+  /** Internal: change handler used by `FileUpload.HiddenInput` */
+  onInputChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 export const FileUploadContext = React.createContext<FileUploadContextValue | undefined>(undefined);
@@ -73,7 +59,7 @@ export const FileUploadContext = React.createContext<FileUploadContextValue | un
  * @example
  * ```tsx
  * function CustomUploadUI() {
- *   const { files, addFiles, removeFile, isDragging } = useFileUploadContext();
+ *   const { files, removeFile } = useFileUploadContext();
  *   return (
  *     <div>
  *       {files.map(file => (

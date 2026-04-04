@@ -1,10 +1,8 @@
 'use client';
 import * as React from 'react';
+import { Dropzone } from '@base-ui/react/dropzone';
 import { FileUpload } from '@base-ui/react/file-upload';
-import {
-  SettingsMetadata,
-  useExperimentSettings,
-} from './_components/SettingsPanel';
+import { SettingsMetadata, useExperimentSettings } from './_components/SettingsPanel';
 import styles from './file-upload.module.css';
 
 interface Settings {
@@ -49,33 +47,42 @@ export default function FileUploadExperiment() {
         maxSize={settings.maxSize * 1024 * 1024}
         accept="image/*"
       >
-        <FileUpload.Dropzone className={styles.Dropzone}>
-          {({ isDragging }) => (
-            <div className={isDragging ? styles.Dragging : ''}>
-              <UploadIcon className={styles.Icon} />
-              <p className={styles.Text}>
-                {isDragging ? 'Drop files here' : 'Drag & drop files here'}
-              </p>
-              <FileUpload.Trigger className={styles.Button}>Browse files</FileUpload.Trigger>
-            </div>
-          )}
-        </FileUpload.Dropzone>
+        <FileUpload.HiddenInput />
+        <UploadDropzone />
 
-        <FileUpload.PreviewList className={styles.PreviewList}>
-          <FilePreviewItems />
-        </FileUpload.PreviewList>
+        <FilePreviewItems />
       </FileUpload.Root>
     </div>
+  );
+}
+
+function UploadDropzone() {
+  const { disabled, openFileDialog } = FileUpload.useFileUploadContext();
+
+  return (
+    <Dropzone className={styles.Dropzone} disabled={disabled} onOpen={openFileDialog}>
+      {({ isDragging }) => (
+        <div className={isDragging ? styles.Dragging : ''}>
+          <UploadIcon className={styles.Icon} />
+          <p className={styles.Text}>{isDragging ? 'Drop files here' : 'Drag & drop files here'}</p>
+          <FileUpload.Trigger className={styles.Button}>Browse files</FileUpload.Trigger>
+        </div>
+      )}
+    </Dropzone>
   );
 }
 
 function FilePreviewItems() {
   const { files, removeFile } = FileUpload.useFileUploadContext();
 
+  if (files.length === 0) {
+    return null;
+  }
+
   return (
-    <React.Fragment>
+    <ul className={styles.PreviewList}>
       {files.map((file) => (
-        <FileUpload.PreviewItem key={file.id} file={file} className={styles.PreviewItem}>
+        <li key={file.id} className={styles.PreviewItem}>
           <div className={styles.FileInfo}>
             <span className={styles.FileName}>{file.name}</span>
             <span className={styles.FileSize}>{(file.size / 1024).toFixed(2)} KB</span>
@@ -88,9 +95,9 @@ function FilePreviewItems() {
           >
             ×
           </button>
-        </FileUpload.PreviewItem>
+        </li>
       ))}
-    </React.Fragment>
+    </ul>
   );
 }
 

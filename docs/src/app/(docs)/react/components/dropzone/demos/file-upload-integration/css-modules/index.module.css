@@ -1,0 +1,87 @@
+.container {
+  width: 100%;
+  border-radius: 0.75rem;
+  border: 1px solid #e5e7eb;
+  background-color: #fff;
+  padding: 1.5rem;
+}
+
+.dropzone {
+  margin-top: 1rem;
+  border: 2px dashed #9ca3af;
+  border-radius: 0.75rem;
+  background: #f9fafb;
+  padding: 1.25rem;
+  text-align: center;
+  transition:
+    border-color 0.2s,
+    background-color 0.2s;
+}
+
+.dropzone:hover {
+  border-color: #2563eb;
+  background: #eff6ff;
+}
+
+.dropzone:focus {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+.dropzone[data-dragging] {
+  border-color: #2563eb;
+  background: #dbeafe;
+}
+
+.dropzone[data-disabled] {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.heading {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.list {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  list-style: none;
+  padding: 0;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.75rem;
+}
+
+.fileName {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.875rem;
+  color: #111827;
+}
+
+.remove {
+  border: 0;
+  background: transparent;
+  color: #6b7280;
+  cursor: pointer;
+  font-size: 0.75rem;
+}
+
+.empty {
+  margin-top: 1rem;
+  margin-bottom: 0;
+  font-size: 0.875rem;
+  color: #6b7280;
+}

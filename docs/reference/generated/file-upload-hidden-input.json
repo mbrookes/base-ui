@@ -1,0 +1,22 @@
+{
+  "name": "FileUploadHiddenInput",
+  "description": "Hidden file input that powers file selection for File Upload.\n\nPlace this part inside `FileUpload.Root` to enable file selection.",
+  "props": {
+    "className": {
+      "type": "string | ((state: FileUpload.HiddenInput.State) => string | undefined)",
+      "description": "CSS class applied to the element, or a function that\nreturns a class based on the component’s state.",
+      "detailedType": "| string\n| ((\n    state: FileUpload.HiddenInput.State,\n  ) => string | undefined)"
+    },
+    "style": {
+      "type": "CSSProperties | ((state: FileUpload.HiddenInput.State) => CSSProperties | undefined)",
+      "detailedType": "| React.CSSProperties\n| ((\n    state: FileUpload.HiddenInput.State,\n  ) => CSSProperties | undefined)\n| undefined"
+    },
+    "render": {
+      "type": "ReactElement | ((props: HTMLProps, state: FileUpload.HiddenInput.State) => ReactElement)",
+      "description": "Allows you to replace the component’s HTML element\nwith a different tag, or compose it with another component.\n\nAccepts a `ReactElement` or a function that returns the element to render.",
+      "detailedType": "| ReactElement\n| ((\n    props: HTMLProps,\n    state: FileUpload.HiddenInput.State,\n  ) => ReactElement)"
+    }
+  },
+  "dataAttributes": {},
+  "cssVariables": {}
+}

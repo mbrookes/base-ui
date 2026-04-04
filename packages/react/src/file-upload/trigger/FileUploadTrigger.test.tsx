@@ -14,12 +14,23 @@ function getFileInput() {
   return input;
 }
 
+function TestRoot(props: React.ComponentProps<typeof FileUpload.Root>) {
+  const { children, ...other } = props;
+
+  return (
+    <FileUpload.Root {...other}>
+      <FileUpload.HiddenInput />
+      {children}
+    </FileUpload.Root>
+  );
+}
+
 describe('FileUpload.Trigger', () => {
   it('renders a button element', () => {
     render(
-      <FileUpload.Root>
+      <TestRoot>
         <FileUpload.Trigger>Upload Files</FileUpload.Trigger>
-      </FileUpload.Root>,
+      </TestRoot>,
     );
 
     const button = screen.getByRole('button', { name: 'Upload Files' });
@@ -29,9 +40,9 @@ describe('FileUpload.Trigger', () => {
 
   it('has type="button" by default', () => {
     render(
-      <FileUpload.Root>
+      <TestRoot>
         <FileUpload.Trigger>Upload</FileUpload.Trigger>
-      </FileUpload.Root>,
+      </TestRoot>,
     );
 
     const button = screen.getByRole('button', { name: 'Upload' });
@@ -41,9 +52,9 @@ describe('FileUpload.Trigger', () => {
   it('opens file dialog when clicked', async () => {
     const user = userEvent.setup();
     render(
-      <FileUpload.Root>
+      <TestRoot>
         <FileUpload.Trigger>Upload</FileUpload.Trigger>
-      </FileUpload.Root>,
+      </TestRoot>,
     );
 
     const button = screen.getByRole('button', { name: 'Upload' });
@@ -57,9 +68,9 @@ describe('FileUpload.Trigger', () => {
 
   it('is disabled when disabled prop is true', () => {
     render(
-      <FileUpload.Root disabled>
+      <TestRoot disabled>
         <FileUpload.Trigger>Upload</FileUpload.Trigger>
-      </FileUpload.Root>,
+      </TestRoot>,
     );
 
     const button = screen.getByRole('button', { name: 'Upload' });
@@ -69,9 +80,9 @@ describe('FileUpload.Trigger', () => {
   it('does not open file dialog when disabled and clicked', async () => {
     const user = userEvent.setup();
     render(
-      <FileUpload.Root disabled>
+      <TestRoot disabled>
         <FileUpload.Trigger>Upload</FileUpload.Trigger>
-      </FileUpload.Root>,
+      </TestRoot>,
     );
 
     const button = screen.getByRole('button', { name: 'Upload' });
@@ -86,9 +97,9 @@ describe('FileUpload.Trigger', () => {
   it('forwards ref to button element', () => {
     const ref = React.createRef<HTMLButtonElement>();
     render(
-      <FileUpload.Root>
+      <TestRoot>
         <FileUpload.Trigger ref={ref}>Upload</FileUpload.Trigger>
-      </FileUpload.Root>,
+      </TestRoot>,
     );
 
     expect(ref.current).toBeInstanceOf(HTMLButtonElement);
@@ -97,11 +108,11 @@ describe('FileUpload.Trigger', () => {
 
   it('applies custom props to button element', () => {
     render(
-      <FileUpload.Root>
+      <TestRoot>
         <FileUpload.Trigger data-testid="custom-trigger" className="custom-class">
           Upload
         </FileUpload.Trigger>
-      </FileUpload.Root>,
+      </TestRoot>,
     );
 
     const button = screen.getByRole('button', { name: 'Upload' });
@@ -111,9 +122,9 @@ describe('FileUpload.Trigger', () => {
 
   it('applies data-disabled attribute when disabled', () => {
     render(
-      <FileUpload.Root disabled>
+      <TestRoot disabled>
         <FileUpload.Trigger>Upload</FileUpload.Trigger>
-      </FileUpload.Root>,
+      </TestRoot>,
     );
 
     const button = screen.getByRole('button', { name: 'Upload' });
@@ -122,9 +133,9 @@ describe('FileUpload.Trigger', () => {
 
   it('does not apply data-disabled when enabled', () => {
     render(
-      <FileUpload.Root>
+      <TestRoot>
         <FileUpload.Trigger>Upload</FileUpload.Trigger>
-      </FileUpload.Root>,
+      </TestRoot>,
     );
 
     const button = screen.getByRole('button', { name: 'Upload' });
@@ -135,9 +146,9 @@ describe('FileUpload.Trigger', () => {
     const user = userEvent.setup();
     const customClick = vi.fn();
     render(
-      <FileUpload.Root>
+      <TestRoot>
         <FileUpload.Trigger onClick={customClick}>Upload</FileUpload.Trigger>
-      </FileUpload.Root>,
+      </TestRoot>,
     );
 
     const button = screen.getByRole('button', { name: 'Upload' });
@@ -151,9 +162,9 @@ describe('FileUpload.Trigger', () => {
     const user = userEvent.setup();
     const customClick = vi.fn();
     render(
-      <FileUpload.Root>
+      <TestRoot>
         <FileUpload.Trigger onClick={customClick}>Upload</FileUpload.Trigger>
-      </FileUpload.Root>,
+      </TestRoot>,
     );
 
     const button = screen.getByRole('button', { name: 'Upload' });
@@ -165,12 +176,12 @@ describe('FileUpload.Trigger', () => {
 
   it('renders children correctly', () => {
     render(
-      <FileUpload.Root>
+      <TestRoot>
         <FileUpload.Trigger>
           <span data-testid="icon">📁</span>
           Upload Files
         </FileUpload.Trigger>
-      </FileUpload.Root>,
+      </TestRoot>,
     );
 
     expect(screen.getByTestId('icon')).toBeInTheDocument();
@@ -179,11 +190,11 @@ describe('FileUpload.Trigger', () => {
 
   it('resolves className callback with disabled state', () => {
     render(
-      <FileUpload.Root disabled>
+      <TestRoot disabled>
         <FileUpload.Trigger className={(state) => (state.disabled ? 'disabled' : 'enabled')}>
           Upload
         </FileUpload.Trigger>
-      </FileUpload.Root>,
+      </TestRoot>,
     );
 
     const button = screen.getByRole('button');
@@ -192,22 +203,22 @@ describe('FileUpload.Trigger', () => {
 
   it('resolves className callback when disabled state changes', () => {
     const { rerender } = render(
-      <FileUpload.Root disabled={false}>
+      <TestRoot disabled={false}>
         <FileUpload.Trigger className={(state) => (state.disabled ? 'disabled' : 'enabled')}>
           Upload
         </FileUpload.Trigger>
-      </FileUpload.Root>,
+      </TestRoot>,
     );
 
     let button = screen.getByRole('button');
     expect(button).toHaveClass('enabled');
 
     rerender(
-      <FileUpload.Root disabled>
+      <TestRoot disabled>
         <FileUpload.Trigger className={(state) => (state.disabled ? 'disabled' : 'enabled')}>
           Upload
         </FileUpload.Trigger>
-      </FileUpload.Root>,
+      </TestRoot>,
     );
 
     button = screen.getByRole('button');
@@ -217,11 +228,11 @@ describe('FileUpload.Trigger', () => {
   describe('nativeButton={false}', () => {
     it('renders role="button" without type="button" on a non-button element', () => {
       render(
-        <FileUpload.Root>
+        <TestRoot>
           <FileUpload.Trigger render={<div />} nativeButton={false}>
             Upload
           </FileUpload.Trigger>
-        </FileUpload.Root>,
+        </TestRoot>,
       );
 
       const trigger = screen.getByRole('button', { name: 'Upload' });
@@ -231,11 +242,11 @@ describe('FileUpload.Trigger', () => {
 
     it('uses aria-disabled instead of disabled attribute when disabled', () => {
       render(
-        <FileUpload.Root disabled>
+        <TestRoot disabled>
           <FileUpload.Trigger render={<div />} nativeButton={false}>
             Upload
           </FileUpload.Trigger>
-        </FileUpload.Root>,
+        </TestRoot>,
       );
 
       const trigger = screen.getByRole('button', { name: 'Upload' });
@@ -245,11 +256,11 @@ describe('FileUpload.Trigger', () => {
 
     it('opens file dialog when Enter key is pressed', () => {
       render(
-        <FileUpload.Root>
+        <TestRoot>
           <FileUpload.Trigger render={<div />} nativeButton={false}>
             Upload
           </FileUpload.Trigger>
-        </FileUpload.Root>,
+        </TestRoot>,
       );
 
       const trigger = screen.getByRole('button', { name: 'Upload' });
@@ -264,11 +275,11 @@ describe('FileUpload.Trigger', () => {
 
     it('opens file dialog when Space key is released', () => {
       render(
-        <FileUpload.Root>
+        <TestRoot>
           <FileUpload.Trigger render={<div />} nativeButton={false}>
             Upload
           </FileUpload.Trigger>
-        </FileUpload.Root>,
+        </TestRoot>,
       );
 
       const trigger = screen.getByRole('button', { name: 'Upload' });
@@ -287,9 +298,9 @@ describe('FileUpload.Trigger', () => {
       const user = userEvent.setup();
       const customClick = vi.fn((event) => event.preventBaseUIHandler());
       render(
-        <FileUpload.Root>
+        <TestRoot>
           <FileUpload.Trigger onClick={customClick}>Upload</FileUpload.Trigger>
-        </FileUpload.Root>,
+        </TestRoot>,
       );
 
       const trigger = screen.getByRole('button', { name: 'Upload' });

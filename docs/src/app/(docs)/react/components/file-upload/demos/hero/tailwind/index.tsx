@@ -1,10 +1,8 @@
 'use client';
 
 import * as React from 'react';
-import { UploadCloud, X, CheckCircle2, AlertCircle } from 'lucide-react';
+import { X } from 'lucide-react';
 import { FileUpload } from '@base-ui/react/file-upload';
-import { Progress } from '@base-ui/react/progress';
-import { useFileRejection } from '../useFileRejection';
 
 function formatBytes(bytes?: number) {
   if (bytes === undefined || bytes === null) {
@@ -19,158 +17,70 @@ function formatBytes(bytes?: number) {
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(1))} ${sizes[i]}`;
 }
 
-function FilePreviewItems() {
-  const { files, removeFile, updateFile } = FileUpload.useFileUploadContext();
+function FileList() {
+  const { files, removeFile } = FileUpload.useFileUploadContext();
 
-  // Simulate upload progress
-  React.useEffect(() => {
-    const interval = setInterval(() => {
-      files.forEach((file) => {
-        if (file.status !== 'idle' && file.status !== 'uploading') {
-          return;
-        }
-
-        const newProgress = Math.min(file.progress + Math.random() * 15, 100);
-        updateFile(file.id, {
-          progress: newProgress,
-          status: newProgress >= 100 ? 'success' : 'uploading',
-        });
-      });
-    }, 300);
-
-    return () => clearInterval(interval);
-  }, [files, updateFile]);
+  if (files.length === 0) {
+    return <p className="mt-4 text-sm text-gray-500">No files selected yet.</p>;
+  }
 
   return (
-    <React.Fragment>
+    <ul className="mt-6 space-y-2 list-none p-0 m-0">
       {files.map((file) => (
-        <FileUpload.PreviewItem
+        <li
           key={file.id}
-          file={file}
-          className="relative flex flex-col gap-2 overflow-hidden rounded-lg border border-gray-200 bg-white p-3 shadow-sm hover:border-gray-300"
+          className="flex items-center justify-between gap-3 rounded-md border border-gray-200 bg-white px-3 py-2"
         >
-          <div className="flex items-start gap-3">
-            <div className="relative h-14 w-14 flex-shrink-0 overflow-hidden rounded-md border border-gray-100">
-              <img src={file.preview} alt={file.name} className="h-full w-full object-cover" />
-            </div>
-            <div className="flex flex-1 flex-col overflow-hidden">
-              <p className="truncate text-sm font-medium text-gray-900" title={file.name}>
-                {file.name}
-              </p>
-              <p className="text-xs text-gray-500">{formatBytes(file.size)}</p>
-              {(file.status === 'uploading' || file.status === 'idle') && (
-                <Progress.Root
-                  value={file.progress}
-                  className="w-full mt-2"
-                  aria-label={`Upload progress for ${file.name}`}
-                >
-                  <Progress.Track className="block w-full h-1.5 bg-gray-200 rounded-full overflow-hidden relative">
-                    <Progress.Indicator className="block h-full bg-blue-500 rounded-full transition-[width] duration-300" />
-                  </Progress.Track>
-                </Progress.Root>
-              )}
-              <div className="mt-1 flex items-center gap-2">
-                {file.status === 'success' && (
-                  <span className="flex items-center whitespace-nowrap text-xs font-medium text-green-600">
-                    <CheckCircle2 className="mr-1 h-3 w-3" /> Complete
-                  </span>
-                )}
-                {file.status === 'error' && (
-                  <span className="flex items-center whitespace-nowrap text-xs font-medium text-red-600">
-                    <AlertCircle className="mr-1 h-3 w-3" /> Error
-                  </span>
-                )}
-              </div>
-            </div>
-            <button
-              type="button"
-              onClick={() => removeFile(file.id)}
-              className="text-gray-400 hover:text-gray-500 focus:outline-none"
-              title={`Remove ${file.name}`}
-              aria-label={`Remove ${file.name}`}
-            >
-              <X className="h-4 w-4" />
-            </button>
+          <div className="min-w-0">
+            <p className="truncate text-sm font-medium text-gray-900" title={file.name}>
+              {file.name}
+            </p>
+            <p className="text-xs text-gray-500">{formatBytes(file.size)}</p>
           </div>
-        </FileUpload.PreviewItem>
+          <button
+            type="button"
+            onClick={() => removeFile(file.id)}
+            className="text-gray-400 hover:text-gray-600 focus:outline-none"
+            title={`Remove ${file.name}`}
+            aria-label={`Remove ${file.name}`}
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </li>
       ))}
-    </React.Fragment>
+    </ul>
   );
 }
 
 export default function FileUploadDemo() {
   const maxFiles = 5;
   const [isUploadDisabled, setIsUploadDisabled] = React.useState(false);
-  const { errorMessages, handleFileDrop, handleFileChange } = useFileRejection();
 
   const handleDemoFileChange = React.useCallback<
-    NonNullable<React.ComponentProps<typeof FileUpload.Root>['onFileChange']>
+    NonNullable<React.ComponentProps<typeof FileUpload.Root>['onFilesChange']>
   >(
-    (files, eventDetails) => {
-      handleFileChange(files, eventDetails);
+    (files) => {
       setIsUploadDisabled(files.length >= maxFiles);
     },
-    [handleFileChange, maxFiles],
+    [maxFiles],
   );
 
   return (
     <div className="w-full rounded-xl border border-gray-200 bg-white p-8 shadow-sm">
-      <div className="mb-6">
-        <h3 className="text-xl font-semibold text-gray-900">Upload Images</h3>
-        <p className="text-sm text-gray-500">PNG, JPG, GIF up to 5MB</p>
-      </div>
-
       <FileUpload.Root
         maxFiles={maxFiles}
         maxSize={5 * 1024 * 1024}
         accept="image/png, image/jpeg, image/gif"
         multiple
         disabled={isUploadDisabled}
-        onFileChange={handleDemoFileChange}
-        onFileDrop={handleFileDrop}
+        onFilesChange={handleDemoFileChange}
       >
-        <FileUpload.Dropzone className="group relative mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10 transition-colors hover:bg-gray-50 hover:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 data-[dragging]:border-blue-500 data-[dragging]:bg-blue-50 data-[disabled]:cursor-not-allowed data-[disabled]:opacity-60 data-[disabled]:!bg-transparent data-[disabled]:!border-gray-900/25 data-[disabled]:hover:!bg-transparent data-[disabled]:hover:!border-gray-900/25 data-[disabled]:focus:!outline-none data-[disabled]:focus:!ring-0 data-[disabled]:focus:!ring-offset-0">
-          {({ isDragging }) => (
-            <div className="text-center">
-              <div
-                className={`mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 transition-transform ${
-                  isDragging ? 'scale-110 bg-blue-100 text-blue-600' : ''
-                }`}
-              >
-                <UploadCloud className="h-6 w-6 text-gray-600" aria-hidden="true" />
-              </div>
-              <div className="mt-4 flex text-sm leading-6 text-gray-600 justify-center">
-                {isUploadDisabled ? (
-                  <span className="font-semibold text-gray-700">Upload limit reached</span>
-                ) : (
-                  <React.Fragment>
-                    <span className="font-semibold text-blue-600 hover:text-blue-500">
-                      Click to upload
-                    </span>
-                    <p className="pl-1">or drag and drop</p>
-                  </React.Fragment>
-                )}
-              </div>
-              <p className="text-xs leading-5 text-gray-500" role="status" aria-live="polite">
-                {isUploadDisabled
-                  ? 'Remove a file to upload more'
-                  : 'up to 5 images, max 5MB each'}
-              </p>
-            </div>
-          )}
-        </FileUpload.Dropzone>
+        <FileUpload.HiddenInput />
+        <FileUpload.Trigger className="mt-2 inline-flex items-center rounded-lg bg-blue-600 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 data-disabled:cursor-not-allowed data-disabled:opacity-60">
+          {isUploadDisabled ? 'Upload limit reached' : 'Select files'}
+        </FileUpload.Trigger>
 
-        <FileUpload.PreviewList className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <FilePreviewItems />
-        </FileUpload.PreviewList>
-
-        {errorMessages.length > 0 ? (
-          <ul role="alert" className="mt-4 list-disc pl-5 text-sm text-red-600">
-            {errorMessages.map((message) => (
-              <li key={message}>{message}</li>
-            ))}
-          </ul>
-        ) : null}
+        <FileList />
       </FileUpload.Root>
     </div>
   );

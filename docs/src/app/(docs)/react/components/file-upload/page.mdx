@@ -1,36 +1,34 @@
 # File Upload
 
-<Subtitle>A file upload component with drag-and-drop, paste, and click-to-select support.</Subtitle>
+<Subtitle>A file upload primitive for selecting, validating, and managing files.</Subtitle>
 
 <Meta
   name="description"
-  content="A high-quality, unstyled React file upload component with drag-and-drop, paste, file validation, and comprehensive accessibility features."
+  content="A high-quality, unstyled React file upload component with drag-and-drop, paste, and file validation."
 />
 
 import { DemoFileUploadHero } from './demos/hero';
-import { DemoFileUploadValidation } from './demos/validation';
 
 <DemoFileUploadHero />
 
 ## Usage guidelines
 
-- **Ideal for custom workflows**: Perfect for applications that need specific upload flows, preview displays, validation feedback, or integration with custom upload services.
-- **No built-in upload**: File Upload handles file selection and validation only. You must implement the actual file upload using fetch, axios, or your HTTP client. See [Uploading Files](#uploading-files) below.
-- **Form controls must have an accessible name**: Ensure file upload dropzones and triggers are properly labeled. Use the [`Field` component](/react/components/field) or native `<label>` elements for accessibility.
+- File Upload handles file selection and validation. You implement network upload logic separately.
+- Use `FileUpload.Root` as the state container.
+- Add `FileUpload.HiddenInput` inside `FileUpload.Root` to enable file selection.
+- Use `FileUpload.Trigger` to collect files.
+- Use `FileUpload.useFileUploadContext` to render selected files and actions such as remove.
 
 ## Anatomy
 
-File Upload is composed of several subcomponents that work together. Import them and assemble:
+Import the component and assemble its parts:
 
 ```jsx title="Anatomy"
 import { FileUpload } from '@base-ui/react/file-upload';
 
 <FileUpload.Root>
-  <FileUpload.Dropzone>Drag files here or click</FileUpload.Dropzone>
-  <FileUpload.Trigger>Upload</FileUpload.Trigger>
-  <FileUpload.PreviewList>
-    <FileUpload.PreviewItem>{/* preview content */}</FileUpload.PreviewItem>
-  </FileUpload.PreviewList>
+  <FileUpload.HiddenInput />
+  <FileUpload.Trigger>Select files</FileUpload.Trigger>
 </FileUpload.Root>;
 ```
 
@@ -38,93 +36,61 @@ import { FileUpload } from '@base-ui/react/file-upload';
 
 ### Basic setup
 
-`FileUpload.Root` manages file state and provides context to child components. It accepts files through drag-and-drop, click-to-select, paste, or the hidden input it renders automatically.
-
 ```jsx title="Basic file upload"
 import { FileUpload } from '@base-ui/react/file-upload';
 
-function FileList() {
+function SelectedFiles() {
   const { files, removeFile } = FileUpload.useFileUploadContext();
-  return files.map((file) => (
-    <div key={file.id}>
-      {file.name}
-      <button onClick={() => removeFile(file.id)}>Remove</button>
-    </div>
-  ));
+
+  if (files.length === 0) {
+    return <p>No files selected.</p>;
+  }
+
+  return (
+    <ul>
+      {files.map((file) => (
+        <li key={file.id}>
+          {file.name}
+          <button onClick={() => removeFile(file.id)}>Remove</button>
+        </li>
+      ))}
+    </ul>
+  );
 }
 
 export default function App() {
   return (
-    <FileUpload.Root maxFiles={5}>
-      <FileUpload.Dropzone>Upload files</FileUpload.Dropzone>
+    <FileUpload.Root>
+      <FileUpload.HiddenInput />
       <FileUpload.Trigger>Select files</FileUpload.Trigger>
-      <FileList />
+      <SelectedFiles />
     </FileUpload.Root>
   );
 }
 ```
-
-### Controlled state
-
-Control file state using `onFileChange` callback:
-
-```jsx title="Handling file changes" "onFileChange"
-import * as React from 'react';
-import { FileUpload } from '@base-ui/react/file-upload';
-
-export default function App() {
-  const [files, setFiles] = React.useState([]);
-
-  return (
-    <FileUpload.Root
-      onFileChange={(newFiles) => {
-        setFiles(newFiles);
-      }}
-    >
-      <FileUpload.Dropzone>Upload files</FileUpload.Dropzone>
-      <FileUpload.Trigger>Select files</FileUpload.Trigger>
-    </FileUpload.Root>
-  );
-}
-```
-
-## Usage
 
 ### File validation
 
-<DemoFileUploadValidation />
-
-Control which files are accepted using `accept`, `maxSize`, `minSize`, and `maxFiles` props:
-
-```jsx title="File validation" "accept" "maxSize" "minsize" "maxFiles"
+```jsx title="Validation props" "accept" "maxSize" "minSize" "maxFiles"
 <FileUpload.Root
   accept="image/png, image/jpeg, .pdf"
   maxSize={10 * 1024 * 1024}
   minSize={1024}
   maxFiles={5}
-  onFileDrop={(acceptedFiles, fileRejections) => {
+  onFilesAdd={(acceptedFiles, fileRejections) => {
     fileRejections.forEach(({ file, reason, eventDetails }) => {
       console.log(`Rejected ${file.name}: ${reason}`, eventDetails.message);
     });
   }}
 >
-  <FileUpload.Dropzone>Upload files</FileUpload.Dropzone>
+  <FileUpload.HiddenInput />
   <FileUpload.Trigger>Select files</FileUpload.Trigger>
 </FileUpload.Root>
 ```
 
-**Notes**
-
-- `accept` mirrors the native file input: use MIME types like `image/png` or file extensions like `.png`.
-- File extensions are matched against the file name (case-insensitive).
-- For image previews, always provide meaningful `alt` text for screen reader users.
-- File size limits are in bytes. The example above limits files to 10MB and a minimum of 1KB.
-
 ### Custom validation
 
-Use `validator` for custom rules beyond file size and type checks. Return an error message to reject the file:
-
-```jsx title="Custom validation" "validator"
+```jsx title="Custom validator" "validator"
 <FileUpload.Root
   validator={(file) => {
     if (file.name.includes('confidential')) {
@@ -132,1022 +98,96 @@ Use `validator` for custom rules beyond file size and type checks. Return an err
     }
     return null;
   }}
-  onFileDrop={(acceptedFiles, fileRejections) => {
-    fileRejections.forEach(({ file, reason, eventDetails }) => {
-      console.log(`${file.name}: ${reason}`, eventDetails.message);
-    });
-  }}
 >
-  <FileUpload.Dropzone>Upload files</FileUpload.Dropzone>
-  <FileUpload.Trigger />
+  <FileUpload.HiddenInput />
+  <FileUpload.Trigger>Select files</FileUpload.Trigger>
 </FileUpload.Root>
-```
-
-### Image validation
-
-`validator` is synchronous. Use this for sync checks (for example file name/extension rules):
-
-```jsx title="Image dimension validation" "getImageDimensions"
-import * as React from 'react';
-import { FileUpload } from '@base-ui/react/file-upload';
-
-export default function ImageUpload() {
-  return (
-    <FileUpload.Root
-      accept="image/*"
-      validator={(file) => {
-        if (!file.name.match(/\.(png|jpe?g|gif|webp)$/i)) {
-          return 'Only PNG, JPG, GIF, and WebP images are allowed';
-        }
-
-        return null;
-      }}
-    >
-      <FileUpload.Dropzone>Drop images here</FileUpload.Dropzone>
-      <FileUpload.Trigger>Select images</FileUpload.Trigger>
-    </FileUpload.Root>
-  );
-}
-```
-
-If you need async checks (for example image dimensions from file decoding), run those checks in your upload pipeline after file selection.
-
-### Utility helpers
-
-File Upload also exports utility helpers for client-side file inspection and image metadata checks:
-
-```jsx title="FileUpload utility helpers"
-import {
-  FileUpload,
-  getImageDimensions,
-  getImageAspectRatio,
-  validateImageDimensions,
-} from '@base-ui/react/file-upload';
-```
-
-Available helpers:
-
-- `getImageDimensions(file)` – returns `{ width, height }` for image files
-- `validateImageDimensions(file, constraints)` – validates image dimensions against min/max constraints
-- `getImageAspectRatio(file)` – returns `width / height`
-
-The `constraints` object supports:
-
-```ts
-{
-  minWidth?: number;
-  maxWidth?: number;
-  minHeight?: number;
-  maxHeight?: number;
-}
-```
-
-Use these helpers in your async upload pipeline (for example in `onFileChange` or before submitting to your backend). Even with client-side checks, always validate again on the server.
-
-### Drag and drop state
-
-Access the dragging state in the Dropzone render prop:
-
-```jsx title="Dragging state" "{isDragging}"
-<FileUpload.Dropzone>
-  {({ isDragging }) => (
-    <div style={{ opacity: isDragging ? 0.5 : 1 }}>
-      {isDragging ? 'Drop files here' : 'Drag files or click'}
-    </div>
-  )}
-</FileUpload.Dropzone>
 ```
 
 ### Handling file dialog cancellation
 
-Use `onCancel` to react when the user closes the file dialog without selecting files:
-
-```jsx title="Handle cancel" "onCancel"
+```jsx title="onCancel"
 <FileUpload.Root onCancel={() => console.log('User canceled file selection')}>
+  <FileUpload.HiddenInput />
   <FileUpload.Trigger>Select files</FileUpload.Trigger>
 </FileUpload.Root>
 ```
-
-### Detecting duplicate files
-
-Duplicate files are silently ignored by default. Use `onFileDrop` to detect when a user selects the same file more than once:
-
-```jsx title="Duplicate detection" "DUPLICATE_FILE"
-<FileUpload.Root
-  onFileDrop={(acceptedFiles, fileRejections) => {
-    const duplicates = fileRejections.filter((r) => r.reason === 'DUPLICATE_FILE');
-    duplicates.forEach(({ file }) => {
-      console.log('Duplicate:', file.name);
-    });
-  }}
->
-  <FileUpload.Trigger>Select files</FileUpload.Trigger>
-</FileUpload.Root>
-```
-
-### Collecting accepted and rejected files together
-
-`onFileDrop` fires once per drop, paste, or file-dialog selection with both accepted files and all rejections in a single callback:
-
-```jsx title="onFileDrop" "onFileDrop"
-import * as React from 'react';
-import { FileUpload } from '@base-ui/react/file-upload';
-
-export default function App() {
-  const [rejections, setRejections] = React.useState([]);
-
-  return (
-    <div>
-      <FileUpload.Root
-        accept="image/*"
-        maxSize={2 * 1024 * 1024}
-        maxFiles={5}
-        onFileDrop={(acceptedFiles, fileRejections) => {
-          // Replace rejection messages each time files are added
-          setRejections(fileRejections);
-        }}
-        onFileChange={(files, eventDetails) => {
-          // Clear rejections when files are removed
-          if (
-            eventDetails.reason === 'file-removed' ||
-            eventDetails.reason === 'files-cleared'
-          ) {
-            setRejections([]);
-          }
-        }}
-      >
-        <FileUpload.Dropzone>Upload images</FileUpload.Dropzone>
-        <FileUpload.Trigger>Select images</FileUpload.Trigger>
-      </FileUpload.Root>
-
-      {rejections.length > 0 && (
-        <ul role="alert">
-          {rejections.map(({ file, eventDetails }) => (
-            <li key={file.name}>
-              {file.name}: {eventDetails.message}
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
-  );
-}
-```
-
-Each entry in `fileRejections` is a `FileUpload.Rejection` with `file`, `reason`, and `eventDetails` fields. `acceptedFiles` contains the files that passed validation and were added to the list.
 
 ### Paste from clipboard
 
-`FileUpload.Root` listens for paste events and includes any file-like clipboard items (screenshots, copied images). Paste is ignored when focused on an input, textarea, or contenteditable element:
-
 ```jsx title="Paste files"
 <FileUpload.Root>
-  <FileUpload.Dropzone>Paste or drop files here</FileUpload.Dropzone>
+  <FileUpload.HiddenInput />
+  <FileUpload.Trigger>Select files</FileUpload.Trigger>
 </FileUpload.Root>
 ```
 
 ### Folder upload
 
-Enable directory selection with the `directory` prop. This uses `webkitdirectory` under the hood, so browser support varies:
-
-```jsx title="Folder upload" "directory"
+```jsx title="Directory upload" "directory"
 <FileUpload.Root directory>
+  <FileUpload.HiddenInput />
   <FileUpload.Trigger>Select folder</FileUpload.Trigger>
 </FileUpload.Root>
 ```
 
-### Preview items with context
-
-Use `FileUploadPreviewItem` and `useFileUploadPreviewItem` to display and manage file information:
-
-```jsx title="File preview items" "useFileUploadPreviewItem"
-import { FileUpload } from '@base-ui/react/file-upload';
-
-function CustomPreviewItem({ file }) {
-  const { onRemove } = FileUpload.useFileUploadPreviewItem();
-
-  return (
-    <div>
-      {file.preview && <img src={file.preview} alt={file.name} />}
-      <span>{file.name}</span>
-      <button onClick={onRemove}>Remove</button>
-    </div>
-  );
-}
-
-export default function App() {
-  const { files } = FileUpload.useFileUploadContext();
-
-  return (
-    <FileUpload.Root>
-      <FileUpload.Dropzone>Upload files</FileUpload.Dropzone>
-      <FileUpload.PreviewList>
-        {files.map((file) => (
-          <FileUpload.PreviewItem key={file.id} file={file}>
-            <CustomPreviewItem file={file} />
-          </FileUpload.PreviewItem>
-        ))}
-      </FileUpload.PreviewList>
-    </FileUpload.Root>
-  );
-}
-```
-
 ## Accessibility
 
-File Upload is built with accessibility best practices in mind:
+- Pair controls with a visible label.
+- Keep trigger text descriptive.
+- File Upload includes live region announcements for key file events.
 
-- **WCAG-aligned guidance**: Supports patterns commonly used to satisfy WCAG 2.1 Level AA requirements
-- **Keyboard navigation**: Full keyboard support with logical tab order
-- **Screen reader support**: Semantic HTML and ARIA labels for VoiceOver, JAWS, and other assistants
-- **Focus management**: Clear focus indicators for interactive controls
-- **Live regions**: File status updates announced to screen reader users
-
-### Accessible labeling
-
-For accessible naming, pair file upload controls with visible labels (for example using `Field.Root` and `Field.Label`).
-
-```jsx title="Accessible labeling with Field"
+```jsx title="Labeling with Field"
 import { Field } from '@base-ui/react/field';
 import { FileUpload } from '@base-ui/react/file-upload';
 
 <Field.Root>
   <Field.Label>Profile image</Field.Label>
   <FileUpload.Root accept="image/*">
-    <FileUpload.Dropzone>Drop image here</FileUpload.Dropzone>
+    <FileUpload.HiddenInput />
     <FileUpload.Trigger>Select image</FileUpload.Trigger>
   </FileUpload.Root>
 </Field.Root>;
 ```
 
-## Uploading Files
+## Uploading files
 
-**Important: FileUpload handles file selection only. You must implement the actual upload.**
+File Upload does not upload files by itself. Use `FileUpload.useFileUploadContext` to read selected files, then send them with `fetch`, `axios`, or your upload client.
 
-Here's a complete example showing how to upload files to your server:
-
-```jsx title="Upload files with fetch" "FormData" "fetch"
+```jsx title="Upload selected files"
 import * as React from 'react';
 import { FileUpload } from '@base-ui/react/file-upload';
 
-function FileUploadContent() {
-  const { files, removeFile } = FileUpload.useFileUploadContext();
-  const [isUploading, setIsUploading] = React.useState(false);
-  const [uploadError, setUploadError] = React.useState<string | null>(null);
+function Uploader() {
+  const { files, clearFiles } = FileUpload.useFileUploadContext();
 
   const handleUpload = async () => {
-    setIsUploading(true);
-    setUploadError(null);
-
-    try {
-      const formData = new FormData();
-      files.forEach((file) => {
-        formData.append('files', file);
-      });
-
-      const response = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error('Upload failed');
-      }
-
-      // Clear files after successful upload
-      files.forEach((file) => removeFile(file.id));
-    } catch (error) {
-      setUploadError(error instanceof Error ? error.message : 'Unknown error');
-    } finally {
-      setIsUploading(false);
-    }
-  };
-
-  return (
-    <>
-      <FileUpload.Dropzone>Drop files here</FileUpload.Dropzone>
-      <FileUpload.Trigger>Select files</FileUpload.Trigger>
-
-      {files.length > 0 && (
-        <>
-          <button onClick={handleUpload} disabled={isUploading}>
-            {isUploading ? 'Uploading...' : 'Upload Files'}
-          </button>
-          {uploadError && <div style={{ color: 'red' }}>{uploadError}</div>}
-        </>
-      )}
-
-      <FileUpload.PreviewList>
-        {files.map((file) => (
-          <FileUpload.PreviewItem key={file.id} file={file}>
-            <span>{file.name}</span>
-          </FileUpload.PreviewItem>
-        ))}
-      </FileUpload.PreviewList>
-    </>
-  );
-}
-
-export default function FileUploadWithUpload() {
-  return (
-    <FileUpload.Root>
-      <FileUploadContent />
-    </FileUpload.Root>
-  );
-}
-```
-
-### Upload with progress tracking
-
-To show upload progress, track the upload state separately from file selection:
-
-```jsx title="Upload with progress" "uploadProgress"
-import * as React from 'react';
-import { FileUpload } from '@base-ui/react/file-upload';
-
-function FileUploadContent() {
-  const { files } = FileUpload.useFileUploadContext();
-  const [uploadProgress, setUploadProgress] = React.useState<Record<string, number>>({});
-
-  const uploadFile = async (file: File) => {
-    const xhr = new XMLHttpRequest();
-
-    xhr.upload.addEventListener('progress', (e) => {
-      if (e.lengthComputable) {
-        const percentComplete = Math.round((e.loaded / e.total) * 100);
-        setUploadProgress((prev) => ({
-          ...prev,
-          [file.name]: percentComplete,
-        }));
-      }
-    });
-
-    xhr.addEventListener('load', () => {
-      setUploadProgress((prev) => ({
-        ...prev,
-        [file.name]: 100,
-      }));
-    });
-
     const formData = new FormData();
-    formData.append('file', file);
-    xhr.open('POST', '/api/upload');
-    xhr.send(formData);
+    files.forEach((file) => formData.append('files', file));
+
+    await fetch('/api/upload', {
+      method: 'POST',
+      body: formData,
+    });
+
+    clearFiles();
   };
 
-  return (
-    <>
-      <FileUpload.Dropzone>Drop files here</FileUpload.Dropzone>
-
-      {files.length > 0 && (
-        <button onClick={() => files.forEach(uploadFile)}>
-          Upload All Files
-        </button>
-      )}
-
-      <FileUpload.PreviewList>
-        {files.map((file) => (
-          <FileUpload.PreviewItem key={file.id} file={file}>
-            <div>
-              <span>{file.name}</span>
-              {uploadProgress[file.name] !== undefined && (
-                <div>
-                  <progress
-                    value={uploadProgress[file.name]}
-                    max="100"
-                  />
-                  <span>{uploadProgress[file.name]}%</span>
-                </div>
-              )}
-            </div>
-          </FileUpload.PreviewItem>
-        ))}
-      </FileUpload.PreviewList>
-    </>
-  );
+  return <button onClick={handleUpload}>Upload</button>;
 }
 
-export default function FileUploadWithProgress() {
+export default function App() {
   return (
     <FileUpload.Root>
-      <FileUploadContent />
-    </FileUpload.Root>
-  );
-}
-```
-
-### Upload with retry and cancel
-
-Implement retry logic for failed uploads and allow users to cancel in-progress uploads:
-
-```jsx title="Upload with retry and cancel" "AbortController"
-import * as React from 'react';
-import { FileUpload } from '@base-ui/react/file-upload';
-
-interface FileUploadState {
-  progress: number;
-  status: 'idle' | 'uploading' | 'success' | 'error' | 'cancelled';
-  error?: string;
-  retries: number;
-}
-
-function FileUploadContent() {
-  const { files, removeFile } = FileUpload.useFileUploadContext();
-  const [uploadStates, setUploadStates] = React.useState<Record<string, FileUploadState>>({});
-  const abortControllersRef = React.useRef<Record<string, AbortController>>({});
-
-  const uploadFile = async (file: File, retryCount = 0) => {
-    const maxRetries = 3;
-    const fileKey = file.id;
-
-    // Initialize upload state
-    setUploadStates((prev) => ({
-      ...prev,
-      [fileKey]: {
-        progress: 0,
-        status: 'uploading',
-        error: undefined,
-        retries: retryCount,
-      },
-    }));
-
-    try {
-      const controller = new AbortController();
-      abortControllersRef.current[fileKey] = controller;
-
-      const xhr = new XMLHttpRequest();
-
-      xhr.upload.addEventListener('progress', (e) => {
-        if (e.lengthComputable) {
-          const percentComplete = Math.round((e.loaded / e.total) * 100);
-          setUploadStates((prev) => ({
-            ...prev,
-            [fileKey]: { ...prev[fileKey], progress: percentComplete },
-          }));
-        }
-      });
-
-      await new Promise<void>((resolve, reject) => {
-        xhr.addEventListener('load', () => {
-          if (xhr.status >= 200 && xhr.status < 300) {
-            resolve();
-          } else {
-            reject(new Error(`Upload failed with status ${xhr.status}`));
-          }
-        });
-
-        xhr.addEventListener('error', () => reject(new Error('Network error')));
-        xhr.addEventListener('abort', () => reject(new Error('Upload cancelled')));
-
-        const formData = new FormData();
-        formData.append('file', file);
-        xhr.open('POST', '/api/upload', true);
-        xhr.send(formData);
-      });
-
-      setUploadStates((prev) => ({
-        ...prev,
-        [fileKey]: {
-          progress: 100,
-          status: 'success',
-          retries: retryCount,
-        },
-      }));
-    } catch (error) {
-      const message = error instanceof Error ? error.message : 'Unknown error';
-
-      // Retry logic
-      if (retryCount < maxRetries && message !== 'Upload cancelled') {
-        setUploadStates((prev) => ({
-          ...prev,
-          [fileKey]: {
-            progress: 0,
-            status: 'idle',
-            error: `Failed, retrying... (${retryCount + 1}/${maxRetries})`,
-            retries: retryCount,
-          },
-        }));
-
-        // Retry after 2 seconds
-        setTimeout(() => uploadFile(file, retryCount + 1), 2000);
-      } else {
-        setUploadStates((prev) => ({
-          ...prev,
-          [fileKey]: {
-            progress: 0,
-            status: 'error',
-            error: message === 'Upload cancelled' ? 'Cancelled' : `Failed after ${maxRetries} retries`,
-            retries: retryCount,
-          },
-        }));
-      }
-    }
-  };
-
-  const cancelUpload = (fileKey: string) => {
-    abortControllersRef.current[fileKey]?.abort();
-    setUploadStates((prev) => ({
-      ...prev,
-      [fileKey]: {
-        ...prev[fileKey],
-        status: 'cancelled',
-        progress: prev[fileKey].progress,
-        retries: prev[fileKey].retries,
-      },
-    }));
-  };
-
-  const retryUpload = (file: File) => {
-    uploadFile(file, 0);
-  };
-
-  return (
-    <>
-      <FileUpload.Dropzone>Drop files here</FileUpload.Dropzone>
-
-      {files.length > 0 && (
-        <button onClick={() => files.forEach((file) => uploadFile(file))}>
-          Upload All Files
-        </button>
-      )}
-
-      <FileUpload.PreviewList>
-        {files.map((file) => {
-          const state = uploadStates[file.id] || { progress: 0, status: 'idle', retries: 0 };
-
-          return (
-            <FileUpload.PreviewItem key={file.id} file={file}>
-              <div>
-                <span>{file.name}</span>
-
-                {state.status === 'uploading' && (
-                  <div>
-                    <progress value={state.progress} max="100" />
-                    <span>{state.progress}%</span>
-                  </div>
-                )}
-
-                {state.status === 'success' && <span style={{ color: 'green' }}>✓ Uploaded</span>}
-
-                {state.status === 'error' && (
-                  <div>
-                    <span style={{ color: 'red' }}>✗ {state.error}</span>
-                    <button onClick={() => retryUpload(file)}>Retry</button>
-                  </div>
-                )}
-
-                {state.status === 'uploading' && (
-                  <button onClick={() => cancelUpload(file.id)}>Cancel</button>
-                )}
-              </div>
-            </FileUpload.PreviewItem>
-          );
-        })}
-      </FileUpload.PreviewList>
-    </FileUpload.Root>
-  );
-}
-```
-
-**Key patterns:**
-
-- **Retry**: Automatically retry failed uploads (configurable max retries)
-- **Cancel**: Use `AbortController` to cancel in-progress uploads
-- **State tracking**: Track each file's upload status separately
-- **Exponential backoff**: Wait before retrying (for example, 2 seconds)
-- **User feedback**: Show progress, errors, and retry options
-
-### Upload with pause and resume
-
-Implement pause/resume functionality for long-running uploads:
-
-```jsx title="Upload with pause and resume"
-import * as React from 'react';
-import { FileUpload } from '@base-ui/react/file-upload';
-
-interface UploadState {
-  status: 'idle' | 'uploading' | 'paused' | 'success' | 'error';
-  progress: number;
-  error?: string;
-}
-
-function FileUploadContent() {
-  const { files } = FileUpload.useFileUploadContext();
-  const [uploadStates, setUploadStates] = React.useState<Record<string, UploadState>>({});
-  const xhrsRef = React.useRef<Record<string, XMLHttpRequest>>({});
-
-  const uploadFile = async (file: File) => {
-    const fileKey = file.id;
-
-    setUploadStates((prev) => ({
-      ...prev,
-      [fileKey]: { status: 'uploading', progress: 0 },
-    }));
-
-    try {
-      const xhr = new XMLHttpRequest();
-      xhrsRef.current[fileKey] = xhr;
-
-      xhr.upload.addEventListener('progress', (e) => {
-        if (e.lengthComputable) {
-          const percentComplete = Math.round((e.loaded / e.total) * 100);
-          setUploadStates((prev) => {
-            const current = prev[fileKey];
-            // Only update progress if not paused
-            if (current?.status !== 'paused') {
-              return {
-                ...prev,
-                [fileKey]: { ...current, progress: percentComplete },
-              };
-            }
-            return prev;
-          });
-        }
-      });
-
-      await new Promise<void>((resolve, reject) => {
-        xhr.addEventListener('load', () => {
-          if (xhr.status >= 200 && xhr.status < 300) {
-            resolve();
-          } else {
-            reject(new Error(`Upload failed with status ${xhr.status}`));
-          }
-        });
-
-        xhr.addEventListener('error', () => reject(new Error('Network error')));
-
-        const formData = new FormData();
-        formData.append('file', file);
-        xhr.open('POST', '/api/upload');
-        xhr.send(formData);
-      });
-
-      setUploadStates((prev) => ({
-        ...prev,
-        [fileKey]: { status: 'success', progress: 100 },
-      }));
-    } catch (error) {
-      const message = error instanceof Error ? error.message : 'Unknown error';
-      setUploadStates((prev) => ({
-        ...prev,
-        [fileKey]: { status: 'error', progress: prev[fileKey]?.progress || 0, error: message },
-      }));
-    }
-  };
-
-  const pauseUpload = (fileKey: string) => {
-    const xhr = xhrsRef.current[fileKey];
-    if (xhr) {
-      xhr.abort();
-      setUploadStates((prev) => ({
-        ...prev,
-        [fileKey]: { ...prev[fileKey], status: 'paused' },
-      }));
-    }
-  };
-
-  const resumeUpload = (file: File) => {
-    setUploadStates((prev) => ({
-      ...prev,
-      [file.id]: { ...prev[file.id], status: 'uploading' },
-    }));
-    uploadFile(file);
-  };
-
-  return (
-    <>
-      <FileUpload.Dropzone>Drop files here</FileUpload.Dropzone>
-
-      {files.length > 0 && (
-        <button onClick={() => files.forEach(uploadFile)}>
-          Upload All Files
-        </button>
-      )}
-
-      <FileUpload.PreviewList>
-        {files.map((file) => {
-          const state = uploadStates[file.id] || { status: 'idle', progress: 0 };
-
-          return (
-            <FileUpload.PreviewItem key={file.id} file={file}>
-              <div>
-                <span>{file.name}</span>
-
-                {state.status === 'uploading' && (
-                  <div>
-                    <progress value={state.progress} max="100" />
-                    <span>{state.progress}%</span>
-                  </div>
-                )}
-
-                {state.status === 'paused' && (
-                  <div>
-                    <span>Paused at {state.progress}%</span>
-                    <button onClick={() => resumeUpload(file)}>Resume</button>
-                  </div>
-                )}
-
-                {state.status === 'uploading' && (
-                  <button onClick={() => pauseUpload(file.id)}>Pause</button>
-                )}
-
-                {state.status === 'success' && (
-                  <span style={{ color: 'green' }}>✓ Completed</span>
-                )}
-
-                {state.status === 'error' && (
-                  <span style={{ color: 'red' }}>✗ {state.error}</span>
-                )}
-              </div>
-            </FileUpload.PreviewItem>
-          );
-        })}
-      </FileUpload.PreviewList>
-    </>
-  );
-}
-
-export default function FileUploadWithPause() {
-  return (
-    <FileUpload.Root>
-      <FileUploadContent />
-    </FileUpload.Root>
-  );
-}
-```
-
-**Note**: Complete pause/resume requires chunked uploads with server support (upload part by part). The example above shows the UI pattern; your server needs to support resuming from the last received byte.
-
-### File pause/resume via context
-
-The FileUpload context provides `pauseFile` and `resumeFile` methods to control file upload state directly:
-
-```jsx title="Using pauseFile and resumeFile" "pauseFile" "resumeFile" "onFilePause" "onFileResume"
-import * as React from 'react';
-import { FileUpload } from '@base-ui/react/file-upload';
-
-function FileUploadContent() {
-  const { files, pauseFile, resumeFile } = FileUpload.useFileUploadContext();
-  const [pauses, setPauses] = React.useState<Map<string, boolean>>(new Map());
-
-  const togglePause = (fileId: string) => {
-    if (pauses.get(fileId)) {
-      resumeFile(fileId);
-      setPauses((prev) => {
-        const next = new Map(prev);
-        next.set(fileId, false);
-        return next;
-      });
-    } else {
-      pauseFile(fileId);
-      setPauses((prev) => {
-        const next = new Map(prev);
-        next.set(fileId, true);
-        return next;
-      });
-    }
-  };
-
-  return (
-    <>
-      <FileUpload.Dropzone>Drop files here</FileUpload.Dropzone>
-      <FileUpload.PreviewList>
-        {files.map((file) => {
-          const isPaused = pauses.get(file.id) || false;
-          return (
-            <FileUpload.PreviewItem key={file.id} file={file}>
-              <button onClick={() => togglePause(file.id)}>
-                {isPaused ? 'Resume' : 'Pause'}
-              </button>
-            </FileUpload.PreviewItem>
-          );
-        })}
-      </FileUpload.PreviewList>
-    </>
-  );
-}
-
-export default function FileUploadWithContextPause() {
-  return (
-    <FileUpload.Root
-      onFilePause={(file) => console.log('File paused:', file.name)}
-      onFileResume={(file) => console.log('File resumed:', file.name)}
-    >
-      <FileUploadContent />
-    </FileUpload.Root>
-  );
-}
-```
-
-**Context methods:**
-
-- `pauseFile(fileId: string)` - Pause an uploading file. Only works on files with status `uploading`.
-- `resumeFile(fileId: string)` - Resume a paused file. Only works on files with status `paused`.
-
-**Callbacks:**
-
-- `onFilePause: (file: FileUploadRootExtendedFile) => void` - Called when a file is paused
-- `onFileResume: (file: FileUploadRootExtendedFile) => void` - Called when a file is resumed
-
-**File properties:**
-
-- `file.isPaused?: boolean` - Indicates if the file is currently paused
-- `file.uploadedBytes?: number` - Bytes uploaded so far (useful for resumable uploads)
-
-### Form integration
-
-Integrate FileUpload with HTML forms:
-
-```jsx title="FileUpload in a form"
-import * as React from 'react';
-import { FileUpload } from '@base-ui/react/file-upload';
-
-function FileUploadFormContent() {
-  const { files } = FileUpload.useFileUploadContext();
-  const [formData, setFormData] = React.useState({ title: '' });
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    const data = new FormData();
-    data.append('title', formData.title);
-    files.forEach((file) => data.append('files', file));
-
-    await fetch('/api/submit', { method: 'POST', body: data });
-  };
-
-  return (
-    <form onSubmit={handleSubmit}>
-      <input
-        type="text"
-        placeholder="Title"
-        value={formData.title}
-        onChange={(e) => setFormData({ title: e.target.value })}
-      />
-
-      <FileUpload.Dropzone>Drop files here</FileUpload.Dropzone>
+      <FileUpload.HiddenInput />
       <FileUpload.Trigger>Select files</FileUpload.Trigger>
-
-      <button type="submit">Submit</button>
-    </form>
-  );
-}
-
-export default function FileUploadForm() {
-  return (
-    <FileUpload.Root>
-      <FileUploadFormContent />
+      <Uploader />
     </FileUpload.Root>
   );
 }
 ```
 
-### File filtering
-
-Filter which files are displayed in the preview list using the `filter` prop on `FileUpload.PreviewList`:
-
-```jsx title="File filtering" "filter"
-import * as React from 'react';
-import { FileUpload } from '@base-ui/react/file-upload';
-
-function FileList() {
-  const { files } = FileUpload.useFileUploadContext();
-  return files.map((file) => (
-    <FileUpload.PreviewItem key={file.id} file={file}>
-      <span>{file.name}</span>
-    </FileUpload.PreviewItem>
-  ));
-}
-
-export default function FileUploadWithFiltering() {
-  const [showOnlyImages, setShowOnlyImages] = React.useState(false);
-
-  return (
-    <FileUpload.Root>
-      <FileUpload.Dropzone>Drop files here</FileUpload.Dropzone>
-      <FileUpload.Trigger>Select files</FileUpload.Trigger>
-
-      <label>
-        <input
-          type="checkbox"
-          checked={showOnlyImages}
-          onChange={(e) => setShowOnlyImages(e.target.checked)}
-        />
-        Show only images
-      </label>
-
-      <FileUpload.PreviewList
-        filter={(files) => {
-          if (showOnlyImages) {
-            return files.filter((file) => file.type.startsWith('image/'));
-          }
-          return files;
-        }}
-      >
-        <FileList />
-      </FileUpload.PreviewList>
-    </FileUpload.Root>
-  );
-}
-```
-
-The `filter` function receives the full array of files and returns a filtered array. The filtered result is used to determine the `data-empty` state and is passed as `state.files` to the `className` function; it does not automatically filter the `children` you render inside `PreviewList`.
-
-### Locale-based formatting
-
-File Upload follows the same pattern as other components:
-
-- use `locale` for `Intl` formatting in built-in messages (for example file sizes), and
-- use targeted callbacks (`onFileDrop`, `onRetry`, etc.) to customize behavior.
-
-```jsx title="Locale formatting" "locale"
-import * as React from 'react';
-import { FileUpload } from '@base-ui/react/file-upload';
-
-export default function FileUploadLocale() {
-  return (
-    <FileUpload.Root locale="de-DE" maxSize={5 * 1024 * 1024}>
-      <FileUpload.Dropzone>Dateien hier ablegen</FileUpload.Dropzone>
-      <FileUpload.Trigger>Dateien auswählen</FileUpload.Trigger>
-    </FileUpload.Root>
-  );
-}
-```
-
-```jsx title="Callback-based customization" "onFileDrop"
-import * as React from 'react';
-import { FileUpload } from '@base-ui/react/file-upload';
-
-export default function FileUploadCustomHandling() {
-  return (
-    <FileUpload.Root
-      onFileDrop={(acceptedFiles, fileRejections) => {
-        fileRejections.forEach(({ file, reason }) => {
-          console.log('Rejected:', file.name, reason);
-        });
-      }}
-    >
-      <FileUpload.Dropzone>Drop files here</FileUpload.Dropzone>
-      <FileUpload.Trigger>Select files</FileUpload.Trigger>
-    </FileUpload.Root>
-  );
-}
-```
-
-### Accessibility features
-
-File Upload includes comprehensive accessibility features:
-
-- **Keyboard navigation**: Use Space/Enter to open file dialog, Tab to navigate components
-- **Screen reader support**: Live region announcements for file operations ("3 files added", "File failed")
-- **ARIA labels**: All dropzones and triggers have proper `role` and `aria-label` attributes
-- **Color independence**: Drag-and-drop state changes aren't communicated by color alone
-
-**Live announcements** are automatically read by screen readers when:
-
-- Files are successfully added
-- A file is removed
-- A validation error occurs
-- File upload succeeds or fails
-
-The live region is visually hidden but available to screen readers:
-
-```jsx title="Live region example" "aria-live"
-<FileUpload.Root>
-  <FileUpload.Dropzone>Upload files</FileUpload.Dropzone>
-  {/* Live region announcements happen automatically */}
-</FileUpload.Root>
-```
-
-For custom announcements, listen to the callbacks:
-
-```jsx title="Custom announcements"
-import * as React from 'react';
-import { FileUpload } from '@base-ui/react/file-upload';
-
-export default function FileUploadWithAnnouncements() {
-  const [announcement, setAnnouncement] = React.useState('');
-
-  return (
-    <FileUpload.Root
-      onFileChange={(files) => {
-        setAnnouncement(`${files.length} file(s) selected`);
-      }}
-    >
-      <FileUpload.Dropzone>Drop files here</FileUpload.Dropzone>
-
-      {/* Optional: Custom live region for additional announcements */}
-      <div aria-live="polite" aria-atomic="true">
-        {announcement}
-      </div>
-    </FileUpload.Root>
-  );
-}
-```
-
-## Browser Support
-
-File Upload works in all modern browsers. Here's browser-specific support:
+## Browser support
 
 | Feature         | Chrome | Firefox | Safari | Edge |
 | :-------------- | :----: | :-----: | :----: | :--: |
@@ -1156,106 +196,16 @@ File Upload works in all modern browsers. Here's browser-specific support:
 | Paste files     |   ✅   |   ✅    |   ✅   |  ✅  |
 | Folder upload   |   ✅   |   ✅    |   ⚠️   |  ✅  |
 
-**Folder upload notes:**
-
-- Uses `webkitdirectory` attribute (non-standard but widely supported)
-- **Safari**: Limited support, may not work reliably
-- **Firefox**: Works but with permission prompt on some systems
-- **Mobile**: Generally not supported across browsers
-
-{/* ## FAQ
-
-### Why is there no built-in upload?
-
-File Upload is **headless** — it handles the UI abstraction for file selection and validation, but not the upload mechanism. This gives you complete control to:
-
-- Use any HTTP client (fetch, axios, React Query, etc.)
-- Upload to any service (your server, S3, Cloudinary, etc.)
-- Implement custom retry/pause/resume logic
-- Track progress however you want
-
-This design follows Base UI's philosophy of minimal, focused components.
-
-### How do I integrate with my backend?
-
-See the [Uploading Files](#uploading-files) section above. Use `fetch`, `axios`, or any HTTP client with the `onFileChange` callback to send files when ready.
-
-### Can I crop or resize images?
-
-Image processing (cropping, resizing, filters) is outside FileUpload's scope. Consider using:
-
-- [Sharp](https://sharp.pixelplumbing.com/) (Node.js server-side)
-- [Canvas API](https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API) (client-side)
-- [Konva](https://konvajs.org/) (image editor UI)
-- [Cloudinary](https://cloudinary.com/) (upload service with transformations)
-
-### Do I need to revoke preview URLs?
-
-If you create your own previews with `URL.createObjectURL`, you should revoke them when a file is removed or when the component unmounts to avoid memory leaks.
-
-File Upload automatically revokes the `file.preview` URLs it creates when files are removed or the component unmounts. If you create additional preview URLs, revoke them manually:
-
-```jsx title="Preview cleanup"
-React.useEffect(() => {
-  return () => {
-    files.forEach((file) => URL.revokeObjectURL(file.preview));
-  };
-}, [files]);
-```
-
-### How do I add drag-to-reorder for files?
-
-Reordering isn't built-in, but you can implement it with the file state:
-
-```jsx title="File reordering"
-const [files, setFiles] = React.useState([]);
-
-const moveFile = (fromIndex: number, toIndex: number) => {
-  const newFiles = [...files];
-  const [removed] = newFiles.splice(fromIndex, 1);
-  newFiles.splice(toIndex, 0, removed);
-  setFiles(newFiles);
-};
-```
-
-### Can I validate file content, not just extension?
-
-Use client-side checks for UX only, then validate again on your server:
-
-```jsx title="Server-side validation"
-const handleUpload = async (file: File) => {
-  const formData = new FormData();
-  formData.append('file', file);
-
-  const response = await fetch('/api/validate-upload', {
-    method: 'POST',
-    body: formData,
-  });
-
-  const result = await response.json();
-  if (!result.valid) {
-    // Handle invalid file
-  }
-};
-```
-
-*/}
-
 ## API reference
 
-<Reference component="FileUpload" parts="Root, Trigger, Dropzone, PreviewList, PreviewItem" />
+<Reference component="FileUpload" parts="Root, HiddenInput, Trigger" />
 
 export const metadata = {
   keywords: [
     'React File Upload',
-    'File Upload Component',
-    'Drag and Drop',
-    'Headless File Upload',
-    'Unstyled File Upload',
-    'File Validation',
-    'File Preview',
-    'Accessible File Upload',
-    'WCAG Compliant',
-    'Base UI',
+    'Accessible file upload component',
+    'File upload with drag and drop',
+    'Headless React file upload',
+    'Base UI file upload',
   ],
 };

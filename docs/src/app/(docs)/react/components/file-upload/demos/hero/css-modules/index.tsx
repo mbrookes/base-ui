@@ -1,11 +1,9 @@
 'use client';
 
 import * as React from 'react';
-import { UploadCloud, X, CheckCircle2, AlertCircle } from 'lucide-react';
+import { X } from 'lucide-react';
 import { FileUpload } from '@base-ui/react/file-upload';
-import { Progress } from '@base-ui/react/progress';
 import styles from './index.module.css';
-import { useFileRejection } from '../useFileRejection';
 
 function formatBytes(bytes?: number) {
   if (bytes === undefined || bytes === null) {
@@ -20,148 +18,67 @@ function formatBytes(bytes?: number) {
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(1))} ${sizes[i]}`;
 }
 
-function FilePreviewItems() {
-  const { files, removeFile, updateFile } = FileUpload.useFileUploadContext();
+function FileList() {
+  const { files, removeFile } = FileUpload.useFileUploadContext();
 
-  // Simulate upload progress
-  React.useEffect(() => {
-    const interval = setInterval(() => {
-      files.forEach((file) => {
-        if (file.status !== 'idle' && file.status !== 'uploading') {
-          return;
-        }
-
-        const newProgress = Math.min(file.progress + Math.random() * 15, 100);
-        updateFile(file.id, {
-          progress: newProgress,
-          status: newProgress >= 100 ? 'success' : 'uploading',
-        });
-      });
-    }, 300);
-
-    return () => clearInterval(interval);
-  }, [files, updateFile]);
+  if (files.length === 0) {
+    return <p className={styles.emptyState}>No files selected yet.</p>;
+  }
 
   return (
-    <React.Fragment>
+    <ul className={styles.fileList}>
       {files.map((file) => (
-        <FileUpload.PreviewItem key={file.id} file={file} className={styles.previewItem}>
-          <div className={styles.previewContent}>
-            <div className={styles.previewImage}>
-              <img src={file.preview} alt={file.name} className={styles.image} />
-            </div>
-            <div className={styles.previewInfo}>
-              <p className={styles.fileName} title={file.name}>
-                {file.name}
-              </p>
-              <p className={styles.fileSize}>{formatBytes(file.size)}</p>
-              {(file.status === 'uploading' || file.status === 'idle') && (
-                <Progress.Root
-                  value={file.progress}
-                  className={styles.progress}
-                  aria-label={`Upload progress for ${file.name}`}
-                >
-                  <Progress.Track className={styles.progressTrack}>
-                    <Progress.Indicator className={styles.progressIndicator} />
-                  </Progress.Track>
-                </Progress.Root>
-              )}
-              <div className={styles.statusContainer}>
-                {file.status === 'success' && (
-                  <span className={styles.statusSuccess}>
-                    <CheckCircle2 className={styles.statusIcon} /> Complete
-                  </span>
-                )}
-                {file.status === 'error' && (
-                  <span className={styles.statusError}>
-                    <AlertCircle className={styles.statusIcon} /> Error
-                  </span>
-                )}
-              </div>
-            </div>
-            <button
-              type="button"
-              onClick={() => removeFile(file.id)}
-              className={styles.removeButton}
-              title={`Remove ${file.name}`}
-              aria-label={`Remove ${file.name}`}
-            >
-              <X className={styles.removeIcon} />
-            </button>
+        <li key={file.id} className={styles.fileRow}>
+          <div className={styles.fileMeta}>
+            <span className={styles.fileName} title={file.name}>
+              {file.name}
+            </span>
+            <span className={styles.fileSize}>{formatBytes(file.size)}</span>
           </div>
-        </FileUpload.PreviewItem>
+          <button
+            type="button"
+            onClick={() => removeFile(file.id)}
+            className={styles.removeButton}
+            title={`Remove ${file.name}`}
+            aria-label={`Remove ${file.name}`}
+          >
+            <X className={styles.removeIcon} />
+          </button>
+        </li>
       ))}
-    </React.Fragment>
+    </ul>
   );
 }
 
 export default function FileUploadDemo() {
   const maxFiles = 5;
   const [isUploadDisabled, setIsUploadDisabled] = React.useState(false);
-  const { errorMessages, handleFileDrop, handleFileChange } = useFileRejection();
 
   const handleDemoFileChange = React.useCallback<
-    NonNullable<React.ComponentProps<typeof FileUpload.Root>['onFileChange']>
+    NonNullable<React.ComponentProps<typeof FileUpload.Root>['onFilesChange']>
   >(
-    (files, eventDetails) => {
-      handleFileChange(files, eventDetails);
+    (files) => {
       setIsUploadDisabled(files.length >= maxFiles);
     },
-    [handleFileChange, maxFiles],
+    [maxFiles],
   );
 
   return (
     <div className={styles.container}>
-      <div className={styles.header}>
-        <h3 className={styles.title}>Upload Images</h3>
-        <p className={styles.subtitle}>PNG, JPG, GIF up to 5MB</p>
-      </div>
-
       <FileUpload.Root
         maxFiles={maxFiles}
         maxSize={5 * 1024 * 1024}
         accept="image/png, image/jpeg, image/gif"
         multiple
         disabled={isUploadDisabled}
-        onFileChange={handleDemoFileChange}
-        onFileDrop={handleFileDrop}
+        onFilesChange={handleDemoFileChange}
       >
-        <FileUpload.Dropzone className={styles.dropzone}>
-          {({ isDragging }) => (
-            <div className={styles.dropzoneContent}>
-              <div className={`${styles.dropzoneIcon} ${isDragging ? styles.dragging : ''}`}>
-                <UploadCloud className={styles.icon} aria-hidden="true" />
-              </div>
-              <div className={styles.dropzoneText}>
-                {isUploadDisabled ? (
-                  <span className={styles.dropzoneDisabledText}>Upload limit reached</span>
-                ) : (
-                  <React.Fragment>
-                    <span className={styles.dropzoneAction}>Click to upload</span>
-                    <p className={styles.dropzoneOr}>or drag and drop</p>
-                  </React.Fragment>
-                )}
-              </div>
-              <p className={styles.dropzoneHint} role="status" aria-live="polite">
-                {isUploadDisabled
-                  ? 'Remove a file to upload more'
-                  : 'up to 5 images, max 5MB each'}
-              </p>
-            </div>
-          )}
-        </FileUpload.Dropzone>
+        <FileUpload.HiddenInput />
+        <FileUpload.Trigger className={styles.trigger}>
+          {isUploadDisabled ? 'Upload limit reached' : 'Select files'}
+        </FileUpload.Trigger>
 
-        <FileUpload.PreviewList className={styles.previewList}>
-          <FilePreviewItems />
-        </FileUpload.PreviewList>
-
-        {errorMessages.length > 0 ? (
-          <ul role="alert" className={styles.errorMessageList}>
-            {errorMessages.map((message) => (
-              <li key={message}>{message}</li>
-            ))}
-          </ul>
-        ) : null}
+        <FileList />
       </FileUpload.Root>
     </div>
   );

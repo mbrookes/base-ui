@@ -1,0 +1,88 @@
+# Dropzone
+
+<Subtitle>A drop target primitive for drag-and-drop and click-to-select file selection.</Subtitle>
+
+<Meta
+  name="description"
+  content="A high-quality, unstyled React dropzone primitive for drag-and-drop and click-to-select file selection."
+/>
+
+import { DemoDropzoneHero } from './demos/hero';
+
+<DemoDropzoneHero />
+
+## Usage guidelines
+
+- Use `Dropzone` to handle drag-and-drop and keyboard/pointer activation.
+- Add `Dropzone.HiddenInput` to support click-to-select as part of the same interaction surface.
+- Use `onFilesDrop` for dropped files and `Dropzone.HiddenInput` `onChange` for selected files.
+
+## Anatomy
+
+Import the component and assemble its parts:
+
+```jsx title="Anatomy"
+import { Dropzone } from '@base-ui/react/dropzone';
+
+<Dropzone>
+  <Dropzone.HiddenInput />
+  Drop files here
+</Dropzone>;
+```
+
+## Examples
+
+### Dropzone with file input
+
+```jsx title="Dropzone with file input"
+import * as React from 'react';
+import { Dropzone } from '@base-ui/react/dropzone';
+
+export default function App() {
+  const [files, setFiles] = React.useState([]);
+
+  const appendFiles = React.useCallback((nextFiles) => {
+    setFiles((prev) => [...prev, ...nextFiles]);
+  }, []);
+
+  return (
+    <Dropzone onFilesDrop={(droppedFiles) => appendFiles(droppedFiles)}>
+      <>
+        <Dropzone.HiddenInput
+          multiple
+          onChange={(event) => {
+            const selectedFiles = Array.from(event.currentTarget.files ?? []);
+            if (selectedFiles.length > 0) {
+              appendFiles(selectedFiles);
+            }
+            event.currentTarget.value = '';
+          }}
+        />
+        Drop files here or click
+      </>
+    </Dropzone>
+  );
+}
+```
+
+## Integration with File Upload
+
+Use `Dropzone` with `FileUpload.Root` to provide a drag-and-drop surface around the upload flow.
+
+import { DemoDropzoneFileUploadIntegration } from './demos/file-upload-integration';
+
+<DemoDropzoneFileUploadIntegration />
+
+## API reference
+
+<Reference component="Dropzone" parts="Dropzone, HiddenInput" />
+
+export const metadata = {
+  keywords: [
+    'React Dropzone',
+    'Drag and drop files',
+    'Drop target component',
+    'Headless dropzone primitive',
+    'Base UI dropzone',
+  ],
+};

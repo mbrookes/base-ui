@@ -47,30 +47,15 @@
       "description": "Callback when the file dialog is canceled.",
       "detailedType": "(() => void) | undefined"
     },
-    "onFileChange": {
-      "type": "((files: FileUpload.Root.ExtendedFile[], eventDetails: FileUpload.Root.ChangeEventDetails) => void)",
-      "description": "Callback when files are added or removed.",
-      "detailedType": "| ((\n    files: FileUpload.Root.ExtendedFile[],\n    eventDetails: FileUpload.Root.ChangeEventDetails,\n  ) => void)\n| undefined"
-    },
-    "onFileDrop": {
+    "onFilesAdd": {
       "type": "((acceptedFiles: FileUpload.Root.ExtendedFile[], fileRejections: FileUpload.Root.Rejection[], eventDetails: FileUpload.Root.ChangeEventDetails) => void)",
       "description": "Callback fired once per add/drop/paste/input attempt with accepted and rejected files.\nThis fires even when no files are accepted.",
       "detailedType": "| ((\n    acceptedFiles: FileUpload.Root.ExtendedFile[],\n    fileRejections: FileUpload.Root.Rejection[],\n    eventDetails: FileUpload.Root.ChangeEventDetails,\n  ) => void)\n| undefined"
     },
-    "onFilePause": {
-      "type": "((file: FileUpload.Root.ExtendedFile) => void)",
-      "description": "Callback when a file upload is paused.",
-      "detailedType": "| ((file: FileUpload.Root.ExtendedFile) => void)\n| undefined"
-    },
-    "onFileResume": {
-      "type": "((file: FileUpload.Root.ExtendedFile) => void)",
-      "description": "Callback when a paused file upload is resumed.",
-      "detailedType": "| ((file: FileUpload.Root.ExtendedFile) => void)\n| undefined"
-    },
-    "onRetry": {
-      "type": "((file: FileUpload.Root.ExtendedFile) => void)",
-      "description": "Callback when a file retry is initiated.",
-      "detailedType": "| ((file: FileUpload.Root.ExtendedFile) => void)\n| undefined"
+    "onFilesChange": {
+      "type": "((files: FileUpload.Root.ExtendedFile[], eventDetails: FileUpload.Root.ChangeEventDetails) => void)",
+      "description": "Callback when files are added or removed.",
+      "detailedType": "| ((\n    files: FileUpload.Root.ExtendedFile[],\n    eventDetails: FileUpload.Root.ChangeEventDetails,\n  ) => void)\n| undefined"
     },
     "validator": {
       "type": "((file: File) => string | null)",

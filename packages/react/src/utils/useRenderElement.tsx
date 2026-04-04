@@ -118,16 +118,14 @@ function evaluateRenderProp<T extends React.ElementType, S>(
   state: S,
 ): React.ReactElement {
   if (render) {
-    const sanitizedProps = omitRenderProp(props);
-
     if (typeof render === 'function') {
       if (process.env.NODE_ENV !== 'production') {
         warnIfRenderPropLooksLikeComponent(render);
       }
-      return render(sanitizedProps, state);
+      return render(props, state);
     }
-    const mergedProps = mergeProps(sanitizedProps, render.props);
-    mergedProps.ref = sanitizedProps.ref;
+    const mergedProps = mergeProps(props, render.props);
+    mergedProps.ref = props.ref;
 
     let newElement = render;
 
@@ -188,18 +186,6 @@ function warnIfRenderPropLooksLikeComponent(renderFn: { name: string }) {
     'Use `render={<Component />}` or `render={(props) => <Component {...props} />}` instead.',
     'https://base-ui.com/r/invalid-render-prop',
   );
-}
-
-function omitRenderProp(
-  props: React.HTMLAttributes<any> & React.RefAttributes<any>,
-): React.HTMLAttributes<any> & React.RefAttributes<any> {
-  const sanitizedProps = {
-    ...props,
-  } as React.HTMLAttributes<any> & React.RefAttributes<any> & { render?: unknown };
-
-  delete sanitizedProps.render;
-
-  return sanitizedProps;
 }
 
 function renderTag(Tag: string, props: Record<string, any>) {

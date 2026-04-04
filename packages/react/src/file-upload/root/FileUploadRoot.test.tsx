@@ -2,6 +2,7 @@ import * as React from 'react';
 import { render, screen, waitFor, fireEvent, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi } from 'vitest';
+import { Dropzone } from '../../dropzone';
 import { FileUpload } from '../index';
 
 type TestFileUploadContext = {
@@ -11,9 +12,7 @@ type TestFileUploadContext = {
     type: string;
     lastModified: number;
     id: string;
-    status: 'idle' | 'uploading' | 'success' | 'error' | 'paused';
-    isPaused?: boolean;
-    uploadedBytes?: number;
+    status: 'idle' | 'uploading' | 'success' | 'error';
     progress?: number;
     error?: string;
   }>;
@@ -23,16 +22,11 @@ type TestFileUploadContext = {
   updateFile: (
     id: string,
     updates: {
-      status?: 'idle' | 'uploading' | 'success' | 'error' | 'paused';
+      status?: 'idle' | 'uploading' | 'success' | 'error';
       progress?: number;
       error?: string;
-      isPaused?: boolean;
-      uploadedBytes?: number;
     },
   ) => void;
-  pauseFile: (id: string) => void;
-  resumeFile: (id: string) => void;
-  retryFile: (id: string) => void;
 };
 
 function getTestContext(contextValue: TestFileUploadContext | null): TestFileUploadContext {
@@ -85,12 +79,31 @@ function getFileInput() {
   return input;
 }
 
+function TestRoot(props: React.ComponentProps<typeof FileUpload.Root>) {
+  const { children, ...other } = props;
+
+  return (
+    <FileUpload.Root {...other}>
+      <FileUpload.HiddenInput />
+      {children}
+    </FileUpload.Root>
+  );
+}
+
+function TestDropzone(
+  props: Omit<React.ComponentProps<typeof Dropzone>, 'dragging' | 'disabled' | 'onOpen'>,
+) {
+  const { disabled, openFileDialog } = FileUpload.useFileUploadContext();
+
+  return <Dropzone disabled={disabled} onOpen={openFileDialog} {...props} />;
+}
+
 describe('FileUpload', () => {
   it('renders the component', () => {
     render(
-      <FileUpload.Root>
-        <FileUpload.Dropzone>Drag files here</FileUpload.Dropzone>
-      </FileUpload.Root>,
+      <TestRoot>
+        <TestDropzone>Drag files here</TestDropzone>
+      </TestRoot>,
     );
 
     expect(screen.getByText('Drag files here')).toBeInTheDocument();
@@ -100,9 +113,9 @@ describe('FileUpload', () => {
     const user = userEvent.setup();
 
     render(
-      <FileUpload.Root>
+      <TestRoot>
         <FileUpload.Trigger>Upload</FileUpload.Trigger>
-      </FileUpload.Root>,
+      </TestRoot>,
     );
 
     const button = screen.getByRole('button', { name: 'Upload' });
@@ -113,10 +126,10 @@ describe('FileUpload', () => {
 
   it('disables components when disabled prop is true', () => {
     render(
-      <FileUpload.Root disabled>
-        <FileUpload.Dropzone>Drag files here</FileUpload.Dropzone>
+      <TestRoot disabled>
+        <TestDropzone>Drag files here</TestDropzone>
         <FileUpload.Trigger>Upload</FileUpload.Trigger>
-      </FileUpload.Root>,
+      </TestRoot>,
     );
 
     const [dropzone, trigger] = screen.getAllByRole('button');
@@ -124,32 +137,22 @@ describe('FileUpload', () => {
     expect(dropzone).toHaveAttribute('aria-disabled', 'true');
   });
 
-  it('applies data-empty attribute to preview list when there are no files', () => {
-    render(
-      <FileUpload.Root>
-        <FileUpload.PreviewList data-testid="preview-list" />
-      </FileUpload.Root>,
-    );
-
-    expect(screen.getByTestId('preview-list')).toHaveAttribute('data-empty');
-  });
-
   it('applies correct accept attribute to input', () => {
-    render(<FileUpload.Root accept="image/png,image/jpeg">{null}</FileUpload.Root>);
+    render(<TestRoot accept="image/png,image/jpeg">{null}</TestRoot>);
 
     const input = getFileInput();
     expect(input.accept).toBe('image/png,image/jpeg');
   });
 
   it('applies multiple attribute to input when multiple is true', () => {
-    render(<FileUpload.Root multiple>{null}</FileUpload.Root>);
+    render(<TestRoot multiple>{null}</TestRoot>);
 
     const input = getFileInput();
     expect(input.multiple).toBe(true);
   });
 
   it('does not apply multiple attribute when multiple is false', () => {
-    render(<FileUpload.Root multiple={false}>{null}</FileUpload.Root>);
+    render(<TestRoot multiple={false}>{null}</TestRoot>);
 
     const input = getFileInput();
     expect(input.multiple).toBe(false);
@@ -157,13 +160,13 @@ describe('FileUpload', () => {
 
   it('sets dragging state on drag events', async () => {
     render(
-      <FileUpload.Root>
-        <FileUpload.Dropzone data-testid="dropzone">
+      <TestRoot>
+        <TestDropzone data-testid="dropzone">
           {({ isDragging }) => (
             <div data-testid="dragging-state">{isDragging ? 'dragging' : 'idle'}</div>
           )}
-        </FileUpload.Dropzone>
-      </FileUpload.Root>,
+        </TestDropzone>
+      </TestRoot>,
     );
 
     const dropzone = screen.getByTestId('dropzone');
@@ -181,25 +184,26 @@ describe('FileUpload', () => {
     it('does not set dragging state when onDragEnter calls preventBaseUIHandler', () => {
       const customDragEnter = vi.fn((event) => event.preventBaseUIHandler());
       render(
-        <FileUpload.Root onDragEnter={customDragEnter}>
-          <FileUpload.Dropzone data-testid="dropzone">Drop files here</FileUpload.Dropzone>
-        </FileUpload.Root>,
+        <TestRoot onDragEnter={customDragEnter} data-testid="root">
+          <TestDropzone data-testid="dropzone">Drop files here</TestDropzone>
+        </TestRoot>,
       );
 
       const dropzone = screen.getByTestId('dropzone');
+      const root = screen.getByTestId('root');
       fireEvent.dragEnter(dropzone);
 
       expect(customDragEnter).toHaveBeenCalled();
-      expect(dropzone).not.toHaveAttribute('data-dragging');
+      expect(root).not.toHaveAttribute('data-dragging');
     });
 
     it('does not add files when onDrop calls preventBaseUIHandler', () => {
-      const onFileChange = vi.fn();
+      const onFilesChange = vi.fn();
       const customDrop = vi.fn((event) => event.preventBaseUIHandler());
       render(
-        <FileUpload.Root onFileChange={onFileChange} onDrop={customDrop} data-testid="root">
-          <FileUpload.Dropzone data-testid="dropzone">Drop files here</FileUpload.Dropzone>
-        </FileUpload.Root>,
+        <TestRoot onFilesChange={onFilesChange} onDrop={customDrop} data-testid="root">
+          <TestDropzone data-testid="dropzone">Drop files here</TestDropzone>
+        </TestRoot>,
       );
 
       const dropzone = screen.getByTestId('dropzone');
@@ -209,16 +213,16 @@ describe('FileUpload', () => {
       fireEvent.drop(dropzone, { dataTransfer });
 
       expect(customDrop).toHaveBeenCalled();
-      expect(onFileChange).not.toHaveBeenCalled();
+      expect(onFilesChange).not.toHaveBeenCalled();
     });
 
     it('does not add files when onPaste calls preventBaseUIHandler', () => {
-      const onFileChange = vi.fn();
+      const onFilesChange = vi.fn();
       const customPaste = vi.fn((event) => event.preventBaseUIHandler());
       render(
-        <FileUpload.Root onFileChange={onFileChange} onPaste={customPaste} data-testid="root">
-          <FileUpload.Dropzone>Drop files here</FileUpload.Dropzone>
-        </FileUpload.Root>,
+        <TestRoot onFilesChange={onFilesChange} onPaste={customPaste} data-testid="root">
+          <TestDropzone>Drop files here</TestDropzone>
+        </TestRoot>,
       );
 
       const root = screen.getByTestId('root');
@@ -228,17 +232,17 @@ describe('FileUpload', () => {
       fireEvent.paste(root, { clipboardData });
 
       expect(customPaste).toHaveBeenCalled();
-      expect(onFileChange).not.toHaveBeenCalled();
+      expect(onFilesChange).not.toHaveBeenCalled();
     });
   });
 
   it('adds files when pasting files onto the root', async () => {
-    const onFileChange = vi.fn();
+    const onFilesChange = vi.fn();
 
     render(
-      <FileUpload.Root onFileChange={onFileChange} data-testid="root">
-        <FileUpload.Dropzone>Drop files here</FileUpload.Dropzone>
-      </FileUpload.Root>,
+      <TestRoot onFilesChange={onFilesChange} data-testid="root">
+        <TestDropzone>Drop files here</TestDropzone>
+      </TestRoot>,
     );
 
     const root = screen.getByTestId('root');
@@ -249,16 +253,16 @@ describe('FileUpload', () => {
       clipboardData,
     });
 
-    await waitFor(() => expect(onFileChange).toHaveBeenCalled());
+    await waitFor(() => expect(onFilesChange).toHaveBeenCalled());
 
-    const latestFiles = onFileChange.mock.calls.at(-1)?.[0];
+    const latestFiles = onFilesChange.mock.calls.at(-1)?.[0];
     expect(latestFiles?.[0].name).toBe('paste.txt');
   });
 
   it('calls onCancel when file dialog is canceled', async () => {
     const onCancel = vi.fn();
 
-    render(<FileUpload.Root onCancel={onCancel}>{null}</FileUpload.Root>);
+    render(<TestRoot onCancel={onCancel}>{null}</TestRoot>);
 
     const input = getFileInput();
 
@@ -272,10 +276,10 @@ describe('FileUpload', () => {
     await waitFor(() => expect(onCancel).toHaveBeenCalled());
   });
 
-  it('reports DUPLICATE_FILE reason via onFileDrop when the same file is selected again', async () => {
-    const onFileDrop = vi.fn();
+  it('reports DUPLICATE_FILE reason via onFilesAdd when the same file is selected again', async () => {
+    const onFilesAdd = vi.fn();
 
-    render(<FileUpload.Root onFileDrop={onFileDrop}>{null}</FileUpload.Root>);
+    render(<TestRoot onFilesAdd={onFilesAdd}>{null}</TestRoot>);
 
     const input = getFileInput();
     const file = new File(['content'], 'dup.txt', { type: 'text/plain' });
@@ -284,10 +288,10 @@ describe('FileUpload', () => {
     await userEvent.upload(input, file);
 
     await waitFor(() => {
-      expect(onFileDrop).toHaveBeenCalledTimes(2);
+      expect(onFilesAdd).toHaveBeenCalledTimes(2);
     });
 
-    const [, fileRejections] = onFileDrop.mock.calls[1];
+    const [, fileRejections] = onFilesAdd.mock.calls[1];
     expect(fileRejections).toHaveLength(1);
     expect(fileRejections[0]).toMatchObject({
       reason: 'DUPLICATE_FILE',
@@ -296,13 +300,13 @@ describe('FileUpload', () => {
     });
   });
 
-  it('reports rejected file via onFileDrop fileRejections', async () => {
-    const onFileDrop = vi.fn();
+  it('reports rejected file via onFilesAdd fileRejections', async () => {
+    const onFilesAdd = vi.fn();
 
     render(
-      <FileUpload.Root accept="image/*" onFileDrop={onFileDrop}>
+      <TestRoot accept="image/*" onFilesAdd={onFilesAdd}>
         {null}
-      </FileUpload.Root>,
+      </TestRoot>,
     );
 
     const input = getFileInput();
@@ -315,8 +319,8 @@ describe('FileUpload', () => {
 
     fireEvent.change(input);
 
-    await waitFor(() => expect(onFileDrop).toHaveBeenCalled());
-    const [acceptedFiles, fileRejections] = onFileDrop.mock.calls[0];
+    await waitFor(() => expect(onFilesAdd).toHaveBeenCalled());
+    const [acceptedFiles, fileRejections] = onFilesAdd.mock.calls[0];
     expect(acceptedFiles).toHaveLength(0);
     expect(fileRejections).toHaveLength(1);
     expect(fileRejections[0]).toMatchObject({
@@ -328,13 +332,13 @@ describe('FileUpload', () => {
     });
   });
 
-  it('calls onFileDrop with accepted and rejected files for a mixed selection', async () => {
-    const onFileDrop = vi.fn();
+  it('calls onFilesAdd with accepted and rejected files for a mixed selection', async () => {
+    const onFilesAdd = vi.fn();
 
     render(
-      <FileUpload.Root accept="image/*" onFileDrop={onFileDrop}>
+      <TestRoot accept="image/*" onFilesAdd={onFilesAdd}>
         {null}
-      </FileUpload.Root>,
+      </TestRoot>,
     );
 
     const input = getFileInput();
@@ -348,9 +352,9 @@ describe('FileUpload', () => {
 
     fireEvent.change(input);
 
-    await waitFor(() => expect(onFileDrop).toHaveBeenCalled());
+    await waitFor(() => expect(onFilesAdd).toHaveBeenCalled());
 
-    expect(onFileDrop).toHaveBeenCalledWith(
+    expect(onFilesAdd).toHaveBeenCalledWith(
       expect.arrayContaining([expect.objectContaining({ name: 'photo.jpg' })]),
       expect.arrayContaining([
         expect.objectContaining({
@@ -367,13 +371,13 @@ describe('FileUpload', () => {
     );
   });
 
-  it('calls onFileDrop when all selected files are rejected', async () => {
-    const onFileDrop = vi.fn();
+  it('calls onFilesAdd when all selected files are rejected', async () => {
+    const onFilesAdd = vi.fn();
 
     render(
-      <FileUpload.Root accept="image/*" onFileDrop={onFileDrop}>
+      <TestRoot accept="image/*" onFilesAdd={onFilesAdd}>
         {null}
-      </FileUpload.Root>,
+      </TestRoot>,
     );
 
     const input = getFileInput();
@@ -386,9 +390,9 @@ describe('FileUpload', () => {
 
     fireEvent.change(input);
 
-    await waitFor(() => expect(onFileDrop).toHaveBeenCalled());
+    await waitFor(() => expect(onFilesAdd).toHaveBeenCalled());
 
-    expect(onFileDrop).toHaveBeenCalledWith(
+    expect(onFilesAdd).toHaveBeenCalledWith(
       [],
       expect.arrayContaining([
         expect.objectContaining({
@@ -406,13 +410,13 @@ describe('FileUpload', () => {
   });
 
   it('accepts files when accept includes file extensions', async () => {
-    const onFileChange = vi.fn();
-    const onFileDrop = vi.fn();
+    const onFilesChange = vi.fn();
+    const onFilesAdd = vi.fn();
 
     render(
-      <FileUpload.Root accept=".txt" onFileChange={onFileChange} onFileDrop={onFileDrop}>
+      <TestRoot accept=".txt" onFilesChange={onFilesChange} onFilesAdd={onFilesAdd}>
         {null}
-      </FileUpload.Root>,
+      </TestRoot>,
     );
 
     const input = getFileInput();
@@ -425,25 +429,25 @@ describe('FileUpload', () => {
 
     fireEvent.change(input);
 
-    await waitFor(() => expect(onFileChange).toHaveBeenCalled());
-    const [, fileRejections] = onFileDrop.mock.calls[0];
+    await waitFor(() => expect(onFilesChange).toHaveBeenCalled());
+    const [, fileRejections] = onFilesAdd.mock.calls[0];
     expect(fileRejections).toHaveLength(0);
   });
 
   it('uses custom validator to reject files', async () => {
-    const onFileChange = vi.fn();
-    const onFileDrop = vi.fn();
+    const onFilesChange = vi.fn();
+    const onFilesAdd = vi.fn();
     const validator = vi.fn().mockReturnValue('Blocked by policy');
 
     render(
-      <FileUpload.Root
+      <TestRoot
         accept="*"
-        onFileChange={onFileChange}
-        onFileDrop={onFileDrop}
+        onFilesChange={onFilesChange}
+        onFilesAdd={onFilesAdd}
         validator={validator}
       >
         {null}
-      </FileUpload.Root>,
+      </TestRoot>,
     );
 
     const input = getFileInput();
@@ -456,27 +460,27 @@ describe('FileUpload', () => {
 
     fireEvent.change(input);
 
-    await waitFor(() => expect(onFileDrop).toHaveBeenCalled());
-    const [, fileRejections] = onFileDrop.mock.calls[0];
+    await waitFor(() => expect(onFilesAdd).toHaveBeenCalled());
+    const [, fileRejections] = onFilesAdd.mock.calls[0];
     expect(fileRejections).toHaveLength(1);
     expect(fileRejections[0]).toMatchObject({
       file,
       reason: 'CUSTOM_VALIDATION_FAILED',
       eventDetails: expect.objectContaining({ message: 'Blocked by policy' }),
     });
-    const latestFiles = onFileChange.mock.calls.at(-1)?.[0] ?? [];
+    const latestFiles = onFilesChange.mock.calls.at(-1)?.[0] ?? [];
     expect(latestFiles).not.toEqual(expect.arrayContaining([file]));
     expect(validator).toHaveBeenCalledWith(file);
   });
 
   it('does not enforce a max file size by default', async () => {
-    const onFileChange = vi.fn();
-    const onFileDrop = vi.fn();
+    const onFilesChange = vi.fn();
+    const onFilesAdd = vi.fn();
 
     render(
-      <FileUpload.Root onFileChange={onFileChange} onFileDrop={onFileDrop} accept="*">
+      <TestRoot onFilesChange={onFilesChange} onFilesAdd={onFilesAdd} accept="*">
         {null}
-      </FileUpload.Root>,
+      </TestRoot>,
     );
 
     const input = getFileInput();
@@ -491,22 +495,22 @@ describe('FileUpload', () => {
 
     fireEvent.change(input);
 
-    await waitFor(() => expect(onFileChange).toHaveBeenCalled());
+    await waitFor(() => expect(onFilesChange).toHaveBeenCalled());
 
-    const [, fileRejections] = onFileDrop.mock.calls[0];
+    const [, fileRejections] = onFilesAdd.mock.calls[0];
     expect(fileRejections).toHaveLength(0);
-    const latestFiles = onFileChange.mock.calls.at(-1)?.[0];
+    const latestFiles = onFilesChange.mock.calls.at(-1)?.[0];
     expect(latestFiles?.[0].name).toBe('large.bin');
   });
 
   it('respects maxSize constraint and rejects oversized files', async () => {
-    const onFileDrop = vi.fn();
-    const onFileChange = vi.fn();
+    const onFilesAdd = vi.fn();
+    const onFilesChange = vi.fn();
 
     render(
-      <FileUpload.Root maxSize={1024} onFileDrop={onFileDrop} onFileChange={onFileChange}>
+      <TestRoot maxSize={1024} onFilesAdd={onFilesAdd} onFilesChange={onFilesChange}>
         {null}
-      </FileUpload.Root>,
+      </TestRoot>,
     );
 
     const input = getFileInput();
@@ -519,25 +523,25 @@ describe('FileUpload', () => {
 
     fireEvent.change(input);
 
-    await waitFor(() => expect(onFileDrop).toHaveBeenCalled());
-    const [, fileRejections] = onFileDrop.mock.calls[0];
+    await waitFor(() => expect(onFilesAdd).toHaveBeenCalled());
+    const [, fileRejections] = onFilesAdd.mock.calls[0];
     expect(fileRejections[0]).toMatchObject({
       file: largeFile,
       reason: 'FILE_TOO_LARGE',
       eventDetails: expect.objectContaining({ message: expect.stringContaining('too large') }),
     });
-    // onFileChange should not be called when all files are rejected (files state unchanged)
-    expect(onFileChange).not.toHaveBeenCalled();
+    // onFilesChange should not be called when all files are rejected (files state unchanged)
+    expect(onFilesChange).not.toHaveBeenCalled();
   });
 
   it('respects minSize constraint and rejects undersized files', async () => {
-    const onFileDrop = vi.fn();
-    const onFileChange = vi.fn();
+    const onFilesAdd = vi.fn();
+    const onFilesChange = vi.fn();
 
     render(
-      <FileUpload.Root minSize={1024} onFileDrop={onFileDrop} onFileChange={onFileChange}>
+      <TestRoot minSize={1024} onFilesAdd={onFilesAdd} onFilesChange={onFilesChange}>
         {null}
-      </FileUpload.Root>,
+      </TestRoot>,
     );
 
     const input = getFileInput();
@@ -550,8 +554,8 @@ describe('FileUpload', () => {
 
     fireEvent.change(input);
 
-    await waitFor(() => expect(onFileDrop).toHaveBeenCalled());
-    const [, fileRejections] = onFileDrop.mock.calls[0];
+    await waitFor(() => expect(onFilesAdd).toHaveBeenCalled());
+    const [, fileRejections] = onFilesAdd.mock.calls[0];
     expect(fileRejections[0]).toMatchObject({
       file: tinyFile,
       reason: 'FILE_TOO_SMALL',
@@ -560,12 +564,12 @@ describe('FileUpload', () => {
   });
 
   it('respects maxFiles constraint in single file mode', async () => {
-    const onFileChange = vi.fn();
+    const onFilesChange = vi.fn();
 
     render(
-      <FileUpload.Root maxFiles={1} multiple={false} onFileChange={onFileChange}>
+      <TestRoot maxFiles={1} multiple={false} onFilesChange={onFilesChange}>
         {null}
-      </FileUpload.Root>,
+      </TestRoot>,
     );
 
     const input = getFileInput();
@@ -574,20 +578,20 @@ describe('FileUpload', () => {
     await userEvent.upload(input, file);
 
     await waitFor(() => {
-      expect(onFileChange).toHaveBeenCalledWith(
+      expect(onFilesChange).toHaveBeenCalledWith(
         expect.arrayContaining([expect.objectContaining({ name: 'test.txt' })]),
         expect.objectContaining({ reason: expect.any(String) }),
       );
     });
 
-    const uploadedFiles = onFileChange.mock.calls.at(-1)?.[0];
+    const uploadedFiles = onFilesChange.mock.calls.at(-1)?.[0];
     expect(uploadedFiles?.length).toBe(1);
   });
 
   it('keeps existing file in single-file mode when replacement is rejected', async () => {
     let contextValue: TestFileUploadContext | null = null;
-    const onFileChange = vi.fn();
-    const onFileDrop = vi.fn();
+    const onFilesChange = vi.fn();
+    const onFilesAdd = vi.fn();
 
     function TestComponent() {
       contextValue = FileUpload.useFileUploadContext() as unknown as TestFileUploadContext;
@@ -595,9 +599,14 @@ describe('FileUpload', () => {
     }
 
     render(
-      <FileUpload.Root multiple={false} accept="image/*" onFileChange={onFileChange} onFileDrop={onFileDrop}>
+      <TestRoot
+        multiple={false}
+        accept="image/*"
+        onFilesChange={onFilesChange}
+        onFilesAdd={onFilesAdd}
+      >
         <TestComponent />
-      </FileUpload.Root>,
+      </TestRoot>,
     );
 
     const validFile = new File(['content'], 'photo.jpg', { type: 'image/jpeg' });
@@ -607,14 +616,14 @@ describe('FileUpload', () => {
       getTestContext(contextValue).addFiles([validFile]);
     });
 
-    await waitFor(() => expect(onFileChange).toHaveBeenCalled());
+    await waitFor(() => expect(onFilesChange).toHaveBeenCalled());
 
     act(() => {
       getTestContext(contextValue).addFiles([invalidFile]);
     });
 
-    await waitFor(() => expect(onFileDrop).toHaveBeenCalledTimes(2));
-    const [, fileRejections] = onFileDrop.mock.calls[1];
+    await waitFor(() => expect(onFilesAdd).toHaveBeenCalledTimes(2));
+    const [, fileRejections] = onFilesAdd.mock.calls[1];
     expect(fileRejections).toHaveLength(1);
     expect(fileRejections[0]).toMatchObject({
       file: invalidFile,
@@ -622,13 +631,13 @@ describe('FileUpload', () => {
       eventDetails: expect.objectContaining({ reason: 'MIME_TYPE_NOT_ALLOWED' }),
     });
 
-    const latestFiles = onFileChange.mock.calls.at(-1)?.[0];
+    const latestFiles = onFilesChange.mock.calls.at(-1)?.[0];
     expect(latestFiles).toHaveLength(1);
     expect(latestFiles?.[0].name).toBe('photo.jpg');
   });
 
   it('cleans up object URLs on unmount', async () => {
-    const { unmount } = render(<FileUpload.Root>{null}</FileUpload.Root>);
+    const { unmount } = render(<TestRoot>{null}</TestRoot>);
 
     const input = getFileInput();
     const file = new File(['content'], 'test.txt', { type: 'text/plain' });
@@ -655,9 +664,9 @@ describe('FileUpload', () => {
     }
 
     render(
-      <FileUpload.Root>
+      <TestRoot>
         <TestComponent />
-      </FileUpload.Root>,
+      </TestRoot>,
     );
 
     const input = getFileInput();
@@ -678,13 +687,13 @@ describe('FileUpload', () => {
 
   it('resolves className callback with disabled state', () => {
     render(
-      <FileUpload.Root disabled>
+      <TestRoot disabled>
         <FileUpload.Trigger
           className={(state) => (state.disabled ? 'disabled-trigger' : 'enabled-trigger')}
         >
           Upload
         </FileUpload.Trigger>
-      </FileUpload.Root>,
+      </TestRoot>,
     );
 
     const button = screen.getByRole('button');
@@ -693,26 +702,26 @@ describe('FileUpload', () => {
 
   it('resolves className callback when disabled state changes', () => {
     const { rerender } = render(
-      <FileUpload.Root disabled={false}>
+      <TestRoot disabled={false}>
         <FileUpload.Trigger
           className={(state) => (state.disabled ? 'disabled-trigger' : 'enabled-trigger')}
         >
           Upload
         </FileUpload.Trigger>
-      </FileUpload.Root>,
+      </TestRoot>,
     );
 
     let button = screen.getByRole('button');
     expect(button).toHaveClass('enabled-trigger');
 
     rerender(
-      <FileUpload.Root disabled>
+      <TestRoot disabled>
         <FileUpload.Trigger
           className={(state) => (state.disabled ? 'disabled-trigger' : 'enabled-trigger')}
         >
           Upload
         </FileUpload.Trigger>
-      </FileUpload.Root>,
+      </TestRoot>,
     );
 
     button = screen.getByRole('button');
@@ -720,7 +729,7 @@ describe('FileUpload', () => {
   });
 
   it('announces file rejection to screen readers', async () => {
-    render(<FileUpload.Root accept="image/*">{null}</FileUpload.Root>);
+    render(<TestRoot accept="image/*">{null}</TestRoot>);
 
     const input = getFileInput();
     const file = new File(['content'], 'test.txt', { type: 'text/plain' });
@@ -734,11 +743,7 @@ describe('FileUpload', () => {
   });
 
   it('separates success and rejection messages in announcement with a space', async () => {
-    render(
-      <FileUpload.Root accept="image/*">
-        {null}
-      </FileUpload.Root>,
-    );
+    render(<TestRoot accept="image/*">{null}</TestRoot>);
 
     const input = getFileInput();
     const validFile = new File(['content'], 'photo.jpg', { type: 'image/jpeg' });
@@ -761,27 +766,13 @@ describe('FileUpload', () => {
   });
 
   describe('Full workflow integration', () => {
-    it('supports select via dropzone, view in preview list, and remove', async () => {
-      const onFileChange = vi.fn();
-      const staticPreviewFile: FileUpload.Root.ExtendedFile = Object.assign(
-        new File(['content'], 'test.txt', { type: 'text/plain' }),
-        {
-          id: 'test-1',
-          preview: 'blob:test',
-          status: 'idle' as const,
-          progress: 0,
-        },
-      );
+    it('supports selecting files via dropzone and reporting onFilesChange', async () => {
+      const onFilesChange = vi.fn();
 
       render(
-        <FileUpload.Root onFileChange={onFileChange}>
-          <FileUpload.Dropzone data-testid="dropzone">Drop files here or click</FileUpload.Dropzone>
-          <FileUpload.PreviewList data-testid="preview-list">
-            <FileUpload.PreviewItem file={staticPreviewFile}>
-              <span data-testid="file-name">test.txt</span>
-            </FileUpload.PreviewItem>
-          </FileUpload.PreviewList>
-        </FileUpload.Root>,
+        <TestRoot onFilesChange={onFilesChange}>
+          <TestDropzone data-testid="dropzone">Drop files here or click</TestDropzone>
+        </TestRoot>,
       );
 
       const input = getFileInput();
@@ -790,7 +781,7 @@ describe('FileUpload', () => {
       await userEvent.upload(input, file);
 
       await waitFor(() => {
-        expect(onFileChange).toHaveBeenCalledWith(
+        expect(onFilesChange).toHaveBeenCalledWith(
           expect.arrayContaining([expect.objectContaining({ name: 'test.txt' })]),
           expect.objectContaining({ reason: expect.any(String) }),
         );
@@ -798,12 +789,12 @@ describe('FileUpload', () => {
     });
 
     it('supports multiple file selection at different times', async () => {
-      const onFileChange = vi.fn();
+      const onFilesChange = vi.fn();
 
       render(
-        <FileUpload.Root onFileChange={onFileChange}>
+        <TestRoot onFilesChange={onFilesChange}>
           <FileUpload.Trigger>Upload</FileUpload.Trigger>
-        </FileUpload.Root>,
+        </TestRoot>,
       );
 
       const input = getFileInput();
@@ -812,7 +803,7 @@ describe('FileUpload', () => {
       await userEvent.upload(input, file1);
 
       await waitFor(() => {
-        expect(onFileChange).toHaveBeenCalledWith(
+        expect(onFilesChange).toHaveBeenCalledWith(
           expect.arrayContaining([expect.objectContaining({ name: 'test1.txt' })]),
           expect.objectContaining({ reason: expect.any(String) }),
         );
@@ -822,19 +813,19 @@ describe('FileUpload', () => {
       await userEvent.upload(input, file2);
 
       await waitFor(() => {
-        expect(onFileChange.mock.calls.length).toBeGreaterThan(1);
+        expect(onFilesChange.mock.calls.length).toBeGreaterThan(1);
       });
     });
   });
 
   describe('Error scenarios', () => {
     it('handles file rejection with error message', async () => {
-      const onFileDrop = vi.fn();
+      const onFilesAdd = vi.fn();
 
       render(
-        <FileUpload.Root accept="image/*" onFileDrop={onFileDrop}>
+        <TestRoot accept="image/*" onFilesAdd={onFilesAdd}>
           {null}
-        </FileUpload.Root>,
+        </TestRoot>,
       );
 
       const input = getFileInput();
@@ -847,18 +838,18 @@ describe('FileUpload', () => {
 
       fireEvent.change(input);
 
-      await waitFor(() => expect(onFileDrop).toHaveBeenCalled());
-      const [, fileRejections] = onFileDrop.mock.calls[0];
+      await waitFor(() => expect(onFilesAdd).toHaveBeenCalled());
+      const [, fileRejections] = onFilesAdd.mock.calls[0];
       expect(fileRejections[0].file).toBe(textFile);
     });
 
     it('respects maxSize constraint', async () => {
-      const onFileDrop = vi.fn();
+      const onFilesAdd = vi.fn();
 
       render(
-        <FileUpload.Root maxSize={100} onFileDrop={onFileDrop}>
+        <TestRoot maxSize={100} onFilesAdd={onFilesAdd}>
           {null}
-        </FileUpload.Root>,
+        </TestRoot>,
       );
 
       const input = getFileInput();
@@ -873,18 +864,18 @@ describe('FileUpload', () => {
 
       fireEvent.change(input);
 
-      await waitFor(() => expect(onFileDrop).toHaveBeenCalled());
-      const [, fileRejections] = onFileDrop.mock.calls[0];
+      await waitFor(() => expect(onFilesAdd).toHaveBeenCalled());
+      const [, fileRejections] = onFilesAdd.mock.calls[0];
       expect(fileRejections).toHaveLength(1);
     });
 
     it('respects minSize constraint', async () => {
-      const onFileDrop = vi.fn();
+      const onFilesAdd = vi.fn();
 
       render(
-        <FileUpload.Root minSize={100} onFileDrop={onFileDrop}>
+        <TestRoot minSize={100} onFilesAdd={onFilesAdd}>
           {null}
-        </FileUpload.Root>,
+        </TestRoot>,
       );
 
       const input = getFileInput();
@@ -897,463 +888,9 @@ describe('FileUpload', () => {
 
       fireEvent.change(input);
 
-      await waitFor(() => expect(onFileDrop).toHaveBeenCalled());
-      const [, fileRejections] = onFileDrop.mock.calls[0];
+      await waitFor(() => expect(onFilesAdd).toHaveBeenCalled());
+      const [, fileRejections] = onFilesAdd.mock.calls[0];
       expect(fileRejections).toHaveLength(1);
-    });
-  });
-
-  describe('abort signal support', () => {
-    it('provides abort signal for upload tracking', () => {
-      function TestComponent() {
-        const { getAbortSignal } = FileUpload.useFileUploadContext();
-        const [signal, setSignal] = React.useState<AbortSignal | null>(null);
-
-        React.useEffect(() => {
-          if (getAbortSignal) {
-            const sig = getAbortSignal('test-id');
-            setSignal(sig);
-          }
-        }, [getAbortSignal]);
-
-        return <div>{signal && <div data-testid="has-signal">Has Signal</div>}</div>;
-      }
-
-      render(
-        <FileUpload.Root>
-          <TestComponent />
-        </FileUpload.Root>,
-      );
-
-      expect(screen.getByTestId('has-signal')).toBeInTheDocument();
-    });
-
-    it('returns the same abort signal for the same file id', async () => {
-      function TestComponent() {
-        const { getAbortSignal } = FileUpload.useFileUploadContext();
-        const [sameSignal, setSameSignal] = React.useState(false);
-
-        React.useEffect(() => {
-          const signalA = getAbortSignal('test-id');
-          const signalB = getAbortSignal('test-id');
-          setSameSignal(signalA === signalB);
-        }, [getAbortSignal]);
-
-        return <div>{sameSignal && <div data-testid="same-signal">Same Signal</div>}</div>;
-      }
-
-      render(
-        <FileUpload.Root>
-          <TestComponent />
-        </FileUpload.Root>,
-      );
-
-      await waitFor(() => {
-        expect(screen.getByTestId('same-signal')).toBeInTheDocument();
-      });
-    });
-
-    it('aborts upload when abortUpload is called', async () => {
-      function TestComponent() {
-        const context = FileUpload.useFileUploadContext();
-        const [aborted, setAborted] = React.useState(false);
-
-        return (
-          <div>
-            <button
-              onClick={() => {
-                const signal = context.getAbortSignal('test-id');
-                signal.addEventListener('abort', () => setAborted(true));
-                context.abortUpload('test-id');
-              }}
-            >
-              Abort Upload
-            </button>
-            {aborted && <div data-testid="aborted">Aborted</div>}
-          </div>
-        );
-      }
-
-      render(
-        <FileUpload.Root>
-          <TestComponent />
-        </FileUpload.Root>,
-      );
-
-      const abortButton = screen.getByRole('button', { name: 'Abort Upload' });
-      await userEvent.setup().click(abortButton);
-
-      await waitFor(() => {
-        expect(screen.getByTestId('aborted')).toBeInTheDocument();
-      });
-    });
-  });
-
-  describe('retryFile', () => {
-    it('resets a file from error status back to idle', () => {
-      let contextValue: TestFileUploadContext | null = null;
-
-      function TestComponent() {
-        contextValue = FileUpload.useFileUploadContext() as unknown as TestFileUploadContext;
-        return null;
-      }
-
-      render(
-        <FileUpload.Root>
-          <TestComponent />
-        </FileUpload.Root>,
-      );
-
-      const input = getFileInput();
-      const file = new File(['content'], 'test.txt', { type: 'text/plain' });
-
-      fireEvent.change(input, { target: { files: [file] } });
-
-      const fileId = getTestContext(contextValue).files[0].id;
-
-      act(() => {
-        getTestContext(contextValue).updateFile(fileId, { status: 'error', error: 'Upload failed' });
-      });
-
-      expect(getTestContext(contextValue).files[0].status).toBe('error');
-
-      act(() => {
-        getTestContext(contextValue).retryFile(fileId);
-      });
-
-      expect(getTestContext(contextValue).files[0].status).toBe('idle');
-      expect(getTestContext(contextValue).files[0].progress).toBe(0);
-      expect(getTestContext(contextValue).files[0].error).toBeUndefined();
-    });
-
-    it('does not retry a file that is not in error state', () => {
-      const onRetry = vi.fn();
-      let contextValue: TestFileUploadContext | null = null;
-
-      function TestComponent() {
-        contextValue = FileUpload.useFileUploadContext() as unknown as TestFileUploadContext;
-        return null;
-      }
-
-      render(
-        <FileUpload.Root onRetry={onRetry}>
-          <TestComponent />
-        </FileUpload.Root>,
-      );
-
-      const input = getFileInput();
-      const file = new File(['content'], 'test.txt', { type: 'text/plain' });
-
-      fireEvent.change(input, { target: { files: [file] } });
-
-      const fileId = getTestContext(contextValue).files[0].id;
-
-      act(() => {
-        getTestContext(contextValue).retryFile(fileId);
-      });
-
-      expect(onRetry).not.toHaveBeenCalled();
-      expect(getTestContext(contextValue).files[0].status).toBe('idle');
-    });
-
-    it('calls onRetry with the file in its error state', () => {
-      let statusAtCallTime: string | undefined;
-      const onRetry = vi.fn((f) => {
-        statusAtCallTime = f.status;
-      });
-      let contextValue: TestFileUploadContext | null = null;
-
-      function TestComponent() {
-        contextValue = FileUpload.useFileUploadContext() as unknown as TestFileUploadContext;
-        return null;
-      }
-
-      render(
-        <FileUpload.Root onRetry={onRetry}>
-          <TestComponent />
-        </FileUpload.Root>,
-      );
-
-      const input = getFileInput();
-      const file = new File(['content'], 'test.txt', { type: 'text/plain' });
-
-      fireEvent.change(input, { target: { files: [file] } });
-
-      const fileId = getTestContext(contextValue).files[0].id;
-
-      act(() => {
-        getTestContext(contextValue).updateFile(fileId, { status: 'error', error: 'Upload failed' });
-      });
-
-      act(() => {
-        getTestContext(contextValue).retryFile(fileId);
-      });
-
-      expect(onRetry).toHaveBeenCalledOnce();
-      expect(statusAtCallTime).toBe('error');
-    });
-  });
-
-  describe('Resumable uploads (pause/resume)', () => {
-    it('exposes pauseFile and resumeFile methods in context', () => {
-      let contextValue: TestFileUploadContext | null = null;
-
-      function TestComponent() {
-        contextValue = FileUpload.useFileUploadContext() as unknown as TestFileUploadContext;
-        return null;
-      }
-
-      render(
-        <FileUpload.Root>
-          <TestComponent />
-        </FileUpload.Root>,
-      );
-
-      expect(contextValue).not.toBeNull();
-      const context = getTestContext(contextValue);
-
-      expect(typeof context.pauseFile).toBe('function');
-      expect(typeof context.resumeFile).toBe('function');
-    });
-
-    it('paused file has isPaused flag set to true', () => {
-      let contextValue: TestFileUploadContext | null = null;
-
-      function TestComponent() {
-        const context = FileUpload.useFileUploadContext() as unknown as TestFileUploadContext;
-        contextValue = context;
-        return null;
-      }
-
-      render(
-        <FileUpload.Root>
-          <TestComponent />
-        </FileUpload.Root>,
-      );
-
-      const file = new File(['test content'], 'test.txt', { type: 'text/plain' });
-      expect(contextValue).not.toBeNull();
-
-      act(() => {
-        getTestContext(contextValue).addFiles([file]);
-      });
-
-      act(() => {
-        const fileId = getTestContext(contextValue).files[0].id;
-        const latestContext = getTestContext(contextValue);
-        latestContext.updateFile(fileId, { status: 'uploading' });
-        latestContext.pauseFile(fileId);
-      });
-
-      expect(getTestContext(contextValue).files[0].isPaused).toBe(true);
-    });
-
-    it('resumed file has isPaused flag set to false', () => {
-      let contextValue: TestFileUploadContext | null = null;
-
-      function TestComponent() {
-        const context = FileUpload.useFileUploadContext() as unknown as TestFileUploadContext;
-        contextValue = context;
-        return null;
-      }
-
-      render(
-        <FileUpload.Root>
-          <TestComponent />
-        </FileUpload.Root>,
-      );
-
-      const file = new File(['test'], 'test.txt', { type: 'text/plain' });
-      expect(contextValue).not.toBeNull();
-
-      act(() => {
-        getTestContext(contextValue).addFiles([file]);
-      });
-
-      act(() => {
-        const fileId = getTestContext(contextValue).files[0].id;
-        const latestContext = getTestContext(contextValue);
-        latestContext.updateFile(fileId, { status: 'uploading' });
-        latestContext.pauseFile(fileId);
-        latestContext.resumeFile(fileId);
-      });
-
-      expect(getTestContext(contextValue).files[0].isPaused).toBe(false);
-    });
-
-    it('supports uploadedBytes property for tracking progress', () => {
-      let contextValue: TestFileUploadContext | null = null;
-
-      function TestComponent() {
-        const context = FileUpload.useFileUploadContext() as unknown as TestFileUploadContext;
-        contextValue = context;
-        return null;
-      }
-
-      render(
-        <FileUpload.Root>
-          <TestComponent />
-        </FileUpload.Root>,
-      );
-
-      const file = new File(['0123456789'], 'test.txt', { type: 'text/plain' });
-      expect(contextValue).not.toBeNull();
-
-      act(() => {
-        getTestContext(contextValue).addFiles([file]);
-      });
-
-      act(() => {
-        const fileId = getTestContext(contextValue).files[0].id;
-        getTestContext(contextValue).updateFile(fileId, { uploadedBytes: 5, progress: 50 });
-      });
-
-      expect(getTestContext(contextValue).files[0].uploadedBytes).toBe(5);
-      expect(getTestContext(contextValue).files[0].progress).toBe(50);
-    });
-
-    it('does not pause a file that is not uploading', () => {
-      const onFilePause = vi.fn();
-      let contextValue: TestFileUploadContext | null = null;
-
-      function TestComponent() {
-        const context = FileUpload.useFileUploadContext() as unknown as TestFileUploadContext;
-        contextValue = context;
-        return null;
-      }
-
-      render(
-        <FileUpload.Root onFilePause={onFilePause}>
-          <TestComponent />
-        </FileUpload.Root>,
-      );
-
-      const file = new File(['test'], 'test.txt', { type: 'text/plain' });
-      expect(contextValue).not.toBeNull();
-
-      act(() => {
-        getTestContext(contextValue).addFiles([file]);
-      });
-
-      act(() => {
-        const fileId = getTestContext(contextValue).files[0].id;
-        getTestContext(contextValue).pauseFile(fileId);
-      });
-
-      expect(onFilePause).not.toHaveBeenCalled();
-      expect(getTestContext(contextValue).files[0].status).toBe('idle');
-    });
-
-    it('does not resume a file that is not paused', () => {
-      const onFileResume = vi.fn();
-      let contextValue: TestFileUploadContext | null = null;
-
-      function TestComponent() {
-        const context = FileUpload.useFileUploadContext() as unknown as TestFileUploadContext;
-        contextValue = context;
-        return null;
-      }
-
-      render(
-        <FileUpload.Root onFileResume={onFileResume}>
-          <TestComponent />
-        </FileUpload.Root>,
-      );
-
-      const file = new File(['test'], 'test.txt', { type: 'text/plain' });
-      expect(contextValue).not.toBeNull();
-
-      act(() => {
-        getTestContext(contextValue).addFiles([file]);
-      });
-
-      act(() => {
-        const fileId = getTestContext(contextValue).files[0].id;
-        getTestContext(contextValue).resumeFile(fileId);
-      });
-
-      expect(onFileResume).not.toHaveBeenCalled();
-      expect(getTestContext(contextValue).files[0].status).toBe('idle');
-    });
-
-    it('calls onFilePause with the file in its uploading state', () => {
-      let statusAtCallTime: string | undefined;
-      const onFilePause = vi.fn((f) => {
-        statusAtCallTime = f.status;
-      });
-      let contextValue: TestFileUploadContext | null = null;
-
-      function TestComponent() {
-        contextValue = FileUpload.useFileUploadContext() as unknown as TestFileUploadContext;
-        return null;
-      }
-
-      render(
-        <FileUpload.Root onFilePause={onFilePause}>
-          <TestComponent />
-        </FileUpload.Root>,
-      );
-
-      const file = new File(['test'], 'test.txt', { type: 'text/plain' });
-
-      act(() => {
-        getTestContext(contextValue).addFiles([file]);
-      });
-
-      const fileId = getTestContext(contextValue).files[0].id;
-
-      act(() => {
-        getTestContext(contextValue).updateFile(fileId, { status: 'uploading' });
-      });
-
-      act(() => {
-        getTestContext(contextValue).pauseFile(fileId);
-      });
-
-      expect(onFilePause).toHaveBeenCalledOnce();
-      expect(statusAtCallTime).toBe('uploading');
-    });
-
-    it('calls onFileResume with the file in its paused state', () => {
-      let statusAtCallTime: string | undefined;
-      const onFileResume = vi.fn((f) => {
-        statusAtCallTime = f.status;
-      });
-      let contextValue: TestFileUploadContext | null = null;
-
-      function TestComponent() {
-        contextValue = FileUpload.useFileUploadContext() as unknown as TestFileUploadContext;
-        return null;
-      }
-
-      render(
-        <FileUpload.Root onFileResume={onFileResume}>
-          <TestComponent />
-        </FileUpload.Root>,
-      );
-
-      const file = new File(['test'], 'test.txt', { type: 'text/plain' });
-
-      act(() => {
-        getTestContext(contextValue).addFiles([file]);
-      });
-
-      const fileId = getTestContext(contextValue).files[0].id;
-
-      act(() => {
-        getTestContext(contextValue).updateFile(fileId, { status: 'uploading' });
-      });
-
-      act(() => {
-        getTestContext(contextValue).pauseFile(fileId);
-      });
-
-      act(() => {
-        getTestContext(contextValue).resumeFile(fileId);
-      });
-
-      expect(onFileResume).toHaveBeenCalledOnce();
-      expect(statusAtCallTime).toBe('paused');
     });
   });
 
@@ -1368,10 +905,10 @@ describe('FileUpload', () => {
       }
 
       render(
-        <FileUpload.Root>
+        <TestRoot>
           <div role="status" aria-live="polite" aria-atomic="true" />
           <TestComponent />
-        </FileUpload.Root>,
+        </TestRoot>,
       );
 
       const input = getFileInput();
@@ -1402,9 +939,9 @@ describe('FileUpload', () => {
       }
 
       render(
-        <FileUpload.Root>
+        <TestRoot>
           <TestComponent />
-        </FileUpload.Root>,
+        </TestRoot>,
       );
 
       const input = getFileInput();
@@ -1432,10 +969,10 @@ describe('FileUpload', () => {
       }
 
       render(
-        <FileUpload.Root>
+        <TestRoot>
           <div role="status" aria-live="polite" aria-atomic="true" />
           <TestComponent />
-        </FileUpload.Root>,
+        </TestRoot>,
       );
 
       const input = getFileInput();
@@ -1455,12 +992,12 @@ describe('FileUpload', () => {
 
   describe('maxFiles in multiple mode', () => {
     it('respects maxFiles limit when selecting multiple files', async () => {
-      const onFileChange = vi.fn();
+      const onFilesChange = vi.fn();
 
       render(
-        <FileUpload.Root maxFiles={3} multiple onFileChange={onFileChange}>
+        <TestRoot maxFiles={3} multiple onFilesChange={onFilesChange}>
           {null}
-        </FileUpload.Root>,
+        </TestRoot>,
       );
 
       const input = getFileInput();
@@ -1476,7 +1013,7 @@ describe('FileUpload', () => {
 
       // Should only add 3 files due to maxFiles limit
       await waitFor(() => {
-        expect(onFileChange).toHaveBeenCalledWith(
+        expect(onFilesChange).toHaveBeenCalledWith(
           expect.arrayContaining([
             expect.objectContaining({ name: 'test1.txt' }),
             expect.objectContaining({ name: 'test2.txt' }),
@@ -1486,7 +1023,7 @@ describe('FileUpload', () => {
         );
       });
 
-      expect(onFileChange.mock.calls[0][0]).toHaveLength(3);
+      expect(onFilesChange.mock.calls[0][0]).toHaveLength(3);
     });
 
     it('announces max files reached message', async () => {
@@ -1499,10 +1036,10 @@ describe('FileUpload', () => {
       }
 
       render(
-        <FileUpload.Root maxFiles={2} multiple>
+        <TestRoot maxFiles={2} multiple>
           <div role="status" aria-live="polite" aria-atomic="true" />
           <TestComponent />
-        </FileUpload.Root>,
+        </TestRoot>,
       );
 
       const input = getFileInput();
@@ -1529,13 +1066,13 @@ describe('FileUpload', () => {
       expect(getTestContext(contextValue).files).toHaveLength(2);
     });
 
-    it('reports MAX_FILES_REACHED via onFileDrop when selecting more than maxFiles at once', async () => {
-      const onFileDrop = vi.fn();
+    it('reports MAX_FILES_REACHED via onFilesAdd when selecting more than maxFiles at once', async () => {
+      const onFilesAdd = vi.fn();
 
       render(
-        <FileUpload.Root maxFiles={2} multiple onFileDrop={onFileDrop}>
+        <TestRoot maxFiles={2} multiple onFilesAdd={onFilesAdd}>
           {null}
-        </FileUpload.Root>,
+        </TestRoot>,
       );
 
       const input = getFileInput();
@@ -1547,8 +1084,8 @@ describe('FileUpload', () => {
 
       fireEvent.change(input, { target: { files } });
 
-      await waitFor(() => expect(onFileDrop).toHaveBeenCalled());
-      const [, fileRejections] = onFileDrop.mock.calls[0];
+      await waitFor(() => expect(onFilesAdd).toHaveBeenCalled());
+      const [, fileRejections] = onFilesAdd.mock.calls[0];
       expect(fileRejections).toHaveLength(1);
       expect(fileRejections[0]).toMatchObject({
         file: expect.objectContaining({ name: 'test3.txt' }),
@@ -1560,13 +1097,13 @@ describe('FileUpload', () => {
       });
     });
 
-    it('reports MAX_FILES_REACHED via onFileDrop when trying to add files after reaching the limit', async () => {
-      const onFileDrop = vi.fn();
+    it('reports MAX_FILES_REACHED via onFilesAdd when trying to add files after reaching the limit', async () => {
+      const onFilesAdd = vi.fn();
 
       render(
-        <FileUpload.Root maxFiles={2} multiple onFileDrop={onFileDrop}>
+        <TestRoot maxFiles={2} multiple onFilesAdd={onFilesAdd}>
           {null}
-        </FileUpload.Root>,
+        </TestRoot>,
       );
 
       const input = getFileInput();
@@ -1580,8 +1117,8 @@ describe('FileUpload', () => {
         },
       });
 
-      await waitFor(() => expect(onFileDrop).toHaveBeenCalledTimes(1));
-      onFileDrop.mockClear();
+      await waitFor(() => expect(onFilesAdd).toHaveBeenCalledTimes(1));
+      onFilesAdd.mockClear();
 
       fireEvent.change(input, {
         target: {
@@ -1589,8 +1126,8 @@ describe('FileUpload', () => {
         },
       });
 
-      await waitFor(() => expect(onFileDrop).toHaveBeenCalled());
-      const [, fileRejections] = onFileDrop.mock.calls[0];
+      await waitFor(() => expect(onFilesAdd).toHaveBeenCalled());
+      const [, fileRejections] = onFilesAdd.mock.calls[0];
       expect(fileRejections).toHaveLength(1);
       expect(fileRejections[0]).toMatchObject({
         file: expect.objectContaining({ name: 'test3.txt' }),
@@ -1603,12 +1140,12 @@ describe('FileUpload', () => {
     });
 
     it('allows adding files up to the limit in increments', async () => {
-      const onFileChange = vi.fn();
+      const onFilesChange = vi.fn();
 
       render(
-        <FileUpload.Root maxFiles={5} multiple onFileChange={onFileChange}>
+        <TestRoot maxFiles={5} multiple onFilesChange={onFilesChange}>
           {null}
-        </FileUpload.Root>,
+        </TestRoot>,
       );
 
       const input = getFileInput();
@@ -1622,7 +1159,7 @@ describe('FileUpload', () => {
       fireEvent.change(input, { target: { files: firstBatch } });
 
       await waitFor(() => {
-        expect(onFileChange).toHaveBeenCalledWith(
+        expect(onFilesChange).toHaveBeenCalledWith(
           expect.arrayContaining([
             expect.objectContaining({ name: 'test1.txt' }),
             expect.objectContaining({ name: 'test2.txt' }),
@@ -1641,7 +1178,7 @@ describe('FileUpload', () => {
       fireEvent.change(input, { target: { files: secondBatch } });
 
       await waitFor(() => {
-        expect(onFileChange).toHaveBeenCalledWith(
+        expect(onFilesChange).toHaveBeenCalledWith(
           expect.arrayContaining([
             expect.objectContaining({ name: 'test1.txt' }),
             expect.objectContaining({ name: 'test2.txt' }),
@@ -1653,23 +1190,23 @@ describe('FileUpload', () => {
         );
       });
 
-      expect(onFileChange.mock.calls[onFileChange.mock.calls.length - 1][0]).toHaveLength(5);
+      expect(onFilesChange.mock.calls[onFilesChange.mock.calls.length - 1][0]).toHaveLength(5);
     });
 
     it('fills remaining slots with later valid files when earlier files are rejected', async () => {
-      const onFileChange = vi.fn();
-      const onFileDrop = vi.fn();
+      const onFilesChange = vi.fn();
+      const onFilesAdd = vi.fn();
 
       render(
-        <FileUpload.Root
+        <TestRoot
           maxFiles={3}
           maxSize={1024}
           multiple
-          onFileChange={onFileChange}
-          onFileDrop={onFileDrop}
+          onFilesChange={onFilesChange}
+          onFilesAdd={onFilesAdd}
         >
           {null}
-        </FileUpload.Root>,
+        </TestRoot>,
       );
 
       const input = getFileInput();
@@ -1681,13 +1218,13 @@ describe('FileUpload', () => {
       });
 
       await waitFor(() => {
-        expect(onFileChange).toHaveBeenCalledWith(
+        expect(onFilesChange).toHaveBeenCalledWith(
           expect.arrayContaining([expect.objectContaining({ name: 'existing.txt' })]),
           expect.objectContaining({ reason: expect.any(String) }),
         );
       });
 
-      onFileChange.mockClear();
+      onFilesChange.mockClear();
 
       const oversized = new File([new Uint8Array(2048)], 'too-large.txt', { type: 'text/plain' });
       const validA = new File(['a'], 'valid-a.txt', { type: 'text/plain' });
@@ -1700,11 +1237,11 @@ describe('FileUpload', () => {
       });
 
       await waitFor(() => {
-        const latestFiles = onFileChange.mock.calls.at(-1)?.[0] ?? [];
+        const latestFiles = onFilesChange.mock.calls.at(-1)?.[0] ?? [];
         expect(latestFiles).toHaveLength(3);
       });
 
-      const latestFiles = onFileChange.mock.calls.at(-1)?.[0] ?? [];
+      const latestFiles = onFilesChange.mock.calls.at(-1)?.[0] ?? [];
       expect(latestFiles).toEqual(
         expect.arrayContaining([
           expect.objectContaining({ name: 'existing.txt' }),
@@ -1713,7 +1250,7 @@ describe('FileUpload', () => {
         ]),
       );
 
-      const [, fileRejections] = onFileDrop.mock.calls.at(-1) ?? [];
+      const [, fileRejections] = onFilesAdd.mock.calls.at(-1) ?? [];
       expect(fileRejections).toHaveLength(1);
       expect(fileRejections[0]).toMatchObject({
         file: expect.objectContaining({ name: 'too-large.txt' }),
@@ -1735,9 +1272,9 @@ describe('FileUpload', () => {
       }
 
       render(
-        <FileUpload.Root maxFiles={3} multiple>
+        <TestRoot maxFiles={3} multiple>
           <TestComponent />
-        </FileUpload.Root>,
+        </TestRoot>,
       );
 
       const fileA = new File(['a'], 'a.txt', { type: 'text/plain' });
@@ -1769,9 +1306,9 @@ describe('FileUpload', () => {
       }
 
       render(
-        <FileUpload.Root maxFiles={4} multiple>
+        <TestRoot maxFiles={4} multiple>
           <TestComponent />
-        </FileUpload.Root>,
+        </TestRoot>,
       );
 
       const fileA = new File(['a'], 'a.txt', { type: 'text/plain' });
@@ -1802,9 +1339,9 @@ describe('FileUpload', () => {
       }
 
       render(
-        <FileUpload.Root maxFiles={2} multiple>
+        <TestRoot maxFiles={2} multiple>
           <TestComponent />
-        </FileUpload.Root>,
+        </TestRoot>,
       );
 
       const fileA = new File(['a'], 'a.txt', { type: 'text/plain' });
@@ -1830,9 +1367,9 @@ describe('FileUpload', () => {
     });
   });
 
-  describe('onFileChange callback', () => {
-    it('calls onFileChange with reason file-updated when updateFile is called', async () => {
-      const onFileChange = vi.fn();
+  describe('onFilesChange callback', () => {
+    it('calls onFilesChange with reason file-updated when updateFile is called', async () => {
+      const onFilesChange = vi.fn();
       let contextValue: TestFileUploadContext | null = null;
 
       function TestComponent() {
@@ -1842,9 +1379,9 @@ describe('FileUpload', () => {
       }
 
       render(
-        <FileUpload.Root onFileChange={onFileChange}>
+        <TestRoot onFilesChange={onFilesChange}>
           <TestComponent />
-        </FileUpload.Root>,
+        </TestRoot>,
       );
 
       const input = getFileInput();
@@ -1856,7 +1393,7 @@ describe('FileUpload', () => {
         expect(getTestContext(contextValue).files).toHaveLength(1);
       });
 
-      onFileChange.mockClear();
+      onFilesChange.mockClear();
 
       const fileId = getTestContext(contextValue).files[0].id;
 
@@ -1865,17 +1402,19 @@ describe('FileUpload', () => {
       });
 
       await waitFor(() => {
-        expect(onFileChange).toHaveBeenCalledWith(
-          expect.arrayContaining([expect.objectContaining({ name: 'test.txt', status: 'uploading', progress: 50 })]),
+        expect(onFilesChange).toHaveBeenCalledWith(
+          expect.arrayContaining([
+            expect.objectContaining({ name: 'test.txt', status: 'uploading', progress: 50 }),
+          ]),
           expect.objectContaining({ reason: 'file-updated' }),
         );
       });
     });
 
-    it('calls onFileChange when files are added', async () => {
-      const onFileChange = vi.fn();
+    it('calls onFilesChange when files are added', async () => {
+      const onFilesChange = vi.fn();
 
-      render(<FileUpload.Root onFileChange={onFileChange}>{null}</FileUpload.Root>);
+      render(<TestRoot onFilesChange={onFilesChange}>{null}</TestRoot>);
 
       const input = getFileInput();
       const file = new File(['content'], 'test.txt', { type: 'text/plain' });
@@ -1883,15 +1422,15 @@ describe('FileUpload', () => {
       fireEvent.change(input, { target: { files: [file] } });
 
       await waitFor(() => {
-        expect(onFileChange).toHaveBeenCalledWith(
+        expect(onFilesChange).toHaveBeenCalledWith(
           expect.arrayContaining([expect.objectContaining({ name: 'test.txt' })]),
           expect.objectContaining({ reason: expect.any(String) }),
         );
       });
     });
 
-    it('calls onFileChange when a file is removed', async () => {
-      const onFileChange = vi.fn();
+    it('calls onFilesChange when a file is removed', async () => {
+      const onFilesChange = vi.fn();
       let contextValue: TestFileUploadContext | null = null;
 
       function TestComponent() {
@@ -1901,9 +1440,9 @@ describe('FileUpload', () => {
       }
 
       render(
-        <FileUpload.Root onFileChange={onFileChange}>
+        <TestRoot onFilesChange={onFilesChange}>
           <TestComponent />
-        </FileUpload.Root>,
+        </TestRoot>,
       );
 
       const input = getFileInput();
@@ -1912,10 +1451,10 @@ describe('FileUpload', () => {
       fireEvent.change(input, { target: { files: [file] } });
 
       await waitFor(() => {
-        expect(onFileChange).toHaveBeenCalled();
+        expect(onFilesChange).toHaveBeenCalled();
       });
 
-      onFileChange.mockClear();
+      onFilesChange.mockClear();
 
       const fileId = getTestContext(contextValue).files[0].id;
 
@@ -1924,15 +1463,15 @@ describe('FileUpload', () => {
       });
 
       await waitFor(() => {
-        expect(onFileChange).toHaveBeenCalledWith(
+        expect(onFilesChange).toHaveBeenCalledWith(
           [],
           expect.objectContaining({ reason: expect.any(String) }),
         );
       });
     });
 
-    it('calls onFileChange when all files are cleared', async () => {
-      const onFileChange = vi.fn();
+    it('calls onFilesChange when all files are cleared', async () => {
+      const onFilesChange = vi.fn();
       let contextValue: TestFileUploadContext | null = null;
 
       function TestComponent() {
@@ -1942,9 +1481,9 @@ describe('FileUpload', () => {
       }
 
       render(
-        <FileUpload.Root onFileChange={onFileChange}>
+        <TestRoot onFilesChange={onFilesChange}>
           <TestComponent />
-        </FileUpload.Root>,
+        </TestRoot>,
       );
 
       const input = getFileInput();
@@ -1956,27 +1495,27 @@ describe('FileUpload', () => {
       fireEvent.change(input, { target: { files } });
 
       await waitFor(() => {
-        expect(onFileChange).toHaveBeenCalled();
+        expect(onFilesChange).toHaveBeenCalled();
       });
 
-      onFileChange.mockClear();
+      onFilesChange.mockClear();
 
       act(() => {
         getTestContext(contextValue).clearFiles();
       });
 
       await waitFor(() => {
-        expect(onFileChange).toHaveBeenCalledWith(
+        expect(onFilesChange).toHaveBeenCalledWith(
           [],
           expect.objectContaining({ reason: expect.any(String) }),
         );
       });
     });
 
-    it('provides extended file properties in onFileChange', async () => {
-      const onFileChange = vi.fn();
+    it('provides extended file properties in onFilesChange', async () => {
+      const onFilesChange = vi.fn();
 
-      render(<FileUpload.Root onFileChange={onFileChange}>{null}</FileUpload.Root>);
+      render(<TestRoot onFilesChange={onFilesChange}>{null}</TestRoot>);
 
       const input = getFileInput();
       const file = new File(['content'], 'test.txt', { type: 'text/plain' });
@@ -1984,7 +1523,7 @@ describe('FileUpload', () => {
       fireEvent.change(input, { target: { files: [file] } });
 
       await waitFor(() => {
-        expect(onFileChange).toHaveBeenCalledWith(
+        expect(onFilesChange).toHaveBeenCalledWith(
           expect.arrayContaining([
             expect.objectContaining({
               name: 'test.txt',
@@ -2011,9 +1550,9 @@ describe('FileUpload', () => {
       }
 
       render(
-        <FileUpload.Root>
+        <TestRoot>
           <TestComponent />
-        </FileUpload.Root>,
+        </TestRoot>,
       );
 
       const input = getFileInput();
@@ -2041,9 +1580,9 @@ describe('FileUpload', () => {
       }
 
       render(
-        <FileUpload.Root>
+        <TestRoot>
           <TestComponent />
-        </FileUpload.Root>,
+        </TestRoot>,
       );
 
       const input = getFileInput();
@@ -2070,9 +1609,9 @@ describe('FileUpload', () => {
       }
 
       render(
-        <FileUpload.Root>
+        <TestRoot>
           <TestComponent />
-        </FileUpload.Root>,
+        </TestRoot>,
       );
 
       const input = getFileInput();
@@ -2090,7 +1629,7 @@ describe('FileUpload', () => {
       expect(uploadedFile.lastModified).toBe(lastModified);
     });
 
-    it('preserves File prototype (instanceof File) after pause, resume, and retry', () => {
+    it('preserves File prototype (instanceof File) after metadata updates', () => {
       let contextValue: TestFileUploadContext | null = null;
 
       function TestComponent() {
@@ -2100,9 +1639,9 @@ describe('FileUpload', () => {
       }
 
       render(
-        <FileUpload.Root>
+        <TestRoot>
           <TestComponent />
-        </FileUpload.Root>,
+        </TestRoot>,
       );
 
       const input = getFileInput();
@@ -2121,21 +1660,15 @@ describe('FileUpload', () => {
       expect(getTestContext(contextValue).files[0]).toBeInstanceOf(File);
 
       act(() => {
-        getTestContext(contextValue).pauseFile(fileId);
+        getTestContext(contextValue).updateFile(fileId, { status: 'success', progress: 100 });
       });
       expect(getTestContext(contextValue).files[0]).toBeInstanceOf(File);
 
       act(() => {
-        getTestContext(contextValue).resumeFile(fileId);
-      });
-      expect(getTestContext(contextValue).files[0]).toBeInstanceOf(File);
-
-      act(() => {
-        getTestContext(contextValue).updateFile(fileId, { status: 'error' });
-      });
-
-      act(() => {
-        getTestContext(contextValue).retryFile(fileId);
+        getTestContext(contextValue).updateFile(fileId, {
+          status: 'error',
+          error: 'Upload failed',
+        });
       });
       expect(getTestContext(contextValue).files[0]).toBeInstanceOf(File);
     });
