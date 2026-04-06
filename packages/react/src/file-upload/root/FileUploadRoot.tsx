@@ -357,7 +357,7 @@ export const FileUploadRoot = React.forwardRef<HTMLDivElement, FileUploadRootPro
       style: { position: 'relative', ...style },
       children: (
         <React.Fragment>
-          <div style={visuallyHidden} role="status" aria-live="polite">
+          <div style={visuallyHidden} role="status" aria-live="polite" aria-atomic="true">
             {announcement}
           </div>
           {children}

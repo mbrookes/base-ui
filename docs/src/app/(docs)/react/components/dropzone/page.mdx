@@ -16,6 +16,8 @@ import { DemoDropzoneHero } from './demos/hero';
 - Use `Dropzone` to handle drag-and-drop and keyboard/pointer activation.
 - Add `Dropzone.HiddenInput` to support click-to-select as part of the same interaction surface.
 - Use `onFilesDrop` for dropped files and `Dropzone.HiddenInput` `onChange` for selected files.
+- Give the dropzone an accessible name through visible text, or provide `aria-label`/`aria-labelledby` when using icon-only content.
+- Avoid placing interactive descendants such as buttons or links inside `Dropzone`. Place secondary actions next to the dropzone or use a separate trigger.
 
 ## Anatomy
 
@@ -64,6 +66,12 @@ export default function App() {
   );
 }
 ```
+
+## Accessibility
+
+- Provide a visible label or instructions inside the dropzone so its purpose is announced correctly.
+- If the dropzone uses only an icon or custom visual content, add an `aria-label` or `aria-labelledby`.
+- Avoid nesting interactive controls inside the dropzone. Use adjacent controls such as `FileUpload.Trigger` for secondary actions.
 
 ## Integration with File Upload
 

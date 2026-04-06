@@ -191,11 +191,6 @@ const DropzoneRoot = React.forwardRef<HTMLDivElement, DropzoneProps>(
               role: 'button',
               tabIndex: disabled ? -1 : 0,
               'aria-disabled': disabled || undefined,
-              'aria-label':
-                elementProps['aria-label'] ??
-                (elementProps['aria-labelledby'] == null
-                  ? 'Drop files here or click to select'
-                  : undefined),
               onDragEnter: handleDragEnter,
               onDragLeave: handleDragLeave,
               onDragOver: handleDragOver,

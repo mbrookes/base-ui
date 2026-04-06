@@ -38,9 +38,21 @@ describe('Dropzone', () => {
   it('renders as a button-like div', () => {
     render(<Dropzone>Drop files</Dropzone>);
 
-    const dropzone = screen.getByRole('button');
+    const dropzone = screen.getByRole('button', { name: 'Drop files' });
     expect(dropzone.tagName).toBe('DIV');
     expect(dropzone).toHaveAttribute('tabindex', '0');
+  });
+
+  it('uses visible text as the accessible name by default', () => {
+    render(<Dropzone>Upload receipts</Dropzone>);
+
+    expect(screen.getByRole('button', { name: 'Upload receipts' })).toBeInTheDocument();
+  });
+
+  it('supports an explicit aria-label', () => {
+    render(<Dropzone aria-label="Upload proof of address">Upload</Dropzone>);
+
+    expect(screen.getByRole('button', { name: 'Upload proof of address' })).toBeInTheDocument();
   });
 
   it('opens via click and keyboard', async () => {
@@ -109,7 +121,7 @@ describe('Dropzone', () => {
       </Dropzone>,
     );
 
-    await user.click(screen.getByRole('button', { name: 'Nested' }));
+    await user.click(screen.getByText('Nested'));
 
     expect(onOpen).not.toHaveBeenCalled();
   });
