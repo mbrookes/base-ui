@@ -58,12 +58,12 @@ describe('Dropzone', () => {
 
   it('supports aria-labelledby', () => {
     render(
-      <>
+      <React.Fragment>
         <span id="dropzone-label">Upload receipts</span>
         <Dropzone aria-labelledby="dropzone-label">
           <svg aria-hidden="true" />
         </Dropzone>
-      </>,
+      </React.Fragment>,
     );
 
     expect(screen.getByRole('button', { name: 'Upload receipts' })).toBeInTheDocument();
