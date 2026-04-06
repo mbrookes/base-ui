@@ -1,7 +1,8 @@
 import * as React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, createEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi } from 'vitest';
+import { isJSDOM } from '#test-utils';
 import { Dropzone } from './Dropzone';
 
 const createDataTransfer = (files: File[]) => {
@@ -53,6 +54,19 @@ describe('Dropzone', () => {
     render(<Dropzone aria-label="Upload proof of address">Upload</Dropzone>);
 
     expect(screen.getByRole('button', { name: 'Upload proof of address' })).toBeInTheDocument();
+  });
+
+  it('supports aria-labelledby', () => {
+    render(
+      <>
+        <span id="dropzone-label">Upload receipts</span>
+        <Dropzone aria-labelledby="dropzone-label">
+          <svg aria-hidden="true" />
+        </Dropzone>
+      </>,
+    );
+
+    expect(screen.getByRole('button', { name: 'Upload receipts' })).toBeInTheDocument();
   });
 
   it('opens via click and keyboard', async () => {
@@ -146,6 +160,75 @@ describe('Dropzone', () => {
     expect(screen.getByText('idle')).toBeInTheDocument();
   });
 
+  it('supports controlled dragging state', () => {
+    const onDraggingChange = vi.fn();
+
+    function ControlledDropzone() {
+      const [dragging, setDragging] = React.useState(false);
+
+      return (
+        <Dropzone
+          data-testid="dropzone"
+          dragging={dragging}
+          onDraggingChange={(nextDragging) => {
+            onDraggingChange(nextDragging);
+            setDragging(nextDragging);
+          }}
+        >
+          {({ isDragging }) => <span>{isDragging ? 'dragging' : 'idle'}</span>}
+        </Dropzone>
+      );
+    }
+
+    render(<ControlledDropzone />);
+
+    const dropzone = screen.getByTestId('dropzone');
+
+    fireEvent.dragEnter(dropzone);
+    expect(onDraggingChange).toHaveBeenCalledWith(true);
+    expect(dropzone).toHaveAttribute('data-dragging', '');
+    expect(screen.getByText('dragging')).toBeInTheDocument();
+
+    fireEvent.dragLeave(dropzone);
+    expect(onDraggingChange).toHaveBeenCalledWith(false);
+    expect(dropzone).not.toHaveAttribute('data-dragging');
+    expect(screen.getByText('idle')).toBeInTheDocument();
+  });
+
+  it('keeps dragging state when drag leaves to a descendant', () => {
+    render(
+      <Dropzone data-testid="dropzone">
+        <span data-testid="child">Drop files</span>
+      </Dropzone>,
+    );
+
+    const dropzone = screen.getByTestId('dropzone');
+    const child = screen.getByTestId('child');
+
+    fireEvent.dragEnter(dropzone);
+    expect(dropzone).toHaveAttribute('data-dragging', '');
+
+    const dragLeaveEvent = createEvent.dragLeave(dropzone);
+    Object.defineProperty(dragLeaveEvent, 'relatedTarget', {
+      value: child,
+      configurable: true,
+    });
+
+    fireEvent(dropzone, dragLeaveEvent);
+    expect(dropzone).toHaveAttribute('data-dragging', '');
+  });
+
+  it.skipIf(!isJSDOM)('sets copy dropEffect on drag over', () => {
+    render(<Dropzone data-testid="dropzone">Drop files</Dropzone>);
+
+    const dropzone = screen.getByTestId('dropzone');
+    const dataTransfer = createDataTransfer([]);
+
+    fireEvent.dragOver(dropzone, { dataTransfer });
+
+    expect(dataTransfer.dropEffect).toBe('copy');
+  });
+
   it('emits dropped files', () => {
     const onFilesDrop = vi.fn();
 
@@ -164,6 +247,23 @@ describe('Dropzone', () => {
       expect.arrayContaining([expect.objectContaining({ name: 'test.txt' })]),
       expect.anything(),
     );
+  });
+
+  it('does not emit dropped files when disabled', () => {
+    const onFilesDrop = vi.fn();
+
+    render(
+      <Dropzone data-testid="dropzone" disabled onFilesDrop={onFilesDrop}>
+        Drop files
+      </Dropzone>,
+    );
+
+    const file = new File(['content'], 'test.txt', { type: 'text/plain' });
+    fireEvent.drop(screen.getByTestId('dropzone'), {
+      dataTransfer: createDataTransfer([file]),
+    });
+
+    expect(onFilesDrop).not.toHaveBeenCalled();
   });
 
   it('forwards ref to the root div', () => {
@@ -185,5 +285,16 @@ describe('Dropzone', () => {
 
     expect(ref.current).toBeInstanceOf(HTMLInputElement);
     expect(ref.current).toHaveAttribute('type', 'file');
+  });
+
+  it('applies disabled state to the hidden input', () => {
+    render(
+      <Dropzone disabled>
+        <Dropzone.HiddenInput data-testid="input" />
+        Drop files
+      </Dropzone>,
+    );
+
+    expect(screen.getByTestId('input')).toBeDisabled();
   });
 });
