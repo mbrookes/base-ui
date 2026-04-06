@@ -258,13 +258,10 @@ export const FileUploadRoot = React.forwardRef<HTMLDivElement, FileUploadRootPro
       locale,
     });
 
-    const state: FileUploadRootState = React.useMemo(
-      () => ({
-        dragging: isDragging,
-        disabled: contextValue.disabled,
-      }),
-      [isDragging, contextValue.disabled],
-    );
+    const state: FileUploadRootState = {
+      dragging: isDragging,
+      disabled: contextValue.disabled,
+    };
 
     const handleDragEnter = useStableCallback((event: React.DragEvent) => {
       event.preventDefault();

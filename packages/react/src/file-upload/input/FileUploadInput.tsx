@@ -52,12 +52,7 @@ export const FileUploadHiddenInput = React.forwardRef(function FileUploadHiddenI
     }
   }, [directory]);
 
-  const state: FileUploadHiddenInputState = React.useMemo(
-    () => ({
-      disabled,
-    }),
-    [disabled],
-  );
+  const state: FileUploadHiddenInputState = { disabled };
 
   return useRenderElement('input', componentProps, {
     state,

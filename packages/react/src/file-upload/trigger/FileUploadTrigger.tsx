@@ -51,12 +51,7 @@ export const FileUploadTrigger = React.forwardRef(function FileUploadTriggerComp
     native: nativeButton,
   });
 
-  const state: FileUploadTriggerState = React.useMemo(
-    () => ({
-      disabled,
-    }),
-    [disabled],
-  );
+  const state: FileUploadTriggerState = { disabled };
 
   const handleClick = useStableCallback((event: React.SyntheticEvent<HTMLElement>) => {
     event.preventDefault();

@@ -34,12 +34,9 @@ export const DropzoneHiddenInput = React.forwardRef(function DropzoneHiddenInput
     setInputElement(node);
   });
 
-  const state: DropzoneHiddenInputState = React.useMemo(
-    () => ({
-      disabled,
-    }),
-    [disabled],
-  );
+  const state: DropzoneHiddenInputState = {
+    disabled,
+  };
 
   return useRenderElement('input', componentProps, {
     state,

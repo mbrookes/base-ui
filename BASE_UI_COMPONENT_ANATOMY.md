@@ -15,9 +15,11 @@ Purpose: high-signal implementation rules for coding agents working on `packages
 5. Preserve `render` when using `useRenderElement`:
    - pass original `componentProps` as arg 2
    - do not drop/rename-away `render`
+   - do **not** pass a React component function (`render={MyComponent}`); pass an element (`render={<MyComponent />}`) or a render function (`render={(props) => <MyComponent {...props} />}`). `useRenderElement` emits a dev warning when an uppercase-named function is received.
 6. Avoid `as any` unless unavoidable and justified.
-7. Optional public props should be `?: T | undefined`.
-8. Data attributes are presence-based (`data-disabled`, not `data-disabled="true"`).
+7. Do **not** wrap `state` in `React.useMemo`. Compute it as a plain object on every render — memoizing it is unnecessary because `useRenderElement` only uses it for data-attribute mapping and class/style resolution.
+8. Optional public props should be `?: T | undefined`.
+9. Data attributes are presence-based (`data-disabled`, not `data-disabled="true"`).
 
 ## 2. Choose Component Shape
 
@@ -99,7 +101,7 @@ export const ComponentPart = React.forwardRef<HTMLButtonElement, ComponentPartPr
   function ComponentPart(componentProps, forwardedRef) {
     const { render, className, disabled = false, ...elementProps } = componentProps;
 
-    const state: ComponentPartState = React.useMemo(() => ({ disabled }), [disabled]);
+    const state: ComponentPartState = { disabled };
 
     const onClick = useStableCallback((event: React.MouseEvent) => {
       if (disabled) {

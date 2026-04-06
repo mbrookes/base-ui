@@ -165,13 +165,10 @@ const DropzoneRoot = React.forwardRef<HTMLDivElement, DropzoneProps>(
       }
     });
 
-    const state: DropzoneState = React.useMemo(
-      () => ({
-        dragging,
-        disabled,
-      }),
-      [dragging, disabled],
-    );
+    const state: DropzoneState = {
+      dragging,
+      disabled,
+    };
 
     const contextValue = React.useMemo(
       () => ({
