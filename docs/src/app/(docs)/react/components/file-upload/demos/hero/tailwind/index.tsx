@@ -21,7 +21,7 @@ function FileList() {
   const { files, removeFile } = FileUpload.useFileUploadContext();
 
   if (files.length === 0) {
-    return <p className="mt-4 text-sm text-gray-500">No files selected yet.</p>;
+    return <p className="mt-4 text-center text-sm text-gray-500">No files selected yet.</p>;
   }
 
   return (
@@ -76,7 +76,7 @@ export default function FileUploadDemo() {
         onFilesChange={handleDemoFileChange}
       >
         <FileUpload.HiddenInput />
-        <FileUpload.Trigger className="mt-2 inline-flex items-center rounded-lg bg-blue-600 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 data-disabled:cursor-not-allowed data-disabled:opacity-60">
+        <FileUpload.Trigger className="mt-2 mx-auto flex items-center justify-center h-10 px-3.5 outline-0 border border-gray-200 rounded-md bg-gray-50 font-inherit text-base font-medium leading-6 text-gray-900 select-none hover:data-[disabled]:bg-gray-50 hover:bg-gray-100 active:data-[disabled]:bg-gray-50 active:bg-gray-200 active:shadow-[inset_0_1px_3px_rgba(0,0,0,0.1)] active:border-t-gray-300 active:data-[disabled]:shadow-none active:data-[disabled]:border-t-gray-200 focus-visible:outline-2 focus-visible:outline-blue-800 focus-visible:-outline-offset-1 data-[disabled]:text-gray-500">
           {isUploadDisabled ? 'Upload limit reached' : 'Select files'}
         </FileUpload.Trigger>
 
