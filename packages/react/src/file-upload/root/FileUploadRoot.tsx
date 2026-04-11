@@ -10,7 +10,7 @@ import { FileUploadContext } from './FileUploadContext';
 import { fileUploadRootStateAttributesMapping } from './stateAttributesMapping';
 import { useFileUploadRoot } from './useFileUploadRoot';
 
-export const FILE_UPLOAD_ROOT_REJECT_REASONS = {
+export const REJECT_REASONS = {
   FILE_TOO_LARGE: 'FILE_TOO_LARGE',
   FILE_TOO_SMALL: 'FILE_TOO_SMALL',
   MIME_TYPE_NOT_ALLOWED: 'MIME_TYPE_NOT_ALLOWED',
@@ -20,9 +20,9 @@ export const FILE_UPLOAD_ROOT_REJECT_REASONS = {
 } as const;
 
 export type FileUploadRootRejectReason =
-  (typeof FILE_UPLOAD_ROOT_REJECT_REASONS)[keyof typeof FILE_UPLOAD_ROOT_REJECT_REASONS];
+  (typeof REJECT_REASONS)[keyof typeof REJECT_REASONS];
 
-export const FILE_UPLOAD_ROOT_CHANGE_REASONS = {
+export const CHANGE_REASONS = {
   FILE_ADDED: 'file-added',
   FILE_REMOVED: 'file-removed',
   FILES_CLEARED: 'files-cleared',
@@ -30,7 +30,7 @@ export const FILE_UPLOAD_ROOT_CHANGE_REASONS = {
 } as const;
 
 export type FileUploadRootChangeReason =
-  (typeof FILE_UPLOAD_ROOT_CHANGE_REASONS)[keyof typeof FILE_UPLOAD_ROOT_CHANGE_REASONS];
+  (typeof CHANGE_REASONS)[keyof typeof CHANGE_REASONS];
 
 export type FileUploadRootChangeEventDetails = BaseUIChangeEventDetails<FileUploadRootChangeReason>;
 

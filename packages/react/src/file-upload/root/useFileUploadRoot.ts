@@ -5,7 +5,7 @@ import { useId as useBaseUIId } from '@base-ui/utils/useId';
 import { useStableCallback } from '@base-ui/utils/useStableCallback';
 import { generateId } from '@base-ui/utils/generateId';
 import { createChangeEventDetails } from '../../utils/createBaseUIEventDetails';
-import { FILE_UPLOAD_ROOT_REJECT_REASONS, FILE_UPLOAD_ROOT_CHANGE_REASONS } from './FileUploadRoot';
+import { REJECT_REASONS, CHANGE_REASONS } from './FileUploadRoot';
 import type {
   FileUploadRootRejectReason,
   FileUploadRootChangeReason,
@@ -236,21 +236,21 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
   const validateFile = useStableCallback((file: File): ValidationResult => {
     if (Number.isFinite(maxSizeProp) && file.size > maxSizeProp) {
       return {
-        reason: FILE_UPLOAD_ROOT_REJECT_REASONS.FILE_TOO_LARGE,
+        reason: REJECT_REASONS.FILE_TOO_LARGE,
         message: formattedMaxSize ?? '',
       };
     }
 
     if (file.size < minSizeProp) {
       return {
-        reason: FILE_UPLOAD_ROOT_REJECT_REASONS.FILE_TOO_SMALL,
+        reason: REJECT_REASONS.FILE_TOO_SMALL,
         message: formattedMinSize,
       };
     }
 
     if (acceptTypes.length > 0 && !isFileTypeAccepted(file, acceptTypes)) {
       return {
-        reason: FILE_UPLOAD_ROOT_REJECT_REASONS.MIME_TYPE_NOT_ALLOWED,
+        reason: REJECT_REASONS.MIME_TYPE_NOT_ALLOWED,
         message: messages.fileTypeNotAccepted,
       };
     }
@@ -263,21 +263,21 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
         customError = validator(file);
       } catch (error) {
         return {
-          reason: FILE_UPLOAD_ROOT_REJECT_REASONS.CUSTOM_VALIDATION_FAILED,
+          reason: REJECT_REASONS.CUSTOM_VALIDATION_FAILED,
           message: error instanceof Error ? error.message : String(error),
         };
       }
 
       if (typeof customError === 'string') {
         return {
-          reason: FILE_UPLOAD_ROOT_REJECT_REASONS.CUSTOM_VALIDATION_FAILED,
+          reason: REJECT_REASONS.CUSTOM_VALIDATION_FAILED,
           message: customError,
         };
       }
 
       if (customError) {
         return {
-          reason: FILE_UPLOAD_ROOT_REJECT_REASONS.CUSTOM_VALIDATION_FAILED,
+          reason: REJECT_REASONS.CUSTOM_VALIDATION_FAILED,
           message: String(customError),
         };
       }
@@ -295,7 +295,7 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
       return;
     }
 
-    lastChangeReasonRef.current = FILE_UPLOAD_ROOT_CHANGE_REASONS.FILE_ADDED;
+    lastChangeReasonRef.current = CHANGE_REASONS.FILE_ADDED;
     lastChangeEventRef.current = event;
 
     // Use the ref so rapid successive calls always see the up-to-date list.
@@ -306,7 +306,7 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
     const maxFilesReachedMessage = messages.maxFilesReached(maxFilesProp);
     const createAddedEventDetails = () =>
       createChangeEventDetails<FileUploadRootChangeReason>(
-        FILE_UPLOAD_ROOT_CHANGE_REASONS.FILE_ADDED,
+        CHANGE_REASONS.FILE_ADDED,
         event,
       );
 
@@ -317,7 +317,7 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
         fileRejections.push(
           createFileRejection(
             file,
-            FILE_UPLOAD_ROOT_REJECT_REASONS.MAX_FILES_REACHED,
+            REJECT_REASONS.MAX_FILES_REACHED,
             maxFilesReachedMessage,
             event,
           ),
@@ -347,7 +347,7 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
         fileRejections.push(
           createFileRejection(
             file,
-            FILE_UPLOAD_ROOT_REJECT_REASONS.MAX_FILES_REACHED,
+            REJECT_REASONS.MAX_FILES_REACHED,
             maxFilesReachedMessage,
             event,
           ),
@@ -361,7 +361,7 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
         fileRejections.push(
           createFileRejection(
             file,
-            FILE_UPLOAD_ROOT_REJECT_REASONS.DUPLICATE_FILE,
+            REJECT_REASONS.DUPLICATE_FILE,
             messages.duplicateFile,
             event,
           ),
@@ -423,7 +423,7 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
   });
 
   const removeFile = useStableCallback((id: string) => {
-    lastChangeReasonRef.current = FILE_UPLOAD_ROOT_CHANGE_REASONS.FILE_REMOVED;
+    lastChangeReasonRef.current = CHANGE_REASONS.FILE_REMOVED;
     lastChangeEventRef.current = undefined;
 
     const prev = filesRef.current;
@@ -446,7 +446,7 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
       return;
     }
 
-    lastChangeReasonRef.current = FILE_UPLOAD_ROOT_CHANGE_REASONS.FILES_CLEARED;
+    lastChangeReasonRef.current = CHANGE_REASONS.FILES_CLEARED;
     lastChangeEventRef.current = undefined;
 
     filesRef.current.forEach((file) => {
@@ -459,7 +459,7 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
   });
 
   const updateFile = useStableCallback((id: string, updates: FileUploadRootFileUpdates) => {
-    lastChangeReasonRef.current = FILE_UPLOAD_ROOT_CHANGE_REASONS.FILE_UPDATED;
+    lastChangeReasonRef.current = CHANGE_REASONS.FILE_UPDATED;
     lastChangeEventRef.current = undefined;
 
     const prev = filesRef.current;
