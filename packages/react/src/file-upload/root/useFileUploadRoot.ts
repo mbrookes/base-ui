@@ -181,9 +181,7 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
     locale,
   } = params;
 
-  const maxFiles = maxFilesProp;
-  const minSize = minSizeProp;
-  const maxSize = maxSizeProp;
+
 
   const [files, setFiles] = React.useState<FileUploadRootExtendedFile[]>([]);
   const [announcement, setAnnouncement] = React.useState({ text: '', key: 0 });
@@ -197,16 +195,16 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
   );
   const acceptTypes = React.useMemo(() => parseAccept(accept), [accept]);
   const formattedMinSize = React.useMemo(
-    () => messages.fileTooSmall(formatBytes(minSize, numberFormatter)),
-    [minSize, numberFormatter],
+    () => messages.fileTooSmall(formatBytes(minSizeProp, numberFormatter)),
+    [minSizeProp, numberFormatter],
   );
   const formattedMaxSize = React.useMemo(() => {
-    if (!Number.isFinite(maxSize)) {
+    if (!Number.isFinite(maxSizeProp)) {
       return null;
     }
 
-    return messages.fileTooLarge(formatBytes(maxSize, numberFormatter));
-  }, [maxSize, numberFormatter]);
+    return messages.fileTooLarge(formatBytes(maxSizeProp, numberFormatter));
+  }, [maxSizeProp, numberFormatter]);
 
   // Mirror of `files` in a ref so addFiles can read the latest value synchronously.
   const filesRef = React.useRef<FileUploadRootExtendedFile[]>([]);
@@ -217,9 +215,9 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
     fallbackInputIdRef.current = generateId('file-upload-input');
   }
   const inputId = useBaseUIId() ?? fallbackInputIdRef.current;
-  const isInitialRender = React.useRef(true);
   const lastChangeReasonRef = React.useRef<FileUploadRootChangeReason>('file-added');
   const lastChangeEventRef = React.useRef<Event | undefined>(undefined);
+  const isInitialRenderRef = React.useRef(true);
 
   // Cleanup object URLs to prevent memory leaks
   React.useEffect(() => {
@@ -232,28 +230,24 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
 
   // Notify parent of changes
   React.useEffect(() => {
-    if (isInitialRender.current) {
-      isInitialRender.current = false;
+    if (isInitialRenderRef.current) {
+      isInitialRenderRef.current = false;
       return;
     }
-    const eventDetails = createChangeEventDetails<FileUploadRootChangeReason>(
-      lastChangeReasonRef.current,
-      lastChangeEventRef.current,
-    );
-    onFilesChange?.(files, eventDetails);
+    onFilesChange?.(files, createChangeEventDetails(lastChangeReasonRef.current, lastChangeEventRef.current));
   }, [files, onFilesChange]);
 
   // Stable callbacks intentionally avoid dependency-array churn while still
   // reading the latest render-time constraints and handlers.
   const validateFile = useStableCallback((file: File): ValidationResult => {
-    if (Number.isFinite(maxSize) && file.size > maxSize) {
+    if (Number.isFinite(maxSizeProp) && file.size > maxSizeProp) {
       return {
         reason: FILE_UPLOAD_ROOT_REJECT_REASONS.FILE_TOO_LARGE,
         message: formattedMaxSize ?? '',
       };
     }
 
-    if (file.size < minSize) {
+    if (file.size < minSizeProp) {
       return {
         reason: FILE_UPLOAD_ROOT_REJECT_REASONS.FILE_TOO_SMALL,
         message: formattedMinSize,
@@ -312,10 +306,10 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
 
     // Use the ref so rapid successive calls always see the up-to-date list.
     const prev = filesRef.current;
-    const selectionLimit = multiple ? maxFiles : Math.min(1, maxFiles);
+    const selectionLimit = multiple ? maxFilesProp : Math.min(1, maxFilesProp);
     const remainingSlots = multiple ? selectionLimit - prev.length : selectionLimit;
 
-    const maxFilesReachedMessage = messages.maxFilesReached(maxFiles);
+    const maxFilesReachedMessage = messages.maxFilesReached(maxFilesProp);
 
     if (remainingSlots <= 0) {
       const fileRejections: FileUploadRootRejection[] = [];
@@ -526,9 +520,9 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
   const contextValue: FileUploadContextValue = React.useMemo(
     () => ({
       files,
-      maxFiles,
-      maxSize,
-      minSize,
+      maxFiles: maxFilesProp,
+      maxSize: maxSizeProp,
+      minSize: minSizeProp,
       accept,
       multiple,
       directory,
@@ -545,9 +539,9 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
     }),
     [
       files,
-      maxFiles,
-      maxSize,
-      minSize,
+      maxFilesProp,
+      maxSizeProp,
+      minSizeProp,
       accept,
       multiple,
       directory,
