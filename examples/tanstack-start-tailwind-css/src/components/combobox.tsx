@@ -7,7 +7,7 @@ export function Root(props: Combobox.Root.Props<any, any>) {
   return <Combobox.Root {...props} />;
 }
 
-export const Input = React.forwardRef<HTMLInputElement, Combobox.Input.Props>(function Input(
+export const Input = React.forwardRef<HTMLInputElement, Combobox.Input.Props>(function ComboboxInput(
   { className, ...props }: Combobox.Input.Props,
   forwardedRef: React.ForwardedRef<HTMLInputElement>,
 ) {
