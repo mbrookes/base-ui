@@ -4,12 +4,6 @@ import { FileUploadRootDataAttributes } from './FileUploadRootDataAttributes';
 
 export const fileUploadRootStateAttributesMapping: StateAttributesMapping<FileUploadRoot.State> = {
   disabled(value): Record<string, string> | null {
-    if (!value) {
-      return null;
-    }
-
-    return {
-      [FileUploadRootDataAttributes.disabled]: '',
-    };
+    return value ? { [FileUploadRootDataAttributes.disabled]: '' } : null;
   },
 };

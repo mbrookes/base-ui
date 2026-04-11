@@ -5,12 +5,6 @@ import { FileUploadTriggerDataAttributes } from './FileUploadTriggerDataAttribut
 export const fileUploadTriggerStateAttributesMapping: StateAttributesMapping<FileUploadTrigger.State> =
   {
     disabled(value): Record<string, string> | null {
-      if (!value) {
-        return null;
-      }
-
-      return {
-        [FileUploadTriggerDataAttributes.disabled]: '',
-      };
+      return value ? { [FileUploadTriggerDataAttributes.disabled]: '' } : null;
     },
   };
