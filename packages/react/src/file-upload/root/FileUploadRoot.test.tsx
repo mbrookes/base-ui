@@ -53,22 +53,6 @@ const createClipboardData = (files: File[]) => {
   return dataTransfer;
 };
 
-const createDataTransfer = (files: File[]) => {
-  if (typeof DataTransfer === 'undefined') {
-    return { files } as unknown as DataTransfer;
-  }
-
-  const dataTransfer = new DataTransfer();
-  files.forEach((file) => {
-    dataTransfer.items.add(file);
-  });
-  Object.defineProperty(dataTransfer, 'files', {
-    value: files,
-    configurable: true,
-  });
-  return dataTransfer;
-};
-
 function getFileInput() {
   const input = document.querySelector('input[type="file"]');
 
@@ -1589,7 +1573,10 @@ describe('FileUpload', () => {
       onFilesChange.mockClear();
 
       act(() => {
-        getTestContext(contextValue).updateFile('missing-id', { status: 'uploading', progress: 50 });
+        getTestContext(contextValue).updateFile('missing-id', {
+          status: 'uploading',
+          progress: 50,
+        });
       });
 
       expect(onFilesChange).not.toHaveBeenCalled();

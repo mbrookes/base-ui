@@ -129,9 +129,9 @@ export interface FileUploadRootParameters {
   /**
    * Callback fired once per add/drop/paste/input attempt with accepted and rejected files.
    * This fires even when no files are accepted.
-    *
-    * `acceptedFiles` reflects the files actually committed to state for that attempt,
-    * after max-files and duplicate checks are applied.
+   *
+   * `acceptedFiles` reflects the files actually committed to state for that attempt,
+   * after max-files and duplicate checks are applied.
    */
   onFilesAdd?:
     | ((
@@ -154,8 +154,8 @@ export interface FileUploadRootParameters {
 export interface FileUploadRootExtendedFile extends File {
   /**
    * Unique identifier for the file.
-    *
-    * This should be treated as the stable identity key for consumers.
+   *
+   * This should be treated as the stable identity key for consumers.
    */
   id: string;
   /**
