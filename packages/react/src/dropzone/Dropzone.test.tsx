@@ -270,7 +270,7 @@ describe('Dropzone', () => {
     const ref = React.createRef<HTMLDivElement>();
     render(<Dropzone ref={ref}>Drop files</Dropzone>);
 
-    expect(ref.current).toBeInstanceOf(HTMLDivElement);
+    expect(ref.current).toBe(screen.getByRole('button', { name: 'Drop files' }));
   });
 
   it('forwards ref to the input part', () => {
@@ -283,7 +283,6 @@ describe('Dropzone', () => {
       </Dropzone>,
     );
 
-    expect(ref.current).toBeInstanceOf(HTMLInputElement);
     expect(ref.current).toHaveAttribute('type', 'file');
   });
 

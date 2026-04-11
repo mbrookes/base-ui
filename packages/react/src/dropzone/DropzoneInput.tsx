@@ -30,17 +30,9 @@ export const DropzoneHiddenInput = React.forwardRef(function DropzoneHiddenInput
   const { disabled, setInputElement } = useDropzoneContext();
   const { render, className, ...elementProps } = componentProps;
 
-  const handleInputRef = useStableCallback((node: HTMLInputElement | null) => {
-    setInputElement(node);
-  });
-
-  const state: DropzoneHiddenInputState = {
-    disabled,
-  };
-
   return useRenderElement('input', componentProps, {
-    state,
-    ref: [forwardedRef, handleInputRef],
+    state: { disabled },
+    ref: [forwardedRef, setInputElement],
     props: [
       elementProps,
       {

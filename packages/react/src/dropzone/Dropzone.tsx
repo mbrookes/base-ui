@@ -165,11 +165,6 @@ const DropzoneRoot = React.forwardRef<HTMLDivElement, DropzoneProps>(
       }
     });
 
-    const state: DropzoneState = {
-      dragging,
-      disabled,
-    };
-
     const contextValue = React.useMemo(
       () => ({
         disabled,
@@ -181,7 +176,7 @@ const DropzoneRoot = React.forwardRef<HTMLDivElement, DropzoneProps>(
     return (
       <DropzoneContext.Provider value={contextValue}>
         {useRenderElement('div', props, {
-          state,
+          state: { dragging, disabled },
           ref: forwardedRef,
           props: [
             {
