@@ -29,7 +29,7 @@ const isPromiseLike = (value: unknown): value is PromiseLike<unknown> => {
   return 'then' in value && typeof (value as PromiseLike<unknown>).then === 'function';
 };
 
-// Generate a unique key for file deduplication based on name, size, and timestamp
+// Generate a unique key for file deduplication based on file identity metadata.
 const getFileKey = (file: {
   name: string;
   size: number;

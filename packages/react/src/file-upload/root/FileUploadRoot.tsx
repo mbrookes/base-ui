@@ -193,8 +193,7 @@ export interface FileUploadRootProps
  * Manages file upload state and provides context for child components.
  *
  * This is the root component that should wrap all other FileUpload components.
- * It handles file validation, clipboard paste support, and state management for the entire
- * file upload workflow.
+ * It handles file validation, input/paste integration, and shared state for the file upload workflow.
  *
  * @component
  * @example
@@ -238,6 +237,7 @@ export const FileUploadRoot = React.forwardRef<HTMLDivElement, FileUploadRootPro
       onFilesAdd,
       onCancel,
       locale,
+      // Keep these out of `other` so DOM prop typing stays valid in useRenderElement props.
       render,
       style,
       className,
