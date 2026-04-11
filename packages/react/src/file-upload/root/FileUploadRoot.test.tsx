@@ -225,7 +225,7 @@ describe('FileUpload', () => {
     await waitFor(() => expect(onCancel).toHaveBeenCalled());
   });
 
-  it('reports DUPLICATE_FILE reason via onFilesAdd when the same file is selected again', async () => {
+  it('reports duplicate-file reason via onFilesAdd when the same file is selected again', async () => {
     const onFilesAdd = vi.fn();
 
     render(<TestRoot onFilesAdd={onFilesAdd}>{null}</TestRoot>);
@@ -243,10 +243,10 @@ describe('FileUpload', () => {
     const [, fileRejections] = onFilesAdd.mock.calls[1];
     expect(fileRejections).toHaveLength(1);
     expect(fileRejections[0]).toMatchObject({
-      reason: 'DUPLICATE_FILE',
+      reason: 'duplicate-file',
       file: expect.any(File),
       eventDetails: expect.objectContaining({
-        reason: 'DUPLICATE_FILE',
+        reason: 'duplicate-file',
         message: 'duplicate file',
       }),
     });
@@ -277,7 +277,7 @@ describe('FileUpload', () => {
     expect(fileRejections).toHaveLength(1);
     expect(fileRejections[0]).toMatchObject({
       file,
-      reason: 'MIME_TYPE_NOT_ALLOWED',
+      reason: 'mime-type-not-allowed',
       eventDetails: expect.objectContaining({
         message: expect.any(String),
       }),
@@ -311,9 +311,9 @@ describe('FileUpload', () => {
       expect.arrayContaining([
         expect.objectContaining({
           file: rejectedFile,
-          reason: 'MIME_TYPE_NOT_ALLOWED',
+          reason: 'mime-type-not-allowed',
           eventDetails: expect.objectContaining({
-            reason: 'MIME_TYPE_NOT_ALLOWED',
+            reason: 'mime-type-not-allowed',
           }),
         }),
       ]),
@@ -323,7 +323,7 @@ describe('FileUpload', () => {
     );
   });
 
-  it('does not accept non-MIME prefix matches for wildcard accept patterns', async () => {
+  it('does not accept non-mime prefix matches for wildcard accept patterns', async () => {
     const onFilesAdd = vi.fn();
 
     render(
@@ -351,11 +351,11 @@ describe('FileUpload', () => {
     expect(fileRejections).toHaveLength(1);
     expect(fileRejections[0]).toMatchObject({
       file: expect.objectContaining({ name: 'bad.bin' }),
-      reason: 'MIME_TYPE_NOT_ALLOWED',
+      reason: 'mime-type-not-allowed',
     });
   });
 
-  it('matches MIME accept patterns case-insensitively', async () => {
+  it('matches mime accept patterns case-insensitively', async () => {
     const onFilesAdd = vi.fn();
 
     render(
@@ -407,9 +407,9 @@ describe('FileUpload', () => {
       expect.arrayContaining([
         expect.objectContaining({
           file: rejectedFile,
-          reason: 'MIME_TYPE_NOT_ALLOWED',
+          reason: 'mime-type-not-allowed',
           eventDetails: expect.objectContaining({
-            reason: 'MIME_TYPE_NOT_ALLOWED',
+            reason: 'mime-type-not-allowed',
           }),
         }),
       ]),
@@ -500,7 +500,7 @@ describe('FileUpload', () => {
     expect(fileRejections).toHaveLength(1);
     expect(fileRejections[0]).toMatchObject({
       file,
-      reason: 'CUSTOM_VALIDATION_FAILED',
+      reason: 'custom-validation-failed',
       eventDetails: expect.objectContaining({ message: 'Blocked by policy' }),
     });
     const latestFiles = onFilesChange.mock.calls.at(-1)?.[0] ?? [];
@@ -536,7 +536,7 @@ describe('FileUpload', () => {
     expect(fileRejections).toHaveLength(1);
     expect(fileRejections[0]).toMatchObject({
       file,
-      reason: 'CUSTOM_VALIDATION_FAILED',
+      reason: 'custom-validation-failed',
       eventDetails: expect.objectContaining({ message: 'Policy check failed' }),
     });
   });
@@ -595,7 +595,7 @@ describe('FileUpload', () => {
     const [, fileRejections] = onFilesAdd.mock.calls[0];
     expect(fileRejections[0]).toMatchObject({
       file: largeFile,
-      reason: 'FILE_TOO_LARGE',
+      reason: 'file-too-large',
       eventDetails: expect.objectContaining({ message: expect.stringContaining('too large') }),
     });
     // onFilesChange should not be called when all files are rejected (files state unchanged)
@@ -626,7 +626,7 @@ describe('FileUpload', () => {
     const [, fileRejections] = onFilesAdd.mock.calls[0];
     expect(fileRejections[0]).toMatchObject({
       file: tinyFile,
-      reason: 'FILE_TOO_SMALL',
+      reason: 'file-too-small',
       eventDetails: expect.objectContaining({ message: expect.stringContaining('too small') }),
     });
   });
@@ -656,7 +656,7 @@ describe('FileUpload', () => {
     expect(fileRejections).toHaveLength(1);
     expect(fileRejections[0]).toMatchObject({
       file,
-      reason: 'MAX_FILES_REACHED',
+      reason: 'max-files-reached',
     });
   });
 
@@ -724,8 +724,8 @@ describe('FileUpload', () => {
     expect(fileRejections).toHaveLength(1);
     expect(fileRejections[0]).toMatchObject({
       file: invalidFile,
-      reason: 'MIME_TYPE_NOT_ALLOWED',
-      eventDetails: expect.objectContaining({ reason: 'MIME_TYPE_NOT_ALLOWED' }),
+      reason: 'mime-type-not-allowed',
+      eventDetails: expect.objectContaining({ reason: 'mime-type-not-allowed' }),
     });
 
     const latestFiles = onFilesChange.mock.calls.at(-1)?.[0];
@@ -769,7 +769,7 @@ describe('FileUpload', () => {
     expect(latestFiles?.[0].name).toBe('replacement.txt');
   });
 
-  it('reports MAX_FILES_REACHED for extra files in a single-file selection', async () => {
+  it('reports max-files-reached for extra files in a single-file selection', async () => {
     const onFilesAdd = vi.fn();
 
     render(
@@ -797,8 +797,8 @@ describe('FileUpload', () => {
     expect(fileRejections).toHaveLength(1);
     expect(fileRejections[0]).toMatchObject({
       file: secondFile,
-      reason: 'MAX_FILES_REACHED',
-      eventDetails: expect.objectContaining({ reason: 'MAX_FILES_REACHED' }),
+      reason: 'max-files-reached',
+      eventDetails: expect.objectContaining({ reason: 'max-files-reached' }),
     });
   });
 
@@ -1201,7 +1201,7 @@ describe('FileUpload', () => {
       expect(getTestContext(contextValue).files).toHaveLength(2);
     });
 
-    it('reports MAX_FILES_REACHED via onFilesAdd when selecting more than maxFiles at once', async () => {
+    it('reports max-files-reached via onFilesAdd when selecting more than maxFiles at once', async () => {
       const onFilesAdd = vi.fn();
 
       render(
@@ -1224,15 +1224,15 @@ describe('FileUpload', () => {
       expect(fileRejections).toHaveLength(1);
       expect(fileRejections[0]).toMatchObject({
         file: expect.objectContaining({ name: 'test3.txt' }),
-        reason: 'MAX_FILES_REACHED',
+        reason: 'max-files-reached',
         eventDetails: expect.objectContaining({
-          reason: 'MAX_FILES_REACHED',
+          reason: 'max-files-reached',
           message: 'Cannot add files. Limit of 2 reached.',
         }),
       });
     });
 
-    it('reports MAX_FILES_REACHED via onFilesAdd when trying to add files after reaching the limit', async () => {
+    it('reports max-files-reached via onFilesAdd when trying to add files after reaching the limit', async () => {
       const onFilesAdd = vi.fn();
 
       render(
@@ -1266,9 +1266,9 @@ describe('FileUpload', () => {
       expect(fileRejections).toHaveLength(1);
       expect(fileRejections[0]).toMatchObject({
         file: expect.objectContaining({ name: 'test3.txt' }),
-        reason: 'MAX_FILES_REACHED',
+        reason: 'max-files-reached',
         eventDetails: expect.objectContaining({
-          reason: 'MAX_FILES_REACHED',
+          reason: 'max-files-reached',
           message: 'Cannot add files. Limit of 2 reached.',
         }),
       });
@@ -1389,8 +1389,8 @@ describe('FileUpload', () => {
       expect(fileRejections).toHaveLength(1);
       expect(fileRejections[0]).toMatchObject({
         file: expect.objectContaining({ name: 'too-large.txt' }),
-        reason: 'FILE_TOO_LARGE',
-        eventDetails: expect.objectContaining({ reason: 'FILE_TOO_LARGE' }),
+        reason: 'file-too-large',
+        eventDetails: expect.objectContaining({ reason: 'file-too-large' }),
       });
     });
 

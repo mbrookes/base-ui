@@ -11,12 +11,12 @@ import { fileUploadRootStateAttributesMapping } from './stateAttributesMapping';
 import { useFileUploadRoot } from './useFileUploadRoot';
 
 export const REJECT_REASONS = {
-  FILE_TOO_LARGE: 'FILE_TOO_LARGE',
-  FILE_TOO_SMALL: 'FILE_TOO_SMALL',
-  MIME_TYPE_NOT_ALLOWED: 'MIME_TYPE_NOT_ALLOWED',
-  MAX_FILES_REACHED: 'MAX_FILES_REACHED',
-  CUSTOM_VALIDATION_FAILED: 'CUSTOM_VALIDATION_FAILED',
-  DUPLICATE_FILE: 'DUPLICATE_FILE',
+  FILE_TOO_LARGE: 'file-too-large',
+  FILE_TOO_SMALL: 'file-too-small',
+  MIME_TYPE_NOT_ALLOWED: 'mime-type-not-allowed',
+  MAX_FILES_REACHED: 'max-files-reached',
+  CUSTOM_VALIDATION_FAILED: 'custom-validation-failed',
+  DUPLICATE_FILE: 'duplicate-file',
 } as const;
 
 export type FileUploadRootRejectReason =
