@@ -85,7 +85,6 @@ const messages = {
   asyncValidatorNotSupported:
     'Async validators are not supported. Return a string or null synchronously.',
   maxFilesReached: (count: number) => `Cannot add files. Limit of ${count} reached.`,
-  duplicateFile: (fileName: string) => `${fileName}: duplicate file`,
   filesAdded: (count: number) => `Added ${count} file${count !== 1 ? 's' : ''}.`,
   filesRejected: (count: number, errors: string[]) => {
     const details = errors.slice(0, 3).join(', ');
@@ -99,13 +98,18 @@ const messages = {
   allFilesRemoved: 'All files removed',
 };
 
+const formatFileError = (fileName: string, message: string) => `${fileName}: ${message}`;
+
 // Check if a file type matches the accept string
 const parseAccept = (accept: string): string[] => {
   if (!accept || accept === '*') {
     return [];
   }
 
-  return accept.split(',').map((t) => t.trim());
+  return accept
+    .split(',')
+    .map((t) => t.trim())
+    .filter(Boolean);
 };
 
 const isFileTypeAccepted = (file: File, acceptTypes: string[]): boolean => {
@@ -240,6 +244,10 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
       return;
     }
 
+    if (newFiles.length === 0) {
+      return;
+    }
+
     lastChangeReasonRef.current = FILE_UPLOAD_ROOT_CHANGE_REASONS.FILE_ADDED;
     lastChangeEventRef.current = event;
 
@@ -306,13 +314,13 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
           reason: FILE_UPLOAD_ROOT_REJECT_REASONS.MAX_FILES_REACHED,
           eventDetails,
         });
-        errors.push(`${file.name}: ${maxFilesReachedMessage}`);
+        errors.push(formatFileError(file.name, maxFilesReachedMessage));
         return;
       }
 
       const fileKey = getFileKey(file);
       if (existingKeys.has(fileKey)) {
-        const dupMessage = messages.duplicateFile(file.name);
+        const dupMessage = formatFileError(file.name, 'duplicate file');
         const eventDetails = rejectDetails(FILE_UPLOAD_ROOT_REJECT_REASONS.DUPLICATE_FILE, dupMessage);
         fileRejections.push({
           file,
@@ -331,7 +339,7 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
           reason: error.reason,
           eventDetails,
         });
-        errors.push(`${file.name}: ${error.message}`);
+        errors.push(formatFileError(file.name, error.message));
       } else {
         existingKeys.add(fileKey);
 
@@ -387,10 +395,6 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
     lastChangeReasonRef.current = FILE_UPLOAD_ROOT_CHANGE_REASONS.FILE_REMOVED;
     lastChangeEventRef.current = undefined;
 
-    // Read the name before setFiles so the announcement fires reliably —
-    // functional updaters don't run synchronously before setState returns.
-    const removedFileName = filesRef.current.find((f) => f.id === id)?.name ?? null;
-
     const prev = filesRef.current;
     const fileToRemove = prev.find((f) => f.id === id);
     if (!fileToRemove) {
@@ -404,9 +408,7 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
     filesRef.current = nextFiles;
     setFiles(nextFiles);
 
-    if (removedFileName) {
-      setAnnouncement((prev) => ({ text: messages.fileRemoved(removedFileName), key: prev.key + 1 }));
-    }
+    setAnnouncement((prev) => ({ text: messages.fileRemoved(fileToRemove.name), key: prev.key + 1 }));
   });
 
   const clearFiles = useStableCallback(() => {
@@ -434,16 +436,19 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
     }
 
     const currentFile = prev[fileIndex];
-    const nextFile = createExtendedFile(currentFile, {
-      id: currentFile.id,
-      preview: currentFile.preview,
-      status: updates.status ?? currentFile.status,
-      progress: updates.progress ?? currentFile.progress,
-      error: 'error' in updates ? updates.error : currentFile.error,
-    });
+    // Metadata updates should not clone file contents; mutate metadata fields only.
+    if (updates.status !== undefined) {
+      currentFile.status = updates.status;
+    }
+    if (updates.progress !== undefined) {
+      currentFile.progress = updates.progress;
+    }
+    if ('error' in updates) {
+      currentFile.error = updates.error;
+    }
 
     const nextFiles = [...prev];
-    nextFiles[fileIndex] = nextFile;
+    nextFiles[fileIndex] = currentFile;
     filesRef.current = nextFiles;
     setFiles(nextFiles);
   });

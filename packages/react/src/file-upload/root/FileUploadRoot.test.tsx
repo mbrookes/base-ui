@@ -466,6 +466,31 @@ describe('FileUpload', () => {
     expect(fileRejections).toHaveLength(0);
   });
 
+  it('ignores empty entries in the accept string', async () => {
+    const onFilesAdd = vi.fn();
+
+    render(
+      <TestRoot accept="image/png,  , .txt" onFilesAdd={onFilesAdd}>
+        {null}
+      </TestRoot>,
+    );
+
+    const input = getFileInput();
+    const file = new File(['content'], 'notes.txt', { type: 'text/plain' });
+
+    Object.defineProperty(input, 'files', {
+      value: [file],
+      configurable: true,
+    });
+
+    fireEvent.change(input);
+
+    await waitFor(() => expect(onFilesAdd).toHaveBeenCalled());
+    const [acceptedFiles, fileRejections] = onFilesAdd.mock.calls[0];
+    expect(acceptedFiles).toHaveLength(1);
+    expect(fileRejections).toHaveLength(0);
+  });
+
   it('uses custom validator to reject files', async () => {
     const onFilesChange = vi.fn();
     const onFilesAdd = vi.fn();
@@ -1041,6 +1066,35 @@ describe('FileUpload', () => {
   });
 
   describe('maxFiles in multiple mode', () => {
+    it('does nothing when addFiles is called with an empty array', async () => {
+      const onFilesAdd = vi.fn();
+      const onFilesChange = vi.fn();
+      let contextValue: TestFileUploadContext | null = null;
+
+      function TestComponent() {
+        const ctx = FileUpload.useFileUploadContext();
+        contextValue = ctx as unknown as TestFileUploadContext;
+        return null;
+      }
+
+      render(
+        <TestRoot multiple onFilesAdd={onFilesAdd} onFilesChange={onFilesChange}>
+          <TestComponent />
+        </TestRoot>,
+      );
+
+      act(() => {
+        getTestContext(contextValue).addFiles([]);
+      });
+
+      await waitFor(() => {
+        expect(getTestContext(contextValue).files).toHaveLength(0);
+      });
+
+      expect(onFilesAdd).not.toHaveBeenCalled();
+      expect(onFilesChange).not.toHaveBeenCalled();
+    });
+
     it('respects maxFiles limit when selecting multiple files', async () => {
       const onFilesChange = vi.fn();
 
@@ -1829,6 +1883,45 @@ describe('FileUpload', () => {
         });
       });
       expect(getTestContext(contextValue).files[0]).toBeInstanceOf(File);
+    });
+
+    it('keeps the same file object reference across metadata updates', () => {
+      let contextValue: TestFileUploadContext | null = null;
+
+      function TestComponent() {
+        const ctx = FileUpload.useFileUploadContext();
+        contextValue = ctx as unknown as TestFileUploadContext;
+        return null;
+      }
+
+      render(
+        <TestRoot>
+          <TestComponent />
+        </TestRoot>,
+      );
+
+      const input = getFileInput();
+      const file = new File(['content'], 'test.txt', { type: 'text/plain' });
+
+      fireEvent.change(input, { target: { files: [file] } });
+
+      const fileId = getTestContext(contextValue).files[0].id;
+      const firstRef = getTestContext(contextValue).files[0];
+
+      act(() => {
+        getTestContext(contextValue).updateFile(fileId, { status: 'uploading', progress: 10 });
+      });
+
+      expect(getTestContext(contextValue).files[0]).toBe(firstRef);
+
+      act(() => {
+        getTestContext(contextValue).updateFile(fileId, {
+          status: 'error',
+          error: 'Upload failed',
+        });
+      });
+
+      expect(getTestContext(contextValue).files[0]).toBe(firstRef);
     });
   });
 });

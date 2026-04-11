@@ -159,8 +159,7 @@ export interface FileUploadRootExtendedFile extends File {
   /**
    * Unique identifier for the file.
     *
-    * This should be treated as the stable identity key. File object identity may
-    * change after updates, so consumers should compare by `id`.
+    * This should be treated as the stable identity key for consumers.
    */
   id: string;
   /**
