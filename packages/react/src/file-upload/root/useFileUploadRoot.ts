@@ -141,10 +141,6 @@ const parseAccept = (accept: string): string[] =>
   accept.split(',').map((t) => t.trim().toLowerCase()).filter(Boolean);
 
 const isFileTypeAccepted = (file: File, acceptTypes: string[]): boolean => {
-  if (acceptTypes.length === 0) {
-    return true;
-  }
-
   const fileType = file.type.toLowerCase();
 
   return acceptTypes.some((acceptType) => {
@@ -381,18 +377,15 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
       } else {
         existingKeys.add(fileKey);
 
-        const id = generateId('file');
         const normalizedFile = cloneFileForUpload(file);
-        const preview = URL.createObjectURL(normalizedFile);
-
-        const extendedFile = createExtendedFile(normalizedFile, {
-          id,
-          preview,
-          status: 'idle' as const,
-          progress: 0,
-        });
-
-        validFiles.push(extendedFile);
+        validFiles.push(
+          createExtendedFile(normalizedFile, {
+            id: generateId('file'),
+            preview: URL.createObjectURL(normalizedFile),
+            status: 'idle' as const,
+            progress: 0,
+          }),
+        );
         acceptedCount += 1;
       }
     });
