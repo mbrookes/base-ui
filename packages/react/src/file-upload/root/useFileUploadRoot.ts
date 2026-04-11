@@ -477,7 +477,9 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
   });
 
   const openFileDialog = useStableCallback(() => {
-    if (!disabled && inputRef.current) inputRef.current.click();
+    if (!disabled && inputRef.current) {
+      inputRef.current.click();
+    }
   });
 
   const setInputElement = useStableCallback((node: HTMLInputElement | null) => {

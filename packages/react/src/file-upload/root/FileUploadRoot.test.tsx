@@ -923,11 +923,10 @@ describe('FileUpload', () => {
     fireEvent.change(input);
 
     await waitFor(() => {
-      const liveRegion = screen.getByRole('status');
-      const text = liveRegion.textContent ?? '';
-      expect(text).toContain('Added');
-      expect(text).toContain('rejected');
+      expect(screen.getByRole('status')).toHaveTextContent('Added');
     });
+
+    expect(screen.getByRole('status')).toHaveTextContent('rejected');
   });
 
   describe('Full workflow integration', () => {
