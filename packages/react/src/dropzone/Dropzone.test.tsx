@@ -11,9 +11,9 @@ const createDataTransfer = (files: File[]) => {
   }
 
   const dataTransfer = new DataTransfer();
-  files.forEach((file) => {
+  for (const file of files) {
     dataTransfer.items.add(file);
-  });
+  }
 
   Object.defineProperty(dataTransfer, 'files', {
     value: files,

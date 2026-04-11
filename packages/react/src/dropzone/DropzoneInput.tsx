@@ -1,7 +1,6 @@
 'use client';
 
 import * as React from 'react';
-import { useStableCallback } from '@base-ui/utils/useStableCallback';
 import { useRenderElement } from '../utils/useRenderElement';
 import type { BaseUIComponentProps } from '../utils/types';
 import { useDropzoneContext } from './DropzoneContext';
