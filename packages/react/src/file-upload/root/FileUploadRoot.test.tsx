@@ -371,6 +371,38 @@ describe('FileUpload', () => {
     );
   });
 
+  it('does not accept non-MIME prefix matches for wildcard accept patterns', async () => {
+    const onFilesAdd = vi.fn();
+
+    render(
+      <TestRoot accept="image/*" onFilesAdd={onFilesAdd}>
+        {null}
+      </TestRoot>,
+    );
+
+    const input = getFileInput();
+    const invalidPrefixMime = new File(['bad'], 'bad.bin', { type: 'imagefoo/png' });
+    const validImage = new File(['ok'], 'ok.png', { type: 'image/png' });
+
+    Object.defineProperty(input, 'files', {
+      value: [invalidPrefixMime, validImage],
+      configurable: true,
+    });
+
+    fireEvent.change(input);
+
+    await waitFor(() => expect(onFilesAdd).toHaveBeenCalled());
+
+    const [acceptedFiles, fileRejections] = onFilesAdd.mock.calls[0];
+    expect(acceptedFiles).toHaveLength(1);
+    expect(acceptedFiles[0].name).toBe('ok.png');
+    expect(fileRejections).toHaveLength(1);
+    expect(fileRejections[0]).toMatchObject({
+      file: expect.objectContaining({ name: 'bad.bin' }),
+      reason: 'MIME_TYPE_NOT_ALLOWED',
+    });
+  });
+
   it('calls onFilesAdd when all selected files are rejected', async () => {
     const onFilesAdd = vi.fn();
 
@@ -892,6 +924,24 @@ describe('FileUpload', () => {
       const [, fileRejections] = onFilesAdd.mock.calls[0];
       expect(fileRejections).toHaveLength(1);
     });
+
+    it('truncates long rejection announcements with an and more suffix', async () => {
+      render(<TestRoot accept="image/*">{null}</TestRoot>);
+
+      const input = getFileInput();
+      const files = [
+        new File(['a'], 'a.txt', { type: 'text/plain' }),
+        new File(['b'], 'b.txt', { type: 'text/plain' }),
+        new File(['c'], 'c.txt', { type: 'text/plain' }),
+        new File(['d'], 'd.txt', { type: 'text/plain' }),
+      ];
+
+      fireEvent.change(input, { target: { files } });
+
+      await waitFor(() => {
+        expect(screen.getByRole('status').textContent).toContain('and more');
+      });
+    });
   });
 
   describe('removeFile', () => {
@@ -1259,6 +1309,45 @@ describe('FileUpload', () => {
       });
     });
 
+    it('treats files in different directory paths as distinct for duplicate checks', async () => {
+      const onFilesAdd = vi.fn();
+
+      render(
+        <TestRoot multiple directory onFilesAdd={onFilesAdd}>
+          {null}
+        </TestRoot>,
+      );
+
+      const input = getFileInput();
+
+      const lastModified = Date.now();
+      const fileA = new File(['x'], 'same-name.txt', { type: 'text/plain', lastModified });
+      const fileB = new File(['x'], 'same-name.txt', { type: 'text/plain', lastModified });
+
+      Object.defineProperty(fileA, 'webkitRelativePath', {
+        configurable: true,
+        value: 'a/same-name.txt',
+      });
+      Object.defineProperty(fileB, 'webkitRelativePath', {
+        configurable: true,
+        value: 'b/same-name.txt',
+      });
+
+      fireEvent.change(input, {
+        target: {
+          files: [fileA, fileB],
+        },
+      });
+
+      await waitFor(() => {
+        expect(onFilesAdd).toHaveBeenCalled();
+      });
+
+      const [acceptedFiles, fileRejections] = onFilesAdd.mock.calls[0];
+      expect(acceptedFiles).toHaveLength(2);
+      expect(fileRejections).toHaveLength(0);
+    });
+
     it('does not exceed maxFiles when addFiles is called concurrently before a render', async () => {
       // Both addFiles calls happen in the same act() before React commits, so
       // filesRef.current is stale for the second call. The setFiles updater must
@@ -1444,6 +1533,40 @@ describe('FileUpload', () => {
           expect.objectContaining({ reason: 'file-updated' }),
         );
       });
+    });
+
+    it('does not call onFilesChange when updateFile is called with an unknown id', async () => {
+      const onFilesChange = vi.fn();
+      let contextValue: TestFileUploadContext | null = null;
+
+      function TestComponent() {
+        const ctx = FileUpload.useFileUploadContext();
+        contextValue = ctx as unknown as TestFileUploadContext;
+        return null;
+      }
+
+      render(
+        <TestRoot onFilesChange={onFilesChange}>
+          <TestComponent />
+        </TestRoot>,
+      );
+
+      const input = getFileInput();
+      const file = new File(['content'], 'test.txt', { type: 'text/plain' });
+
+      fireEvent.change(input, { target: { files: [file] } });
+
+      await waitFor(() => {
+        expect(getTestContext(contextValue).files).toHaveLength(1);
+      });
+
+      onFilesChange.mockClear();
+
+      act(() => {
+        getTestContext(contextValue).updateFile('missing-id', { status: 'uploading', progress: 50 });
+      });
+
+      expect(onFilesChange).not.toHaveBeenCalled();
     });
 
     it('calls onFilesChange when files are added', async () => {
