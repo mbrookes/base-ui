@@ -1326,10 +1326,9 @@ describe('FileUpload', () => {
       });
     });
 
-    it('revokes preview URLs for files dropped by maxFiles cap during concurrent addFiles', async () => {
-      // Both addFiles calls happen before React commits, so both see remainingSlots = 2.
-      // First updater commits [A, B]. Second updater then sees actualRemaining = 0
-      // and drops C and D; their preview URLs must be revoked to avoid a memory leak.
+    it('does not create extra preview URLs when maxFiles is already reached by a prior addFiles call', async () => {
+      // addFiles updates filesRef synchronously, so the second call sees remainingSlots = 0
+      // and rejects C and D before creating preview URLs.
       let contextValue: TestFileUploadContext | null = null;
 
       function TestComponent() {
@@ -1360,8 +1359,7 @@ describe('FileUpload', () => {
         expect(getTestContext(contextValue).files).toHaveLength(2);
       });
 
-      // C and D were validated (preview URLs created) but dropped by the cap.
-      expect(revokeObjectURLSpy).toHaveBeenCalledTimes(2);
+      expect(revokeObjectURLSpy).not.toHaveBeenCalled();
 
       revokeObjectURLSpy.mockRestore();
     });

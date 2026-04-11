@@ -33,6 +33,31 @@ const isPromiseLike = (value: unknown): value is PromiseLike<unknown> => {
 const getFileKey = (file: { name: string; size: number; lastModified: number }) =>
   `${file.name}:${file.size}:${file.lastModified}`;
 
+const createExtendedFile = (
+  file: File,
+  metadata: {
+    id: string;
+    preview: string;
+    status: FileUploadRootExtendedFile['status'];
+    progress: number;
+    error?: string | undefined;
+  },
+): FileUploadRootExtendedFile => {
+  const clonedFile = new File([file], file.name, {
+    type: file.type,
+    lastModified: file.lastModified,
+  }) as FileUploadRootExtendedFile;
+
+  if ('webkitRelativePath' in file && file.webkitRelativePath) {
+    Object.defineProperty(clonedFile, 'webkitRelativePath', {
+      configurable: true,
+      value: file.webkitRelativePath,
+    });
+  }
+
+  return Object.assign(clonedFile, metadata);
+};
+
 const formatBytes = (bytes: number, locale?: Intl.LocalesArgument) => {
   if (bytes === 0) {
     return '0 B';
@@ -283,12 +308,12 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
         const preview = URL.createObjectURL(file);
         previewUrlsRef.current.set(id, preview);
 
-        const extendedFile = Object.assign(file, {
+        const extendedFile = createExtendedFile(file, {
           id,
           preview,
           status: 'idle' as const,
           progress: 0,
-        }) as FileUploadRootExtendedFile;
+        });
 
         validFiles.push(extendedFile);
         acceptedCount += 1;
@@ -298,8 +323,25 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
     const successMsg = validFiles.length > 0 ? messages.filesAdded(validFiles.length) : '';
     const errorMsg = errors.length > 0 ? messages.filesRejected(errors.length, errors) : '';
 
+    if (!multiple && validFiles.length > 0) {
+      // single-file mode: replace with the newly selected file; revoke all previous URLs.
+      prev.forEach((f) => {
+        URL.revokeObjectURL(f.preview);
+        previewUrlsRef.current.delete(f.id);
+      });
+    }
+
+    const filesToAdd = validFiles;
+    const nextFiles =
+      filesToAdd.length === 0 ? prev : multiple ? [...prev, ...filesToAdd] : filesToAdd;
+
+    if (nextFiles !== prev) {
+      filesRef.current = nextFiles;
+      setFiles(nextFiles);
+    }
+
     onFilesAdd?.(
-      validFiles,
+      filesToAdd,
       fileRejections,
       createChangeEventDetails<FileUploadRootChangeReason>(
         FILE_UPLOAD_ROOT_CHANGE_REASONS.FILE_ADDED,
@@ -308,52 +350,6 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
     );
 
     setAnnouncement((prev) => ({ text: [successMsg, errorMsg].filter(Boolean).join(' '), key: prev.key + 1 }));
-
-    // Use a functional update to merge our changes on top of the latest committed
-    // state, preventing concurrent rapid calls from losing earlier additions.
-    setFiles((latestPrev) => {
-      if (multiple) {
-        // Re-enforce maxFiles cap using the actual latest committed state.
-        // This prevents concurrent addFiles calls from collectively exceeding
-        // maxFiles when they both validated against a stale filesRef.current.
-        const actualRemaining = Math.max(0, maxFiles - latestPrev.length);
-        const filesToAdd = validFiles.slice(0, actualRemaining);
-
-        // Files beyond the cap will not be added; revoke their preview URLs now.
-        validFiles.slice(actualRemaining).forEach((f) => {
-          URL.revokeObjectURL(f.preview);
-          previewUrlsRef.current.delete(f.id);
-        });
-
-        if (latestPrev === prev) {
-          return filesToAdd.length > 0 ? [...latestPrev, ...filesToAdd] : latestPrev;
-        }
-        // A concurrent update has already been applied; merge our filesToAdd on top.
-        const latestKeys = new Set(latestPrev.map((f) => getFileKey(f)));
-        const uniqueFiles: FileUploadRootExtendedFile[] = [];
-        for (const f of filesToAdd) {
-          if (latestKeys.has(getFileKey(f))) {
-            // Already present due to a concurrent update; revoke the URL we created.
-            URL.revokeObjectURL(f.preview);
-            previewUrlsRef.current.delete(f.id);
-          } else {
-            uniqueFiles.push(f);
-          }
-        }
-        return uniqueFiles.length > 0 ? [...latestPrev, ...uniqueFiles] : latestPrev;
-      }
-
-      if (validFiles.length === 0) {
-        return latestPrev;
-      }
-
-      // single-file mode: replace with the newly selected file; revoke all previous URLs.
-      latestPrev.forEach((f) => {
-        URL.revokeObjectURL(f.preview);
-        previewUrlsRef.current.delete(f.id);
-      });
-      return validFiles;
-    });
   });
 
   const removeFile = useStableCallback((id: string) => {
@@ -364,16 +360,18 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
     // functional updaters don't run synchronously before setState returns.
     const removedFileName = filesRef.current.find((f) => f.id === id)?.name ?? null;
 
-    setFiles((prev) => {
-      // URL revocation stays inside the updater so it uses the correct `prev`
-      // snapshot and handles batched addFiles + removeFile correctly.
-      const fileToRemove = prev.find((f) => f.id === id);
-      if (fileToRemove) {
-        URL.revokeObjectURL(fileToRemove.preview);
-        previewUrlsRef.current.delete(id);
-      }
-      return prev.filter((f) => f.id !== id);
-    });
+    const prev = filesRef.current;
+    const fileToRemove = prev.find((f) => f.id === id);
+    if (!fileToRemove) {
+      return;
+    }
+
+    URL.revokeObjectURL(fileToRemove.preview);
+    previewUrlsRef.current.delete(id);
+
+    const nextFiles = prev.filter((f) => f.id !== id);
+    filesRef.current = nextFiles;
+    setFiles(nextFiles);
 
     if (removedFileName) {
       setAnnouncement((prev) => ({ text: messages.fileRemoved(removedFileName), key: prev.key + 1 }));
@@ -384,22 +382,39 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
     lastChangeReasonRef.current = FILE_UPLOAD_ROOT_CHANGE_REASONS.FILES_CLEARED;
     lastChangeEventRef.current = undefined;
 
-    // URL.revokeObjectURL is idempotent — safe to call inside the updater so we
-    // always use the correct `prev` snapshot (handles batched addFiles + clearFiles).
-    setFiles((prev) => {
-      prev.forEach((file) => {
-        URL.revokeObjectURL(file.preview);
-        previewUrlsRef.current.delete(file.id);
-      });
-      return [];
+    filesRef.current.forEach((file) => {
+      URL.revokeObjectURL(file.preview);
+      previewUrlsRef.current.delete(file.id);
     });
+
+    filesRef.current = [];
+    setFiles([]);
     setAnnouncement((prev) => ({ text: messages.allFilesRemoved, key: prev.key + 1 }));
   });
 
   const updateFile = useStableCallback((id: string, updates: FileUploadRootFileUpdates) => {
     lastChangeReasonRef.current = FILE_UPLOAD_ROOT_CHANGE_REASONS.FILE_UPDATED;
     lastChangeEventRef.current = undefined;
-    setFiles((prev) => prev.map((file) => (file.id === id ? Object.assign(file, updates) : file)));
+
+    const prev = filesRef.current;
+    const fileIndex = prev.findIndex((file) => file.id === id);
+    if (fileIndex === -1) {
+      return;
+    }
+
+    const currentFile = prev[fileIndex];
+    const nextFile = createExtendedFile(currentFile, {
+      id: currentFile.id,
+      preview: currentFile.preview,
+      status: updates.status ?? currentFile.status,
+      progress: updates.progress ?? currentFile.progress,
+      error: 'error' in updates ? updates.error : currentFile.error,
+    });
+
+    const nextFiles = [...prev];
+    nextFiles[fileIndex] = nextFile;
+    filesRef.current = nextFiles;
+    setFiles(nextFiles);
   });
 
   const openFileDialog = useStableCallback(() => {
