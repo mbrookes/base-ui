@@ -142,6 +142,7 @@ const parseAccept = (accept: string): string[] =>
 
 const isFileTypeAccepted = (file: File, acceptTypes: string[]): boolean => {
   const fileType = file.type.toLowerCase();
+  const fileName = file.name.toLowerCase();
 
   return acceptTypes.some((acceptType) => {
     if (acceptType === '*') {
@@ -149,7 +150,7 @@ const isFileTypeAccepted = (file: File, acceptTypes: string[]): boolean => {
     }
     // File extension like .png, .pdf
     if (acceptType.startsWith('.')) {
-      return file.name.toLowerCase().endsWith(acceptType.toLowerCase());
+      return fileName.endsWith(acceptType);
     }
     // MIME type wildcard like image/*
     if (acceptType.endsWith('/*')) {
@@ -192,13 +193,13 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
     () => messages.fileTooSmall(formatBytes(minSizeProp, numberFormatter)),
     [minSizeProp, numberFormatter],
   );
-  const formattedMaxSize = React.useMemo(() => {
-    if (!Number.isFinite(maxSizeProp)) {
-      return null;
-    }
-
-    return messages.fileTooLarge(formatBytes(maxSizeProp, numberFormatter));
-  }, [maxSizeProp, numberFormatter]);
+  const formattedMaxSize = React.useMemo(
+    () =>
+      Number.isFinite(maxSizeProp)
+        ? messages.fileTooLarge(formatBytes(maxSizeProp, numberFormatter))
+        : null,
+    [maxSizeProp, numberFormatter],
+  );
 
   // Mirror of `files` in a ref so addFiles can read the latest value synchronously.
   const filesRef = React.useRef<FileUploadRootExtendedFile[]>([]);
@@ -304,7 +305,7 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
     if (remainingSlots <= 0) {
       const fileRejections: FileUploadRootRejection[] = [];
 
-      newFiles.forEach((file) => {
+      for (const file of newFiles) {
         fileRejections.push(
           createFileRejection(
             file,
@@ -313,7 +314,7 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
             event,
           ),
         );
-      });
+      }
 
       incrementAnnouncement(setAnnouncement, maxFilesReachedMessage);
 
@@ -333,7 +334,7 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
     const existingKeys = new Set(prev.map(getFileKey));
     let acceptedCount = 0;
 
-    newFiles.forEach((file) => {
+    for (const file of newFiles) {
       if (acceptedCount >= remainingSlots) {
         fileRejections.push(
           createFileRejection(
@@ -344,7 +345,7 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
           ),
         );
         errors.push(formatFileError(file.name, maxFilesReachedMessage));
-        return;
+        continue;
       }
 
       const fileKey = getFileKey(file);
@@ -358,7 +359,7 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
           ),
         );
         errors.push(formatFileError(file.name, messages.duplicateFile));
-        return;
+        continue;
       }
 
       const error = validateFile(file);
@@ -379,7 +380,7 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
         );
         acceptedCount += 1;
       }
-    });
+    }
 
     if (!multiple && validFiles.length > 0) {
       // single-file mode: replace with the newly selected file; revoke all previous URLs.
@@ -490,9 +491,7 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
       onCancel?.();
     }
 
-    if (inputRef.current) {
-      inputRef.current.value = '';
-    }
+    event.target.value = '';
   });
 
   const contextValue: FileUploadContextValue = React.useMemo(
