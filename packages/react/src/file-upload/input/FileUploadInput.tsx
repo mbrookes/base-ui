@@ -39,13 +39,8 @@ export const FileUploadHiddenInput = React.forwardRef(function FileUploadHiddenI
   });
 
   useIsoLayoutEffect(() => {
-    const node = inputRef.current;
-    if (!node) {
-      return;
-    }
-
-    node.toggleAttribute('webkitdirectory', directory);
-    node.toggleAttribute('directory', directory);
+    inputRef.current?.toggleAttribute('webkitdirectory', directory);
+    inputRef.current?.toggleAttribute('directory', directory);
   }, [directory]);
 
   return useRenderElement('input', componentProps, {
