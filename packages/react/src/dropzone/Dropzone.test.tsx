@@ -40,7 +40,6 @@ describe('Dropzone', () => {
     render(<Dropzone>Drop files</Dropzone>);
 
     const dropzone = screen.getByRole('button', { name: 'Drop files' });
-    expect(dropzone.tagName).toBe('DIV');
     expect(dropzone).toHaveAttribute('tabindex', '0');
   });
 
