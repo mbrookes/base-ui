@@ -283,13 +283,11 @@ export const FileUploadRoot = React.forwardRef<HTMLDivElement, FileUploadRootPro
       const pastedFiles = Array.from(clipboardData.files);
       if (pastedFiles.length === 0) {
         for (const item of Array.from(clipboardData.items)) {
-          if (item.kind !== 'file') {
-            continue;
-          }
-
-          const file = item.getAsFile();
-          if (file) {
-            pastedFiles.push(file);
+          if (item.kind === 'file') {
+            const file = item.getAsFile();
+            if (file) {
+              pastedFiles.push(file);
+            }
           }
         }
       }
