@@ -71,6 +71,7 @@ const messages = {
   fileTypeNotAccepted: 'File type not accepted',
   asyncValidatorNotSupported:
     'Async validators are not supported. Return a string or null synchronously.',
+  duplicateFile: 'duplicate file',
   maxFilesReached: (count: number) => `Cannot add files. Limit of ${count} reached.`,
   filesAdded: (count: number) => `Added ${count} file${count !== 1 ? 's' : ''}.`,
   filesRejected: (count: number, errors: string[]) => {
@@ -351,7 +352,7 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
 
       const fileKey = getFileKey(file);
       if (existingKeys.has(fileKey)) {
-        const dupMessage = formatFileError(file.name, 'duplicate file');
+        const dupMessage = formatFileError(file.name, messages.duplicateFile);
         const eventDetails = rejectDetails(
           FILE_UPLOAD_ROOT_REJECT_REASONS.DUPLICATE_FILE,
           dupMessage,
