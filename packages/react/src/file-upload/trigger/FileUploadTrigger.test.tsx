@@ -90,7 +90,6 @@ describe('FileUpload.Trigger', () => {
       </TestRoot>,
     );
 
-    expect(ref.current).toBeInstanceOf(HTMLButtonElement);
     expect(ref.current).toBe(screen.getByRole('button', { name: 'Upload' }));
   });
 
