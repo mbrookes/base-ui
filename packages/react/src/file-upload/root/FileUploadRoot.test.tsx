@@ -1326,6 +1326,43 @@ describe('FileUpload', () => {
       });
     });
 
+    it('reports accepted files correctly for back-to-back addFiles calls at maxFiles cap', async () => {
+      const onFilesAdd = vi.fn();
+      let contextValue: TestFileUploadContext | null = null;
+
+      function TestComponent() {
+        const ctx = FileUpload.useFileUploadContext();
+        contextValue = ctx as unknown as TestFileUploadContext;
+        return null;
+      }
+
+      render(
+        <TestRoot maxFiles={2} multiple onFilesAdd={onFilesAdd}>
+          <TestComponent />
+        </TestRoot>,
+      );
+
+      const fileA = new File(['a'], 'a.txt', { type: 'text/plain' });
+      const fileB = new File(['b'], 'b.txt', { type: 'text/plain' });
+      const fileC = new File(['c'], 'c.txt', { type: 'text/plain' });
+      const fileD = new File(['d'], 'd.txt', { type: 'text/plain' });
+
+      act(() => {
+        getTestContext(contextValue).addFiles([fileA, fileB]);
+        getTestContext(contextValue).addFiles([fileC, fileD]);
+      });
+
+      await waitFor(() => {
+        expect(getTestContext(contextValue).files).toHaveLength(2);
+      });
+
+      expect(onFilesAdd).toHaveBeenCalledTimes(2);
+      expect(onFilesAdd.mock.calls[0]?.[0]).toHaveLength(2);
+      expect(onFilesAdd.mock.calls[0]?.[1]).toHaveLength(0);
+      expect(onFilesAdd.mock.calls[1]?.[0]).toHaveLength(0);
+      expect(onFilesAdd.mock.calls[1]?.[1]).toHaveLength(2);
+    });
+
     it('does not create extra preview URLs when maxFiles is already reached by a prior addFiles call', async () => {
       // addFiles updates filesRef synchronously, so the second call sees remainingSlots = 0
       // and rejects C and D before creating preview URLs.
