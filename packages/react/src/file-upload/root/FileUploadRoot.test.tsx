@@ -486,6 +486,39 @@ describe('FileUpload', () => {
     expect(validator).toHaveBeenCalledWith(file);
   });
 
+  it('treats thrown custom validator errors as rejections', async () => {
+    const onFilesAdd = vi.fn();
+    const validator = vi.fn(() => {
+      throw new Error('Policy check failed');
+    });
+
+    render(
+      <TestRoot accept="*" onFilesAdd={onFilesAdd} validator={validator}>
+        {null}
+      </TestRoot>,
+    );
+
+    const input = getFileInput();
+    const file = new File(['content'], 'notes.txt', { type: 'text/plain' });
+
+    Object.defineProperty(input, 'files', {
+      value: [file],
+      configurable: true,
+    });
+
+    fireEvent.change(input);
+
+    await waitFor(() => expect(onFilesAdd).toHaveBeenCalled());
+    const [acceptedFiles, fileRejections] = onFilesAdd.mock.calls[0];
+    expect(acceptedFiles).toHaveLength(0);
+    expect(fileRejections).toHaveLength(1);
+    expect(fileRejections[0]).toMatchObject({
+      file,
+      reason: 'CUSTOM_VALIDATION_FAILED',
+      eventDetails: expect.objectContaining({ message: 'Policy check failed' }),
+    });
+  });
+
   it('does not enforce a max file size by default', async () => {
     const onFilesChange = vi.fn();
     const onFilesAdd = vi.fn();

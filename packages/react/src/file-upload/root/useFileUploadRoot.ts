@@ -87,6 +87,18 @@ const messages = {
 
 const formatFileError = (fileName: string, message: string) => `${fileName}: ${message}`;
 
+const getThrownErrorMessage = (error: unknown) => {
+  if (typeof error === 'string') {
+    return error;
+  }
+
+  if (error instanceof Error && error.message) {
+    return error.message;
+  }
+
+  return 'Custom validator threw an error.';
+};
+
 // Check if a file type matches the accept string
 const parseAccept = (accept: string): string[] => {
   if (!accept || accept === '*') {
@@ -206,7 +218,17 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
 
     // Custom validation
     if (validator) {
-      const customError = validator(file);
+      let customError: unknown;
+
+      try {
+        customError = validator(file);
+      } catch (error) {
+        return {
+          reason: FILE_UPLOAD_ROOT_REJECT_REASONS.CUSTOM_VALIDATION_FAILED,
+          message: getThrownErrorMessage(error),
+        };
+      }
+
       if (isPromiseLike(customError)) {
         return {
           reason: FILE_UPLOAD_ROOT_REJECT_REASONS.CUSTOM_VALIDATION_FAILED,
