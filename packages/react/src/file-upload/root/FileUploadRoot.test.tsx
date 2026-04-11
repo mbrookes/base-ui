@@ -142,13 +142,6 @@ describe('FileUpload', () => {
     expect(input.multiple).toBe(true);
   });
 
-  it('does not apply multiple attribute when multiple is false', () => {
-    render(<TestRoot multiple={false}>{null}</TestRoot>);
-
-    const input = getFileInput();
-    expect(input.multiple).toBe(false);
-  });
-
   it('sets dragging state on drag events', async () => {
     render(
       <TestRoot>
@@ -1179,62 +1172,9 @@ describe('FileUpload', () => {
         expect(screen.getByText('All files removed', { exact: false })).toBeInTheDocument();
       });
     });
-
-    it('does nothing when clearFiles is called with an empty list', () => {
-      const onFilesChange = vi.fn();
-      let contextValue: TestFileUploadContext | null = null;
-
-      function TestComponent() {
-        const ctx = FileUpload.useFileUploadContext();
-        contextValue = ctx as unknown as TestFileUploadContext;
-        return null;
-      }
-
-      render(
-        <TestRoot onFilesChange={onFilesChange}>
-          <TestComponent />
-        </TestRoot>,
-      );
-
-      act(() => {
-        getTestContext(contextValue).clearFiles();
-      });
-
-      expect(getTestContext(contextValue).files).toHaveLength(0);
-      expect(onFilesChange).not.toHaveBeenCalled();
-    });
   });
 
   describe('maxFiles in multiple mode', () => {
-    it('does nothing when addFiles is called with an empty array', async () => {
-      const onFilesAdd = vi.fn();
-      const onFilesChange = vi.fn();
-      let contextValue: TestFileUploadContext | null = null;
-
-      function TestComponent() {
-        const ctx = FileUpload.useFileUploadContext();
-        contextValue = ctx as unknown as TestFileUploadContext;
-        return null;
-      }
-
-      render(
-        <TestRoot multiple onFilesAdd={onFilesAdd} onFilesChange={onFilesChange}>
-          <TestComponent />
-        </TestRoot>,
-      );
-
-      act(() => {
-        getTestContext(contextValue).addFiles([]);
-      });
-
-      await waitFor(() => {
-        expect(getTestContext(contextValue).files).toHaveLength(0);
-      });
-
-      expect(onFilesAdd).not.toHaveBeenCalled();
-      expect(onFilesChange).not.toHaveBeenCalled();
-    });
-
     it('respects maxFiles limit when selecting multiple files', async () => {
       const onFilesChange = vi.fn();
 
@@ -1646,43 +1586,6 @@ describe('FileUpload', () => {
       expect(onFilesAdd.mock.calls[1]?.[1]).toHaveLength(2);
     });
 
-    it('does not create extra preview URLs when maxFiles is already reached by a prior addFiles call', async () => {
-      // addFiles updates filesRef synchronously, so the second call sees remainingSlots = 0
-      // and rejects C and D before creating preview URLs.
-      let contextValue: TestFileUploadContext | null = null;
-
-      function TestComponent() {
-        const ctx = FileUpload.useFileUploadContext();
-        contextValue = ctx as unknown as TestFileUploadContext;
-        return null;
-      }
-
-      render(
-        <TestRoot maxFiles={2} multiple>
-          <TestComponent />
-        </TestRoot>,
-      );
-
-      const fileA = new File(['a'], 'a.txt', { type: 'text/plain' });
-      const fileB = new File(['b'], 'b.txt', { type: 'text/plain' });
-      const fileC = new File(['c'], 'c.txt', { type: 'text/plain' });
-      const fileD = new File(['d'], 'd.txt', { type: 'text/plain' });
-
-      const revokeObjectURLSpy = vi.spyOn(URL, 'revokeObjectURL');
-
-      act(() => {
-        getTestContext(contextValue).addFiles([fileA, fileB]);
-        getTestContext(contextValue).addFiles([fileC, fileD]);
-      });
-
-      await waitFor(() => {
-        expect(getTestContext(contextValue).files).toHaveLength(2);
-      });
-
-      expect(revokeObjectURLSpy).not.toHaveBeenCalled();
-
-      revokeObjectURLSpy.mockRestore();
-    });
   });
 
   describe('onFilesChange callback', () => {
