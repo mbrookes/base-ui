@@ -214,6 +214,8 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
     onFilesChange?.(files, eventDetails);
   }, [files, onFilesChange]);
 
+  // Stable callbacks intentionally avoid dependency-array churn while still
+  // reading the latest render-time constraints and handlers.
   const validateFile = useStableCallback((file: File): ValidationResult => {
     if (Number.isFinite(maxSize) && file.size > maxSize) {
       return {
