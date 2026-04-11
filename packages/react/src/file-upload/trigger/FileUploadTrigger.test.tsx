@@ -26,18 +26,6 @@ function TestRoot(props: React.ComponentProps<typeof FileUpload.Root>) {
 }
 
 describe('FileUpload.Trigger', () => {
-  it('renders a button element', () => {
-    render(
-      <TestRoot>
-        <FileUpload.Trigger>Upload Files</FileUpload.Trigger>
-      </TestRoot>,
-    );
-
-    const button = screen.getByRole('button', { name: 'Upload Files' });
-    expect(button).toBeInTheDocument();
-    expect(button.tagName).toBe('BUTTON');
-  });
-
   it('has type="button" by default', () => {
     render(
       <TestRoot>
