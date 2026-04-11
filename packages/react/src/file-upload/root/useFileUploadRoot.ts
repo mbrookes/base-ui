@@ -48,21 +48,7 @@ const createExtendedFile = (
     progress: number;
     error?: string | undefined;
   },
-): FileUploadRootExtendedFile => {
-  const clonedFile = new File([file], file.name, {
-    type: file.type,
-    lastModified: file.lastModified,
-  }) as FileUploadRootExtendedFile;
-
-  if ('webkitRelativePath' in file && file.webkitRelativePath) {
-    Object.defineProperty(clonedFile, 'webkitRelativePath', {
-      configurable: true,
-      value: file.webkitRelativePath,
-    });
-  }
-
-  return Object.assign(clonedFile, metadata);
-};
+): FileUploadRootExtendedFile => Object.assign(file, metadata) as FileUploadRootExtendedFile;
 
 const formatBytes = (bytes: number, formatter: Intl.NumberFormat) => {
   if (bytes === 0) {
