@@ -1,6 +1,6 @@
 {
   "name": "FileUploadRoot",
-  "description": "Manages file upload state and provides context for child components.\n\nThis is the root component that should wrap all other FileUpload components.\nIt handles file validation, drag-and-drop, and state management for the entire\nfile upload workflow.",
+  "description": "Manages file upload state and provides context for child components.\n\nThis is the root component that should wrap all other FileUpload components.\nIt handles file validation, input/paste integration, and shared state for the file upload workflow.",
   "props": {
     "accept": {
       "type": "string",
@@ -49,7 +49,7 @@
     },
     "onFilesAdd": {
       "type": "((acceptedFiles: FileUpload.Root.ExtendedFile[], fileRejections: FileUpload.Root.Rejection[], eventDetails: FileUpload.Root.ChangeEventDetails) => void)",
-      "description": "Callback fired once per add/drop/paste/input attempt with accepted and rejected files.\nThis fires even when no files are accepted.",
+      "description": "Callback fired once per add/drop/paste/input attempt with accepted and rejected files.\nThis fires even when no files are accepted.\n\n`acceptedFiles` reflects the files actually committed to state for that attempt,\nafter max-files and duplicate checks are applied.",
       "detailedType": "| ((\n    acceptedFiles: FileUpload.Root.ExtendedFile[],\n    fileRejections: FileUpload.Root.Rejection[],\n    eventDetails: FileUpload.Root.ChangeEventDetails,\n  ) => void)\n| undefined"
     },
     "onFilesChange": {
@@ -90,9 +90,6 @@
     }
   },
   "dataAttributes": {
-    "data-dragging": {
-      "description": "Present when files are being dragged over the dropzone."
-    },
     "data-disabled": {
       "description": "Present when the component is disabled."
     }
