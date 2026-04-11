@@ -43,7 +43,7 @@ export const FileUploadTrigger = React.forwardRef(function FileUploadTriggerComp
   componentProps: FileUploadTriggerProps,
   ref: React.ForwardedRef<HTMLElement>,
 ) {
-  const { render, className, nativeButton = true, ...elementProps } = componentProps;
+  const { nativeButton = true, ...elementProps } = componentProps;
   const { openFileDialog, disabled } = useFileUploadContext();
 
   const { getButtonProps, buttonRef } = useButton({
@@ -51,15 +51,13 @@ export const FileUploadTrigger = React.forwardRef(function FileUploadTriggerComp
     native: nativeButton,
   });
 
-  const state: FileUploadTriggerState = { disabled };
-
   const handleClick = useStableCallback((event: React.SyntheticEvent<HTMLElement>) => {
     event.preventDefault();
     openFileDialog();
   });
 
   return useRenderElement('button', componentProps, {
-    state,
+    state: { disabled },
     ref: [ref, buttonRef],
     props: [{ onClick: handleClick }, elementProps, getButtonProps],
     stateAttributesMapping: fileUploadTriggerStateAttributesMapping,
