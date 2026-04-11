@@ -93,9 +93,16 @@ function TestRoot(props: React.ComponentProps<typeof FileUpload.Root>) {
 function TestDropzone(
   props: Omit<React.ComponentProps<typeof Dropzone>, 'dragging' | 'disabled' | 'onOpen'>,
 ) {
-  const { disabled, openFileDialog } = FileUpload.useFileUploadContext();
+  const { disabled, openFileDialog, addFiles } = FileUpload.useFileUploadContext();
 
-  return <Dropzone disabled={disabled} onOpen={openFileDialog} {...props} />;
+  return (
+    <Dropzone
+      disabled={disabled}
+      onOpen={openFileDialog}
+      onFilesDrop={(files, event) => addFiles(files, event.nativeEvent)}
+      {...props}
+    />
+  );
 }
 
 describe('FileUpload', () => {
@@ -181,41 +188,6 @@ describe('FileUpload', () => {
   });
 
   describe('preventBaseUIHandler', () => {
-    it('does not set dragging state when onDragEnter calls preventBaseUIHandler', () => {
-      const customDragEnter = vi.fn((event) => event.preventBaseUIHandler());
-      render(
-        <TestRoot onDragEnter={customDragEnter} data-testid="root">
-          <TestDropzone data-testid="dropzone">Drop files here</TestDropzone>
-        </TestRoot>,
-      );
-
-      const dropzone = screen.getByTestId('dropzone');
-      const root = screen.getByTestId('root');
-      fireEvent.dragEnter(dropzone);
-
-      expect(customDragEnter).toHaveBeenCalled();
-      expect(root).not.toHaveAttribute('data-dragging');
-    });
-
-    it('does not add files when onDrop calls preventBaseUIHandler', () => {
-      const onFilesChange = vi.fn();
-      const customDrop = vi.fn((event) => event.preventBaseUIHandler());
-      render(
-        <TestRoot onFilesChange={onFilesChange} onDrop={customDrop} data-testid="root">
-          <TestDropzone data-testid="dropzone">Drop files here</TestDropzone>
-        </TestRoot>,
-      );
-
-      const dropzone = screen.getByTestId('dropzone');
-      const file = new File(['content'], 'test.txt', { type: 'text/plain' });
-      const dataTransfer = createDataTransfer([file]);
-
-      fireEvent.drop(dropzone, { dataTransfer });
-
-      expect(customDrop).toHaveBeenCalled();
-      expect(onFilesChange).not.toHaveBeenCalled();
-    });
-
     it('does not add files when onPaste calls preventBaseUIHandler', () => {
       const onFilesChange = vi.fn();
       const customPaste = vi.fn((event) => event.preventBaseUIHandler());

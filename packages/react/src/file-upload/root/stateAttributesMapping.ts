@@ -3,15 +3,6 @@ import type { FileUploadRoot } from './FileUploadRoot';
 import { FileUploadRootDataAttributes } from './FileUploadRootDataAttributes';
 
 export const fileUploadRootStateAttributesMapping: StateAttributesMapping<FileUploadRoot.State> = {
-  dragging(value): Record<string, string> | null {
-    if (!value) {
-      return null;
-    }
-
-    return {
-      [FileUploadRootDataAttributes.dragging]: '',
-    };
-  },
   disabled(value): Record<string, string> | null {
     if (!value) {
       return null;

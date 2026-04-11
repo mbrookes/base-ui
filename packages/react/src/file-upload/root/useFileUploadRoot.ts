@@ -152,7 +152,6 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
   } = params;
 
   const [files, setFiles] = React.useState<FileUploadRootExtendedFile[]>([]);
-  const [isDragging, setIsDragging] = React.useState(false);
   const [announcement, setAnnouncement] = React.useState({ text: '', key: 0 });
   const numberFormatter = React.useMemo(
     () =>
@@ -511,8 +510,6 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
 
   return {
     contextValue,
-    isDragging,
-    setIsDragging,
     announcement,
   };
 };

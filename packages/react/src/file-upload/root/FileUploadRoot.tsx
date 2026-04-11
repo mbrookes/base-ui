@@ -56,10 +56,6 @@ export interface FileUploadRootRejection {
 
 export interface FileUploadRootState {
   /**
-  * Whether files are currently being dragged over `FileUpload.Root`.
-   */
-  dragging: boolean;
-  /**
    * Whether the file upload is disabled.
    */
   disabled: boolean;
@@ -197,7 +193,7 @@ export interface FileUploadRootProps
  * Manages file upload state and provides context for child components.
  *
  * This is the root component that should wrap all other FileUpload components.
- * It handles file validation, drag-and-drop, and state management for the entire
+ * It handles file validation, clipboard paste support, and state management for the entire
  * file upload workflow.
  *
  * @component
@@ -248,7 +244,7 @@ export const FileUploadRoot = React.forwardRef<HTMLDivElement, FileUploadRootPro
       ...other
     } = props;
 
-    const { contextValue, isDragging, setIsDragging, announcement } = useFileUploadRoot({
+    const { contextValue, announcement } = useFileUploadRoot({
       maxFiles,
       maxSize,
       minSize,
@@ -264,55 +260,8 @@ export const FileUploadRoot = React.forwardRef<HTMLDivElement, FileUploadRootPro
     });
 
     const state: FileUploadRootState = {
-      dragging: isDragging,
       disabled: contextValue.disabled,
     };
-
-    const handleDragEnter = useStableCallback((event: React.DragEvent) => {
-      event.preventDefault();
-      event.stopPropagation();
-      if (contextValue.disabled) {
-        return;
-      }
-      setIsDragging(true);
-    });
-
-    const handleDragLeave = useStableCallback((event: React.DragEvent) => {
-      event.preventDefault();
-      event.stopPropagation();
-      if (contextValue.disabled) {
-        return;
-      }
-      if (event.currentTarget.contains(event.relatedTarget as Node)) {
-        return;
-      }
-      setIsDragging(false);
-    });
-
-    const handleDrop = useStableCallback((event: React.DragEvent) => {
-      event.preventDefault();
-      event.stopPropagation();
-      if (contextValue.disabled) {
-        return;
-      }
-      setIsDragging(false);
-
-      if (event.dataTransfer.files && event.dataTransfer.files.length > 0) {
-        contextValue.addFiles(Array.from(event.dataTransfer.files), event.nativeEvent);
-      }
-    });
-
-    const handleDragOver = useStableCallback((event: React.DragEvent) => {
-      event.preventDefault();
-      event.stopPropagation();
-      if (contextValue.disabled) {
-        return;
-      }
-      // Set dropEffect to indicate valid drop target
-      if (event.dataTransfer) {
-        event.dataTransfer.dropEffect = 'copy';
-      }
-    });
 
     const handlePaste = useStableCallback((event: React.ClipboardEvent) => {
       if (contextValue.disabled) {
@@ -351,10 +300,6 @@ export const FileUploadRoot = React.forwardRef<HTMLDivElement, FileUploadRootPro
     });
 
     const defaultProps: HTMLProps = {
-      onDragEnter: handleDragEnter,
-      onDragLeave: handleDragLeave,
-      onDrop: handleDrop,
-      onDragOver: handleDragOver,
       onPaste: handlePaste,
       style: { position: 'relative', ...style },
       children: (
