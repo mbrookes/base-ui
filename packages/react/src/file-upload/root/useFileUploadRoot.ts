@@ -99,6 +99,17 @@ const getThrownErrorMessage = (error: unknown) => {
   return 'Custom validator threw an error.';
 };
 
+const normalizeNonNegativeFinite = (value: number, fallback: number) =>
+  Number.isFinite(value) ? Math.max(0, value) : fallback;
+
+const normalizeFileCountLimit = (value: number) => {
+  if (!Number.isFinite(value)) {
+    return Number.POSITIVE_INFINITY;
+  }
+
+  return Math.max(0, Math.floor(value));
+};
+
 // Check if a file type matches the accept string
 const parseAccept = (accept: string): string[] => {
   if (!accept || accept === '*') {
@@ -136,9 +147,9 @@ const isFileTypeAccepted = (file: File, acceptTypes: string[]): boolean => {
 
 export const useFileUploadRoot = (params: FileUploadRootParameters) => {
   const {
-    maxFiles = Number.POSITIVE_INFINITY,
-    maxSize = Number.POSITIVE_INFINITY,
-    minSize = 0,
+    maxFiles: maxFilesProp = Number.POSITIVE_INFINITY,
+    maxSize: maxSizeProp = Number.POSITIVE_INFINITY,
+    minSize: minSizeProp = 0,
     accept = '',
     validator,
     multiple = true,
@@ -149,6 +160,12 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
     onCancel,
     locale,
   } = params;
+
+  const maxFiles = normalizeFileCountLimit(maxFilesProp);
+  const normalizedMinSize = normalizeNonNegativeFinite(minSizeProp, 0);
+  const normalizedMaxSize = normalizeNonNegativeFinite(maxSizeProp, Number.POSITIVE_INFINITY);
+  const minSize = Math.min(normalizedMinSize, normalizedMaxSize);
+  const maxSize = Math.max(normalizedMinSize, normalizedMaxSize);
 
   const [files, setFiles] = React.useState<FileUploadRootExtendedFile[]>([]);
   const [announcement, setAnnouncement] = React.useState({ text: '', key: 0 });
