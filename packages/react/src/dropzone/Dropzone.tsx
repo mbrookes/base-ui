@@ -123,6 +123,15 @@ const DropzoneRoot = React.forwardRef<HTMLDivElement, DropzoneProps>(
       }
     });
 
+    const openPicker = useStableCallback(() => {
+      if (inputElementRef.current) {
+        inputElementRef.current.click();
+        return;
+      }
+
+      onOpen?.();
+    });
+
     const handleClick = useStableCallback((event: React.MouseEvent<HTMLDivElement>) => {
       if (disabled) {
         return;
@@ -140,12 +149,7 @@ const DropzoneRoot = React.forwardRef<HTMLDivElement, DropzoneProps>(
       }
 
       event.preventDefault();
-      if (inputElementRef.current) {
-        inputElementRef.current.click();
-        return;
-      }
-
-      onOpen?.();
+      openPicker();
     });
 
     const handleKeyDown = useStableCallback((event: React.KeyboardEvent<HTMLDivElement>) => {
@@ -155,13 +159,7 @@ const DropzoneRoot = React.forwardRef<HTMLDivElement, DropzoneProps>(
 
       if (event.key === 'Enter' || event.key === ' ') {
         event.preventDefault();
-
-        if (inputElementRef.current) {
-          inputElementRef.current.click();
-          return;
-        }
-
-        onOpen?.();
+        openPicker();
       }
     });
 
