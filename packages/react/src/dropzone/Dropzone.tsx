@@ -105,9 +105,8 @@ const DropzoneRoot = React.forwardRef<HTMLDivElement, DropzoneProps>(
       if (disabled) {
         return;
       }
-      if (event.dataTransfer) {
-        event.dataTransfer.dropEffect = 'copy';
-      }
+
+      event.dataTransfer.dropEffect = 'copy';
     });
 
     const handleDrop = useStableCallback((event: React.DragEvent<HTMLDivElement>) => {
@@ -117,7 +116,7 @@ const DropzoneRoot = React.forwardRef<HTMLDivElement, DropzoneProps>(
       }
 
       setDragging(false);
-      const files = Array.from(event.dataTransfer.files ?? []);
+      const files = Array.from(event.dataTransfer.files);
       if (files.length > 0) {
         onFilesDrop?.(files, event);
       }
