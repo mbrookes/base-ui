@@ -16,13 +16,8 @@ import type {
 } from './FileUploadRoot';
 import type { FileUploadContextValue } from './FileUploadContext';
 
-type UseFileUploadRootParameters = FileUploadRootParameters;
-
-type RejectReasonCode =
-  (typeof FILE_UPLOAD_ROOT_REJECT_REASONS)[keyof typeof FILE_UPLOAD_ROOT_REJECT_REASONS];
-
 type ValidationResult = {
-  reason: RejectReasonCode;
+  reason: FileUploadRootRejectReason;
   message: string;
 } | null;
 
@@ -56,19 +51,18 @@ const formatBytes = (bytes: number, locale?: Intl.LocalesArgument) => {
   return `${formattedValue} ${sizes[i]}`;
 };
 
-// Screen reader announcement and error messages (pure functions — no hook dependencies)
 const messages = {
   fileTooLarge: (maxSizeFormatted: string) => `File too large (max ${maxSizeFormatted})`,
   fileTooSmall: (minSizeFormatted: string) => `File too small (min ${minSizeFormatted})`,
-  fileTypeNotAccepted: () => 'File type not accepted',
-  asyncValidatorNotSupported: () =>
+  fileTypeNotAccepted: 'File type not accepted',
+  asyncValidatorNotSupported:
     'Async validators are not supported. Return a string or null synchronously.',
   maxFilesReached: (count: number) => `Cannot add files. Limit of ${count} reached.`,
   duplicateFile: (fileName: string) => `${fileName}: duplicate file`,
   filesAdded: (count: number) => `Added ${count} file${count !== 1 ? 's' : ''}.`,
   filesRejected: (count: number, errors: string[]) => `${count} rejected: ${errors.join(', ')}`,
   fileRemoved: (fileName: string) => `Removed file ${fileName}`,
-  allFilesRemoved: () => 'All files removed',
+  allFilesRemoved: 'All files removed',
 };
 
 // Check if a file type matches the accept string
@@ -96,7 +90,7 @@ const isFileTypeAccepted = (file: File, accept: string): boolean => {
   });
 };
 
-export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
+export const useFileUploadRoot = (params: FileUploadRootParameters) => {
   const {
     maxFiles = Number.POSITIVE_INFINITY,
     maxSize = Number.POSITIVE_INFINITY,
@@ -114,7 +108,7 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
 
   const [files, setFiles] = React.useState<FileUploadRootExtendedFile[]>([]);
   const [isDragging, setIsDragging] = React.useState(false);
-  const [announcement, setAnnouncement] = React.useState('');
+  const [announcement, setAnnouncement] = React.useState({ text: '', key: 0 });
   // Mirror of `files` in a ref so addFiles can read the latest value synchronously.
   const filesRef = React.useRef<FileUploadRootExtendedFile[]>([]);
   filesRef.current = files;
@@ -149,9 +143,7 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
   }, [files, onFilesChange]);
 
   const validateFile = useStableCallback((file: File): ValidationResult => {
-    const hasMaxSizeLimit = Number.isFinite(maxSize);
-
-    if (hasMaxSizeLimit && file.size > maxSize) {
+    if (Number.isFinite(maxSize) && file.size > maxSize) {
       return {
         reason: FILE_UPLOAD_ROOT_REJECT_REASONS.FILE_TOO_LARGE,
         message: messages.fileTooLarge(formatBytes(maxSize, locale)),
@@ -168,7 +160,7 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
     if (!isFileTypeAccepted(file, accept)) {
       return {
         reason: FILE_UPLOAD_ROOT_REJECT_REASONS.MIME_TYPE_NOT_ALLOWED,
-        message: messages.fileTypeNotAccepted(),
+        message: messages.fileTypeNotAccepted,
       };
     }
 
@@ -178,7 +170,7 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
       if (isPromiseLike(customError)) {
         return {
           reason: FILE_UPLOAD_ROOT_REJECT_REASONS.CUSTOM_VALIDATION_FAILED,
-          message: messages.asyncValidatorNotSupported(),
+          message: messages.asyncValidatorNotSupported,
         };
       }
 
@@ -228,7 +220,7 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
         });
       });
 
-      setAnnouncement(maxFilesReachedMessage);
+      setAnnouncement((prev) => ({ text: maxFilesReachedMessage, key: prev.key + 1 }));
 
       onFilesAdd?.(
         [],
@@ -242,7 +234,7 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
       return;
     }
 
-    const candidates = multiple ? newFiles : [newFiles[0]];
+    const candidates = multiple ? newFiles : newFiles.slice(0, 1);
     const validFiles: FileUploadRootExtendedFile[] = [];
     const fileRejections: FileUploadRootRejection[] = [];
     const errors: string[] = [];
@@ -251,10 +243,6 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
     let acceptedCount = 0;
 
     candidates.forEach((file) => {
-      if (!file) {
-        return;
-      }
-
       if (acceptedCount >= remainingSlots) {
         const eventDetails = rejectDetails('MAX_FILES_REACHED', maxFilesReachedMessage);
         fileRejections.push({
@@ -309,7 +297,6 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
 
     const successMsg = validFiles.length > 0 ? messages.filesAdded(validFiles.length) : '';
     const errorMsg = errors.length > 0 ? messages.filesRejected(errors.length, errors) : '';
-    const separator = successMsg && errorMsg ? ' ' : '';
 
     onFilesAdd?.(
       validFiles,
@@ -320,7 +307,7 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
       ),
     );
 
-    setAnnouncement(`${successMsg}${separator}${errorMsg}`);
+    setAnnouncement((prev) => ({ text: [successMsg, errorMsg].filter(Boolean).join(' '), key: prev.key + 1 }));
 
     // Use a functional update to merge our changes on top of the latest committed
     // state, preventing concurrent rapid calls from losing earlier additions.
@@ -343,14 +330,16 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
         }
         // A concurrent update has already been applied; merge our filesToAdd on top.
         const latestKeys = new Set(latestPrev.map((f) => getFileKey(f)));
-        const uniqueFiles = filesToAdd.filter((f) => !latestKeys.has(getFileKey(f)));
-        // Files already present due to a concurrent update are also not added; revoke their URLs.
-        filesToAdd
-          .filter((f) => latestKeys.has(getFileKey(f)))
-          .forEach((f) => {
+        const uniqueFiles: FileUploadRootExtendedFile[] = [];
+        for (const f of filesToAdd) {
+          if (latestKeys.has(getFileKey(f))) {
+            // Already present due to a concurrent update; revoke the URL we created.
             URL.revokeObjectURL(f.preview);
             previewUrlsRef.current.delete(f.id);
-          });
+          } else {
+            uniqueFiles.push(f);
+          }
+        }
         return uniqueFiles.length > 0 ? [...latestPrev, ...uniqueFiles] : latestPrev;
       }
 
@@ -358,30 +347,13 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
         return latestPrev;
       }
 
-      // single-file mode: replace with the newly selected file
-      if (latestPrev !== prev) {
-        latestPrev.forEach((f) => {
-          URL.revokeObjectURL(f.preview);
-          previewUrlsRef.current.delete(f.id);
-        });
-      }
+      // single-file mode: replace with the newly selected file; revoke all previous URLs.
+      latestPrev.forEach((f) => {
+        URL.revokeObjectURL(f.preview);
+        previewUrlsRef.current.delete(f.id);
+      });
       return validFiles;
     });
-
-    if (!multiple) {
-      if (validFiles.length === 0) {
-        return;
-      }
-
-      // Revoke URLs for files that are being replaced.
-      const nextIds = new Set(validFiles.map((f) => f.id));
-      prev.forEach((f) => {
-        if (!nextIds.has(f.id)) {
-          URL.revokeObjectURL(f.preview);
-          previewUrlsRef.current.delete(f.id);
-        }
-      });
-    }
   });
 
   const removeFile = useStableCallback((id: string) => {
@@ -404,7 +376,7 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
     });
 
     if (removedFileName) {
-      setAnnouncement(messages.fileRemoved(removedFileName));
+      setAnnouncement((prev) => ({ text: messages.fileRemoved(removedFileName), key: prev.key + 1 }));
     }
   });
 
@@ -421,7 +393,7 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
       });
       return [];
     });
-    setAnnouncement(messages.allFilesRemoved());
+    setAnnouncement((prev) => ({ text: messages.allFilesRemoved, key: prev.key + 1 }));
   });
 
   const updateFile = useStableCallback((id: string, updates: FileUploadRootFileUpdates) => {
@@ -482,14 +454,7 @@ export const useFileUploadRoot = (params: UseFileUploadRootParameters) => {
       directory,
       disabled,
       inputId,
-      removeFile,
-      clearFiles,
-      addFiles,
-      updateFile,
       onCancel,
-      openFileDialog,
-      setInputElement,
-      onInputChange,
     ],
   );
 
