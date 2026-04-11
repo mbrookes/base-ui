@@ -56,7 +56,7 @@ export interface FileUploadRootRejection {
 
 export interface FileUploadRootState {
   /**
-   * Whether files are currently being dragged over the dropzone.
+  * Whether files are currently being dragged over `FileUpload.Root`.
    */
   dragging: boolean;
   /**

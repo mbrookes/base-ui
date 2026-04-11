@@ -1,6 +1,6 @@
 export enum FileUploadRootDataAttributes {
   /**
-   * Present when files are being dragged over the dropzone.
+  * Present when files are being dragged over `FileUpload.Root`.
    */
   dragging = 'data-dragging',
   /**
