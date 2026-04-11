@@ -30,8 +30,13 @@ const isPromiseLike = (value: unknown): value is PromiseLike<unknown> => {
 };
 
 // Generate a unique key for file deduplication based on name, size, and timestamp
-const getFileKey = (file: { name: string; size: number; lastModified: number }) =>
-  `${file.name}:${file.size}:${file.lastModified}`;
+const getFileKey = (file: {
+  name: string;
+  size: number;
+  lastModified: number;
+  type: string;
+  webkitRelativePath?: string;
+}) => `${file.name}:${file.size}:${file.lastModified}:${file.type}:${file.webkitRelativePath ?? ''}`;
 
 const createExtendedFile = (
   file: File,
@@ -58,7 +63,7 @@ const createExtendedFile = (
   return Object.assign(clonedFile, metadata);
 };
 
-const formatBytes = (bytes: number, locale?: Intl.LocalesArgument) => {
+const formatBytes = (bytes: number, formatter: Intl.NumberFormat) => {
   if (bytes === 0) {
     return '0 B';
   }
@@ -68,10 +73,7 @@ const formatBytes = (bytes: number, locale?: Intl.LocalesArgument) => {
   const i = Math.min(Math.floor(Math.log(bytes) / Math.log(k)), sizes.length - 1);
 
   const value = bytes / Math.pow(k, i);
-  const formattedValue = new Intl.NumberFormat(locale, {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 1,
-  }).format(value);
+  const formattedValue = formatter.format(value);
 
   return `${formattedValue} ${sizes[i]}`;
 };
@@ -85,18 +87,32 @@ const messages = {
   maxFilesReached: (count: number) => `Cannot add files. Limit of ${count} reached.`,
   duplicateFile: (fileName: string) => `${fileName}: duplicate file`,
   filesAdded: (count: number) => `Added ${count} file${count !== 1 ? 's' : ''}.`,
-  filesRejected: (count: number, errors: string[]) => `${count} rejected: ${errors.join(', ')}`,
+  filesRejected: (count: number, errors: string[]) => {
+    const details = errors.slice(0, 3).join(', ');
+    if (!details) {
+      return `${count} rejected`;
+    }
+
+    return `${count} rejected: ${details}${errors.length > 3 ? ', and more' : ''}`;
+  },
   fileRemoved: (fileName: string) => `Removed file ${fileName}`,
   allFilesRemoved: 'All files removed',
 };
 
 // Check if a file type matches the accept string
-const isFileTypeAccepted = (file: File, accept: string): boolean => {
+const parseAccept = (accept: string): string[] => {
   if (!accept || accept === '*') {
+    return [];
+  }
+
+  return accept.split(',').map((t) => t.trim());
+};
+
+const isFileTypeAccepted = (file: File, acceptTypes: string[]): boolean => {
+  if (acceptTypes.length === 0) {
     return true;
   }
 
-  const acceptTypes = accept.split(',').map((t) => t.trim());
   return acceptTypes.some((acceptType) => {
     if (acceptType === '*') {
       return true;
@@ -108,7 +124,7 @@ const isFileTypeAccepted = (file: File, accept: string): boolean => {
     // MIME type wildcard like image/*
     if (acceptType.endsWith('/*')) {
       const prefix = acceptType.slice(0, -2);
-      return file.type.startsWith(prefix);
+      return file.type.startsWith(`${prefix}/`);
     }
     // Exact MIME type like image/png
     return file.type === acceptType;
@@ -134,6 +150,15 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
   const [files, setFiles] = React.useState<FileUploadRootExtendedFile[]>([]);
   const [isDragging, setIsDragging] = React.useState(false);
   const [announcement, setAnnouncement] = React.useState({ text: '', key: 0 });
+  const numberFormatter = React.useMemo(
+    () =>
+      new Intl.NumberFormat(locale, {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 1,
+      }),
+    [locale],
+  );
+  const acceptTypes = React.useMemo(() => parseAccept(accept), [accept]);
   // Mirror of `files` in a ref so addFiles can read the latest value synchronously.
   const filesRef = React.useRef<FileUploadRootExtendedFile[]>([]);
   filesRef.current = files;
@@ -171,18 +196,18 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
     if (Number.isFinite(maxSize) && file.size > maxSize) {
       return {
         reason: FILE_UPLOAD_ROOT_REJECT_REASONS.FILE_TOO_LARGE,
-        message: messages.fileTooLarge(formatBytes(maxSize, locale)),
+        message: messages.fileTooLarge(formatBytes(maxSize, numberFormatter)),
       };
     }
 
     if (file.size < minSize) {
       return {
         reason: FILE_UPLOAD_ROOT_REJECT_REASONS.FILE_TOO_SMALL,
-        message: messages.fileTooSmall(formatBytes(minSize, locale)),
+        message: messages.fileTooSmall(formatBytes(minSize, numberFormatter)),
       };
     }
 
-    if (!isFileTypeAccepted(file, accept)) {
+    if (!isFileTypeAccepted(file, acceptTypes)) {
       return {
         reason: FILE_UPLOAD_ROOT_REJECT_REASONS.MIME_TYPE_NOT_ALLOWED,
         message: messages.fileTypeNotAccepted,
@@ -240,7 +265,7 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
         const eventDetails = rejectDetails('MAX_FILES_REACHED', maxFilesReachedMessage);
         fileRejections.push({
           file,
-          reason: 'MAX_FILES_REACHED',
+          reason: FILE_UPLOAD_ROOT_REJECT_REASONS.MAX_FILES_REACHED,
           eventDetails,
         });
       });
@@ -272,7 +297,7 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
         const eventDetails = rejectDetails('MAX_FILES_REACHED', maxFilesReachedMessage);
         fileRejections.push({
           file,
-          reason: 'MAX_FILES_REACHED',
+          reason: FILE_UPLOAD_ROOT_REJECT_REASONS.MAX_FILES_REACHED,
           eventDetails,
         });
         errors.push(`${file.name}: ${maxFilesReachedMessage}`);
@@ -285,7 +310,7 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
         const eventDetails = rejectDetails('DUPLICATE_FILE', dupMessage);
         fileRejections.push({
           file,
-          reason: 'DUPLICATE_FILE',
+          reason: FILE_UPLOAD_ROOT_REJECT_REASONS.DUPLICATE_FILE,
           eventDetails,
         });
         errors.push(dupMessage);
