@@ -28,7 +28,6 @@ export const FileUploadHiddenInput = React.forwardRef(function FileUploadHiddenI
   componentProps: FileUploadHiddenInputProps,
   forwardedRef: React.ForwardedRef<HTMLInputElement>,
 ) {
-  const { render, className, ...elementProps } = componentProps;
   const { inputId, accept, multiple, directory, disabled, setInputElement, onInputChange } =
     useFileUploadContext();
 
@@ -54,10 +53,8 @@ export const FileUploadHiddenInput = React.forwardRef(function FileUploadHiddenI
     }
   }, [directory]);
 
-  const state: FileUploadHiddenInputState = { disabled };
-
   return useRenderElement('input', componentProps, {
-    state,
+    state: { disabled },
     ref: [forwardedRef, handleInputRef],
     props: [
       {
@@ -69,7 +66,7 @@ export const FileUploadHiddenInput = React.forwardRef(function FileUploadHiddenI
         style: { display: 'none' },
         onChange: onInputChange,
       },
-      elementProps,
+      componentProps,
     ],
   });
 });
