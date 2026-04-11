@@ -164,14 +164,20 @@ export interface FileUploadRootExtendedFile extends File {
   preview: string;
   /**
    * Current status of the file.
+   *
+   * This value may be updated in-place by `updateFile`.
    */
   status: FileUploadRootFileStatus;
   /**
    * Upload progress (0-100).
+   *
+   * This value may be updated in-place by `updateFile`.
    */
   progress: number;
   /**
    * Error message if the file failed to upload.
+   *
+   * This value may be updated in-place by `updateFile`.
    */
   error?: string | undefined;
 }
