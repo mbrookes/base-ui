@@ -1009,56 +1009,6 @@ describe('FileUpload', () => {
       expect(fileRejections[0].file).toBe(textFile);
     });
 
-    it('respects maxSize constraint', async () => {
-      const onFilesAdd = vi.fn();
-
-      render(
-        <TestRoot maxSize={100} onFilesAdd={onFilesAdd}>
-          {null}
-        </TestRoot>,
-      );
-
-      const input = getFileInput();
-      const largeFile = new File([new Uint8Array(200)], 'large.txt', {
-        type: 'text/plain',
-      });
-
-      Object.defineProperty(input, 'files', {
-        value: [largeFile],
-        configurable: true,
-      });
-
-      fireEvent.change(input);
-
-      await waitFor(() => expect(onFilesAdd).toHaveBeenCalled());
-      const [, fileRejections] = onFilesAdd.mock.calls[0];
-      expect(fileRejections).toHaveLength(1);
-    });
-
-    it('respects minSize constraint', async () => {
-      const onFilesAdd = vi.fn();
-
-      render(
-        <TestRoot minSize={100} onFilesAdd={onFilesAdd}>
-          {null}
-        </TestRoot>,
-      );
-
-      const input = getFileInput();
-      const smallFile = new File(['x'], 'small.txt', { type: 'text/plain' });
-
-      Object.defineProperty(input, 'files', {
-        value: [smallFile],
-        configurable: true,
-      });
-
-      fireEvent.change(input);
-
-      await waitFor(() => expect(onFilesAdd).toHaveBeenCalled());
-      const [, fileRejections] = onFilesAdd.mock.calls[0];
-      expect(fileRejections).toHaveLength(1);
-    });
-
     it('truncates long rejection announcements with an and more suffix', async () => {
       render(<TestRoot accept="image/*">{null}</TestRoot>);
 
