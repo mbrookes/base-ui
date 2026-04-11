@@ -262,7 +262,10 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
       const fileRejections: FileUploadRootRejection[] = [];
 
       newFiles.forEach((file) => {
-        const eventDetails = rejectDetails('MAX_FILES_REACHED', maxFilesReachedMessage);
+        const eventDetails = rejectDetails(
+          FILE_UPLOAD_ROOT_REJECT_REASONS.MAX_FILES_REACHED,
+          maxFilesReachedMessage,
+        );
         fileRejections.push({
           file,
           reason: FILE_UPLOAD_ROOT_REJECT_REASONS.MAX_FILES_REACHED,
@@ -294,7 +297,10 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
 
     candidates.forEach((file) => {
       if (acceptedCount >= remainingSlots) {
-        const eventDetails = rejectDetails('MAX_FILES_REACHED', maxFilesReachedMessage);
+        const eventDetails = rejectDetails(
+          FILE_UPLOAD_ROOT_REJECT_REASONS.MAX_FILES_REACHED,
+          maxFilesReachedMessage,
+        );
         fileRejections.push({
           file,
           reason: FILE_UPLOAD_ROOT_REJECT_REASONS.MAX_FILES_REACHED,
@@ -307,7 +313,7 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
       const fileKey = getFileKey(file);
       if (existingKeys.has(fileKey)) {
         const dupMessage = messages.duplicateFile(file.name);
-        const eventDetails = rejectDetails('DUPLICATE_FILE', dupMessage);
+        const eventDetails = rejectDetails(FILE_UPLOAD_ROOT_REJECT_REASONS.DUPLICATE_FILE, dupMessage);
         fileRejections.push({
           file,
           reason: FILE_UPLOAD_ROOT_REJECT_REASONS.DUPLICATE_FILE,
