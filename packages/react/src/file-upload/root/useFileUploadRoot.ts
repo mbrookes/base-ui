@@ -186,7 +186,8 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
   filesRef.current = files;
   const inputRef = React.useRef<HTMLInputElement | null>(null);
   const previewUrlsRef = React.useRef<Map<string, string>>(new Map());
-  const inputId = useBaseUIId();
+  const fallbackInputIdRef = React.useRef(generateId('file-upload-input'));
+  const inputId = useBaseUIId() ?? fallbackInputIdRef.current;
   const isInitialRender = React.useRef(true);
   const lastChangeReasonRef = React.useRef<FileUploadRootChangeReason>('file-added');
   const lastChangeEventRef = React.useRef<Event | undefined>(undefined);
@@ -258,10 +259,17 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
         };
       }
 
-      if (customError) {
+      if (typeof customError === 'string') {
         return {
           reason: FILE_UPLOAD_ROOT_REJECT_REASONS.CUSTOM_VALIDATION_FAILED,
           message: customError,
+        };
+      }
+
+      if (customError) {
+        return {
+          reason: FILE_UPLOAD_ROOT_REJECT_REASONS.CUSTOM_VALIDATION_FAILED,
+          message: 'Custom validator failed.',
         };
       }
     }
@@ -533,7 +541,7 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
       multiple,
       directory,
       disabled,
-      inputId: inputId ?? '',
+      inputId,
       removeFile,
       clearFiles,
       addFiles,
