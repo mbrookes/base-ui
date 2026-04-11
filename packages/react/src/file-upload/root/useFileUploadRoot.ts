@@ -43,14 +43,14 @@ const createExtendedFile = (
   file: File,
   metadata: ExtendedFileMetadata,
 ): FileUploadRootExtendedFile => {
-  Object.keys(metadata).forEach((key) => {
+  for (const key in metadata) {
     Object.defineProperty(file, key, {
       value: metadata[key as keyof ExtendedFileMetadata],
       enumerable: true,
       configurable: true,
       writable: true,
     });
-  });
+  }
   return file as FileUploadRootExtendedFile;
 };
 
@@ -131,9 +131,9 @@ const incrementAnnouncement = (
   setAnnouncement: React.Dispatch<React.SetStateAction<{ text: string; key: number }>>,
   text: string,
 ) => {
-  setAnnouncement((currentAnnouncement) => ({
+  setAnnouncement((prev) => ({
     text,
-    key: currentAnnouncement.key + 1,
+    key: prev.key + 1,
   }));
 };
 
@@ -176,8 +176,6 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
     onCancel,
     locale,
   } = params;
-
-
 
   const [files, setFiles] = React.useState<FileUploadRootExtendedFile[]>([]);
   const [announcement, setAnnouncement] = React.useState({ text: '', key: 0 });
@@ -306,6 +304,11 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
     const remainingSlots = multiple ? selectionLimit - prev.length : selectionLimit;
 
     const maxFilesReachedMessage = messages.maxFilesReached(maxFilesProp);
+    const createAddedEventDetails = () =>
+      createChangeEventDetails<FileUploadRootChangeReason>(
+        FILE_UPLOAD_ROOT_CHANGE_REASONS.FILE_ADDED,
+        event,
+      );
 
     if (remainingSlots <= 0) {
       const fileRejections: FileUploadRootRejection[] = [];
@@ -326,10 +329,7 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
       onFilesAdd?.(
         [],
         fileRejections,
-        createChangeEventDetails<FileUploadRootChangeReason>(
-          FILE_UPLOAD_ROOT_CHANGE_REASONS.FILE_ADDED,
-          event,
-        ),
+        createAddedEventDetails(),
       );
 
       return;
@@ -410,10 +410,7 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
     onFilesAdd?.(
       validFiles,
       fileRejections,
-      createChangeEventDetails<FileUploadRootChangeReason>(
-        FILE_UPLOAD_ROOT_CHANGE_REASONS.FILE_ADDED,
-        event,
-      ),
+      createAddedEventDetails(),
     );
 
     incrementAnnouncement(
@@ -471,20 +468,19 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
       return;
     }
 
-    const currentFile = prev[fileIndex];
     // Metadata updates should not clone file contents; mutate metadata fields only.
     if (updates.status !== undefined) {
-      currentFile.status = updates.status;
+      prev[fileIndex].status = updates.status;
     }
     if (updates.progress !== undefined) {
-      currentFile.progress = updates.progress;
+      prev[fileIndex].progress = updates.progress;
     }
     if ('error' in updates) {
-      currentFile.error = updates.error;
+      prev[fileIndex].error = updates.error;
     }
 
     const nextFiles = [...prev];
-    nextFiles[fileIndex] = currentFile;
+    nextFiles[fileIndex] = prev[fileIndex];
     filesRef.current = nextFiles;
     setFiles(nextFiles);
   });
