@@ -142,22 +142,6 @@ describe('FileUpload.Trigger', () => {
     expect(button).not.toHaveAttribute('data-disabled');
   });
 
-  it('composes onClick handler with custom onClick', async () => {
-    const user = userEvent.setup();
-    const customClick = vi.fn();
-    render(
-      <TestRoot>
-        <FileUpload.Trigger onClick={customClick}>Upload</FileUpload.Trigger>
-      </TestRoot>,
-    );
-
-    const button = screen.getByRole('button', { name: 'Upload' });
-
-    await user.click(button);
-
-    expect(customClick).toHaveBeenCalled();
-  });
-
   it('calls custom onClick exactly once per click', async () => {
     const user = userEvent.setup();
     const customClick = vi.fn();
