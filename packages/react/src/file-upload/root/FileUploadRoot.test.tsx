@@ -649,6 +649,75 @@ describe('FileUpload', () => {
     expect(latestFiles?.[0].name).toBe('photo.jpg');
   });
 
+  it('replaces existing file in single-file mode when replacement is accepted', async () => {
+    let contextValue: TestFileUploadContext | null = null;
+    const onFilesChange = vi.fn();
+    const onFilesAdd = vi.fn();
+
+    function TestComponent() {
+      contextValue = FileUpload.useFileUploadContext() as unknown as TestFileUploadContext;
+      return null;
+    }
+
+    render(
+      <TestRoot multiple={false} accept="*" onFilesChange={onFilesChange} onFilesAdd={onFilesAdd}>
+        <TestComponent />
+      </TestRoot>,
+    );
+
+    const firstFile = new File(['content'], 'first.txt', { type: 'text/plain' });
+    const replacementFile = new File(['content'], 'replacement.txt', { type: 'text/plain' });
+
+    act(() => {
+      getTestContext(contextValue).addFiles([firstFile]);
+    });
+
+    await waitFor(() => expect(onFilesChange).toHaveBeenCalled());
+
+    act(() => {
+      getTestContext(contextValue).addFiles([replacementFile]);
+    });
+
+    await waitFor(() => expect(onFilesAdd).toHaveBeenCalledTimes(2));
+
+    const latestFiles = onFilesChange.mock.calls.at(-1)?.[0];
+    expect(latestFiles).toHaveLength(1);
+    expect(latestFiles?.[0].name).toBe('replacement.txt');
+  });
+
+  it('reports MAX_FILES_REACHED for extra files in a single-file selection', async () => {
+    const onFilesAdd = vi.fn();
+
+    render(
+      <TestRoot maxFiles={1} multiple={false} onFilesAdd={onFilesAdd}>
+        {null}
+      </TestRoot>,
+    );
+
+    const input = getFileInput();
+    const firstFile = new File(['content'], 'first.txt', { type: 'text/plain' });
+    const secondFile = new File(['content'], 'second.txt', { type: 'text/plain' });
+
+    Object.defineProperty(input, 'files', {
+      value: [firstFile, secondFile],
+      configurable: true,
+    });
+
+    fireEvent.change(input);
+
+    await waitFor(() => expect(onFilesAdd).toHaveBeenCalled());
+
+    const [acceptedFiles, fileRejections] = onFilesAdd.mock.calls[0];
+    expect(acceptedFiles).toHaveLength(1);
+    expect(acceptedFiles[0]).toMatchObject({ name: 'first.txt' });
+    expect(fileRejections).toHaveLength(1);
+    expect(fileRejections[0]).toMatchObject({
+      file: secondFile,
+      reason: 'MAX_FILES_REACHED',
+      eventDetails: expect.objectContaining({ reason: 'MAX_FILES_REACHED' }),
+    });
+  });
+
   it('cleans up object URLs on unmount', async () => {
     const { unmount } = render(<TestRoot>{null}</TestRoot>);
 

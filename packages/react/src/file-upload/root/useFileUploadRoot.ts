@@ -239,7 +239,8 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
 
     // Use the ref so rapid successive calls always see the up-to-date list.
     const prev = filesRef.current;
-    const remainingSlots = maxFiles - prev.length;
+    const selectionLimit = multiple ? maxFiles : Math.min(1, maxFiles);
+    const remainingSlots = multiple ? selectionLimit - prev.length : selectionLimit;
 
     // Helper to build reject event details with a message payload.
     const rejectDetails = (reason: FileUploadRootRejectReason, msg: string) =>
@@ -284,7 +285,7 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
       return;
     }
 
-    const candidates = multiple ? newFiles : newFiles.slice(0, 1);
+    const candidates = newFiles;
     const validFiles: FileUploadRootExtendedFile[] = [];
     const fileRejections: FileUploadRootRejection[] = [];
     const errors: string[] = [];
