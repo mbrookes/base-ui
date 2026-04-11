@@ -43,9 +43,9 @@ const createExtendedFile = (
   file: File,
   metadata: ExtendedFileMetadata,
 ): FileUploadRootExtendedFile => {
-  for (const key in metadata) {
+  for (const [key, value] of Object.entries(metadata)) {
     Object.defineProperty(file, key, {
-      value: metadata[key as keyof ExtendedFileMetadata],
+      value,
       enumerable: true,
       configurable: true,
       writable: true,
@@ -287,11 +287,7 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
   });
 
   const addFiles = useStableCallback((newFiles: File[], event?: Event) => {
-    if (disabled) {
-      return;
-    }
-
-    if (newFiles.length === 0) {
+    if (disabled || newFiles.length === 0) {
       return;
     }
 
@@ -304,11 +300,6 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
     const remainingSlots = multiple ? selectionLimit - prev.length : selectionLimit;
 
     const maxFilesReachedMessage = messages.maxFilesReached(maxFilesProp);
-    const createAddedEventDetails = () =>
-      createChangeEventDetails<FileUploadRootChangeReason>(
-        CHANGE_REASONS.FILE_ADDED,
-        event,
-      );
 
     if (remainingSlots <= 0) {
       const fileRejections: FileUploadRootRejection[] = [];
@@ -329,7 +320,7 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
       onFilesAdd?.(
         [],
         fileRejections,
-        createAddedEventDetails(),
+        createChangeEventDetails<FileUploadRootChangeReason>(CHANGE_REASONS.FILE_ADDED, event),
       );
 
       return;
@@ -410,7 +401,7 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
     onFilesAdd?.(
       validFiles,
       fileRejections,
-      createAddedEventDetails(),
+      createChangeEventDetails<FileUploadRootChangeReason>(CHANGE_REASONS.FILE_ADDED, event),
     );
 
     incrementAnnouncement(
@@ -480,15 +471,12 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
     }
 
     const nextFiles = [...prev];
-    nextFiles[fileIndex] = prev[fileIndex];
     filesRef.current = nextFiles;
     setFiles(nextFiles);
   });
 
   const openFileDialog = useStableCallback(() => {
-    if (!disabled && inputRef.current) {
-      inputRef.current.click();
-    }
+    if (!disabled && inputRef.current) inputRef.current.click();
   });
 
   const setInputElement = useStableCallback((node: HTMLInputElement | null) => {
