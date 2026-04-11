@@ -118,7 +118,7 @@ const parseAccept = (accept: string): string[] => {
 
   return accept
     .split(',')
-    .map((t) => t.trim())
+    .map((t) => t.trim().toLowerCase())
     .filter(Boolean);
 };
 
@@ -126,6 +126,8 @@ const isFileTypeAccepted = (file: File, acceptTypes: string[]): boolean => {
   if (acceptTypes.length === 0) {
     return true;
   }
+
+  const fileType = file.type.toLowerCase();
 
   return acceptTypes.some((acceptType) => {
     if (acceptType === '*') {
@@ -138,10 +140,10 @@ const isFileTypeAccepted = (file: File, acceptTypes: string[]): boolean => {
     // MIME type wildcard like image/*
     if (acceptType.endsWith('/*')) {
       const prefix = acceptType.slice(0, -2);
-      return file.type.startsWith(`${prefix}/`);
+      return fileType.startsWith(`${prefix}/`);
     }
     // Exact MIME type like image/png
-    return file.type === acceptType;
+    return fileType === acceptType;
   });
 };
 

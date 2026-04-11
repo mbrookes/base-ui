@@ -359,6 +359,32 @@ describe('FileUpload', () => {
     });
   });
 
+  it('matches MIME accept patterns case-insensitively', async () => {
+    const onFilesAdd = vi.fn();
+
+    render(
+      <TestRoot accept="IMAGE/*,APPLICATION/PDF" onFilesAdd={onFilesAdd}>
+        {null}
+      </TestRoot>,
+    );
+
+    const input = getFileInput();
+    const imageFile = new File(['image'], 'photo.png', { type: 'image/png' });
+    const pdfFile = new File(['pdf'], 'doc.pdf', { type: 'application/pdf' });
+
+    Object.defineProperty(input, 'files', {
+      value: [imageFile, pdfFile],
+      configurable: true,
+    });
+
+    fireEvent.change(input);
+
+    await waitFor(() => expect(onFilesAdd).toHaveBeenCalled());
+    const [acceptedFiles, fileRejections] = onFilesAdd.mock.calls[0];
+    expect(acceptedFiles).toHaveLength(2);
+    expect(fileRejections).toHaveLength(0);
+  });
+
   it('calls onFilesAdd when all selected files are rejected', async () => {
     const onFilesAdd = vi.fn();
 
