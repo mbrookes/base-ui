@@ -146,16 +146,7 @@ const getThrownErrorMessage = (error: unknown) => {
   return 'Custom validator threw an error.';
 };
 
-const normalizeNonNegativeFinite = (value: number, fallback: number) =>
-  Number.isFinite(value) ? Math.max(0, value) : fallback;
 
-const normalizeFileCountLimit = (value: number) => {
-  if (!Number.isFinite(value)) {
-    return Number.POSITIVE_INFINITY;
-  }
-
-  return Math.max(0, Math.floor(value));
-};
 
 const createAnnouncementText = (successText: string, errorText: string) =>
   [successText, errorText].filter(Boolean).join(' ');
@@ -223,9 +214,9 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
     locale,
   } = params;
 
-  const maxFiles = normalizeFileCountLimit(maxFilesProp);
-  const minSize = normalizeNonNegativeFinite(minSizeProp, 0);
-  const maxSize = normalizeNonNegativeFinite(maxSizeProp, Number.POSITIVE_INFINITY);
+  const maxFiles = maxFilesProp;
+  const minSize = minSizeProp;
+  const maxSize = maxSizeProp;
 
   const [files, setFiles] = React.useState<FileUploadRootExtendedFile[]>([]);
   const [announcement, setAnnouncement] = React.useState({ text: '', key: 0 });
