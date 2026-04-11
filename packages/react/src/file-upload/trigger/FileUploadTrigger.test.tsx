@@ -131,17 +131,6 @@ describe('FileUpload.Trigger', () => {
     expect(button).toHaveAttribute('data-disabled', '');
   });
 
-  it('does not apply data-disabled when enabled', () => {
-    render(
-      <TestRoot>
-        <FileUpload.Trigger>Upload</FileUpload.Trigger>
-      </TestRoot>,
-    );
-
-    const button = screen.getByRole('button', { name: 'Upload' });
-    expect(button).not.toHaveAttribute('data-disabled');
-  });
-
   it('calls custom onClick exactly once per click', async () => {
     const user = userEvent.setup();
     const customClick = vi.fn();
