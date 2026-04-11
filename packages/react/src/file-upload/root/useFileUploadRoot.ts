@@ -254,7 +254,7 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
       };
     }
 
-    if (!isFileTypeAccepted(file, acceptTypes)) {
+    if (acceptTypes.length > 0 && !isFileTypeAccepted(file, acceptTypes)) {
       return {
         reason: FILE_UPLOAD_ROOT_REJECT_REASONS.MIME_TYPE_NOT_ALLOWED,
         message: messages.fileTypeNotAccepted,
@@ -339,7 +339,6 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
       return;
     }
 
-    const candidates = newFiles;
     const validFiles: FileUploadRootExtendedFile[] = [];
     const fileRejections: FileUploadRootRejection[] = [];
     const errors: string[] = [];
@@ -347,7 +346,7 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
     const existingKeys = new Set(prev.map(getFileKey));
     let acceptedCount = 0;
 
-    candidates.forEach((file) => {
+    newFiles.forEach((file) => {
       if (acceptedCount >= remainingSlots) {
         fileRejections.push(
           createFileRejection(
@@ -398,9 +397,6 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
       }
     });
 
-    const successMsg = validFiles.length > 0 ? messages.filesAdded(validFiles.length) : '';
-    const errorMsg = errors.length > 0 ? messages.filesRejected(errors.length, errors) : '';
-
     if (!multiple && validFiles.length > 0) {
       // single-file mode: replace with the newly selected file; revoke all previous URLs.
       prev.forEach((f) => {
@@ -408,10 +404,9 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
       });
     }
 
-    const filesToAdd = validFiles;
     let nextFiles = prev;
-    if (filesToAdd.length > 0) {
-      nextFiles = multiple ? [...prev, ...filesToAdd] : filesToAdd;
+    if (validFiles.length > 0) {
+      nextFiles = multiple ? [...prev, ...validFiles] : validFiles;
     }
 
     if (nextFiles !== prev) {
@@ -420,7 +415,7 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
     }
 
     onFilesAdd?.(
-      filesToAdd,
+      validFiles,
       fileRejections,
       createChangeEventDetails<FileUploadRootChangeReason>(
         FILE_UPLOAD_ROOT_CHANGE_REASONS.FILE_ADDED,
@@ -428,7 +423,13 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
       ),
     );
 
-    incrementAnnouncement(setAnnouncement, createAnnouncementText(successMsg, errorMsg));
+    incrementAnnouncement(
+      setAnnouncement,
+      createAnnouncementText(
+        validFiles.length > 0 ? messages.filesAdded(validFiles.length) : '',
+        errors.length > 0 ? messages.filesRejected(errors.length, errors) : '',
+      ),
+    );
   });
 
   const removeFile = useStableCallback((id: string) => {
