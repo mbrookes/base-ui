@@ -29,14 +29,6 @@ type ExtendedFileMetadata = {
   error?: string | undefined;
 };
 
-const isPromiseLike = (value: unknown): value is PromiseLike<unknown> => {
-  if (!value || typeof value !== 'object') {
-    return false;
-  }
-
-  return 'then' in value && typeof (value as PromiseLike<unknown>).then === 'function';
-};
-
 // Generate a unique key for file deduplication based on file identity metadata.
 const getFileKey = (file: {
   name: string;
@@ -115,8 +107,6 @@ const messages = {
   fileTooLarge: (maxSizeFormatted: string) => `File too large (max ${maxSizeFormatted})`,
   fileTooSmall: (minSizeFormatted: string) => `File too small (min ${minSizeFormatted})`,
   fileTypeNotAccepted: 'File type not accepted',
-  asyncValidatorNotSupported:
-    'Async validators are not supported. Return a string or null synchronously.',
   duplicateFile: 'duplicate file',
   maxFilesReached: (count: number) => `Cannot add files. Limit of ${count} reached.`,
   filesAdded: (count: number) => `Added ${count} file${count !== 1 ? 's' : ''}.`,
@@ -134,20 +124,6 @@ const messages = {
 
 const formatFileError = (fileName: string, message: string) => `${fileName}: ${message}`;
 
-const getThrownErrorMessage = (error: unknown) => {
-  if (typeof error === 'string') {
-    return error;
-  }
-
-  if (error instanceof Error && error.message) {
-    return error.message;
-  }
-
-  return 'Custom validator threw an error.';
-};
-
-
-
 const createAnnouncementText = (successText: string, errorText: string) =>
   [successText, errorText].filter(Boolean).join(' ');
 
@@ -161,17 +137,8 @@ const incrementAnnouncement = (
   }));
 };
 
-// Check if a file type matches the accept string
-const parseAccept = (accept: string): string[] => {
-  if (!accept || accept === '*') {
-    return [];
-  }
-
-  return accept
-    .split(',')
-    .map((t) => t.trim().toLowerCase())
-    .filter(Boolean);
-};
+const parseAccept = (accept: string): string[] =>
+  accept.split(',').map((t) => t.trim().toLowerCase()).filter(Boolean);
 
 const isFileTypeAccepted = (file: File, acceptTypes: string[]): boolean => {
   if (acceptTypes.length === 0) {
@@ -241,15 +208,6 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
     return messages.fileTooLarge(formatBytes(maxSize, numberFormatter));
   }, [maxSize, numberFormatter]);
 
-  const warnedInvertedBoundsRef = React.useRef(false);
-  if (process.env.NODE_ENV !== 'production' && minSizeProp > maxSizeProp && !warnedInvertedBoundsRef.current) {
-    warnedInvertedBoundsRef.current = true;
-    console.warn(
-      'Base UI: `minSize` is greater than `maxSize` in <FileUpload.Root>. ' +
-        'The values were normalized to keep file-size validation stable.',
-    );
-  }
-
   // Mirror of `files` in a ref so addFiles can read the latest value synchronously.
   const filesRef = React.useRef<FileUploadRootExtendedFile[]>([]);
   filesRef.current = files;
@@ -318,14 +276,7 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
       } catch (error) {
         return {
           reason: FILE_UPLOAD_ROOT_REJECT_REASONS.CUSTOM_VALIDATION_FAILED,
-          message: getThrownErrorMessage(error),
-        };
-      }
-
-      if (isPromiseLike(customError)) {
-        return {
-          reason: FILE_UPLOAD_ROOT_REJECT_REASONS.CUSTOM_VALIDATION_FAILED,
-          message: messages.asyncValidatorNotSupported,
+          message: error instanceof Error ? error.message : String(error),
         };
       }
 
@@ -339,7 +290,7 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
       if (customError) {
         return {
           reason: FILE_UPLOAD_ROOT_REJECT_REASONS.CUSTOM_VALIDATION_FAILED,
-          message: 'Custom validator failed.',
+          message: String(customError),
         };
       }
     }

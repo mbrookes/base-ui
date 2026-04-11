@@ -667,34 +667,6 @@ describe('FileUpload', () => {
     });
   });
 
-  it('warns about inverted minSize and maxSize bounds', async () => {
-    const onFilesAdd = vi.fn();
-    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-
-    render(
-      <TestRoot minSize={2_000} maxSize={1_000} onFilesAdd={onFilesAdd}>
-        {null}
-      </TestRoot>,
-    );
-
-    const input = getFileInput();
-    const testFile = new File([new Uint8Array(500)], 'small.txt', { type: 'text/plain' });
-
-    Object.defineProperty(input, 'files', {
-      value: [testFile],
-      configurable: true,
-    });
-
-    fireEvent.change(input);
-
-    await waitFor(() => expect(onFilesAdd).toHaveBeenCalled());
-    expect(warnSpy).toHaveBeenCalledWith(
-      expect.stringContaining('`minSize` is greater than `maxSize`'),
-    );
-
-    warnSpy.mockRestore();
-  });
-
   it('respects maxFiles constraint in single file mode', async () => {
     const onFilesChange = vi.fn();
 
