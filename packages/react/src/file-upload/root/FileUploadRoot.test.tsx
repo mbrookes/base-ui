@@ -667,7 +667,7 @@ describe('FileUpload', () => {
     });
   });
 
-  it('normalizes inverted minSize and maxSize bounds', async () => {
+  it('warns about inverted minSize and maxSize bounds', async () => {
     const onFilesAdd = vi.fn();
     const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
@@ -678,19 +678,16 @@ describe('FileUpload', () => {
     );
 
     const input = getFileInput();
-    const validFile = new File([new Uint8Array(1_500)], 'mid.txt', { type: 'text/plain' });
+    const testFile = new File([new Uint8Array(500)], 'small.txt', { type: 'text/plain' });
 
     Object.defineProperty(input, 'files', {
-      value: [validFile],
+      value: [testFile],
       configurable: true,
     });
 
     fireEvent.change(input);
 
     await waitFor(() => expect(onFilesAdd).toHaveBeenCalled());
-    const [acceptedFiles, fileRejections] = onFilesAdd.mock.calls[0];
-    expect(acceptedFiles).toHaveLength(1);
-    expect(fileRejections).toHaveLength(0);
     expect(warnSpy).toHaveBeenCalledWith(
       expect.stringContaining('`minSize` is greater than `maxSize`'),
     );

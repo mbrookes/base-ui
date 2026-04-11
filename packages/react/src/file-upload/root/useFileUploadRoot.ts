@@ -224,10 +224,8 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
   } = params;
 
   const maxFiles = normalizeFileCountLimit(maxFilesProp);
-  const normalizedMinSize = normalizeNonNegativeFinite(minSizeProp, 0);
-  const normalizedMaxSize = normalizeNonNegativeFinite(maxSizeProp, Number.POSITIVE_INFINITY);
-  const minSize = Math.min(normalizedMinSize, normalizedMaxSize);
-  const maxSize = Math.max(normalizedMinSize, normalizedMaxSize);
+  const minSize = normalizeNonNegativeFinite(minSizeProp, 0);
+  const maxSize = normalizeNonNegativeFinite(maxSizeProp, Number.POSITIVE_INFINITY);
 
   const [files, setFiles] = React.useState<FileUploadRootExtendedFile[]>([]);
   const [announcement, setAnnouncement] = React.useState({ text: '', key: 0 });
