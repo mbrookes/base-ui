@@ -252,7 +252,10 @@ describe('FileUpload', () => {
     expect(fileRejections[0]).toMatchObject({
       reason: 'DUPLICATE_FILE',
       file: expect.any(File),
-      eventDetails: expect.objectContaining({ reason: 'DUPLICATE_FILE' }),
+      eventDetails: expect.objectContaining({
+        reason: 'DUPLICATE_FILE',
+        message: 'duplicate file',
+      }),
     });
   });
 
@@ -666,6 +669,7 @@ describe('FileUpload', () => {
 
   it('normalizes inverted minSize and maxSize bounds', async () => {
     const onFilesAdd = vi.fn();
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
     render(
       <TestRoot minSize={2_000} maxSize={1_000} onFilesAdd={onFilesAdd}>
@@ -687,6 +691,11 @@ describe('FileUpload', () => {
     const [acceptedFiles, fileRejections] = onFilesAdd.mock.calls[0];
     expect(acceptedFiles).toHaveLength(1);
     expect(fileRejections).toHaveLength(0);
+    expect(warnSpy).toHaveBeenCalledWith(
+      expect.stringContaining('`minSize` is greater than `maxSize`'),
+    );
+
+    warnSpy.mockRestore();
   });
 
   it('respects maxFiles constraint in single file mode', async () => {
@@ -1200,6 +1209,30 @@ describe('FileUpload', () => {
       await waitFor(() => {
         expect(screen.getByText('All files removed', { exact: false })).toBeInTheDocument();
       });
+    });
+
+    it('does nothing when clearFiles is called with an empty list', () => {
+      const onFilesChange = vi.fn();
+      let contextValue: TestFileUploadContext | null = null;
+
+      function TestComponent() {
+        const ctx = FileUpload.useFileUploadContext();
+        contextValue = ctx as unknown as TestFileUploadContext;
+        return null;
+      }
+
+      render(
+        <TestRoot onFilesChange={onFilesChange}>
+          <TestComponent />
+        </TestRoot>,
+      );
+
+      act(() => {
+        getTestContext(contextValue).clearFiles();
+      });
+
+      expect(getTestContext(contextValue).files).toHaveLength(0);
+      expect(onFilesChange).not.toHaveBeenCalled();
     });
   });
 
@@ -1876,23 +1909,58 @@ describe('FileUpload', () => {
       fireEvent.change(input, { target: { files: [file] } });
 
       await waitFor(() => {
-        expect(onFilesChange).toHaveBeenCalledWith(
-          expect.arrayContaining([
-            expect.objectContaining({
-              name: 'test.txt',
-              id: expect.any(String),
-              preview: expect.stringContaining('blob:'),
-              status: 'idle',
-              progress: 0,
-            }),
-          ]),
-          expect.objectContaining({ reason: expect.any(String) }),
-        );
+        expect(onFilesChange).toHaveBeenCalled();
       });
+
+      const [filesArg, detailsArg] = onFilesChange.mock.calls.at(-1)!;
+      expect(filesArg).toHaveLength(1);
+      expect(filesArg[0].name).toBe('test.txt');
+      expect(filesArg[0]).toMatchObject({
+        id: expect.any(String),
+        preview: expect.stringContaining('blob:'),
+        status: 'idle',
+        progress: 0,
+      });
+      expect(detailsArg).toMatchObject({ reason: expect.any(String) });
     });
   });
 
   describe('File property preservation', () => {
+    it('does not mutate the original File object with upload metadata', async () => {
+      let contextValue: TestFileUploadContext | null = null;
+
+      function TestComponent() {
+        const ctx = FileUpload.useFileUploadContext();
+        contextValue = ctx as unknown as TestFileUploadContext;
+        return null;
+      }
+
+      render(
+        <TestRoot>
+          <TestComponent />
+        </TestRoot>,
+      );
+
+      const input = getFileInput();
+      const originalFile = new File(['content'], 'original.txt', { type: 'text/plain' });
+
+      expect(originalFile).not.toHaveProperty('id');
+      expect(originalFile).not.toHaveProperty('preview');
+      expect(originalFile).not.toHaveProperty('status');
+      expect(originalFile).not.toHaveProperty('progress');
+
+      fireEvent.change(input, { target: { files: [originalFile] } });
+
+      await waitFor(() => {
+        expect(getTestContext(contextValue).files).toHaveLength(1);
+      });
+
+      expect(originalFile).not.toHaveProperty('id');
+      expect(originalFile).not.toHaveProperty('preview');
+      expect(originalFile).not.toHaveProperty('status');
+      expect(originalFile).not.toHaveProperty('progress');
+    });
+
     it('preserves File size property', async () => {
       let contextValue: TestFileUploadContext | null = null;
 

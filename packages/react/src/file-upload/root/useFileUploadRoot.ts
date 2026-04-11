@@ -21,6 +21,14 @@ type ValidationResult = {
   message: string;
 } | null;
 
+type ExtendedFileMetadata = {
+  id: string;
+  preview: string;
+  status: FileUploadRootExtendedFile['status'];
+  progress: number;
+  error?: string | undefined;
+};
+
 const isPromiseLike = (value: unknown): value is PromiseLike<unknown> => {
   if (!value || typeof value !== 'object') {
     return false;
@@ -41,14 +49,52 @@ const getFileKey = (file: {
 
 const createExtendedFile = (
   file: File,
-  metadata: {
-    id: string;
-    preview: string;
-    status: FileUploadRootExtendedFile['status'];
-    progress: number;
-    error?: string | undefined;
-  },
-): FileUploadRootExtendedFile => Object.assign(file, metadata) as FileUploadRootExtendedFile;
+  metadata: ExtendedFileMetadata,
+): FileUploadRootExtendedFile => {
+  Object.keys(metadata).forEach((key) => {
+    Object.defineProperty(file, key, {
+      value: metadata[key as keyof ExtendedFileMetadata],
+      enumerable: true,
+      configurable: true,
+      writable: true,
+    });
+  });
+  return file as FileUploadRootExtendedFile;
+};
+
+const createFileRejection = (
+  file: File,
+  reason: FileUploadRootRejectReason,
+  message: string,
+  event?: Event,
+): FileUploadRootRejection => ({
+  file,
+  reason,
+  eventDetails: createChangeEventDetails<FileUploadRootRejectReason, { message: string }>(
+    reason,
+    event,
+    undefined,
+    { message },
+  ),
+});
+
+const cloneFileForUpload = (file: File) => {
+  const cloned = new File([file], file.name, {
+    type: file.type,
+    lastModified: file.lastModified,
+  });
+
+  const webkitRelativePath = (file as File & { webkitRelativePath?: string | undefined })
+    .webkitRelativePath;
+  if (webkitRelativePath) {
+    Object.defineProperty(cloned, 'webkitRelativePath', {
+      configurable: true,
+      value: webkitRelativePath,
+    });
+  }
+
+  return cloned;
+};
 
 const formatBytes = (bytes: number, formatter: Intl.NumberFormat) => {
   if (bytes === 0) {
@@ -109,6 +155,19 @@ const normalizeFileCountLimit = (value: number) => {
   }
 
   return Math.max(0, Math.floor(value));
+};
+
+const createAnnouncementText = (successText: string, errorText: string) =>
+  [successText, errorText].filter(Boolean).join(' ');
+
+const incrementAnnouncement = (
+  setAnnouncement: React.Dispatch<React.SetStateAction<{ text: string; key: number }>>,
+  text: string,
+) => {
+  setAnnouncement((currentAnnouncement) => ({
+    text,
+    key: currentAnnouncement.key + 1,
+  }));
 };
 
 // Check if a file type matches the accept string
@@ -181,12 +240,35 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
     [locale],
   );
   const acceptTypes = React.useMemo(() => parseAccept(accept), [accept]);
+  const formattedMinSize = React.useMemo(
+    () => messages.fileTooSmall(formatBytes(minSize, numberFormatter)),
+    [minSize, numberFormatter],
+  );
+  const formattedMaxSize = React.useMemo(() => {
+    if (!Number.isFinite(maxSize)) {
+      return null;
+    }
+
+    return messages.fileTooLarge(formatBytes(maxSize, numberFormatter));
+  }, [maxSize, numberFormatter]);
+
+  const warnedInvertedBoundsRef = React.useRef(false);
+  if (process.env.NODE_ENV !== 'production' && minSizeProp > maxSizeProp && !warnedInvertedBoundsRef.current) {
+    warnedInvertedBoundsRef.current = true;
+    console.warn(
+      'Base UI: `minSize` is greater than `maxSize` in <FileUpload.Root>. ' +
+        'The values were normalized to keep file-size validation stable.',
+    );
+  }
+
   // Mirror of `files` in a ref so addFiles can read the latest value synchronously.
   const filesRef = React.useRef<FileUploadRootExtendedFile[]>([]);
   filesRef.current = files;
   const inputRef = React.useRef<HTMLInputElement | null>(null);
-  const previewUrlsRef = React.useRef<Map<string, string>>(new Map());
-  const fallbackInputIdRef = React.useRef(generateId('file-upload-input'));
+  const fallbackInputIdRef = React.useRef<string | null>(null);
+  if (fallbackInputIdRef.current === null) {
+    fallbackInputIdRef.current = generateId('file-upload-input');
+  }
   const inputId = useBaseUIId() ?? fallbackInputIdRef.current;
   const isInitialRender = React.useRef(true);
   const lastChangeReasonRef = React.useRef<FileUploadRootChangeReason>('file-added');
@@ -194,11 +276,10 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
 
   // Cleanup object URLs to prevent memory leaks
   React.useEffect(() => {
-    const previewUrls = previewUrlsRef.current;
-
     return () => {
-      previewUrls.forEach((previewUrl) => URL.revokeObjectURL(previewUrl));
-      previewUrls.clear();
+      filesRef.current.forEach((file) => {
+        URL.revokeObjectURL(file.preview);
+      });
     };
   }, []);
 
@@ -221,14 +302,14 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
     if (Number.isFinite(maxSize) && file.size > maxSize) {
       return {
         reason: FILE_UPLOAD_ROOT_REJECT_REASONS.FILE_TOO_LARGE,
-        message: messages.fileTooLarge(formatBytes(maxSize, numberFormatter)),
+        message: formattedMaxSize ?? '',
       };
     }
 
     if (file.size < minSize) {
       return {
         reason: FILE_UPLOAD_ROOT_REJECT_REASONS.FILE_TOO_SMALL,
-        message: messages.fileTooSmall(formatBytes(minSize, numberFormatter)),
+        message: formattedMinSize,
       };
     }
 
@@ -294,36 +375,23 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
     const selectionLimit = multiple ? maxFiles : Math.min(1, maxFiles);
     const remainingSlots = multiple ? selectionLimit - prev.length : selectionLimit;
 
-    // Helper to build reject event details with a message payload.
-    const rejectDetails = (reason: FileUploadRootRejectReason, msg: string) =>
-      createChangeEventDetails<FileUploadRootRejectReason, { message: string }>(
-        reason,
-        event,
-        undefined,
-        { message: msg },
-      );
-
     const maxFilesReachedMessage = messages.maxFilesReached(maxFiles);
 
     if (remainingSlots <= 0) {
       const fileRejections: FileUploadRootRejection[] = [];
 
       newFiles.forEach((file) => {
-        const eventDetails = rejectDetails(
-          FILE_UPLOAD_ROOT_REJECT_REASONS.MAX_FILES_REACHED,
-          maxFilesReachedMessage,
+        fileRejections.push(
+          createFileRejection(
+            file,
+            FILE_UPLOAD_ROOT_REJECT_REASONS.MAX_FILES_REACHED,
+            maxFilesReachedMessage,
+            event,
+          ),
         );
-        fileRejections.push({
-          file,
-          reason: FILE_UPLOAD_ROOT_REJECT_REASONS.MAX_FILES_REACHED,
-          eventDetails,
-        });
       });
 
-      setAnnouncement((currentAnnouncement) => ({
-        text: maxFilesReachedMessage,
-        key: currentAnnouncement.key + 1,
-      }));
+      incrementAnnouncement(setAnnouncement, maxFilesReachedMessage);
 
       onFilesAdd?.(
         [],
@@ -347,52 +415,44 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
 
     candidates.forEach((file) => {
       if (acceptedCount >= remainingSlots) {
-        const eventDetails = rejectDetails(
-          FILE_UPLOAD_ROOT_REJECT_REASONS.MAX_FILES_REACHED,
-          maxFilesReachedMessage,
+        fileRejections.push(
+          createFileRejection(
+            file,
+            FILE_UPLOAD_ROOT_REJECT_REASONS.MAX_FILES_REACHED,
+            maxFilesReachedMessage,
+            event,
+          ),
         );
-        fileRejections.push({
-          file,
-          reason: FILE_UPLOAD_ROOT_REJECT_REASONS.MAX_FILES_REACHED,
-          eventDetails,
-        });
         errors.push(formatFileError(file.name, maxFilesReachedMessage));
         return;
       }
 
       const fileKey = getFileKey(file);
       if (existingKeys.has(fileKey)) {
-        const dupMessage = formatFileError(file.name, messages.duplicateFile);
-        const eventDetails = rejectDetails(
-          FILE_UPLOAD_ROOT_REJECT_REASONS.DUPLICATE_FILE,
-          dupMessage,
+        fileRejections.push(
+          createFileRejection(
+            file,
+            FILE_UPLOAD_ROOT_REJECT_REASONS.DUPLICATE_FILE,
+            messages.duplicateFile,
+            event,
+          ),
         );
-        fileRejections.push({
-          file,
-          reason: FILE_UPLOAD_ROOT_REJECT_REASONS.DUPLICATE_FILE,
-          eventDetails,
-        });
-        errors.push(dupMessage);
+        errors.push(formatFileError(file.name, messages.duplicateFile));
         return;
       }
 
       const error = validateFile(file);
       if (error) {
-        const eventDetails = rejectDetails(error.reason, error.message);
-        fileRejections.push({
-          file,
-          reason: error.reason,
-          eventDetails,
-        });
+        fileRejections.push(createFileRejection(file, error.reason, error.message, event));
         errors.push(formatFileError(file.name, error.message));
       } else {
         existingKeys.add(fileKey);
 
         const id = generateId('file');
-        const preview = URL.createObjectURL(file);
-        previewUrlsRef.current.set(id, preview);
+        const normalizedFile = cloneFileForUpload(file);
+        const preview = URL.createObjectURL(normalizedFile);
 
-        const extendedFile = createExtendedFile(file, {
+        const extendedFile = createExtendedFile(normalizedFile, {
           id,
           preview,
           status: 'idle' as const,
@@ -411,7 +471,6 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
       // single-file mode: replace with the newly selected file; revoke all previous URLs.
       prev.forEach((f) => {
         URL.revokeObjectURL(f.preview);
-        previewUrlsRef.current.delete(f.id);
       });
     }
 
@@ -435,10 +494,7 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
       ),
     );
 
-    setAnnouncement((currentAnnouncement) => ({
-      text: [successMsg, errorMsg].filter(Boolean).join(' '),
-      key: currentAnnouncement.key + 1,
-    }));
+    incrementAnnouncement(setAnnouncement, createAnnouncementText(successMsg, errorMsg));
   });
 
   const removeFile = useStableCallback((id: string) => {
@@ -452,33 +508,29 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
     }
 
     URL.revokeObjectURL(fileToRemove.preview);
-    previewUrlsRef.current.delete(id);
 
     const nextFiles = prev.filter((f) => f.id !== id);
     filesRef.current = nextFiles;
     setFiles(nextFiles);
 
-    setAnnouncement((currentAnnouncement) => ({
-      text: messages.fileRemoved(fileToRemove.name),
-      key: currentAnnouncement.key + 1,
-    }));
+    incrementAnnouncement(setAnnouncement, messages.fileRemoved(fileToRemove.name));
   });
 
   const clearFiles = useStableCallback(() => {
+    if (filesRef.current.length === 0) {
+      return;
+    }
+
     lastChangeReasonRef.current = FILE_UPLOAD_ROOT_CHANGE_REASONS.FILES_CLEARED;
     lastChangeEventRef.current = undefined;
 
     filesRef.current.forEach((file) => {
       URL.revokeObjectURL(file.preview);
-      previewUrlsRef.current.delete(file.id);
     });
 
     filesRef.current = [];
     setFiles([]);
-    setAnnouncement((currentAnnouncement) => ({
-      text: messages.allFilesRemoved,
-      key: currentAnnouncement.key + 1,
-    }));
+    incrementAnnouncement(setAnnouncement, messages.allFilesRemoved);
   });
 
   const updateFile = useStableCallback((id: string, updates: FileUploadRootFileUpdates) => {
