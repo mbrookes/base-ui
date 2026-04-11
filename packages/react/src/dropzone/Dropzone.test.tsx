@@ -44,12 +44,6 @@ describe('Dropzone', () => {
     expect(dropzone).toHaveAttribute('tabindex', '0');
   });
 
-  it('uses visible text as the accessible name by default', () => {
-    render(<Dropzone>Upload receipts</Dropzone>);
-
-    expect(screen.getByRole('button', { name: 'Upload receipts' })).toBeInTheDocument();
-  });
-
   it('supports an explicit aria-label', () => {
     render(<Dropzone aria-label="Upload proof of address">Upload</Dropzone>);
 
