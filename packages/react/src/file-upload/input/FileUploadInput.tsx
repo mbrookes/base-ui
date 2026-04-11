@@ -44,13 +44,8 @@ export const FileUploadHiddenInput = React.forwardRef(function FileUploadHiddenI
       return;
     }
 
-    if (directory) {
-      node.setAttribute('webkitdirectory', '');
-      node.setAttribute('directory', '');
-    } else {
-      node.removeAttribute('webkitdirectory');
-      node.removeAttribute('directory');
-    }
+    node.toggleAttribute('webkitdirectory', directory);
+    node.toggleAttribute('directory', directory);
   }, [directory]);
 
   return useRenderElement('input', componentProps, {
