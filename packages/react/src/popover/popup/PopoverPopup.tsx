@@ -34,7 +34,7 @@ export const PopoverPopup = React.forwardRef(function PopoverPopup(
   componentProps: PopoverPopup.Props,
   forwardedRef: React.ForwardedRef<HTMLDivElement>,
 ) {
-  const { className, render, initialFocus, finalFocus, ...elementProps } = componentProps;
+  const { className, render, initialFocus, finalFocus, style, ...elementProps } = componentProps;
 
   const { store } = usePopoverRootContext();
 
@@ -91,6 +91,7 @@ export const PopoverPopup = React.forwardRef(function PopoverPopup(
     transitionStatus,
   };
   const focusManagerModal = modal !== false && hasClosePart;
+  store.useSyncedValue('focusManagerModal', focusManagerModal);
 
   const setPopupElement = React.useCallback(
     (element: HTMLElement | null) => {

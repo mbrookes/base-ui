@@ -39,6 +39,7 @@ export const TooltipTrigger = fastComponentRef(function TooltipTrigger(
     closeOnClick = true,
     closeDelay,
     id: idProp,
+    style,
     ...elementProps
   } = componentProps;
 
@@ -118,6 +119,7 @@ export const TooltipTrigger = fastComponentRef(function TooltipTrigger(
     },
     triggerElementRef,
     isActiveTrigger: isTriggerActive,
+    isClosing: () => store.select('transitionStatus') === 'ending',
   });
 
   const focusProps = useFocus(floatingRootContext, { enabled: !disabled }).reference;

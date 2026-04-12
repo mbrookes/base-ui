@@ -1,7 +1,7 @@
+import { vi, it, describe, expect } from 'vitest';
 import * as React from 'react';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { vi, it, describe } from 'vitest';
 import { flushMicrotasks } from '@mui/internal-test-utils';
 import { isJSDOM } from '@base-ui/utils/detectBrowser';
 import { useClick, useDismiss, useFloating, useInteractions, useListNavigation } from '../index';
@@ -634,11 +634,11 @@ describe('useListNavigation', () => {
 
     it('true - onNavigate is called with `null` when escaped', async () => {
       const spy = vi.fn();
-      render(<App allowEscape virtual loopFocus onNavigate={(index) => spy(index)} />);
+      render(<App allowEscape virtual loopFocus onNavigate={spy} />);
       fireEvent.keyDown(screen.getByRole('button'), { key: 'ArrowDown' });
       fireEvent.keyDown(screen.getByRole('button'), { key: 'ArrowUp' });
       expect(spy).toHaveBeenCalledTimes(2);
-      expect(spy).toHaveBeenCalledWith(null);
+      expect(spy.mock.calls.some((args) => args[0] === null)).toBe(true);
       await flushMicrotasks();
     });
   });
@@ -688,26 +688,78 @@ describe('useListNavigation', () => {
   describe('prop: focusItemOnHover', () => {
     it('true - focuses item on hover and syncs the active index', async () => {
       const spy = vi.fn();
-      render(<App onNavigate={(index) => spy(index)} />);
+      render(<App onNavigate={spy} />);
       fireEvent.click(screen.getByRole('button'));
       fireEvent.mouseMove(screen.getByTestId('item-1'));
       expect(screen.getByTestId('item-1')).toHaveFocus();
       fireEvent.pointerLeave(screen.getByTestId('item-1'));
       expect(screen.getByRole('menu')).toHaveFocus();
+      expect(spy.mock.calls.some((args) => args[0] === 1)).toBe(true);
+      await flushMicrotasks();
+    });
+
+    it('true - syncs an item on hover when activeIndex is null but selectedIndex matches', async () => {
+      const spy = vi.fn();
+      render(<App focusItemOnOpen={false} selectedIndex={1} onNavigate={(index) => spy(index)} />);
+
+      fireEvent.click(screen.getByRole('button'));
+      fireEvent.mouseMove(screen.getByTestId('item-1'));
+
+      expect(screen.getByTestId('item-1')).toHaveFocus();
       expect(spy).toHaveBeenCalledWith(1);
       await flushMicrotasks();
     });
 
     it('false - does not focus item on hover and does not sync the active index', async () => {
       const spy = vi.fn();
-      render(
-        <App onNavigate={(index) => spy(index)} focusItemOnOpen={false} focusItemOnHover={false} />,
-      );
+      render(<App onNavigate={spy} focusItemOnOpen={false} focusItemOnHover={false} />);
       fireEvent.click(screen.getByRole('button'));
       fireEvent.mouseMove(screen.getByTestId('item-1'));
       expect(screen.getByTestId('item-1')).not.toHaveFocus();
       expect(spy).toHaveBeenCalledTimes(0);
       await flushMicrotasks();
+    });
+
+    it('does not clear the active item on pointer leave when the pointer is still within bounds', async () => {
+      const spy = vi.fn();
+      render(<App onNavigate={spy} />);
+
+      fireEvent.click(screen.getByRole('button'));
+
+      const item = screen.getByTestId('item-1');
+
+      vi.spyOn(item, 'getBoundingClientRect').mockReturnValue({
+        x: 0,
+        y: 0,
+        top: 0,
+        right: 100,
+        bottom: 40,
+        left: 0,
+        width: 100,
+        height: 40,
+        toJSON() {
+          return {};
+        },
+      });
+
+      fireEvent.keyDown(screen.getByRole('menu'), { key: 'ArrowDown' });
+
+      await waitFor(() => {
+        expect(item).toHaveFocus();
+      });
+
+      const callsBeforeLeave = spy.mock.calls.length;
+
+      await act(async () => {
+        fireEvent.pointerLeave(item, {
+          clientX: 50,
+          clientY: 20,
+          pointerType: 'mouse',
+        });
+      });
+
+      await flushMicrotasks();
+      expect(spy).toHaveBeenCalledTimes(callsBeforeLeave);
     });
   });
 

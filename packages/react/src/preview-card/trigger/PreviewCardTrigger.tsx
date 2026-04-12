@@ -29,6 +29,7 @@ export const PreviewCardTrigger = React.forwardRef(function PreviewCardTrigger(
     id: idProp,
     payload,
     handle,
+    style,
     ...elementProps
   } = componentProps;
 
@@ -72,6 +73,7 @@ export const PreviewCardTrigger = React.forwardRef(function PreviewCardTrigger(
     delay: () => ({ open: delayWithDefault, close: closeDelayWithDefault }),
     triggerElementRef,
     isActiveTrigger: isTriggerActive,
+    isClosing: () => store.select('transitionStatus') === 'ending',
   });
 
   const focusProps = useFocus(floatingRootContext, { delay: delayWithDefault });

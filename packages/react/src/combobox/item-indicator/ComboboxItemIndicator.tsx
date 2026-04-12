@@ -10,6 +10,8 @@ import { transitionStatusMapping } from '../../utils/stateAttributesMapping';
 /**
  * Indicates whether the item is selected.
  * Renders a `<span>` element.
+ *
+ * Documentation: [Base UI Combobox](https://base-ui.com/react/components/combobox)
  */
 export const ComboboxItemIndicator = React.forwardRef(function ComboboxItemIndicator(
   componentProps: ComboboxItemIndicator.Props,
@@ -36,7 +38,7 @@ const Inner = React.memo(
       componentProps: ComboboxItemIndicator.Props,
       forwardedRef: React.ForwardedRef<HTMLSpanElement>,
     ) => {
-      const { render, className, keepMounted, ...elementProps } = componentProps;
+      const { render, className, style, keepMounted, ...elementProps } = componentProps;
 
       const { selected } = useComboboxItemContext();
 

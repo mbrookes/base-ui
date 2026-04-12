@@ -18,12 +18,14 @@ const stateAttributesMapping: StateAttributesMapping<ComboboxBackdropState> = {
 /**
  * An overlay displayed beneath the popup.
  * Renders a `<div>` element.
+ *
+ * Documentation: [Base UI Combobox](https://base-ui.com/react/components/combobox)
  */
 export const ComboboxBackdrop = React.forwardRef(function ComboboxBackdrop(
   componentProps: ComboboxBackdrop.Props,
   forwardedRef: React.ForwardedRef<HTMLDivElement>,
 ) {
-  const { className, render, ...elementProps } = componentProps;
+  const { className, render, style, ...elementProps } = componentProps;
 
   const store = useComboboxRootContext();
 

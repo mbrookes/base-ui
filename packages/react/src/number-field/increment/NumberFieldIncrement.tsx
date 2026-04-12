@@ -23,6 +23,7 @@ export const NumberFieldIncrement = React.forwardRef(function NumberFieldIncreme
     className,
     disabled: disabledProp = false,
     nativeButton = true,
+    style,
     ...elementProps
   } = componentProps;
 
@@ -35,16 +36,11 @@ export const NumberFieldIncrement = React.forwardRef(function NumberFieldIncreme
     incrementValue,
     inputRef,
     inputValue,
-    intentionalTouchCheckTimeout,
-    isPressedRef,
     locale,
     maxWithDefault,
-    movesAfterTouchRef,
     readOnly,
     setValue,
-    startAutoChange,
     state,
-    stopAutoChange,
     value,
     valueRef,
     lastChangedValueRef,
@@ -57,8 +53,6 @@ export const NumberFieldIncrement = React.forwardRef(function NumberFieldIncreme
   const props = useNumberFieldButton({
     isIncrement: true,
     inputRef,
-    startAutoChange,
-    stopAutoChange,
     inputValue,
     disabled,
     readOnly,
@@ -69,9 +63,6 @@ export const NumberFieldIncrement = React.forwardRef(function NumberFieldIncreme
     allowInputSyncRef,
     formatOptionsRef,
     valueRef,
-    isPressedRef,
-    intentionalTouchCheckTimeout,
-    movesAfterTouchRef,
     locale,
     lastChangedValueRef,
     onValueCommitted,

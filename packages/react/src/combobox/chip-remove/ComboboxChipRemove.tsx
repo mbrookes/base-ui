@@ -15,6 +15,8 @@ import { findItemIndex } from '../../utils/itemEquality';
 /**
  * A button to remove a chip.
  * Renders a `<button>` element.
+ *
+ * Documentation: [Base UI Combobox](https://base-ui.com/react/components/combobox)
  */
 export const ComboboxChipRemove = React.forwardRef(function ComboboxChipRemove(
   componentProps: ComboboxChipRemove.Props,
@@ -25,6 +27,7 @@ export const ComboboxChipRemove = React.forwardRef(function ComboboxChipRemove(
     className,
     disabled: disabledProp = false,
     nativeButton = true,
+    style,
     ...elementProps
   } = componentProps;
 
@@ -93,6 +96,9 @@ export const ComboboxChipRemove = React.forwardRef(function ComboboxChipRemove(
     props: [
       {
         tabIndex: -1,
+        onMouseDown(event) {
+          event.preventDefault();
+        },
         onClick(event) {
           if (disabled || readOnly) {
             return;

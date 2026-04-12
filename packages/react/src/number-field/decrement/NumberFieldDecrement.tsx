@@ -23,6 +23,7 @@ export const NumberFieldDecrement = React.forwardRef(function NumberFieldDecreme
     className,
     disabled: disabledProp = false,
     nativeButton = true,
+    style,
     ...elementProps
   } = componentProps;
 
@@ -35,15 +36,10 @@ export const NumberFieldDecrement = React.forwardRef(function NumberFieldDecreme
     incrementValue,
     inputRef,
     inputValue,
-    intentionalTouchCheckTimeout,
-    isPressedRef,
     minWithDefault,
-    movesAfterTouchRef,
     readOnly,
     setValue,
-    startAutoChange,
     state,
-    stopAutoChange,
     value,
     valueRef,
     locale,
@@ -57,8 +53,6 @@ export const NumberFieldDecrement = React.forwardRef(function NumberFieldDecreme
   const props = useNumberFieldButton({
     isIncrement: false,
     inputRef,
-    startAutoChange,
-    stopAutoChange,
     inputValue,
     disabled,
     readOnly,
@@ -69,9 +63,6 @@ export const NumberFieldDecrement = React.forwardRef(function NumberFieldDecreme
     allowInputSyncRef,
     formatOptionsRef,
     valueRef,
-    isPressedRef,
-    intentionalTouchCheckTimeout,
-    movesAfterTouchRef,
     locale,
     lastChangedValueRef,
     onValueCommitted,

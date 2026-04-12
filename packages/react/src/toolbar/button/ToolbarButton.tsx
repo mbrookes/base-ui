@@ -23,6 +23,7 @@ export const ToolbarButton = React.forwardRef(function ToolbarButton(
     focusableWhenDisabled = true,
     render,
     nativeButton = true,
+    style,
     ...elementProps
   } = componentProps;
 
@@ -51,6 +52,7 @@ export const ToolbarButton = React.forwardRef(function ToolbarButton(
       tag="button"
       render={render}
       className={className}
+      style={style}
       metadata={itemMetadata}
       state={state}
       refs={[forwardedRef, buttonRef]}
@@ -85,7 +87,7 @@ export interface ToolbarButtonProps
    */
   disabled?: boolean | undefined;
   /**
-   * When `true` the item remains focuseable when disabled.
+   * When `true` the item remains focusable when disabled.
    * @default true
    */
   focusableWhenDisabled?: boolean | undefined;

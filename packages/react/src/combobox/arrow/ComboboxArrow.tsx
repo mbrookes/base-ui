@@ -12,12 +12,14 @@ import { popupStateMapping } from '../../utils/popupStateMapping';
 /**
  * Displays an element positioned against the anchor.
  * Renders a `<div>` element.
+ *
+ * Documentation: [Base UI Combobox](https://base-ui.com/react/components/combobox)
  */
 export const ComboboxArrow = React.forwardRef(function ComboboxArrow(
   componentProps: ComboboxArrow.Props,
   forwardedRef: React.ForwardedRef<HTMLDivElement>,
 ) {
-  const { className, render, ...elementProps } = componentProps;
+  const { className, render, style, ...elementProps } = componentProps;
 
   const store = useComboboxRootContext();
   const { arrowRef, side, align, arrowUncentered, arrowStyles } = useComboboxPositionerContext();
