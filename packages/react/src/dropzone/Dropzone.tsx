@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import { useStableCallback } from '@base-ui/utils/useStableCallback';
+import { contains, getTarget } from '../floating-ui-react/utils/element';
 import { useRenderElement } from '../utils/useRenderElement';
 import type { BaseUIComponentProps } from '../utils/types';
 import { DropzoneContext } from './DropzoneContext';
@@ -95,7 +96,7 @@ const DropzoneRoot = React.forwardRef<HTMLDivElement, DropzoneProps>(
       if (disabled) {
         return;
       }
-      if (event.currentTarget.contains(event.relatedTarget as Node)) {
+      if (contains(event.currentTarget, event.relatedTarget as Element | null)) {
         return;
       }
       setDragging(false);
@@ -138,9 +139,9 @@ const DropzoneRoot = React.forwardRef<HTMLDivElement, DropzoneProps>(
       }
 
       // Do not trigger open when nested interactive controls are used.
-      const target = event.target as HTMLElement;
+      const target = getTarget(event.nativeEvent) as HTMLElement | null;
       const currentTarget = event.currentTarget as HTMLElement;
-      const interactiveElement = target.closest(
+      const interactiveElement = target?.closest(
         'button, a, input, textarea, select, [role="button"]',
       );
 

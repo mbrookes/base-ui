@@ -3,6 +3,7 @@
 import * as React from 'react';
 import { useStableCallback } from '@base-ui/utils/useStableCallback';
 import { visuallyHidden } from '@base-ui/utils/visuallyHidden';
+import { getTarget } from '../../floating-ui-react/utils/element';
 import { useRenderElement } from '../../utils/useRenderElement';
 import type { BaseUIComponentProps, HTMLProps } from '../../utils/types';
 import type { BaseUIChangeEventDetails } from '../../utils/createBaseUIEventDetails';
@@ -268,7 +269,7 @@ export const FileUploadRoot = React.forwardRef<HTMLDivElement, FileUploadRootPro
         return;
       }
 
-      const target = event.target as HTMLElement | null;
+      const target = getTarget(event.nativeEvent) as HTMLElement | null;
       if (target && (target.isContentEditable || /^(INPUT|TEXTAREA)$/.test(target.tagName))) {
         return;
       }
