@@ -1535,7 +1535,6 @@ describe('FileUpload', () => {
       expect(onFilesAdd.mock.calls[1]?.[0]).toHaveLength(0);
       expect(onFilesAdd.mock.calls[1]?.[1]).toHaveLength(2);
     });
-
   });
 
   describe('onFilesChange callback', () => {

@@ -19,8 +19,7 @@ export const REJECT_REASONS = {
   DUPLICATE_FILE: 'duplicate-file',
 } as const;
 
-export type FileUploadRootRejectReason =
-  (typeof REJECT_REASONS)[keyof typeof REJECT_REASONS];
+export type FileUploadRootRejectReason = (typeof REJECT_REASONS)[keyof typeof REJECT_REASONS];
 
 export const CHANGE_REASONS = {
   FILE_ADDED: 'file-added',
@@ -29,8 +28,7 @@ export const CHANGE_REASONS = {
   FILE_UPDATED: 'file-updated',
 } as const;
 
-export type FileUploadRootChangeReason =
-  (typeof CHANGE_REASONS)[keyof typeof CHANGE_REASONS];
+export type FileUploadRootChangeReason = (typeof CHANGE_REASONS)[keyof typeof CHANGE_REASONS];
 
 export type FileUploadRootChangeEventDetails = BaseUIChangeEventDetails<FileUploadRootChangeReason>;
 

@@ -43,7 +43,7 @@ export const FileUploadTrigger = React.forwardRef(function FileUploadTriggerComp
   componentProps: FileUploadTriggerProps,
   ref: React.ForwardedRef<HTMLElement>,
 ) {
-  const { render, className, nativeButton = true, ...elementProps } = componentProps;
+  const { render, className, style, nativeButton = true, ...elementProps } = componentProps;
   const { openFileDialog, disabled } = useFileUploadContext();
 
   const { getButtonProps, buttonRef } = useButton({

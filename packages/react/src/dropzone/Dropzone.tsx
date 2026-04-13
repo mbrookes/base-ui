@@ -57,6 +57,7 @@ const DropzoneRoot = React.forwardRef<HTMLDivElement, DropzoneProps>(
     const {
       className,
       render,
+      style,
       children,
       disabled = false,
       dragging: draggingProp,

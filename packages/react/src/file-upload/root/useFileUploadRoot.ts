@@ -138,7 +138,10 @@ const incrementAnnouncement = (
 };
 
 const parseAccept = (accept: string): string[] =>
-  accept.split(',').map((t) => t.trim().toLowerCase()).filter(Boolean);
+  accept
+    .split(',')
+    .map((t) => t.trim().toLowerCase())
+    .filter(Boolean);
 
 const isFileTypeAccepted = (file: File, acceptTypes: string[]): boolean => {
   const fileType = file.type.toLowerCase();
@@ -229,7 +232,10 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
       isInitialRenderRef.current = false;
       return;
     }
-    onFilesChange?.(files, createChangeEventDetails(lastChangeReasonRef.current, lastChangeEventRef.current));
+    onFilesChange?.(
+      files,
+      createChangeEventDetails(lastChangeReasonRef.current, lastChangeEventRef.current),
+    );
   }, [files, onFilesChange]);
 
   // Stable callbacks intentionally avoid dependency-array churn while still
@@ -351,12 +357,7 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
       const fileKey = getFileKey(file);
       if (existingKeys.has(fileKey)) {
         fileRejections.push(
-          createFileRejection(
-            file,
-            REJECT_REASONS.DUPLICATE_FILE,
-            messages.duplicateFile,
-            event,
-          ),
+          createFileRejection(file, REJECT_REASONS.DUPLICATE_FILE, messages.duplicateFile, event),
         );
         errors.push(formatFileError(file.name, messages.duplicateFile));
         continue;

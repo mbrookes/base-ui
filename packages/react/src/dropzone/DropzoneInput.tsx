@@ -27,7 +27,7 @@ export const DropzoneHiddenInput = React.forwardRef(function DropzoneHiddenInput
   forwardedRef: React.ForwardedRef<HTMLInputElement>,
 ) {
   const { disabled, setInputElement } = useDropzoneContext();
-  const { render, className, ...elementProps } = componentProps;
+  const { render, className, style, ...elementProps } = componentProps;
 
   return useRenderElement('input', componentProps, {
     state: { disabled },
