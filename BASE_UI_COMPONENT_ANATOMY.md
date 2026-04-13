@@ -12,14 +12,12 @@ Purpose: high-signal implementation rules for coding agents working on `packages
    - `useStableCallback` for handlers used in effects/event systems
    - `useTimeout` instead of `setTimeout`
    - `useAnimationFrame` instead of `requestAnimationFrame`
-5. Preserve `render` when using `useRenderElement`:
-   - pass original `componentProps` as arg 2
-   - do not drop/rename-away `render`
-   - do **not** pass a React component function (`render={MyComponent}`); pass an element (`render={<MyComponent />}`) or a render function (`render={(props) => <MyComponent {...props} />}`). `useRenderElement` emits a dev warning when an uppercase-named function is received.
-6. Avoid `as any` unless unavoidable and justified.
-7. Do **not** wrap `state` in `React.useMemo`. Compute it as a plain object on every render — memoizing it is unnecessary because `useRenderElement` only uses it for data-attribute mapping and class/style resolution.
-8. Optional public props should be `?: T | undefined`.
-9. Data attributes are presence-based (`data-disabled`, not `data-disabled="true"`).
+5. Use shadow DOM-safe DOM utilities in event/DOM logic: use `contains`, `getTarget`, and `activeElement` for traversal/targeting; use `ownerDocument` and `ownerWindow` instead of global `document`/`window` when code is tied to a DOM node.
+6. Preserve `render` when using `useRenderElement`: pass original `componentProps` as arg 2; do not drop/rename-away `render`; do **not** pass a React component function (`render={MyComponent}`); pass an element (`render={<MyComponent />}`) or a render function (`render={(props) => <MyComponent {...props} />}`). `useRenderElement` emits a dev warning when an uppercase-named function is received.
+7. Avoid `as any` unless unavoidable and justified.
+8. Do **not** wrap `state` in `React.useMemo`. Compute it as a plain object on every render — memoizing it is unnecessary because `useRenderElement` only uses it for data-attribute mapping and class/style resolution.
+9. Optional public props should be `?: T | undefined`.
+10. Data attributes are presence-based (`data-disabled`, not `data-disabled="true"`).
 
 ## 2. Choose Component Shape
 
@@ -68,6 +66,17 @@ export type * from './item/ComponentItem';
 export { ComponentRoot as Root } from './root/ComponentRoot';
 export { ComponentItem as Item } from './item/ComponentItem';
 ```
+
+### Compound With Wrapped Shared Parts
+
+Use when a public namespace (for example, `Autocomplete`) reuses internals from another component (for example, `Combobox`) but must own part identity and docs metadata.
+
+Rules:
+
+1. `index.parts.ts` should export owned part symbols from local wrapper files for public parts (`./trigger/AutocompleteTrigger`, not directly from `../combobox/...`) when those parts need component-specific docs/type identity.
+2. Wrapper part files should re-export the shared implementation with an owned symbol (`export const AutocompleteTrigger = ComboboxTrigger as AutocompleteTrigger;`) and define local `State`, `Props`, and namespace types.
+3. `index.ts` should export type surfaces from owned wrapper part files for those parts.
+4. Keep purely shared internal-only parts re-exported from the shared component only when there is no public identity/docs requirement.
 
 ### Single-part
 
@@ -201,7 +210,13 @@ Use `it.skipIf(isJSDOM)` / `describe.skipIf(isJSDOM)` for layout-dependent tests
 1. Public props/types need JSDoc.
 2. Include `@default` tags where defaults exist.
 3. Keep docs snippets aligned with runtime behavior.
-4. If public API/JSDoc changes, run:
+4. Keep docs anatomy in sync with part exports:
+   - component anatomy snippets should include all public parts required for a minimal functional composition
+   - if a new required/primary part is added (or part ownership changes), update anatomy docs in the same change
+5. Keep Data Attributes docs synchronized with runtime:
+   - when adding/changing public `*DataAttributes` enums or state mappings, update generated docs/types references accordingly
+   - verify attribute names and semantics match runtime presence-based behavior
+6. If public API/JSDoc changes, run:
 
 ```bash
 pnpm docs:api
