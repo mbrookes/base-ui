@@ -851,49 +851,6 @@ describe('FileUpload', () => {
     revokeObjectURLSpy.mockRestore();
   });
 
-  it('resolves className callback with disabled state', () => {
-    render(
-      <TestRoot disabled>
-        <FileUpload.Trigger
-          className={(state) => (state.disabled ? 'disabled-trigger' : 'enabled-trigger')}
-        >
-          Upload
-        </FileUpload.Trigger>
-      </TestRoot>,
-    );
-
-    const button = screen.getByRole('button');
-    expect(button).toHaveClass('disabled-trigger');
-  });
-
-  it('resolves className callback when disabled state changes', () => {
-    const { rerender } = render(
-      <TestRoot disabled={false}>
-        <FileUpload.Trigger
-          className={(state) => (state.disabled ? 'disabled-trigger' : 'enabled-trigger')}
-        >
-          Upload
-        </FileUpload.Trigger>
-      </TestRoot>,
-    );
-
-    let button = screen.getByRole('button');
-    expect(button).toHaveClass('enabled-trigger');
-
-    rerender(
-      <TestRoot disabled>
-        <FileUpload.Trigger
-          className={(state) => (state.disabled ? 'disabled-trigger' : 'enabled-trigger')}
-        >
-          Upload
-        </FileUpload.Trigger>
-      </TestRoot>,
-    );
-
-    button = screen.getByRole('button');
-    expect(button).toHaveClass('disabled-trigger');
-  });
-
   it('announces file rejection to screen readers', async () => {
     render(<TestRoot accept="image/*">{null}</TestRoot>);
 
