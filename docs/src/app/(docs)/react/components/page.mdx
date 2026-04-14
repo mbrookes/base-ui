@@ -794,14 +794,10 @@ A drop target primitive for drag-and-drop and click-to-select file selection.
   - Integration with File Upload
   - API reference
 - Exports:
-  - Dropzone - Dropzone
-    - Props: children, className, disabled, dragging, onDraggingChange, onFilesDrop, onOpen, render, style
-    - Data Attributes: data-disabled, data-dragging
-  - Dropzone - HiddenInput
-    - Props: className, render, style
   - Dropzone
-    - Props: children, className, disabled, dragging, onDraggingChange, onFilesDrop, onOpen, render, style
     - Data Attributes: data-disabled, data-dragging
+  - DropzoneHiddenInput
+- Types: Dropzone.Props, Dropzone.State, DropzoneHiddenInput.Props, DropzoneHiddenInput.State
 
 </details>
 
@@ -902,13 +898,13 @@ A file upload primitive for selecting, validating, and managing files.
   - API reference
 - Exports:
   - File Upload - Root
-    - Props: accept, children, className, directory, disabled, locale, maxFiles, maxSize, minSize, multiple, onCancel, onFilesAdd, onFilesChange, render, style, validator
+    - Props: accept, children, directory, disabled, locale, maxFiles, maxSize, minSize, multiple, onCancel, onFilesAdd, onFilesChange, validator
+    - Data Attributes: data-disabled
+  - File Upload - Trigger
     - Data Attributes: data-disabled
   - File Upload - HiddenInput
-    - Props: className, render, style
-  - File Upload - Trigger
-    - Props: className, nativeButton, render, style
-    - Data Attributes: data-disabled
+  - File Upload - useFileUploadContext
+- Types: FileUpload.HiddenInput.Props, FileUpload.HiddenInput.State, FileUpload.Root.ChangeEventDetails, FileUpload.Root.ChangeReason, FileUpload.Root.ExtendedFile, FileUpload.Root.FileStatus, FileUpload.Root.FileUpdates, FileUpload.Root.Parameters, FileUpload.Root.Props, FileUpload.Root.RejectEventDetails, FileUpload.Root.RejectReason, FileUpload.Root.Rejection, FileUpload.Root.State, FileUpload.Trigger.Props, FileUpload.Trigger.State
 
 </details>
 
