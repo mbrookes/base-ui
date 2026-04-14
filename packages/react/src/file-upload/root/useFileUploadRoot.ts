@@ -4,7 +4,7 @@ import * as React from 'react';
 import { useId as useBaseUIId } from '@base-ui/utils/useId';
 import { useStableCallback } from '@base-ui/utils/useStableCallback';
 import { generateId } from '@base-ui/utils/generateId';
-import { createChangeEventDetails } from '../../utils/createBaseUIEventDetails';
+import { createChangeEventDetails } from '../../internals/createBaseUIEventDetails';
 import { REJECT_REASONS, CHANGE_REASONS } from './FileUploadRoot';
 import type {
   FileUploadRootRejectReason,

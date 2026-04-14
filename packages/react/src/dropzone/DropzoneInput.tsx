@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { useRenderElement } from '../utils/useRenderElement';
+import { useRenderElement } from '../internals/useRenderElement';
 import type { BaseUIComponentProps } from '../utils/types';
 import { useDropzoneContext } from './DropzoneContext';
 

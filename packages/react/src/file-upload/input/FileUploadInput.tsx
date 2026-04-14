@@ -3,7 +3,7 @@
 import * as React from 'react';
 import { useStableCallback } from '@base-ui/utils/useStableCallback';
 import { useIsoLayoutEffect } from '@base-ui/utils/useIsoLayoutEffect';
-import { useRenderElement } from '../../utils/useRenderElement';
+import { useRenderElement } from '../../internals/useRenderElement';
 import type { BaseUIComponentProps } from '../../utils/types';
 import { useFileUploadContext } from '../root/FileUploadContext';
 

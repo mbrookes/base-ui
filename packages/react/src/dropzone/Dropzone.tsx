@@ -3,7 +3,7 @@
 import * as React from 'react';
 import { useStableCallback } from '@base-ui/utils/useStableCallback';
 import { contains, getTarget } from '../floating-ui-react/utils/element';
-import { useRenderElement } from '../utils/useRenderElement';
+import { useRenderElement } from '../internals/useRenderElement';
 import type { BaseUIComponentProps } from '../utils/types';
 import { DropzoneContext } from './DropzoneContext';
 import { DropzoneHiddenInput } from './DropzoneInput';

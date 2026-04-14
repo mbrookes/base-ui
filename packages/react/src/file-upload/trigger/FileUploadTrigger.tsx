@@ -3,8 +3,8 @@
 import * as React from 'react';
 import { useStableCallback } from '@base-ui/utils/useStableCallback';
 import type { BaseUIComponentProps, NativeButtonProps } from '../../utils/types';
-import { useRenderElement } from '../../utils/useRenderElement';
-import { useButton } from '../../use-button/useButton';
+import { useRenderElement } from '../../internals/useRenderElement';
+import { useButton } from '../../internals/use-button/useButton';
 import { useFileUploadContext } from '../root/FileUploadContext';
 import { fileUploadTriggerStateAttributesMapping } from './stateAttributesMapping';
 
