@@ -1,9 +1,9 @@
-import type { StateAttributesMapping } from '../../utils/getStateAttributesProps';
+import type { StateAttributesMapping } from '../../internals/getStateAttributesProps';
 import type { FileUploadRoot } from './FileUploadRoot';
 import { FileUploadRootDataAttributes } from './FileUploadRootDataAttributes';
 
 export const fileUploadRootStateAttributesMapping: StateAttributesMapping<FileUploadRoot.State> = {
-  disabled(value): Record<string, string> | null {
+  disabled(value: boolean): Record<string, string> | null {
     return value ? { [FileUploadRootDataAttributes.disabled]: '' } : null;
   },
 };

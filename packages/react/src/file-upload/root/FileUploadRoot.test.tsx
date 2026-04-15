@@ -1702,4 +1702,98 @@ describe('FileUpload', () => {
       expect(detailsArg).toMatchObject({ reason: expect.any(String) });
     });
   });
+
+  describe('Accessibility', () => {
+    it('supports custom id on HiddenInput for label association', () => {
+      render(
+        <TestRoot>
+          <label htmlFor="my-upload">Upload files</label>
+          <FileUpload.HiddenInput id="my-upload" data-testid="input" />
+          <FileUpload.Trigger>Select</FileUpload.Trigger>
+        </TestRoot>,
+      );
+
+      const input = screen.getByTestId('input');
+      const label = screen.getByText('Upload files');
+
+      expect(input).toHaveAttribute('id', 'my-upload');
+      expect(label).toHaveAttribute('for', 'my-upload');
+    });
+
+    it('generates unique id for HiddenInput when not provided', () => {
+      render(
+        <TestRoot>
+          <FileUpload.HiddenInput data-testid="input" />
+        </TestRoot>,
+      );
+
+      const input = screen.getByTestId('input');
+      const id = input.id;
+
+      expect(id).toBeTruthy();
+      expect(typeof id).toBe('string');
+      expect(id.length).toBeGreaterThan(0);
+    });
+
+    it('announces file additions to screen readers', async () => {
+      render(
+        <TestRoot>
+          <FileUpload.Trigger>Select</FileUpload.Trigger>
+        </TestRoot>,
+      );
+
+      const input = getFileInput();
+      const files = [new File(['content'], 'test.txt', { type: 'text/plain' })];
+
+      fireEvent.change(input, { target: { files } });
+
+      const announcement = screen.getByRole('status');
+      expect(announcement).toHaveAttribute('aria-live', 'polite');
+
+      await waitFor(() => {
+        expect(announcement).toHaveTextContent('Added 1 file');
+      });
+    });
+
+    it('announces file rejections to screen readers', async () => {
+      render(
+        <TestRoot maxSize={100}>
+          <FileUpload.Trigger>Select</FileUpload.Trigger>
+        </TestRoot>,
+      );
+
+      const input = getFileInput();
+      const files = [new File(['x'.repeat(101)], 'large.txt', { type: 'text/plain' })];
+
+      fireEvent.change(input, { target: { files } });
+
+      await waitFor(() => {
+        const announcement = screen.getByRole('status');
+        expect(announcement).toHaveTextContent(/rejected|too large/i);
+      });
+    });
+
+    it('renders hidden input with proper accessibility attributes', () => {
+      render(
+        <TestRoot>
+          <FileUpload.HiddenInput data-testid="input" />
+        </TestRoot>,
+      );
+
+      const input = screen.getByTestId('input');
+
+      // Hidden input should not be visible but should exist in DOM
+      expect(input).toHaveStyle({ display: 'none' });
+      expect(input).toBeInTheDocument();
+      expect(input).toHaveAttribute('type', 'file');
+    });
+
+    it('provides aria-live status region for announcements', () => {
+      render(<TestRoot>{null}</TestRoot>);
+
+      const statusRegion = screen.getByRole('status');
+      expect(statusRegion).toHaveAttribute('aria-live', 'polite');
+      expect(statusRegion).toHaveAttribute('aria-atomic', 'true');
+    });
+  });
 });

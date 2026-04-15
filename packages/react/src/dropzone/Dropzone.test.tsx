@@ -289,4 +289,61 @@ describe('Dropzone', () => {
 
     expect(screen.getByTestId('input')).toBeDisabled();
   });
+
+  describe('Accessibility', () => {
+    it('announces drag state transitions to screen readers', async () => {
+      render(<Dropzone data-testid="dropzone">Drop files</Dropzone>);
+
+      const dropzone = screen.getByTestId('dropzone');
+
+      // Initial status region should exist
+      let statusRegion = dropzone.querySelector('[role="status"]');
+      expect(statusRegion).toHaveAttribute('aria-live', 'polite');
+      expect(statusRegion).toHaveAttribute('aria-atomic', 'true');
+
+      // Drag enter - announces ready state
+      fireEvent.dragEnter(dropzone);
+      statusRegion = dropzone.querySelector('[role="status"]');
+      expect(statusRegion!.textContent).toContain('Ready to drop files');
+
+      // Drag leave - announces drag ended
+      const dragLeaveEvent = createEvent.dragLeave(dropzone);
+      Object.defineProperty(dragLeaveEvent, 'relatedTarget', {
+        value: null,
+        configurable: true,
+      });
+      fireEvent(dropzone, dragLeaveEvent);
+      statusRegion = dropzone.querySelector('[role="status"]');
+      expect(statusRegion!.textContent).toContain('Drag ended');
+    });
+
+    it('announces successfully dropped files', () => {
+      render(<Dropzone data-testid="dropzone">Drop files</Dropzone>);
+
+      const dropzone = screen.getByTestId('dropzone');
+
+      const file1 = new File(['content'], 'test1.txt', { type: 'text/plain' });
+      const file2 = new File(['content'], 'test2.txt', { type: 'text/plain' });
+
+      fireEvent.drop(dropzone, {
+        dataTransfer: createDataTransfer([file1, file2]),
+      });
+
+      const statusRegion = dropzone.querySelector('[role="status"]');
+      expect(statusRegion!.textContent).toContain('Dropped 2 files');
+    });
+
+    it('announces when no files are dropped', () => {
+      render(<Dropzone data-testid="dropzone">Drop files</Dropzone>);
+
+      const dropzone = screen.getByTestId('dropzone');
+
+      fireEvent.drop(dropzone, {
+        dataTransfer: createDataTransfer([]),
+      });
+
+      const statusRegion = dropzone.querySelector('[role="status"]');
+      expect(statusRegion!.textContent).toContain('No files dropped');
+    });
+  });
 });

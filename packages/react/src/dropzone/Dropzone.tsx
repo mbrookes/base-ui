@@ -4,7 +4,7 @@ import * as React from 'react';
 import { useStableCallback } from '@base-ui/utils/useStableCallback';
 import { contains, getTarget } from '../floating-ui-react/utils/element';
 import { useRenderElement } from '../internals/useRenderElement';
-import type { BaseUIComponentProps } from '../utils/types';
+import type { BaseUIComponentProps } from '../internals/types';
 import { DropzoneContext } from './DropzoneContext';
 import { DropzoneHiddenInput } from './DropzoneInput';
 import { dropzoneStateAttributesMapping } from './stateAttributesMapping';
@@ -51,6 +51,31 @@ export interface DropzoneProps extends Omit<
 /**
  * Interactive drop target and file selection area.
  *
+ * Features drag-and-drop support, keyboard activation, and automatic accessibility announcements.
+ * Announces drag state changes to screen readers.
+ *
+ * @example
+ * ```tsx
+ * <Dropzone
+ *   onFilesDrop={(files) => handleUpload(files)}
+ *   aria-label="Drag and drop files here"
+ * >
+ *   Drop files to upload, or click to browse
+ * </Dropzone>
+ * ```
+ *
+ * @example
+ * With render function to show drag state:
+ * ```tsx
+ * <Dropzone onFilesDrop={handleFiles}>
+ *   {({ isDragging }) => (
+ *     <div style={{ background: isDragging ? '#f0f0f0' : 'white' }}>
+ *       {isDragging ? 'Release to upload' : 'Drag files here'}
+ *     </div>
+ *   )}
+ * </Dropzone>
+ * ```
+ *
  * Documentation: [Base UI Dropzone](https://base-ui.com/react/components/dropzone)
  */
 const DropzoneRoot = React.forwardRef<HTMLDivElement, DropzoneProps>(
@@ -69,6 +94,10 @@ const DropzoneRoot = React.forwardRef<HTMLDivElement, DropzoneProps>(
     } = props;
 
     const [draggingUncontrolled, setDraggingUncontrolled] = React.useState(false);
+    const [announcement, setAnnouncement] = React.useState<{ text: string; key: number }>({
+      text: '',
+      key: 0,
+    });
     const inputElementRef = React.useRef<HTMLInputElement | null>(null);
     const dragging = draggingProp ?? draggingUncontrolled;
 
@@ -89,6 +118,10 @@ const DropzoneRoot = React.forwardRef<HTMLDivElement, DropzoneProps>(
         return;
       }
       setDragging(true);
+      setAnnouncement((prev) => ({
+        text: 'Ready to drop files',
+        key: prev.key + 1,
+      }));
     });
 
     const handleDragLeave = useStableCallback((event: React.DragEvent<HTMLDivElement>) => {
@@ -100,6 +133,10 @@ const DropzoneRoot = React.forwardRef<HTMLDivElement, DropzoneProps>(
         return;
       }
       setDragging(false);
+      setAnnouncement((prev) => ({
+        text: 'Drag ended',
+        key: prev.key + 1,
+      }));
     });
 
     const handleDragOver = useStableCallback((event: React.DragEvent<HTMLDivElement>) => {
@@ -119,6 +156,14 @@ const DropzoneRoot = React.forwardRef<HTMLDivElement, DropzoneProps>(
 
       setDragging(false);
       const files = Array.from(event.dataTransfer.files);
+      const message =
+        files.length > 0
+          ? `Dropped ${files.length} file${files.length !== 1 ? 's' : ''}`
+          : 'No files dropped';
+      setAnnouncement((prev) => ({
+        text: message,
+        key: prev.key + 1,
+      }));
       if (files.length > 0) {
         onFilesDrop?.(files, event);
       }
@@ -188,8 +233,26 @@ const DropzoneRoot = React.forwardRef<HTMLDivElement, DropzoneProps>(
               onDrop: handleDrop,
               onClick: handleClick,
               onKeyDown: handleKeyDown,
-              children:
-                typeof children === 'function' ? children({ isDragging: dragging }) : children,
+              children: (
+                <React.Fragment>
+                  <div
+                    key={announcement.key}
+                    role="status"
+                    aria-live="polite"
+                    aria-atomic="true"
+                    style={{
+                      position: 'absolute',
+                      left: '-10000px',
+                      width: '1px',
+                      height: '1px',
+                      overflow: 'hidden',
+                    }}
+                  >
+                    {announcement.text}
+                  </div>
+                  {typeof children === 'function' ? children({ isDragging: dragging }) : children}
+                </React.Fragment>
+              ),
             },
             elementProps,
           ],

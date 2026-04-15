@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { useRenderElement } from '../internals/useRenderElement';
-import type { BaseUIComponentProps } from '../utils/types';
+import type { BaseUIComponentProps } from '../internals/types';
 import { useDropzoneContext } from './DropzoneContext';
 
 export interface DropzoneHiddenInputState {
