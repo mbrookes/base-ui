@@ -1783,7 +1783,11 @@ describe('FileUpload', () => {
       const input = screen.getByTestId('input');
 
       // Hidden input should not be visible but should exist in DOM
-      expect(input).toHaveStyle({ display: 'none' });
+      expect(input).toHaveStyle({
+        position: 'fixed',
+        width: '1px',
+        height: '1px',
+      });
       expect(input).toBeInTheDocument();
       expect(input).toHaveAttribute('type', 'file');
     });

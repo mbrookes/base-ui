@@ -3,6 +3,7 @@
 import * as React from 'react';
 import { useStableCallback } from '@base-ui/utils/useStableCallback';
 import { useIsoLayoutEffect } from '@base-ui/utils/useIsoLayoutEffect';
+import { visuallyHidden, visuallyHiddenInput } from '@base-ui/utils/visuallyHidden';
 import { useRenderElement } from '../../internals/useRenderElement';
 import type { BaseUIComponentProps } from '../../internals/types';
 import { useFileUploadContext } from '../root/FileUploadContext';
@@ -84,7 +85,7 @@ export const FileUploadHiddenInput = React.forwardRef(function FileUploadHiddenI
         multiple: directory || multiple,
         disabled,
         suppressHydrationWarning: true,
-        style: { display: 'none' },
+          style: elementProps.name ? visuallyHiddenInput : visuallyHidden,
         onChange: onInputChange,
       },
       elementProps,

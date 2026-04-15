@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { visuallyHidden, visuallyHiddenInput } from '@base-ui/utils/visuallyHidden';
 import { useRenderElement } from '../internals/useRenderElement';
 import type { BaseUIComponentProps } from '../internals/types';
 import { useDropzoneContext } from './DropzoneContext';
@@ -38,7 +39,7 @@ export const DropzoneHiddenInput = React.forwardRef(function DropzoneHiddenInput
         type: 'file',
         disabled,
         suppressHydrationWarning: true,
-        style: { display: 'none' },
+          style: elementProps.name ? visuallyHiddenInput : visuallyHidden,
       },
     ],
   });
