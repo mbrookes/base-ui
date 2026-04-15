@@ -16,8 +16,9 @@ import { DemoDropzoneHero } from './demos/hero';
 - Use `Dropzone` to handle drag-and-drop and keyboard/pointer activation.
 - Add `Dropzone.HiddenInput` to support click-to-select as part of the same interaction surface.
 - Use `onFilesDrop` for dropped files and `Dropzone.HiddenInput` `onChange` for selected files.
-- Give the dropzone an accessible name through visible text, or provide `aria-label`/`aria-labelledby` when using icon-only content.
+- **Form controls must have an accessible name**: Provide visible text in the dropzone, or set `aria-label`/`aria-labelledby` for icon-only UIs. See [Labeling a dropzone](#labeling-a-dropzone) and the [forms guide](/react/handbook/forms).
 - Avoid placing interactive descendants such as buttons or links inside `Dropzone`. Place secondary actions next to the dropzone or use a separate trigger.
+- **Built-in announcements**: `Dropzone` includes a live region that announces drag state transitions for screen reader users.
 
 ## Anatomy
 
@@ -49,29 +50,34 @@ export default function App() {
 
   return (
     <Dropzone onFilesDrop={(droppedFiles) => appendFiles(droppedFiles)}>
-      <>
-        <Dropzone.HiddenInput
-          multiple
-          onChange={(event) => {
-            const selectedFiles = Array.from(event.currentTarget.files ?? []);
-            if (selectedFiles.length > 0) {
-              appendFiles(selectedFiles);
-            }
-            event.currentTarget.value = '';
-          }}
-        />
-        Drop files here or click
-      </>
+      <Dropzone.HiddenInput
+        multiple
+        onChange={(event) => {
+          const selectedFiles = Array.from(event.currentTarget.files ?? []);
+          if (selectedFiles.length > 0) {
+            appendFiles(selectedFiles);
+          }
+          event.currentTarget.value = '';
+        }}
+      />
+      Drop files here or click
     </Dropzone>
   );
 }
 ```
 
-## Accessibility
+### Labeling a dropzone
 
-- Provide a visible label or instructions inside the dropzone so its purpose is announced correctly.
-- If the dropzone uses only an icon or custom visual content, add an `aria-label` or `aria-labelledby`.
-- Avoid nesting interactive controls inside the dropzone. Use adjacent controls such as `FileUpload.Trigger` for secondary actions.
+For icon-only designs, provide an explicit accessible name:
+
+```tsx title="Icon-only dropzone"
+import { Dropzone } from '@base-ui/react/dropzone';
+
+<Dropzone aria-label="Upload files">
+  <Dropzone.HiddenInput />
+  <UploadIcon aria-hidden />
+</Dropzone>;
+```
 
 ## Integration with File Upload
 

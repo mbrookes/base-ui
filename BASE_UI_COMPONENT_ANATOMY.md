@@ -201,7 +201,7 @@ export const ComponentHiddenInput = React.forwardRef(function ComponentHiddenInp
 ) {
   const { id: idProp, ...elementProps } = componentProps;
   const { inputId } = useContext(); // auto-generated fallback
-  
+
   return useRenderElement('input', componentProps, {
     props: [{ id: idProp ?? inputId, type: 'file' }, elementProps],
   });

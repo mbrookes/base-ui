@@ -18,6 +18,8 @@ import { DemoFileUploadHero } from './demos/hero';
 - Add `FileUpload.HiddenInput` inside `FileUpload.Root` to enable file selection.
 - Use `FileUpload.Trigger` to collect files.
 - Use `FileUpload.useFileUploadContext` to read selected files and call actions (for example `removeFile`) in your own UI.
+- **Form controls must have an accessible name**: Use a visible label pattern (such as `Field.Label`) or a native label with `htmlFor`/`id`. See [Labeling a file upload](#labeling-a-file-upload) and the [forms guide](/react/handbook/forms).
+- **Built-in announcements**: `FileUpload.Root` includes a live region that announces key file events for screen reader users.
 
 ## Anatomy
 
@@ -131,13 +133,11 @@ export default function App() {
 </FileUpload.Root>
 ```
 
-## Accessibility
+### Labeling a file upload
 
-- Pair controls with a visible label.
-- Keep trigger text descriptive.
-- File Upload includes live region announcements for key file events.
+Use `Field.Label` when integrating with form layouts:
 
-```jsx title="Labeling with Field"
+```tsx title="Using Field.Label"
 import { Field } from '@base-ui/react/field';
 import { FileUpload } from '@base-ui/react/file-upload';
 
@@ -148,6 +148,18 @@ import { FileUpload } from '@base-ui/react/file-upload';
     <FileUpload.Trigger>Select image</FileUpload.Trigger>
   </FileUpload.Root>
 </Field.Root>;
+```
+
+Or use a native label associated to `FileUpload.HiddenInput` with `id`:
+
+```tsx title="Native label with htmlFor/id"
+import { FileUpload } from '@base-ui/react/file-upload';
+
+<FileUpload.Root>
+  <label htmlFor="profile-image-input">Profile image</label>
+  <FileUpload.HiddenInput id="profile-image-input" accept="image/*" />
+  <FileUpload.Trigger>Select image</FileUpload.Trigger>
+</FileUpload.Root>;
 ```
 
 ## Uploading files
@@ -186,15 +198,6 @@ export default function App() {
   );
 }
 ```
-
-## Browser support
-
-| Feature         | Chrome | Firefox | Safari | Edge |
-| :-------------- | :----: | :-----: | :----: | :--: |
-| Drag-and-drop   |   ✅   |   ✅    |   ✅   |  ✅  |
-| Click-to-select |   ✅   |   ✅    |   ✅   |  ✅  |
-| Paste files     |   ✅   |   ✅    |   ✅   |  ✅  |
-| Folder upload   |   ✅   |   ✅    |   ⚠️   |  ✅  |
 
 ## API reference
 
