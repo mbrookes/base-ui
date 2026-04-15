@@ -290,6 +290,22 @@ describe('Dropzone', () => {
     expect(screen.getByTestId('input')).toBeDisabled();
   });
 
+  it('forwards form ownership attributes to the hidden input', () => {
+    render(
+      <React.Fragment>
+        <form id="external-form" />
+        <Dropzone>
+          <Dropzone.HiddenInput data-testid="input" name="files" form="external-form" />
+          Drop files
+        </Dropzone>
+      </React.Fragment>,
+    );
+
+    const input = screen.getByTestId('input');
+    expect(input).toHaveAttribute('name', 'files');
+    expect(input).toHaveAttribute('form', 'external-form');
+  });
+
   describe('Accessibility', () => {
     it('announces drag state transitions to screen readers', async () => {
       render(<Dropzone data-testid="dropzone">Drop files</Dropzone>);

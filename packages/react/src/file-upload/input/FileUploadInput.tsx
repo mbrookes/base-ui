@@ -83,6 +83,7 @@ export const FileUploadHiddenInput = React.forwardRef(function FileUploadHiddenI
         accept,
         multiple: directory || multiple,
         disabled,
+        suppressHydrationWarning: true,
         style: { display: 'none' },
         onChange: onInputChange,
       },

@@ -37,6 +37,7 @@ export const DropzoneHiddenInput = React.forwardRef(function DropzoneHiddenInput
       {
         type: 'file',
         disabled,
+        suppressHydrationWarning: true,
         style: { display: 'none' },
       },
     ],

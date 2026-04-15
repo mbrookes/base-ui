@@ -1788,6 +1788,21 @@ describe('FileUpload', () => {
       expect(input).toHaveAttribute('type', 'file');
     });
 
+    it('forwards form ownership attributes to HiddenInput', () => {
+      render(
+        <React.Fragment>
+          <form id="external-form" />
+          <TestRoot>
+            <FileUpload.HiddenInput data-testid="input" name="files" form="external-form" />
+          </TestRoot>
+        </React.Fragment>,
+      );
+
+      const input = screen.getByTestId('input');
+      expect(input).toHaveAttribute('name', 'files');
+      expect(input).toHaveAttribute('form', 'external-form');
+    });
+
     it('provides aria-live status region for announcements', () => {
       render(<TestRoot>{null}</TestRoot>);
 
