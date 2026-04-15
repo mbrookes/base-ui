@@ -174,7 +174,114 @@ export function usePartContext() {
    - `toHaveAttribute('data-disabled')`
    - `[data-disabled] { ... }`
 
-## 8. Controlled State and Events
+## 8. Accessibility: ARIA and Announcements
+
+### Label Association for Hidden Inputs
+
+When components have hidden file/input elements, expose an optional `id` prop to enable label association:
+
+```tsx
+export interface ComponentInputProps extends BaseUIComponentProps<'input', ComponentInputState> {
+  /**
+   * Optional custom id for the hidden input element.
+   * If not provided, a unique id is auto-generated.
+   *
+   * Use this to associate a visible label with the input for accessibility:
+   * ```tsx
+   * <label htmlFor="my-input">Label text</label>
+   * <Component.HiddenInput id="my-input" />
+   * ```
+   */
+  id?: string | undefined;
+}
+
+export const ComponentHiddenInput = React.forwardRef(function ComponentHiddenInput(
+  componentProps,
+  forwardedRef,
+) {
+  const { id: idProp, ...elementProps } = componentProps;
+  const { inputId } = useContext(); // auto-generated fallback
+  
+  return useRenderElement('input', componentProps, {
+    props: [{ id: idProp ?? inputId, type: 'file' }, elementProps],
+  });
+});
+```
+
+### Screen Reader Announcements for State Changes
+
+For interactive components managing transient state (drag/drop, uploads, notifications), provide hidden `aria-live` regions to announce changes:
+
+```tsx
+// In parent component managing transient state
+const [announcement, setAnnouncement] = React.useState<{ text: string; key: number }>({
+  text: '',
+  key: 0,
+});
+
+const handleDragEnter = useStableCallback((event: React.DragEvent) => {
+  setAnnouncement((prev) => ({ text: 'Ready to drop files', key: prev.key + 1 }));
+});
+
+// In render:
+return (
+  <div>
+    <div
+      key={announcement.key}
+      role="status"
+      aria-live="polite"
+      aria-atomic="true"
+      style={{ position: 'absolute', left: '-10000px', width: '1px', height: '1px' }}
+    >
+      {announcement.text}
+    </div>
+    {/* component content */}
+  </div>
+);
+```
+
+### State Attribute Mapping with Explicit Types
+
+When defining state attribute mappings, always include explicit type annotations for parameters:
+
+```ts
+import type { StateAttributesMapping } from '../../internals/getStateAttributesProps';
+
+export const componentStateAttributesMapping: StateAttributesMapping<ComponentState> = {
+  disabled(value: boolean): Record<string, string> | null {
+    return value ? { 'data-disabled': '' } : null;
+  },
+  isDragging(value: boolean): Record<string, string> | null {
+    return value ? { 'data-dragging': '' } : null;
+  },
+};
+```
+
+### ARIA Semantics and Documentation
+
+Always document accessibility features in JSDoc:
+
+```tsx
+/**
+ * Interactive drop target with keyboard and drag support.
+ *
+ * Features automatic accessibility announcements for drag state transitions.
+ * Supports keyboard activation (Enter, Space) and drag-and-drop.
+ *
+ * @example
+ * Accessible with label and ARIA:
+ * ```tsx
+ * <Component
+ *   aria-label="Drop files to upload"
+ *   onFilesDrop={handleFiles}
+ * >
+ *   Drop files or click to browse
+ * </Component>
+ * ```
+ */
+```
+
+## 9. Controlled State and Events
 
 1. Use `useControlled` for controlled/uncontrolled APIs.
 2. For cancellable public changes, create details (`createChangeEventDetails`) and call external callback before internal commit.
@@ -182,7 +289,7 @@ export function usePartContext() {
 4. Use `details.allowPropagation()` only when popup nesting requires it.
 5. Use `event.preventBaseUIHandler()` only as escape hatch when no prop-based customization exists.
 
-## 9. Testing Requirements
+## 10. Testing Requirements
 
 1. Co-locate tests with part/component.
 2. Use `vitest` + Testing Library.
@@ -205,7 +312,7 @@ pnpm test:chromium <ComponentOrFile> --no-watch
 
 Use `it.skipIf(isJSDOM)` / `describe.skipIf(isJSDOM)` for layout-dependent tests.
 
-## 10. Docs and API Sync
+## 11. Docs and API Sync
 
 1. Public props/types need JSDoc.
 2. Include `@default` tags where defaults exist.
@@ -222,7 +329,7 @@ Use `it.skipIf(isJSDOM)` / `describe.skipIf(isJSDOM)` for layout-dependent tests
 pnpm docs:api
 ```
 
-## 11. Error Message Rules (Public Packages)
+## 12. Error Message Rules (Public Packages)
 
 1. Prefix with `Base UI: `.
 2. Include what happened, why it matters, and how to fix.
@@ -233,7 +340,7 @@ pnpm docs:api
 pnpm extract-error-codes
 ```
 
-## 12. Quality Gates Before Commit
+## 13. Quality Gates Before Commit
 
 Run what applies:
 
@@ -247,7 +354,7 @@ pnpm prettier
 
 Also run relevant component tests (JSDOM and Chromium when needed).
 
-## 13. Fast Agent Checklist
+## 14. Fast Agent Checklist
 
 1. Choose shape: single-part or compound.
 2. Follow nearest existing component pattern.
