@@ -85,7 +85,7 @@ export const FileUploadHiddenInput = React.forwardRef(function FileUploadHiddenI
         multiple: directory || multiple,
         disabled,
         suppressHydrationWarning: true,
-          style: elementProps.name ? visuallyHiddenInput : visuallyHidden,
+        style: elementProps.name ? visuallyHiddenInput : visuallyHidden,
         onChange: onInputChange,
       },
       elementProps,
