@@ -1,4 +1,4 @@
-export enum DropzoneDataAttributes {
+export enum DropzoneRootDataAttributes {
   /**
    * Present when files are being dragged over the dropzone.
    */

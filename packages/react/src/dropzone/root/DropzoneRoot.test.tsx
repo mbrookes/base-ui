@@ -3,7 +3,7 @@ import { render, screen, fireEvent, createEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi } from 'vitest';
 import { isJSDOM } from '#test-utils';
-import * as Dropzone from './index.parts';
+import * as Dropzone from '../index.parts';
 
 const createDataTransfer = (files: File[]) => {
   if (typeof DataTransfer === 'undefined') {
@@ -23,7 +23,7 @@ const createDataTransfer = (files: File[]) => {
   return dataTransfer;
 };
 
-describe('Dropzone', () => {
+describe('Dropzone.Root', () => {
   it('throws when HiddenInput is used outside Dropzone', () => {
     const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 

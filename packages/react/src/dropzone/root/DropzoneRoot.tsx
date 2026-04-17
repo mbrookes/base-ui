@@ -5,8 +5,8 @@ import { useStableCallback } from '@base-ui/utils/useStableCallback';
 import { contains, getTarget } from '../../floating-ui-react/utils/element';
 import { useRenderElement } from '../../internals/useRenderElement';
 import type { BaseUIComponentProps } from '../../internals/types';
-import { DropzoneContext } from '../DropzoneContext';
-import { dropzoneStateAttributesMapping } from '../stateAttributesMapping';
+import { DropzoneRootContext } from './DropzoneRootContext';
+import { dropzoneRootStateAttributesMapping } from './stateAttributesMapping';
 
 export interface DropzoneRootState {
   /**
@@ -194,7 +194,7 @@ export const DropzoneRoot = React.forwardRef<HTMLDivElement, DropzoneRootProps>(
     );
 
     return (
-      <DropzoneContext.Provider value={contextValue}>
+      <DropzoneRootContext.Provider value={contextValue}>
         {useRenderElement('div', props, {
           state: { dragging, disabled },
           ref: forwardedRef,
@@ -232,9 +232,9 @@ export const DropzoneRoot = React.forwardRef<HTMLDivElement, DropzoneRootProps>(
             },
             elementProps,
           ],
-          stateAttributesMapping: dropzoneStateAttributesMapping,
+          stateAttributesMapping: dropzoneRootStateAttributesMapping,
         })}
-      </DropzoneContext.Provider>
+      </DropzoneRootContext.Provider>
     );
   },
 );

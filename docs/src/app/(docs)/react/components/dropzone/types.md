@@ -22,6 +22,13 @@ Interactive drop target and file selection area.
 | style            | `React.CSSProperties \| ((state: Dropzone.Root.State) => React.CSSProperties \| undefined)` | -       | Style applied to the element, or a function that&#xA;returns a style object based on the component's state.                                                                                   |
 | render           | `ReactElement \| ((props: HTMLProps, state: Dropzone.Root.State) => ReactElement)`          | -       | Allows you to replace the component's HTML element&#xA;with a different tag, or compose it with another component. Accepts a `ReactElement` or a function that returns the element to render. |
 
+**Root Data Attributes:**
+
+| Attribute     | Type | Description                                             |
+| :------------ | :--- | :------------------------------------------------------ |
+| data-dragging | -    | Present when files are being dragged over the dropzone. |
+| data-disabled | -    | Present when the dropzone is disabled.                  |
+
 ### Root.Props
 
 Re-export of [Root](#root) props.

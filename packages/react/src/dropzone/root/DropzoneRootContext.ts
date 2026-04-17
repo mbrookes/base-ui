@@ -2,15 +2,17 @@
 
 import * as React from 'react';
 
-export interface DropzoneContextValue {
+export interface DropzoneRootContextValue {
   disabled: boolean;
   setInputElement: (node: HTMLInputElement | null) => void;
 }
 
-export const DropzoneContext = React.createContext<DropzoneContextValue | undefined>(undefined);
+export const DropzoneRootContext = React.createContext<DropzoneRootContextValue | undefined>(
+  undefined,
+);
 
-export function useDropzoneContext(): DropzoneContextValue {
-  const context = React.useContext(DropzoneContext);
+export function useDropzoneRootContext(): DropzoneRootContextValue {
+  const context = React.useContext(DropzoneRootContext);
   if (context === undefined) {
     throw new Error(
       'Base UI: DropzoneContext is missing. Dropzone parts must be placed within <Dropzone.Root>.',
