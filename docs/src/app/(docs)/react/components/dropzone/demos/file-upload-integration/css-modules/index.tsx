@@ -32,13 +32,13 @@ function UploadDropzone() {
   const { openFileDialog, addFiles } = FileUpload.useFileUploadContext();
 
   return (
-    <Dropzone
+    <Dropzone.Root
       className={styles.dropzone}
       onOpen={openFileDialog}
       onFilesDrop={(files, event) => addFiles(files, event.nativeEvent)}
     >
       <p className={styles.heading}>Drop files here or click</p>
-    </Dropzone>
+    </Dropzone.Root>
   );
 }
 

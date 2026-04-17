@@ -1,8 +1,8 @@
 import type { StateAttributesMapping } from '../internals/getStateAttributesProps';
-import type { Dropzone } from './Dropzone';
+import type { DropzoneRootState } from './root/DropzoneRoot';
 import { DropzoneDataAttributes } from './DropzoneDataAttributes';
 
-export const dropzoneStateAttributesMapping: StateAttributesMapping<Dropzone.State> = {
+export const dropzoneStateAttributesMapping: StateAttributesMapping<DropzoneRootState> = {
   dragging(value: boolean): Record<string, string> | null {
     return value ? { [DropzoneDataAttributes.dragging]: '' } : null;
   },

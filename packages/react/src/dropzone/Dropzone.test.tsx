@@ -3,7 +3,7 @@ import { render, screen, fireEvent, createEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi } from 'vitest';
 import { isJSDOM } from '#test-utils';
-import { Dropzone } from './Dropzone';
+import * as Dropzone from './index.parts';
 
 const createDataTransfer = (files: File[]) => {
   if (typeof DataTransfer === 'undefined') {
@@ -30,21 +30,21 @@ describe('Dropzone', () => {
     expect(() => {
       render(<Dropzone.HiddenInput />);
     }).toThrow(
-      'Base UI: DropzoneContext is missing. Dropzone parts must be placed within <Dropzone>.',
+      'Base UI: DropzoneContext is missing. Dropzone parts must be placed within <Dropzone.Root>.',
     );
 
     consoleSpy.mockRestore();
   });
 
   it('renders as a button-like div', () => {
-    render(<Dropzone>Drop files</Dropzone>);
+    render(<Dropzone.Root>Drop files</Dropzone.Root>);
 
     const dropzone = screen.getByRole('button', { name: 'Drop files' });
     expect(dropzone).toHaveAttribute('tabindex', '0');
   });
 
   it('supports an explicit aria-label', () => {
-    render(<Dropzone aria-label="Upload proof of address">Upload</Dropzone>);
+    render(<Dropzone.Root aria-label="Upload proof of address">Upload</Dropzone.Root>);
 
     expect(screen.getByRole('button', { name: 'Upload proof of address' })).toBeInTheDocument();
   });
@@ -53,9 +53,9 @@ describe('Dropzone', () => {
     render(
       <React.Fragment>
         <span id="dropzone-label">Upload receipts</span>
-        <Dropzone aria-labelledby="dropzone-label">
+        <Dropzone.Root aria-labelledby="dropzone-label">
           <svg aria-hidden="true" />
-        </Dropzone>
+        </Dropzone.Root>
       </React.Fragment>,
     );
 
@@ -66,7 +66,7 @@ describe('Dropzone', () => {
     const user = userEvent.setup();
     const onOpen = vi.fn();
 
-    render(<Dropzone onOpen={onOpen}>Drop files</Dropzone>);
+    render(<Dropzone.Root onOpen={onOpen}>Drop files</Dropzone.Root>);
 
     const dropzone = screen.getByRole('button');
 
@@ -82,10 +82,10 @@ describe('Dropzone', () => {
     const inputClick = vi.spyOn(HTMLInputElement.prototype, 'click');
 
     render(
-      <Dropzone>
+      <Dropzone.Root>
         <Dropzone.HiddenInput />
         Drop files
-      </Dropzone>,
+      </Dropzone.Root>,
     );
 
     const dropzone = screen.getByRole('button');
@@ -102,9 +102,9 @@ describe('Dropzone', () => {
     const onOpen = vi.fn();
 
     render(
-      <Dropzone disabled onOpen={onOpen}>
+      <Dropzone.Root disabled onOpen={onOpen}>
         Drop files
-      </Dropzone>,
+      </Dropzone.Root>,
     );
 
     const dropzone = screen.getByRole('button');
@@ -123,9 +123,9 @@ describe('Dropzone', () => {
     const onOpen = vi.fn();
 
     render(
-      <Dropzone onOpen={onOpen}>
+      <Dropzone.Root onOpen={onOpen}>
         <button type="button">Nested</button>
-      </Dropzone>,
+      </Dropzone.Root>,
     );
 
     await user.click(screen.getByText('Nested'));
@@ -135,9 +135,9 @@ describe('Dropzone', () => {
 
   it('tracks dragging state and supports render prop', () => {
     render(
-      <Dropzone data-testid="dropzone">
+      <Dropzone.Root data-testid="dropzone">
         {({ isDragging }) => <span>{isDragging ? 'dragging' : 'idle'}</span>}
-      </Dropzone>,
+      </Dropzone.Root>,
     );
 
     const dropzone = screen.getByTestId('dropzone');
@@ -160,7 +160,7 @@ describe('Dropzone', () => {
       const [dragging, setDragging] = React.useState(false);
 
       return (
-        <Dropzone
+        <Dropzone.Root
           data-testid="dropzone"
           dragging={dragging}
           onDraggingChange={(nextDragging) => {
@@ -169,7 +169,7 @@ describe('Dropzone', () => {
           }}
         >
           {({ isDragging }) => <span>{isDragging ? 'dragging' : 'idle'}</span>}
-        </Dropzone>
+        </Dropzone.Root>
       );
     }
 
@@ -190,9 +190,9 @@ describe('Dropzone', () => {
 
   it('keeps dragging state when drag leaves to a descendant', () => {
     render(
-      <Dropzone data-testid="dropzone">
+      <Dropzone.Root data-testid="dropzone">
         <span data-testid="child">Drop files</span>
-      </Dropzone>,
+      </Dropzone.Root>,
     );
 
     const dropzone = screen.getByTestId('dropzone');
@@ -212,7 +212,7 @@ describe('Dropzone', () => {
   });
 
   it.skipIf(!isJSDOM)('sets copy dropEffect on drag over', () => {
-    render(<Dropzone data-testid="dropzone">Drop files</Dropzone>);
+    render(<Dropzone.Root data-testid="dropzone">Drop files</Dropzone.Root>);
 
     const dropzone = screen.getByTestId('dropzone');
     const dataTransfer = createDataTransfer([]);
@@ -226,9 +226,9 @@ describe('Dropzone', () => {
     const onFilesDrop = vi.fn();
 
     render(
-      <Dropzone data-testid="dropzone" onFilesDrop={onFilesDrop}>
+      <Dropzone.Root data-testid="dropzone" onFilesDrop={onFilesDrop}>
         Drop files
-      </Dropzone>,
+      </Dropzone.Root>,
     );
 
     const file = new File(['content'], 'test.txt', { type: 'text/plain' });
@@ -246,9 +246,9 @@ describe('Dropzone', () => {
     const onFilesDrop = vi.fn();
 
     render(
-      <Dropzone data-testid="dropzone" disabled onFilesDrop={onFilesDrop}>
+      <Dropzone.Root data-testid="dropzone" disabled onFilesDrop={onFilesDrop}>
         Drop files
-      </Dropzone>,
+      </Dropzone.Root>,
     );
 
     const file = new File(['content'], 'test.txt', { type: 'text/plain' });
@@ -261,7 +261,7 @@ describe('Dropzone', () => {
 
   it('forwards ref to the root div', () => {
     const ref = React.createRef<HTMLDivElement>();
-    render(<Dropzone ref={ref}>Drop files</Dropzone>);
+    render(<Dropzone.Root ref={ref}>Drop files</Dropzone.Root>);
 
     expect(ref.current).toBe(screen.getByRole('button', { name: 'Drop files' }));
   });
@@ -270,10 +270,10 @@ describe('Dropzone', () => {
     const ref = React.createRef<HTMLInputElement>();
 
     render(
-      <Dropzone>
+      <Dropzone.Root>
         <Dropzone.HiddenInput ref={ref} />
         Drop files
-      </Dropzone>,
+      </Dropzone.Root>,
     );
 
     expect(ref.current).toHaveAttribute('type', 'file');
@@ -281,10 +281,10 @@ describe('Dropzone', () => {
 
   it('applies disabled state to the hidden input', () => {
     render(
-      <Dropzone disabled>
+      <Dropzone.Root disabled>
         <Dropzone.HiddenInput data-testid="input" />
         Drop files
-      </Dropzone>,
+      </Dropzone.Root>,
     );
 
     expect(screen.getByTestId('input')).toBeDisabled();
@@ -294,10 +294,10 @@ describe('Dropzone', () => {
     render(
       <React.Fragment>
         <form id="external-form" />
-        <Dropzone>
+        <Dropzone.Root>
           <Dropzone.HiddenInput data-testid="input" name="files" form="external-form" />
           Drop files
-        </Dropzone>
+        </Dropzone.Root>
       </React.Fragment>,
     );
 
@@ -308,7 +308,7 @@ describe('Dropzone', () => {
 
   describe('Accessibility', () => {
     it('announces drag state transitions to screen readers', async () => {
-      render(<Dropzone data-testid="dropzone">Drop files</Dropzone>);
+      render(<Dropzone.Root data-testid="dropzone">Drop files</Dropzone.Root>);
 
       const dropzone = screen.getByTestId('dropzone');
 
@@ -334,7 +334,7 @@ describe('Dropzone', () => {
     });
 
     it('announces successfully dropped files', () => {
-      render(<Dropzone data-testid="dropzone">Drop files</Dropzone>);
+      render(<Dropzone.Root data-testid="dropzone">Drop files</Dropzone.Root>);
 
       const dropzone = screen.getByTestId('dropzone');
 
@@ -350,7 +350,7 @@ describe('Dropzone', () => {
     });
 
     it('announces when no files are dropped', () => {
-      render(<Dropzone data-testid="dropzone">Drop files</Dropzone>);
+      render(<Dropzone.Root data-testid="dropzone">Drop files</Dropzone.Root>);
 
       const dropzone = screen.getByTestId('dropzone');
 

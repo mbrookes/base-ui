@@ -22,10 +22,10 @@ Import the component and assemble its parts:
 ```jsx title="Anatomy"
 import { Dropzone } from '@base-ui/react/dropzone';
 
-<Dropzone>
+<Dropzone.Root>
   <Dropzone.HiddenInput />
   Drop files here
-</Dropzone>;
+</Dropzone.Root>;
 ```
 
 ## Examples
@@ -44,7 +44,7 @@ export default function App() {
   }, []);
 
   return (
-    <Dropzone onFilesDrop={(droppedFiles) => appendFiles(droppedFiles)}>
+    <Dropzone.Root onFilesDrop={(droppedFiles) => appendFiles(droppedFiles)}>
       <Dropzone.HiddenInput
         multiple
         onChange={(event) => {
@@ -56,7 +56,7 @@ export default function App() {
         }}
       />
       Drop files here or click
-    </Dropzone>
+    </Dropzone.Root>
   );
 }
 ```
@@ -68,15 +68,15 @@ For icon-only designs, provide an explicit accessible name:
 ```tsx title="Icon-only dropzone"
 import { Dropzone } from '@base-ui/react/dropzone';
 
-<Dropzone aria-label="Upload files">
+<Dropzone.Root aria-label="Upload files">
   <Dropzone.HiddenInput />
   <UploadIcon aria-hidden />
-</Dropzone>;
+</Dropzone.Root>;
 ```
 
 ## Integration with File Upload
 
-Use `Dropzone` with `FileUpload.Root` to provide a drag-and-drop surface around the upload flow.
+Use `Dropzone.Root` with `FileUpload.Root` to provide a drag-and-drop surface around the upload flow.
 
 import { DemoDropzoneFileUploadIntegration } from './demos/file-upload-integration';
 
@@ -86,13 +86,13 @@ import { DemoDropzoneFileUploadIntegration } from './demos/file-upload-integrati
 
 import { TypesDropzone } from './types';
 
-### Dropzone
+### Root
 
-<TypesDropzone.Dropzone />
+<TypesDropzone.Root />
 
 ### HiddenInput
 
-<TypesDropzone.DropzoneHiddenInput />
+<TypesDropzone.HiddenInput />
 
 export const metadata = {
   keywords: [

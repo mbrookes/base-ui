@@ -204,7 +204,7 @@ export interface FileUploadRootProps
  *
  * <FileUpload.Root accept="image/*" maxSize={5242880} onFilesChange={handleFileChange}>
  *   <FileUpload.HiddenInput />
- *   <Dropzone>Drop files here</Dropzone>
+ *   <Dropzone.Root>Drop files here</Dropzone.Root>
  *   <FileUpload.Trigger>Select files</FileUpload.Trigger>
  * </FileUpload.Root>
  * ```
@@ -225,7 +225,9 @@ export interface FileUploadRootProps
  *   <label htmlFor="upload-input">Select images to upload</label>
  *   <FileUpload.HiddenInput id="upload-input" />
  *   <FileUpload.Trigger aria-label="Browse files">Choose files</FileUpload.Trigger>
- *   <Dropzone role="region" aria-label="Drop files here">Drop files to upload</Dropzone>
+ *   <Dropzone.Root role="region" aria-label="Drop files here">
+ *     Drop files to upload
+ *   </Dropzone.Root>
  * </FileUpload.Root>
  * ```
  *

@@ -13,7 +13,7 @@ export default function ExampleDropzone() {
 
   return (
     <div className={styles.container}>
-      <Dropzone
+      <Dropzone.Root
         className={styles.dropzone}
         onFilesDrop={(droppedFiles) => appendFiles(droppedFiles)}
       >
@@ -30,7 +30,7 @@ export default function ExampleDropzone() {
         />
         <p className={styles.heading}>Drop files here</p>
         <p className={styles.hint}>or click to open the file picker</p>
-      </Dropzone>
+      </Dropzone.Root>
 
       {files.length === 0 ? (
         <p className={styles.empty}>No files selected yet.</p>

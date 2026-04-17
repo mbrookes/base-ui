@@ -2,9 +2,9 @@
 
 import * as React from 'react';
 import { visuallyHidden, visuallyHiddenInput } from '@base-ui/utils/visuallyHidden';
-import { useRenderElement } from '../internals/useRenderElement';
-import type { BaseUIComponentProps } from '../internals/types';
-import { useDropzoneContext } from './DropzoneContext';
+import { useRenderElement } from '../../internals/useRenderElement';
+import type { BaseUIComponentProps } from '../../internals/types';
+import { useDropzoneContext } from '../DropzoneContext';
 
 export interface DropzoneHiddenInputState {
   /**

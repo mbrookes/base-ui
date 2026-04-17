@@ -13,7 +13,7 @@ export function useDropzoneContext(): DropzoneContextValue {
   const context = React.useContext(DropzoneContext);
   if (context === undefined) {
     throw new Error(
-      'Base UI: DropzoneContext is missing. Dropzone parts must be placed within <Dropzone>.',
+      'Base UI: DropzoneContext is missing. Dropzone parts must be placed within <Dropzone.Root>.',
     );
   }
 

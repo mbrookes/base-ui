@@ -2,14 +2,13 @@
 
 import * as React from 'react';
 import { useStableCallback } from '@base-ui/utils/useStableCallback';
-import { contains, getTarget } from '../floating-ui-react/utils/element';
-import { useRenderElement } from '../internals/useRenderElement';
-import type { BaseUIComponentProps } from '../internals/types';
-import { DropzoneContext } from './DropzoneContext';
-import { DropzoneHiddenInput } from './DropzoneInput';
-import { dropzoneStateAttributesMapping } from './stateAttributesMapping';
+import { contains, getTarget } from '../../floating-ui-react/utils/element';
+import { useRenderElement } from '../../internals/useRenderElement';
+import type { BaseUIComponentProps } from '../../internals/types';
+import { DropzoneContext } from '../DropzoneContext';
+import { dropzoneStateAttributesMapping } from '../stateAttributesMapping';
 
-export interface DropzoneState {
+export interface DropzoneRootState {
   /**
    * Whether files are being dragged over the dropzone.
    */
@@ -20,8 +19,8 @@ export interface DropzoneState {
   disabled: boolean;
 }
 
-export interface DropzoneProps extends Omit<
-  BaseUIComponentProps<'div', DropzoneState>,
+export interface DropzoneRootProps extends Omit<
+  BaseUIComponentProps<'div', DropzoneRootState>,
   'children'
 > {
   /**
@@ -55,8 +54,8 @@ export interface DropzoneProps extends Omit<
 /**
  * Interactive drop target and file selection area.
  */
-const DropzoneRoot = React.forwardRef<HTMLDivElement, DropzoneProps>(
-  function Dropzone(props, forwardedRef) {
+export const DropzoneRoot = React.forwardRef<HTMLDivElement, DropzoneRootProps>(
+  function DropzoneRoot(props, forwardedRef) {
     const {
       className,
       render,
@@ -240,18 +239,7 @@ const DropzoneRoot = React.forwardRef<HTMLDivElement, DropzoneProps>(
   },
 );
 
-type DropzoneComponent = typeof DropzoneRoot & {
-  HiddenInput: typeof DropzoneHiddenInput;
-};
-
-/**
- * Interactive drop target and file selection area.
- */
-export const Dropzone = Object.assign(DropzoneRoot, {
-  HiddenInput: DropzoneHiddenInput,
-}) as DropzoneComponent;
-
-export namespace Dropzone {
-  export type State = DropzoneState;
-  export type Props = DropzoneProps;
+export namespace DropzoneRoot {
+  export type State = DropzoneRootState;
+  export type Props = DropzoneRootProps;
 }

@@ -38,13 +38,13 @@ function UploadDropzone() {
   const { openFileDialog, addFiles } = FileUpload.useFileUploadContext();
 
   return (
-    <Dropzone
+    <Dropzone.Root
       className="mt-4 rounded-xl border-2 border-dashed border-gray-400 bg-gray-50 px-5 py-6 text-center transition-colors hover:border-blue-600 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 data-dragging:border-blue-600 data-dragging:bg-blue-100 data-disabled:cursor-not-allowed data-disabled:opacity-65"
       onOpen={openFileDialog}
       onFilesDrop={(files, event) => addFiles(files, event.nativeEvent)}
     >
       <p className="text-sm font-semibold text-gray-800">Drop files here or click</p>
-    </Dropzone>
+    </Dropzone.Root>
   );
 }
 

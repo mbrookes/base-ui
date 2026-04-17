@@ -1,5 +1,4 @@
-export { Dropzone } from './Dropzone';
-export { DropzoneHiddenInput } from './DropzoneInput';
+export * as Dropzone from './index.parts';
 
-export type * from './Dropzone';
-export type * from './DropzoneInput';
+export type * from './root/DropzoneRoot';
+export type * from './input/DropzoneHiddenInput';

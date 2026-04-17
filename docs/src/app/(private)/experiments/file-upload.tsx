@@ -60,7 +60,7 @@ function UploadDropzone() {
   const { disabled, openFileDialog } = FileUpload.useFileUploadContext();
 
   return (
-    <Dropzone className={styles.Dropzone} disabled={disabled} onOpen={openFileDialog}>
+    <Dropzone.Root className={styles.Dropzone} disabled={disabled} onOpen={openFileDialog}>
       {({ isDragging }) => (
         <div className={isDragging ? styles.Dragging : ''}>
           <UploadIcon className={styles.Icon} />
@@ -68,7 +68,7 @@ function UploadDropzone() {
           <FileUpload.Trigger className={styles.Button}>Browse files</FileUpload.Trigger>
         </div>
       )}
-    </Dropzone>
+    </Dropzone.Root>
   );
 }
 

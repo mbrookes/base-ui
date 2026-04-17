@@ -1,11 +1,11 @@
 import * as React from 'react';
 import { createRenderer, describeConformance } from '#test-utils';
-import { Dropzone } from './Dropzone';
+import * as Dropzone from './index.parts';
 
 describe('Dropzone conformance', () => {
   const { render } = createRenderer();
 
-  describeConformance(<Dropzone>Drop files</Dropzone>, () => ({
+  describeConformance(<Dropzone.Root>Drop files</Dropzone.Root>, () => ({
     render,
     refInstanceof: window.HTMLDivElement,
   }));
@@ -13,7 +13,7 @@ describe('Dropzone conformance', () => {
   describeConformance(<Dropzone.HiddenInput />, () => ({
     refInstanceof: window.HTMLInputElement,
     render(node) {
-      return render(<Dropzone>{node}</Dropzone>);
+      return render(<Dropzone.Root>{node}</Dropzone.Root>);
     },
   }));
 });
