@@ -13,13 +13,7 @@ import { DemoFileUploadHero } from './demos/hero';
 
 ## Usage guidelines
 
-- File Upload handles file selection and validation. You implement network upload logic separately.
-- Use `FileUpload.Root` as the state container.
-- Add `FileUpload.HiddenInput` inside `FileUpload.Root` to enable file selection.
-- Use `FileUpload.Trigger` to collect files.
-- Use `FileUpload.useFileUploadContext` to read selected files and call actions (for example `removeFile`) in your own UI.
 - **Form controls must have an accessible name**: Use a visible label pattern (such as `Field.Label`) or a native label with `htmlFor`/`id`. See [Labeling a file upload](#labeling-a-file-upload) and the [forms guide](/react/handbook/forms).
-- **Built-in announcements**: `FileUpload.Root` includes a live region that announces key file events for screen reader users.
 
 ## Anatomy
 

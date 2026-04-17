@@ -250,22 +250,6 @@ export interface FileUploadRootProps
  * @see [File Upload Documentation](https://base-ui.com/react/components/file-upload)
  */
 
-/**
- * ACCESSIBILITY NOTES:
- *
- * The FileUploadRoot component provides built-in accessibility features:
- *
- * - **ARIA live region**: Automatically announces file additions, removals, and validation errors
- * - **Keyboard support**: Paste files with Ctrl+V/Cmd+V anywhere within the component
- * - **Label association**: Use the `id` prop on FileUpload.HiddenInput to create a visible label
- * - **Drag state feedback**: Dropzone announces its interactive nature via role="button"
- *
- * For best accessibility, always provide:
- * 1. A visible label with htmlFor pointing to the HiddenInput id
- * 2. ARIA labels on Dropzone and Trigger describing their purpose
- * 3. Error handling in onFilesAdd to display detailed rejection reasons to users
- */
-
 export const FileUploadRoot = React.forwardRef<HTMLDivElement, FileUploadRootProps>(
   function FileUploadRoot(props, ref) {
     const {

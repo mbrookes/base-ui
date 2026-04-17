@@ -13,12 +13,7 @@ import { DemoDropzoneHero } from './demos/hero';
 
 ## Usage guidelines
 
-- Use `Dropzone` to handle drag-and-drop and keyboard/pointer activation.
-- Add `Dropzone.HiddenInput` to support click-to-select as part of the same interaction surface.
-- Use `onFilesDrop` for dropped files and `Dropzone.HiddenInput` `onChange` for selected files.
 - **Form controls must have an accessible name**: Provide visible text in the dropzone, or set `aria-label`/`aria-labelledby` for icon-only UIs. See [Labeling a dropzone](#labeling-a-dropzone) and the [forms guide](/react/handbook/forms).
-- Avoid placing interactive descendants such as buttons or links inside `Dropzone`. Place secondary actions next to the dropzone or use a separate trigger.
-- **Built-in announcements**: `Dropzone` includes a live region that announces drag state transitions for screen reader users.
 
 ## Anatomy
 

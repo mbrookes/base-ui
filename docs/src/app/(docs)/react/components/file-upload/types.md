@@ -6,11 +6,6 @@
 
 ### Root
 
-Manages file upload state and provides context for child components.
-
-This is the root component that should wrap all other FileUpload components.
-It handles file validation, input/paste integration, and shared state for the file upload workflow.
-
 **Root Props:**
 
 | Prop          | Type                                                                                                                                                       | Default    | Description                                                                                                                                                                                                                                                                   |
@@ -28,6 +23,9 @@ It handles file validation, input/paste integration, and shared state for the fi
 | validator     | `((file: FileUpload.Root.ExtendedFile) => string \| null)`                                                                                                 | -          | Custom validation function for additional file validation beyond built-in checks.&#xA;Return an error message string if validation fails, or null if valid. Note: Validation is synchronous. Async validators are not supported.                                              |
 | disabled      | `boolean`                                                                                                                                                  | `false`    | Disable file upload.                                                                                                                                                                                                                                                          |
 | children\*    | `React.ReactNode`                                                                                                                                          | -          | -                                                                                                                                                                                                                                                                             |
+| className     | `string \| ((state: FileUpload.Root.State) => string \| undefined)`                                                                                        | -          | CSS class applied to the element, or a function that&#xA;returns a class based on the component's state.                                                                                                                                                                      |
+| style         | `React.CSSProperties \| ((state: FileUpload.Root.State) => React.CSSProperties \| undefined)`                                                              | -          | Style applied to the element, or a function that&#xA;returns a style object based on the component's state.                                                                                                                                                                   |
+| render        | `ReactElement \| ((props: HTMLProps, state: FileUpload.Root.State) => ReactElement)`                                                                       | -          | Allows you to replace the component's HTML element&#xA;with a different tag, or compose it with another component. Accepts a `ReactElement` or a function that returns the element to render.                                                                                 |
 
 **`validator` Prop Example:**
 
@@ -64,7 +62,25 @@ type FileUploadRootState = {
 ### Root.ChangeEventDetails
 
 ```typescript
-type FileUploadRootChangeEventDetails = FileUpload.Root.ChangeEventDetails;
+type FileUploadRootChangeEventDetails = (
+  | { reason: 'file-added' }
+  | { reason: 'file-removed' }
+  | { reason: 'files-cleared' }
+  | { reason: 'file-updated' }
+) & {
+  /** The native event associated with the custom event. */
+  event: Event;
+  /** Cancels Base UI from handling the event. */
+  cancel: () => void;
+  /** Allows the event to propagate in cases where Base UI will stop the propagation. */
+  allowPropagation: () => void;
+  /** Indicates whether the event has been canceled. */
+  isCanceled: boolean;
+  /** Indicates whether the event is allowed to propagate. */
+  isPropagationAllowed: boolean;
+  /** The element that triggered the event, if applicable. */
+  trigger: Element | undefined;
+};
 ```
 
 ### Root.ChangeReason
@@ -210,7 +226,28 @@ type FileUploadRootParameters = {
 ### Root.RejectEventDetails
 
 ```typescript
-type FileUploadRootRejectEventDetails = FileUpload.Root.RejectEventDetails;
+type FileUploadRootRejectEventDetails = (
+  | { reason: 'file-too-large' }
+  | { reason: 'file-too-small' }
+  | { reason: 'mime-type-not-allowed' }
+  | { reason: 'max-files-reached' }
+  | { reason: 'custom-validation-failed' }
+  | { reason: 'duplicate-file' }
+) & {
+  /** The native event associated with the custom event. */
+  event: Event;
+  /** Cancels Base UI from handling the event. */
+  cancel: () => void;
+  /** Allows the event to propagate in cases where Base UI will stop the propagation. */
+  allowPropagation: () => void;
+  /** Indicates whether the event has been canceled. */
+  isCanceled: boolean;
+  /** Indicates whether the event is allowed to propagate. */
+  isPropagationAllowed: boolean;
+  /** The element that triggered the event, if applicable. */
+  trigger: Element | undefined;
+  message: string;
+};
 ```
 
 ### Root.Rejection
@@ -246,6 +283,15 @@ The Trigger component renders a button that opens the file selection dialog
 when clicked. It's typically used as an alternative to the Dropzone for users
 who prefer clicking a button instead of drag-and-drop.
 
+**Trigger Props:**
+
+| Prop         | Type                                                                                             | Default | Description                                                                                                                                                                                   |
+| :----------- | :----------------------------------------------------------------------------------------------- | :------ | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| nativeButton | `boolean`                                                                                        | `true`  | Whether the component renders a native `<button>` element when replacing it&#xA;via the `render` prop.&#xA;Set to `false` if the rendered element is not a button (for example, `<div>`).     |
+| className    | `string \| ((state: FileUpload.Trigger.State) => string \| undefined)`                           | -       | CSS class applied to the element, or a function that&#xA;returns a class based on the component's state.                                                                                      |
+| style        | `React.CSSProperties \| ((state: FileUpload.Trigger.State) => React.CSSProperties \| undefined)` | -       | Style applied to the element, or a function that&#xA;returns a style object based on the component's state.                                                                                   |
+| render       | `ReactElement \| ((props: HTMLProps, state: FileUpload.Trigger.State) => ReactElement)`          | -       | Allows you to replace the component's HTML element&#xA;with a different tag, or compose it with another component. Accepts a `ReactElement` or a function that returns the element to render. |
+
 **Trigger Data Attributes:**
 
 | Attribute     | Type | Description                                  |
@@ -254,9 +300,7 @@ who prefer clicking a button instead of drag-and-drop.
 
 ### Trigger.Props
 
-```typescript
-type FileUploadTriggerProps = {};
-```
+Re-export of [Trigger](#trigger) props.
 
 ### Trigger.State
 
@@ -273,11 +317,29 @@ Hidden file input that powers file selection for FileUpload.Root.ExtendedFile Up
 
 Place this part inside `FileUpload.Root` to enable file selection.
 
+**HiddenInput Props:**
+
+| Prop      | Type                                                                                                 | Default | Description                                                                                                                                                                                   |
+| :-------- | :--------------------------------------------------------------------------------------------------- | :------ | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| id        | `string`                                                                                             | -       | Optional custom id for the hidden input element.&#xA;If not provided, a unique id is auto-generated. Use this to associate a visible label with the input for accessibility:                  |
+| className | `string \| ((state: FileUpload.HiddenInput.State) => string \| undefined)`                           | -       | CSS class applied to the element, or a function that&#xA;returns a class based on the component's state.                                                                                      |
+| style     | `React.CSSProperties \| ((state: FileUpload.HiddenInput.State) => React.CSSProperties \| undefined)` | -       | Style applied to the element, or a function that&#xA;returns a style object based on the component's state.                                                                                   |
+| render    | `ReactElement \| ((props: HTMLProps, state: FileUpload.HiddenInput.State) => ReactElement)`          | -       | Allows you to replace the component's HTML element&#xA;with a different tag, or compose it with another component. Accepts a `ReactElement` or a function that returns the element to render. |
+
+**`id` Prop Example:**
+
+```tsx
+<FileUpload.Root>
+  <label htmlFor="file-input">Select files:</label>
+  <FileUpload.HiddenInput id="file-input" />
+  <FileUpload.Trigger>Browse</FileUpload.Trigger>
+  <Dropzone>Drop files here</Dropzone>
+</FileUpload.Root>
+```
+
 ### HiddenInput.Props
 
-```typescript
-type FileUploadHiddenInputProps = {};
-```
+Re-export of [HiddenInput](#hiddeninput) props.
 
 ### HiddenInput.State
 
