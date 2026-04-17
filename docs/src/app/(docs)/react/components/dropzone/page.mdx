@@ -30,37 +30,6 @@ import { Dropzone } from '@base-ui/react/dropzone';
 
 ## Examples
 
-### Dropzone with file input
-
-```jsx title="Dropzone with file input"
-import * as React from 'react';
-import { Dropzone } from '@base-ui/react/dropzone';
-
-export default function App() {
-  const [files, setFiles] = React.useState([]);
-
-  const appendFiles = React.useCallback((nextFiles) => {
-    setFiles((prev) => [...prev, ...nextFiles]);
-  }, []);
-
-  return (
-    <Dropzone.Root onFilesDrop={(droppedFiles) => appendFiles(droppedFiles)}>
-      <Dropzone.HiddenInput
-        multiple
-        onChange={(event) => {
-          const selectedFiles = Array.from(event.currentTarget.files ?? []);
-          if (selectedFiles.length > 0) {
-            appendFiles(selectedFiles);
-          }
-          event.currentTarget.value = '';
-        }}
-      />
-      Drop files here or click
-    </Dropzone.Root>
-  );
-}
-```
-
 ### Labeling a dropzone
 
 For icon-only designs, provide an explicit accessible name:
