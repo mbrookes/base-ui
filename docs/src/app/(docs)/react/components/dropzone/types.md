@@ -6,6 +6,22 @@
 
 ### Dropzone
 
+Interactive drop target and file selection area.
+
+**Dropzone Props:**
+
+| Prop             | Type                                                                                   | Default | Description                                                                                                                                                                                   |
+| :--------------- | :------------------------------------------------------------------------------------- | :------ | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| dragging         | `boolean`                                                                              | -       | Controlled dragging state.                                                                                                                                                                    |
+| onDraggingChange | `((dragging: boolean) => void)`                                                        | -       | Called when dragging state changes.                                                                                                                                                           |
+| onFilesDrop      | `((files: File[], event: React.DragEvent<HTMLDivElement>) => void)`                    | -       | Called when files are dropped on the dropzone.                                                                                                                                                |
+| onOpen           | `(() => void)`                                                                         | -       | Called when the dropzone is activated by click or keyboard.                                                                                                                                   |
+| disabled         | `boolean`                                                                              | `false` | Whether the dropzone is disabled.                                                                                                                                                             |
+| children         | `React.ReactNode \| ((state: { isDragging: boolean }) => React.ReactNode)`             | -       | The content of the dropzone.&#xA;This can be a React node or a render function that receives the dragging state.                                                                              |
+| className        | `string \| ((state: Dropzone.State) => string \| undefined)`                           | -       | CSS class applied to the element, or a function that&#xA;returns a class based on the component's state.                                                                                      |
+| style            | `React.CSSProperties \| ((state: Dropzone.State) => React.CSSProperties \| undefined)` | -       | Style applied to the element, or a function that&#xA;returns a style object based on the component's state.                                                                                   |
+| render           | `ReactElement \| ((props: HTMLProps, state: Dropzone.State) => ReactElement)`          | -       | Allows you to replace the component's HTML element&#xA;with a different tag, or compose it with another component. Accepts a `ReactElement` or a function that returns the element to render. |
+
 **Dropzone Data Attributes:**
 
 | Attribute     | Type | Description                                             |
@@ -15,25 +31,7 @@
 
 ### Dropzone.Props
 
-```typescript
-type DropzoneProps = {
-  [key: string]: BaseUIComponentProps<'div', Dropzone.State>;
-  /**
-   * Whether the dropzone is disabled.
-   * @default false
-   */
-  disabled?: boolean;
-  /** Controlled dragging state. */
-  dragging?: boolean;
-  /** Called when dragging state changes. */
-  onDraggingChange?: (dragging: boolean) => void;
-  /** Called when the dropzone is activated by click or keyboard. */
-  onOpen?: () => void;
-  /** Called when files are dropped on the dropzone. */
-  onFilesDrop?: (files: File[], event: React.DragEvent<HTMLDivElement>) => void;
-  children?: React.ReactNode | ((state: { isDragging: boolean }) => React.ReactNode);
-};
-```
+Re-export of [Dropzone](#dropzone) props.
 
 ### Dropzone.State
 
@@ -48,17 +46,19 @@ type DropzoneState = {
 
 ### DropzoneHiddenInput
 
-Hidden file input that powers file selection for Dropzone.
+Hidden file input that enables file selection.
 
-Place this part inside `Dropzone` to enable built-in file picker behavior.
+**DropzoneHiddenInput Props:**
+
+| Prop      | Type                                                                                              | Default | Description                                                                                                                                                                                   |
+| :-------- | :------------------------------------------------------------------------------------------------ | :------ | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| className | `string \| ((state: DropzoneHiddenInput.State) => string \| undefined)`                           | -       | CSS class applied to the element, or a function that&#xA;returns a class based on the component's state.                                                                                      |
+| style     | `React.CSSProperties \| ((state: DropzoneHiddenInput.State) => React.CSSProperties \| undefined)` | -       | Style applied to the element, or a function that&#xA;returns a style object based on the component's state.                                                                                   |
+| render    | `ReactElement \| ((props: HTMLProps, state: DropzoneHiddenInput.State) => ReactElement)`          | -       | Allows you to replace the component's HTML element&#xA;with a different tag, or compose it with another component. Accepts a `ReactElement` or a function that returns the element to render. |
 
 ### DropzoneHiddenInput.Props
 
-```typescript
-type DropzoneHiddenInputProps = {
-  [key: string]: BaseUIComponentProps<'input', DropzoneHiddenInput.State>;
-};
-```
+Re-export of [DropzoneHiddenInput](#dropzonehiddeninput) props.
 
 ### DropzoneHiddenInput.State
 

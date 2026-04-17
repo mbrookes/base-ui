@@ -45,38 +45,15 @@ export interface DropzoneProps extends Omit<
    * Called when files are dropped on the dropzone.
    */
   onFilesDrop?: ((files: File[], event: React.DragEvent<HTMLDivElement>) => void) | undefined;
+  /**
+   * The content of the dropzone.
+   * This can be a React node or a render function that receives the dragging state.
+   */
   children?: React.ReactNode | ((state: { isDragging: boolean }) => React.ReactNode) | undefined;
 }
 
 /**
  * Interactive drop target and file selection area.
- *
- * Features drag-and-drop support, keyboard activation, and automatic accessibility announcements.
- * Announces drag state changes to screen readers.
- *
- * @example
- * ```tsx
- * <Dropzone
- *   onFilesDrop={(files) => handleUpload(files)}
- *   aria-label="Drag and drop files here"
- * >
- *   Drop files to upload, or click to browse
- * </Dropzone>
- * ```
- *
- * @example
- * With render function to show drag state:
- * ```tsx
- * <Dropzone onFilesDrop={handleFiles}>
- *   {({ isDragging }) => (
- *     <div style={{ background: isDragging ? '#f0f0f0' : 'white' }}>
- *       {isDragging ? 'Release to upload' : 'Drag files here'}
- *     </div>
- *   )}
- * </Dropzone>
- * ```
- *
- * Documentation: [Base UI Dropzone](https://base-ui.com/react/components/dropzone)
  */
 const DropzoneRoot = React.forwardRef<HTMLDivElement, DropzoneProps>(
   function Dropzone(props, forwardedRef) {
@@ -267,6 +244,9 @@ type DropzoneComponent = typeof DropzoneRoot & {
   HiddenInput: typeof DropzoneHiddenInput;
 };
 
+/**
+ * Interactive drop target and file selection area.
+ */
 export const Dropzone = Object.assign(DropzoneRoot, {
   HiddenInput: DropzoneHiddenInput,
 }) as DropzoneComponent;

@@ -19,9 +19,7 @@ export interface DropzoneHiddenInputProps extends Omit<
 > {}
 
 /**
- * Hidden file input that powers file selection for Dropzone.
- *
- * Place this part inside `Dropzone` to enable built-in file picker behavior.
+ * Hidden file input that enables file selection.
  */
 export const DropzoneHiddenInput = React.forwardRef(function DropzoneHiddenInput(
   componentProps: DropzoneHiddenInputProps,

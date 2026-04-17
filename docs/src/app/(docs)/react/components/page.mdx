@@ -790,13 +790,17 @@ A drop target primitive for drag-and-drop and click-to-select file selection.
   - Anatomy
   - Examples
     - Dropzone with file input
-  - Accessibility
+    - Labeling a dropzone
   - Integration with File Upload
   - API reference
+    - Dropzone
+    - HiddenInput
 - Exports:
   - Dropzone
+    - Props: children, className, disabled, dragging, onDraggingChange, onFilesDrop, onOpen, render, style
     - Data Attributes: data-disabled, data-dragging
   - DropzoneHiddenInput
+    - Props: className, render, style
 - Types: Dropzone.Props, Dropzone.State, DropzoneHiddenInput.Props, DropzoneHiddenInput.State
 
 </details>
@@ -892,17 +896,21 @@ A file upload primitive for selecting, validating, and managing files.
     - Handling file dialog cancellation
     - Paste from clipboard
     - Folder upload
-  - Accessibility
+    - Labeling a file upload
   - Uploading files
-  - Browser support
   - API reference
+    - Root
+    - HiddenInput
+    - Trigger
 - Exports:
   - File Upload - Root
-    - Props: accept, children, directory, disabled, locale, maxFiles, maxSize, minSize, multiple, onCancel, onFilesAdd, onFilesChange, validator
+    - Props: accept, children, className, directory, disabled, locale, maxFiles, maxSize, minSize, multiple, onCancel, onFilesAdd, onFilesChange, render, style, validator
     - Data Attributes: data-disabled
   - File Upload - Trigger
+    - Props: className, nativeButton, render, style
     - Data Attributes: data-disabled
   - File Upload - HiddenInput
+    - Props: className, id, render, style
   - File Upload - useFileUploadContext
 - Types: FileUpload.HiddenInput.Props, FileUpload.HiddenInput.State, FileUpload.Root.ChangeEventDetails, FileUpload.Root.ChangeReason, FileUpload.Root.ExtendedFile, FileUpload.Root.FileStatus, FileUpload.Root.FileUpdates, FileUpload.Root.Parameters, FileUpload.Root.Props, FileUpload.Root.RejectEventDetails, FileUpload.Root.RejectReason, FileUpload.Root.Rejection, FileUpload.Root.State, FileUpload.Trigger.Props, FileUpload.Trigger.State
 
