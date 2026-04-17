@@ -75,12 +75,12 @@ function TestRoot(props: React.ComponentProps<typeof FileUpload.Root>) {
 }
 
 function TestDropzone(
-  props: Omit<React.ComponentProps<typeof Dropzone>, 'dragging' | 'disabled' | 'onOpen'>,
+  props: Omit<React.ComponentProps<typeof Dropzone.Root>, 'dragging' | 'disabled' | 'onOpen'>,
 ) {
   const { disabled, openFileDialog, addFiles } = FileUpload.useFileUploadContext();
 
   return (
-    <Dropzone
+    <Dropzone.Root
       disabled={disabled}
       onOpen={openFileDialog}
       onFilesDrop={(files, event) => addFiles(files, event.nativeEvent)}
