@@ -39,9 +39,7 @@ export interface FileUploadHiddenInputProps extends BaseUIComponentProps<
 }
 
 /**
- * Hidden file input that powers file selection for File Upload.
- *
- * Place this part inside `FileUpload.Root` to enable file selection.
+ * Hidden file input that enables file selection.
  *
  * @example
  * Accessible file upload with label:

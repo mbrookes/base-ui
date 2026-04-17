@@ -197,12 +197,6 @@ export interface FileUploadRootProps
 /**
  * Manages file upload state and provides context for child components.
  *
- * This is the root component that should wrap all other FileUpload components.
- * It handles file validation, input/paste integration, and shared state for the file upload workflow.
- *
- * Features automatic ARIA announcements for file additions, removals, and validation errors.
- * Supports paste-to-upload and keyboard shortcuts.
- *
  * @component
  * @example
  * ```tsx

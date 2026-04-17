@@ -19,11 +19,7 @@ export interface FileUploadTriggerProps
   extends NativeButtonProps, BaseUIComponentProps<'button', FileUploadTriggerState> {}
 
 /**
- * Button component for triggering the file selection dialog.
- *
- * The Trigger component renders a button that opens the file selection dialog
- * when clicked. It's typically used as an alternative to the Dropzone for users
- * who prefer clicking a button instead of drag-and-drop.
+ * Button that opens the file selection dialog.
  *
  * @component
  * @example

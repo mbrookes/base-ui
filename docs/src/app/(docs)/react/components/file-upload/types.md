@@ -6,6 +6,8 @@
 
 ### Root
 
+Manages file upload state and provides context for child components.
+
 **Root Props:**
 
 | Prop          | Type                                                                                                                                                       | Default    | Description                                                                                                                                                                                                                                                                   |
@@ -277,11 +279,7 @@ type FileUploadRootRejectReason =
 
 ### Trigger
 
-Button component for triggering the file selection dialog.
-
-The Trigger component renders a button that opens the file selection dialog
-when clicked. It's typically used as an alternative to the Dropzone for users
-who prefer clicking a button instead of drag-and-drop.
+Button that opens the file selection dialog.
 
 **Trigger Props:**
 
@@ -313,9 +311,7 @@ type FileUploadTriggerState = {
 
 ### HiddenInput
 
-Hidden file input that powers file selection for FileUpload.Root.ExtendedFile Upload.
-
-Place this part inside `FileUpload.Root` to enable file selection.
+Hidden file input that enables file selection.
 
 **HiddenInput Props:**
 
