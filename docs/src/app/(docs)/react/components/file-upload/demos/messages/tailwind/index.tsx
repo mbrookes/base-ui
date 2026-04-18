@@ -1,13 +1,15 @@
 'use client';
 
-import type { ComponentProps } from 'react';
+import * as React from 'react';
 import { FileUpload } from '@base-ui/react/file-upload';
 
-const messages: NonNullable<ComponentProps<typeof FileUpload.Root>['messages']> = {
+const messages: NonNullable<React.ComponentProps<typeof FileUpload.Root>['messages']> = {
   fileTooLarge: (maxSizeFormatted) => `Archivo demasiado grande (max ${maxSizeFormatted})`,
   maxFilesReached: (count) => `Solo se permite ${count} archivo`,
-  filesAdded: (count) => `${count} archivo${count !== 1 ? 's' : ''} agregado${count !== 1 ? 's' : ''}.`,
-  filesRejected: (count) => `${count} archivo${count !== 1 ? 's' : ''} rechazado${count !== 1 ? 's' : ''}.`,
+  filesAdded: (count) =>
+    `${count} archivo${count !== 1 ? 's' : ''} agregado${count !== 1 ? 's' : ''}.`,
+  filesRejected: (count) =>
+    `${count} archivo${count !== 1 ? 's' : ''} rechazado${count !== 1 ? 's' : ''}.`,
   allFilesRemoved: 'Se eliminaron todos los archivos',
 };
 
