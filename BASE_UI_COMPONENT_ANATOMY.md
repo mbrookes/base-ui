@@ -180,7 +180,7 @@ export function usePartContext() {
 
 When components have hidden file/input elements, expose an optional `id` prop to enable label association:
 
-```tsx
+````tsx
 export interface ComponentInputProps extends BaseUIComponentProps<'input', ComponentInputState> {
   /**
    * Optional custom id for the hidden input element.
@@ -195,18 +195,17 @@ export interface ComponentInputProps extends BaseUIComponentProps<'input', Compo
   id?: string | undefined;
 }
 
-export const ComponentHiddenInput = React.forwardRef(function ComponentHiddenInput(
-  componentProps,
-  forwardedRef,
-) {
-  const { id: idProp, ...elementProps } = componentProps;
-  const { inputId } = useContext(); // auto-generated fallback
+export const ComponentHiddenInput = React.forwardRef(
+  function ComponentHiddenInput(componentProps, forwardedRef) {
+    const { id: idProp, ...elementProps } = componentProps;
+    const { inputId } = useContext(); // auto-generated fallback
 
-  return useRenderElement('input', componentProps, {
-    props: [{ id: idProp ?? inputId, type: 'file' }, elementProps],
-  });
-});
-```
+    return useRenderElement('input', componentProps, {
+      props: [{ id: idProp ?? inputId, type: 'file' }, elementProps],
+    });
+  },
+);
+````
 
 ### Screen Reader Announcements for State Changes
 
@@ -261,7 +260,7 @@ export const componentStateAttributesMapping: StateAttributesMapping<ComponentSt
 
 Always document accessibility features in JSDoc:
 
-```tsx
+````tsx
 /**
  * Interactive drop target with keyboard and drag support.
  *
@@ -279,7 +278,7 @@ Always document accessibility features in JSDoc:
  * </Component>
  * ```
  */
-```
+````
 
 ## 9. Controlled State and Events
 

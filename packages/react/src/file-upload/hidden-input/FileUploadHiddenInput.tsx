@@ -31,7 +31,7 @@ export interface FileUploadHiddenInputProps extends BaseUIComponentProps<
    *   <label htmlFor="file-input">Select files:</label>
    *   <FileUpload.HiddenInput id="file-input" />
    *   <FileUpload.Trigger>Browse</FileUpload.Trigger>
-  *   <Dropzone.Root>Drop files here</Dropzone.Root>
+   *   <Dropzone.Root>Drop files here</Dropzone.Root>
    * </FileUpload.Root>
    * ```
    */
