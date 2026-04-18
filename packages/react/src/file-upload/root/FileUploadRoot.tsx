@@ -148,6 +148,49 @@ export interface FileUploadRootParameters {
    * Defaults to the user's runtime locale.
    */
   locale?: Intl.LocalesArgument | undefined;
+  /**
+   * Overrides for built-in validation and announcement messages.
+   */
+  messages?: Partial<FileUploadRootMessages> | undefined;
+}
+
+export interface FileUploadRootMessages {
+  /**
+   * Message shown when file size exceeds `maxSize`.
+   */
+  fileTooLarge: (maxSizeFormatted: string) => string;
+  /**
+   * Message shown when file size is below `minSize`.
+   */
+  fileTooSmall: (minSizeFormatted: string) => string;
+  /**
+   * Message shown when file type is not accepted.
+   */
+  fileTypeNotAccepted: string;
+  /**
+   * Message shown when a duplicate file is added.
+   */
+  duplicateFile: string;
+  /**
+   * Message shown when the max file count is reached.
+   */
+  maxFilesReached: (count: number) => string;
+  /**
+   * Live region text for successfully added files.
+   */
+  filesAdded: (count: number) => string;
+  /**
+   * Live region text for rejected files.
+   */
+  filesRejected: (count: number, errors: string[]) => string;
+  /**
+   * Live region text when a file is removed.
+   */
+  fileRemoved: (fileName: string) => string;
+  /**
+   * Live region text when all files are removed.
+   */
+  allFilesRemoved: string;
 }
 
 export interface FileUploadRootExtendedFile extends File {
@@ -262,6 +305,7 @@ export const FileUploadRoot = React.forwardRef<HTMLDivElement, FileUploadRootPro
       onFilesAdd,
       onCancel,
       locale,
+      messages,
       // Keep these out of `other` so DOM prop typing stays valid in useRenderElement props.
       render,
       style,
@@ -282,6 +326,7 @@ export const FileUploadRoot = React.forwardRef<HTMLDivElement, FileUploadRootPro
       onFilesAdd,
       onCancel,
       locale,
+      messages,
     });
 
     const handlePaste = useStableCallback((event: React.ClipboardEvent) => {

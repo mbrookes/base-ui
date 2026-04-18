@@ -17,6 +17,7 @@ Manages file upload state and provides context for child components.
 | locale        | `Intl.LocalesArgument`                                                                                                                                     | -          | The locale used by `Intl.NumberFormat` when formatting values in default messages.&#xA;Defaults to the user's runtime locale.                                                                                                                                                 |
 | maxFiles      | `number`                                                                                                                                                   | `Infinity` | Maximum number of files allowed.                                                                                                                                                                                                                                              |
 | maxSize       | `number`                                                                                                                                                   | `Infinity` | Maximum file size in bytes.                                                                                                                                                                                                                                                   |
+| messages      | `Partial<FileUploadRootMessages>`                                                                                                                          | -          | Overrides for built-in validation and announcement messages.                                                                                                                                                                                                                  |
 | minSize       | `number`                                                                                                                                                   | `0`        | Minimum file size in bytes.                                                                                                                                                                                                                                                   |
 | multiple      | `boolean`                                                                                                                                                  | `true`     | Allow multiple file selection.                                                                                                                                                                                                                                                |
 | onCancel      | `(() => void)`                                                                                                                                             | -          | Callback when the file dialog is canceled.                                                                                                                                                                                                                                    |
@@ -222,6 +223,8 @@ type FileUploadRootParameters = {
    * Defaults to the user's runtime locale.
    */
   locale?: Intl.LocalesArgument;
+  /** Overrides for built-in validation and announcement messages. */
+  messages?: Partial<FileUploadRootMessages>;
 };
 ````
 
@@ -408,13 +411,38 @@ type FileUploadContextValue = {
 };
 ```
 
+### FileUploadRootMessages
+
+```typescript
+type FileUploadRootMessages = {
+  /** Message shown when file size exceeds `maxSize`. */
+  fileTooLarge: (maxSizeFormatted: string) => string;
+  /** Message shown when file size is below `minSize`. */
+  fileTooSmall: (minSizeFormatted: string) => string;
+  /** Message shown when file type is not accepted. */
+  fileTypeNotAccepted: string;
+  /** Message shown when a duplicate file is added. */
+  duplicateFile: string;
+  /** Message shown when the max file count is reached. */
+  maxFilesReached: (count: number) => string;
+  /** Live region text for successfully added files. */
+  filesAdded: (count: number) => string;
+  /** Live region text for rejected files. */
+  filesRejected: (count: number, errors: string[]) => string;
+  /** Live region text when a file is removed. */
+  fileRemoved: (fileName: string) => string;
+  /** Live region text when all files are removed. */
+  allFilesRemoved: string;
+};
+```
+
 ## Export Groups
 
 - `FileUpload.Root`: `FileUpload.Root`, `FileUpload.Root.State`, `FileUpload.Root.Props`, `FileUpload.Root.Parameters`, `FileUpload.Root.ExtendedFile`, `FileUpload.Root.FileUpdates`, `FileUpload.Root.FileStatus`, `FileUpload.Root.RejectReason`, `FileUpload.Root.Rejection`, `FileUpload.Root.RejectEventDetails`, `FileUpload.Root.ChangeEventDetails`, `FileUpload.Root.ChangeReason`
 - `FileUpload.HiddenInput`: `FileUpload.HiddenInput`, `FileUpload.HiddenInput.State`, `FileUpload.HiddenInput.Props`
 - `FileUpload.Trigger`: `FileUpload.Trigger`, `FileUpload.Trigger.State`, `FileUpload.Trigger.Props`
 - `FileUpload.useFileUploadContext`
-- `Default`: `FileUploadRootRejectReason`, `FileUploadRootChangeReason`, `FileUploadRootChangeEventDetails`, `FileUploadRootRejectEventDetails`, `FileUploadRootRejection`, `FileUploadRootState`, `FileUploadRootParameters`, `FileUploadRootExtendedFile`, `FileUploadRootFileUpdates`, `FileUploadRootFileStatus`, `FileUploadRootProps`, `FileUploadContextValue`, `FileUploadHiddenInputState`, `FileUploadHiddenInputProps`, `FileUploadTriggerState`, `FileUploadTriggerProps`
+- `Default`: `FileUploadRootRejectReason`, `FileUploadRootChangeReason`, `FileUploadRootChangeEventDetails`, `FileUploadRootRejectEventDetails`, `FileUploadRootRejection`, `FileUploadRootState`, `FileUploadRootParameters`, `FileUploadRootMessages`, `FileUploadRootExtendedFile`, `FileUploadRootFileUpdates`, `FileUploadRootFileStatus`, `FileUploadRootProps`, `FileUploadContextValue`, `FileUploadHiddenInputState`, `FileUploadHiddenInputProps`, `FileUploadTriggerState`, `FileUploadTriggerProps`
 
 ## Canonical Types
 

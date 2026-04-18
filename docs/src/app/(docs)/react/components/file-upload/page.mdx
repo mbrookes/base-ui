@@ -8,6 +8,7 @@
 />
 
 import { DemoFileUploadHero } from './demos/hero';
+import { DemoFileUploadMessages } from './demos/messages';
 
 <DemoFileUploadHero />
 
@@ -97,6 +98,32 @@ export default function App() {
 >
   <FileUpload.HiddenInput />
   <FileUpload.Trigger>Select files</FileUpload.Trigger>
+</FileUpload.Root>
+```
+
+### Custom messages
+
+Provide custom text for built-in validation and announcement messages:
+
+<DemoFileUploadMessages />
+
+```jsx title="Custom messages" "messages"
+<FileUpload.Root
+  maxFiles={1}
+  maxSize={1024 * 1024}
+  messages={{
+    fileTooLarge: (maxSizeFormatted) => `Archivo demasiado grande (max ${maxSizeFormatted})`,
+    maxFilesReached: (count) => `Solo se permite ${count} archivo`,
+    filesAdded: (count) => `${count} archivo${count !== 1 ? 's' : ''} agregado${
+      count !== 1 ? 's' : ''
+    }.`,
+    filesRejected: (count) =>
+      `${count} archivo${count !== 1 ? 's' : ''} rechazado${count !== 1 ? 's' : ''}.`,
+    allFilesRemoved: 'Se eliminaron todos los archivos',
+  }}
+>
+  <FileUpload.HiddenInput />
+  <FileUpload.Trigger>Seleccionar archivo</FileUpload.Trigger>
 </FileUpload.Root>
 ```
 

@@ -802,6 +802,44 @@ describe('FileUpload', () => {
     });
   });
 
+  it('uses custom max-files-reached message override', async () => {
+    const onFilesAdd = vi.fn();
+
+    render(
+      <TestRoot
+        maxFiles={1}
+        onFilesAdd={onFilesAdd}
+        messages={{
+          maxFilesReached: (count) => `Only ${count} file allowed`,
+        }}
+      >
+        {null}
+      </TestRoot>,
+    );
+
+    const input = getFileInput();
+    const firstFile = new File(['content'], 'first.txt', { type: 'text/plain' });
+    const secondFile = new File(['content'], 'second.txt', { type: 'text/plain' });
+
+    Object.defineProperty(input, 'files', {
+      value: [firstFile, secondFile],
+      configurable: true,
+    });
+
+    fireEvent.change(input);
+
+    await waitFor(() => expect(onFilesAdd).toHaveBeenCalled());
+
+    const [, fileRejections] = onFilesAdd.mock.calls[0];
+    expect(fileRejections).toHaveLength(1);
+    expect(fileRejections[0]).toMatchObject({
+      reason: 'max-files-reached',
+      eventDetails: expect.objectContaining({
+        message: 'Only 1 file allowed',
+      }),
+    });
+  });
+
   it('cleans up object URLs on unmount', async () => {
     const { unmount } = render(<TestRoot>{null}</TestRoot>);
 
@@ -1077,6 +1115,36 @@ describe('FileUpload', () => {
 
       await waitFor(() => {
         expect(screen.getByText('All files removed', { exact: false })).toBeInTheDocument();
+      });
+    });
+
+    it('uses custom clear announcement message override', async () => {
+      let contextValue: TestFileUploadContext | null = null;
+
+      function TestComponent() {
+        const ctx = FileUpload.useFileUploadContext();
+        contextValue = ctx as unknown as TestFileUploadContext;
+        return null;
+      }
+
+      render(
+        <TestRoot messages={{ allFilesRemoved: 'Removed everything' }}>
+          <div role="status" aria-live="polite" aria-atomic="true" />
+          <TestComponent />
+        </TestRoot>,
+      );
+
+      const input = getFileInput();
+      const file = new File(['content'], 'test.txt', { type: 'text/plain' });
+
+      fireEvent.change(input, { target: { files: [file] } });
+
+      act(() => {
+        getTestContext(contextValue).clearFiles();
+      });
+
+      await waitFor(() => {
+        expect(screen.getByText('Removed everything', { exact: false })).toBeInTheDocument();
       });
     });
   });

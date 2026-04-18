@@ -11,6 +11,7 @@ import type {
   FileUploadRootChangeReason,
   FileUploadRootExtendedFile,
   FileUploadRootFileUpdates,
+  FileUploadRootMessages,
   FileUploadRootParameters,
   FileUploadRootRejection,
 } from './FileUploadRoot';
@@ -103,7 +104,7 @@ const formatBytes = (bytes: number, formatter: Intl.NumberFormat) => {
   return `${formattedValue} ${sizes[i]}`;
 };
 
-const messages = {
+const defaultMessages: FileUploadRootMessages = {
   fileTooLarge: (maxSizeFormatted: string) => `File too large (max ${maxSizeFormatted})`,
   fileTooSmall: (minSizeFormatted: string) => `File too small (min ${minSizeFormatted})`,
   fileTypeNotAccepted: 'File type not accepted',
@@ -179,6 +180,7 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
     onFilesAdd,
     onCancel,
     locale,
+    messages: messagesProp,
   } = params;
 
   const [files, setFiles] = React.useState<FileUploadRootExtendedFile[]>([]);
@@ -191,17 +193,24 @@ export const useFileUploadRoot = (params: FileUploadRootParameters) => {
       }),
     [locale],
   );
+  const messages = React.useMemo(
+    () => ({
+      ...defaultMessages,
+      ...messagesProp,
+    }),
+    [messagesProp],
+  );
   const acceptTypes = React.useMemo(() => parseAccept(accept), [accept]);
   const formattedMinSize = React.useMemo(
     () => messages.fileTooSmall(formatBytes(minSizeProp, numberFormatter)),
-    [minSizeProp, numberFormatter],
+    [messages, minSizeProp, numberFormatter],
   );
   const formattedMaxSize = React.useMemo(
     () =>
       Number.isFinite(maxSizeProp)
         ? messages.fileTooLarge(formatBytes(maxSizeProp, numberFormatter))
         : null,
-    [maxSizeProp, numberFormatter],
+    [messages, maxSizeProp, numberFormatter],
   );
 
   // Mirror of `files` in a ref so addFiles can read the latest value synchronously.
