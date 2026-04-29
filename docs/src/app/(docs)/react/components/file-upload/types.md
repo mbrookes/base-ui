@@ -312,6 +312,30 @@ type FileUploadTriggerState = {
 };
 ```
 
+### FileSize
+
+Renders the formatted file size for a given byte count.
+
+**FileSize Props:**
+
+| Prop      | Type                                                                                              | Default | Description                                                                                                                                                                                   |
+| :-------- | :------------------------------------------------------------------------------------------------ | :------ | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| bytes\*   | `number \| undefined`                                                                             | -       | The file size in bytes to format.                                                                                                                                                             |
+| locale    | `Intl.LocalesArgument`                                                                            | -       | The locale used by `Intl.NumberFormat` when formatting the value.&#xA;Defaults to the user's runtime locale.                                                                                  |
+| className | `string \| ((state: FileUpload.FileSize.State) => string \| undefined)`                           | -       | CSS class applied to the element, or a function that&#xA;returns a class based on the component's state.                                                                                      |
+| style     | `React.CSSProperties \| ((state: FileUpload.FileSize.State) => React.CSSProperties \| undefined)` | -       | Style applied to the element, or a function that&#xA;returns a style object based on the component's state.                                                                                   |
+| render    | `ReactElement \| ((props: HTMLProps, state: FileUpload.FileSize.State) => ReactElement)`          | -       | Allows you to replace the component's HTML element&#xA;with a different tag, or compose it with another component. Accepts a `ReactElement` or a function that returns the element to render. |
+
+### FileSize.Props
+
+Re-export of [FileSize](#filesize) props.
+
+### FileSize.State
+
+```typescript
+type FileUploadFileSizeState = {};
+```
+
 ### HiddenInput
 
 Hidden file input that enables file selection.
@@ -441,8 +465,9 @@ type FileUploadRootMessages = {
 - `FileUpload.Root`: `FileUpload.Root`, `FileUpload.Root.State`, `FileUpload.Root.Props`, `FileUpload.Root.Parameters`, `FileUpload.Root.ExtendedFile`, `FileUpload.Root.FileUpdates`, `FileUpload.Root.FileStatus`, `FileUpload.Root.RejectReason`, `FileUpload.Root.Rejection`, `FileUpload.Root.RejectEventDetails`, `FileUpload.Root.ChangeEventDetails`, `FileUpload.Root.ChangeReason`
 - `FileUpload.HiddenInput`: `FileUpload.HiddenInput`, `FileUpload.HiddenInput.State`, `FileUpload.HiddenInput.Props`
 - `FileUpload.Trigger`: `FileUpload.Trigger`, `FileUpload.Trigger.State`, `FileUpload.Trigger.Props`
+- `FileUpload.FileSize`: `FileUpload.FileSize`, `FileUpload.FileSize.State`, `FileUpload.FileSize.Props`
 - `FileUpload.useFileUploadContext`
-- `Default`: `FileUploadRootRejectReason`, `FileUploadRootChangeReason`, `FileUploadRootChangeEventDetails`, `FileUploadRootRejectEventDetails`, `FileUploadRootRejection`, `FileUploadRootState`, `FileUploadRootParameters`, `FileUploadRootMessages`, `FileUploadRootExtendedFile`, `FileUploadRootFileUpdates`, `FileUploadRootFileStatus`, `FileUploadRootProps`, `FileUploadContextValue`, `FileUploadHiddenInputState`, `FileUploadHiddenInputProps`, `FileUploadTriggerState`, `FileUploadTriggerProps`
+- `Default`: `FileUploadRootRejectReason`, `FileUploadRootChangeReason`, `FileUploadRootChangeEventDetails`, `FileUploadRootRejectEventDetails`, `FileUploadRootRejection`, `FileUploadRootState`, `FileUploadRootParameters`, `FileUploadRootMessages`, `FileUploadRootExtendedFile`, `FileUploadRootFileUpdates`, `FileUploadRootFileStatus`, `FileUploadRootProps`, `FileUploadContextValue`, `FileUploadHiddenInputState`, `FileUploadHiddenInputProps`, `FileUploadTriggerState`, `FileUploadTriggerProps`, `FileUploadFileSizeState`, `FileUploadFileSizeProps`
 
 ## Canonical Types
 
@@ -463,3 +488,5 @@ Maps `Canonical`: `Alias` — Use Canonical when its namespace is already import
 - `FileUpload.HiddenInput.Props`: `FileUploadHiddenInputProps`
 - `FileUpload.Trigger.State`: `FileUploadTriggerState`
 - `FileUpload.Trigger.Props`: `FileUploadTriggerProps`
+- `FileUpload.FileSize.State`: `FileUploadFileSizeState`
+- `FileUpload.FileSize.Props`: `FileUploadFileSizeProps`

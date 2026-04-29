@@ -5,21 +5,8 @@ import { X } from 'lucide-react';
 import { FileUpload } from '@base-ui/react/file-upload';
 import styles from './index.module.css';
 
-function formatBytes(bytes?: number) {
-  if (bytes === undefined || bytes === null) {
-    return 'Unknown';
-  }
-  if (bytes === 0) {
-    return '0 B';
-  }
-  const k = 1024;
-  const sizes = ['B', 'KB', 'MB', 'GB'];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(1))} ${sizes[i]}`;
-}
-
 function FileList() {
-  const { files, removeFile } = FileUpload.useFileUploadContext();
+  const { files } = FileUpload.useFileUploadContext();
 
   if (files.length === 0) {
     return <p className={styles.emptyState}>No files selected yet.</p>;
@@ -33,17 +20,15 @@ function FileList() {
             <span className={styles.fileName} title={file.name}>
               {file.name}
             </span>
-            <span className={styles.fileSize}>{formatBytes(file.size)}</span>
+            <FileUpload.FileSize bytes={file.size} className={styles.fileSize} />
           </div>
-          <button
-            type="button"
-            onClick={() => removeFile(file.id)}
+          <FileUpload.Remove
+            fileId={file.id}
             className={styles.removeButton}
-            title={`Remove ${file.name}`}
             aria-label={`Remove ${file.name}`}
           >
             <X className={styles.removeIcon} />
-          </button>
+          </FileUpload.Remove>
         </li>
       ))}
     </ul>

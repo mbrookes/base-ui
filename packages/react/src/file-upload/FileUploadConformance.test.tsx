@@ -24,4 +24,19 @@ describe('FileUpload conformance', () => {
       return render(<FileUpload.Root>{node}</FileUpload.Root>);
     },
   }));
+
+  describeConformance(<FileUpload.Remove fileId="test-id">Remove</FileUpload.Remove>, () => ({
+    refInstanceof: window.HTMLButtonElement,
+    button: true,
+    render(node) {
+      return render(<FileUpload.Root>{node}</FileUpload.Root>);
+    },
+  }));
+
+  describeConformance(<FileUpload.FileSize bytes={1024} />, () => ({
+    refInstanceof: window.HTMLSpanElement,
+    render(node) {
+      return render(<FileUpload.Root>{node}</FileUpload.Root>);
+    },
+  }));
 });

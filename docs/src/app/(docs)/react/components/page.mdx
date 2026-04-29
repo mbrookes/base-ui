@@ -899,6 +899,7 @@ A file upload primitive for selecting, validating, and managing files.
     - Root
     - HiddenInput
     - Trigger
+    - FileSize
 - Exports:
   - File Upload - Root
     - Props: accept, children, className, directory, disabled, locale, maxFiles, maxSize, messages, minSize, multiple, onCancel, onFilesAdd, onFilesChange, render, style, validator
@@ -906,10 +907,12 @@ A file upload primitive for selecting, validating, and managing files.
   - File Upload - Trigger
     - Props: className, nativeButton, render, style
     - Data Attributes: data-disabled
+  - File Upload - FileSize
+    - Props: bytes, className, locale, render, style
   - File Upload - HiddenInput
     - Props: className, id, render, style
   - File Upload - useFileUploadContext
-- Types: FileUpload.HiddenInput.Props, FileUpload.HiddenInput.State, FileUpload.Root.ChangeEventDetails, FileUpload.Root.ChangeReason, FileUpload.Root.ExtendedFile, FileUpload.Root.FileStatus, FileUpload.Root.FileUpdates, FileUpload.Root.Parameters, FileUpload.Root.Props, FileUpload.Root.RejectEventDetails, FileUpload.Root.RejectReason, FileUpload.Root.Rejection, FileUpload.Root.State, FileUpload.Trigger.Props, FileUpload.Trigger.State
+- Types: FileUpload.FileSize.Props, FileUpload.FileSize.State, FileUpload.HiddenInput.Props, FileUpload.HiddenInput.State, FileUpload.Root.ChangeEventDetails, FileUpload.Root.ChangeReason, FileUpload.Root.ExtendedFile, FileUpload.Root.FileStatus, FileUpload.Root.FileUpdates, FileUpload.Root.Parameters, FileUpload.Root.Props, FileUpload.Root.RejectEventDetails, FileUpload.Root.RejectReason, FileUpload.Root.Rejection, FileUpload.Root.State, FileUpload.Trigger.Props, FileUpload.Trigger.State
 
 </details>
 

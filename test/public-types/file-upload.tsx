@@ -12,6 +12,8 @@ export type FileUploadTriggerState = FileUpload.Trigger.State;
 export type FileUploadHiddenInputProps = FileUpload.HiddenInput.Props;
 export type FileUploadHiddenInputState = FileUpload.HiddenInput.State;
 
-export interface SimpleFileUploadProps extends Omit<FileUploadRootProps, 'children'> {
-  label?: string;
-}
+export type FileUploadFileSizeProps = FileUpload.FileSize.Props;
+export type FileUploadFileSizeState = FileUpload.FileSize.State;
+
+export type FileUploadRemoveProps = FileUpload.Remove.Props;
+export type FileUploadRemoveState = FileUpload.Remove.State;

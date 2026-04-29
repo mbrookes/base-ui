@@ -37,7 +37,7 @@ import { FileUpload } from '@base-ui/react/file-upload';
 import { FileUpload } from '@base-ui/react/file-upload';
 
 function SelectedFiles() {
-  const { files, removeFile } = FileUpload.useFileUploadContext();
+  const { files } = FileUpload.useFileUploadContext();
 
   if (files.length === 0) {
     return <p>No files selected.</p>;
@@ -48,7 +48,10 @@ function SelectedFiles() {
       {files.map((file) => (
         <li key={file.id}>
           {file.name}
-          <button onClick={() => removeFile(file.id)}>Remove</button>
+          <FileUpload.FileSize bytes={file.size} />
+          <FileUpload.Remove fileId={file.id} aria-label={`Remove ${file.name}`}>
+            Remove
+          </FileUpload.Remove>
         </li>
       ))}
     </ul>
@@ -207,6 +210,14 @@ import { TypesFileUpload } from './types';
 ### Trigger
 
 <TypesFileUpload.Trigger />
+
+### FileSize
+
+<TypesFileUpload.FileSize />
+
+### Remove
+
+<TypesFileUpload.Remove />
 
 export const metadata = {
   keywords: [

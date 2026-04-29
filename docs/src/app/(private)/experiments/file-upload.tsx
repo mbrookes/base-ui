@@ -73,7 +73,7 @@ function UploadDropzone() {
 }
 
 function FilePreviewItems() {
-  const { files, removeFile } = FileUpload.useFileUploadContext();
+  const { files } = FileUpload.useFileUploadContext();
 
   if (files.length === 0) {
     return null;
@@ -85,16 +85,15 @@ function FilePreviewItems() {
         <li key={file.id} className={styles.PreviewItem}>
           <div className={styles.FileInfo}>
             <span className={styles.FileName}>{file.name}</span>
-            <span className={styles.FileSize}>{(file.size / 1024).toFixed(2)} KB</span>
+            <FileUpload.FileSize bytes={file.size} className={styles.FileSize} />
           </div>
-          <button
-            type="button"
+          <FileUpload.Remove
+            fileId={file.id}
             className={styles.RemoveButton}
-            onClick={() => removeFile(file.id)}
             aria-label={`Remove ${file.name}`}
           >
             ×
-          </button>
+          </FileUpload.Remove>
         </li>
       ))}
     </ul>
