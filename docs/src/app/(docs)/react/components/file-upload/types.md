@@ -373,6 +373,39 @@ type FileUploadHiddenInputState = {
 };
 ```
 
+### Remove
+
+Button that removes a specific file from the upload list.
+
+**Remove Props:**
+
+| Prop         | Type                                                                                            | Default | Description                                                                                                                                                                                   |
+| :----------- | :---------------------------------------------------------------------------------------------- | :------ | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| fileId\*     | `string`                                                                                        | -       | The id of the file to remove.                                                                                                                                                                 |
+| nativeButton | `boolean`                                                                                       | `true`  | Whether the component renders a native `<button>` element when replacing it&#xA;via the `render` prop.&#xA;Set to `false` if the rendered element is not a button (for example, `<div>`).     |
+| className    | `string \| ((state: FileUpload.Remove.State) => string \| undefined)`                           | -       | CSS class applied to the element, or a function that&#xA;returns a class based on the component's state.                                                                                      |
+| style        | `React.CSSProperties \| ((state: FileUpload.Remove.State) => React.CSSProperties \| undefined)` | -       | Style applied to the element, or a function that&#xA;returns a style object based on the component's state.                                                                                   |
+| render       | `ReactElement \| ((props: HTMLProps, state: FileUpload.Remove.State) => ReactElement)`          | -       | Allows you to replace the component's HTML element&#xA;with a different tag, or compose it with another component. Accepts a `ReactElement` or a function that returns the element to render. |
+
+**Remove Data Attributes:**
+
+| Attribute     | Type | Description                                 |
+| :------------ | :--- | :------------------------------------------ |
+| data-disabled | -    | Present when the remove button is disabled. |
+
+### Remove.Props
+
+Re-export of [Remove](#remove) props.
+
+### Remove.State
+
+```typescript
+type FileUploadRemoveState = {
+  /** Whether the remove button is disabled. */
+  disabled: boolean;
+};
+```
+
 ### useFileUploadContext
 
 Hook to access FileUpload context within child components.
@@ -466,8 +499,9 @@ type FileUploadRootMessages = {
 - `FileUpload.HiddenInput`: `FileUpload.HiddenInput`, `FileUpload.HiddenInput.State`, `FileUpload.HiddenInput.Props`
 - `FileUpload.Trigger`: `FileUpload.Trigger`, `FileUpload.Trigger.State`, `FileUpload.Trigger.Props`
 - `FileUpload.FileSize`: `FileUpload.FileSize`, `FileUpload.FileSize.State`, `FileUpload.FileSize.Props`
+- `FileUpload.Remove`: `FileUpload.Remove`, `FileUpload.Remove.State`, `FileUpload.Remove.Props`
 - `FileUpload.useFileUploadContext`
-- `Default`: `FileUploadRootRejectReason`, `FileUploadRootChangeReason`, `FileUploadRootChangeEventDetails`, `FileUploadRootRejectEventDetails`, `FileUploadRootRejection`, `FileUploadRootState`, `FileUploadRootParameters`, `FileUploadRootMessages`, `FileUploadRootExtendedFile`, `FileUploadRootFileUpdates`, `FileUploadRootFileStatus`, `FileUploadRootProps`, `FileUploadContextValue`, `FileUploadHiddenInputState`, `FileUploadHiddenInputProps`, `FileUploadTriggerState`, `FileUploadTriggerProps`, `FileUploadFileSizeState`, `FileUploadFileSizeProps`
+- `Default`: `FileUploadRootRejectReason`, `FileUploadRootChangeReason`, `FileUploadRootChangeEventDetails`, `FileUploadRootRejectEventDetails`, `FileUploadRootRejection`, `FileUploadRootState`, `FileUploadRootParameters`, `FileUploadRootMessages`, `FileUploadRootExtendedFile`, `FileUploadRootFileUpdates`, `FileUploadRootFileStatus`, `FileUploadRootProps`, `FileUploadContextValue`, `FileUploadHiddenInputState`, `FileUploadHiddenInputProps`, `FileUploadTriggerState`, `FileUploadTriggerProps`, `FileUploadFileSizeState`, `FileUploadFileSizeProps`, `FileUploadRemoveState`, `FileUploadRemoveProps`
 
 ## Canonical Types
 
@@ -490,3 +524,5 @@ Maps `Canonical`: `Alias` — Use Canonical when its namespace is already import
 - `FileUpload.Trigger.Props`: `FileUploadTriggerProps`
 - `FileUpload.FileSize.State`: `FileUploadFileSizeState`
 - `FileUpload.FileSize.Props`: `FileUploadFileSizeProps`
+- `FileUpload.Remove.State`: `FileUploadRemoveState`
+- `FileUpload.Remove.Props`: `FileUploadRemoveProps`

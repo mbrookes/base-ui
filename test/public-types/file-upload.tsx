@@ -17,3 +17,6 @@ export type FileUploadFileSizeState = FileUpload.FileSize.State;
 
 export type FileUploadRemoveProps = FileUpload.Remove.Props;
 export type FileUploadRemoveState = FileUpload.Remove.State;
+
+export type FileUploadRemoveProps = FileUpload.Remove.Props;
+export type FileUploadRemoveState = FileUpload.Remove.State;
