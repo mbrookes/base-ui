@@ -4,6 +4,12 @@
 
 This repository contains the source code and documentation for Base UI: a headless, unstyled React component library.
 
+## Agent Skills
+
+- Shared workspace skills live in `.agents/skills/`.
+- Use `.agents/skills/base-ui-component-anatomy/` for Base UI component implementation, refactoring, docs, tests, and demo styling tasks.
+- Start with `.agents/skills/base-ui-component-anatomy/SKILL.md` and load topic references from that skill as needed.
+
 ## Project structure
 
 - Source code for components and private utils is in `packages/react/`.
