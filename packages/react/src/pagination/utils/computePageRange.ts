@@ -35,7 +35,9 @@ function range(start: number, end: number): number[] {
  *
  * - Pages `[1, boundaryCount]` are always shown at the start.
  * - Pages `[count-boundaryCount+1, count]` are always shown at the end.
- * - Pages `[page-siblingCount, page+siblingCount]` are always shown in the middle.
+ * - A window of `2*siblingCount+1` pages is always shown in the middle.
+ * - The window shifts toward whichever boundary it is closest to, so the total
+ *   number of rendered items stays constant regardless of which page is active.
  * - If the gap between the start boundary and the middle window is exactly 1 page,
  *   that page is shown instead of an ellipsis.
  * - If the gap is 2 or more pages, an ellipsis is shown.
@@ -54,9 +56,18 @@ export function computePageRange(
   const endStart = Math.max(count - boundaryCount + 1, boundaryCount + 1);
   const endPages = range(Math.max(endStart, 1), count);
 
-  // Sibling window around the current page, clamped to [1, count]
-  const sibStart = Math.max(page - siblingCount, 1);
-  const sibEnd = Math.min(page + siblingCount, count);
+  // Sibling window around the current page.
+  // The window is clamped so it stays at least `boundaryCount+2` from the start,
+  // which ensures an ellipsis (or fill page) is always present on both sides when
+  // the count is large enough. This keeps the total rendered item count stable.
+  const rawSibStart = Math.max(
+    Math.min(page - siblingCount, count - boundaryCount - siblingCount * 2 - 1),
+    boundaryCount + 2,
+  );
+  // Clamp rawSibStart to [1, count] before computing sibEnd.
+  const clampedSibStart = Math.max(1, Math.min(rawSibStart, count));
+  const sibStart = clampedSibStart;
+  const sibEnd = Math.min(count, clampedSibStart + siblingCount * 2);
 
   // Right edge of the start boundary and left edge of the end boundary
   const startEdge = startPages.length > 0 ? startPages[startPages.length - 1] : 0;

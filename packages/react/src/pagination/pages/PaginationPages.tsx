@@ -38,7 +38,6 @@ export function PaginationPages(componentProps: PaginationPages.Props): React.Re
           aria-current={selected ? 'page' : undefined}
           aria-label={selected ? `page ${p}, current page` : `Go to page ${p}`}
           onClick={(event) => handlePageClick(p, event)}
-          tabIndex={disabled ? -1 : 0}
         >
           {p}
         </button>

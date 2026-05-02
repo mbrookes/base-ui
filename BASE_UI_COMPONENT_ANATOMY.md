@@ -422,7 +422,26 @@ pnpm prettier
 
 Also run relevant component tests (JSDOM and Chromium when needed).
 
-## 15. Fast Agent Checklist
+## 15. Wrapper Parts (Container + Inner Interactive Element)
+
+Use when semantic HTML requires a container element wrapping an interactive child (e.g. `<li>` + `<button>`).
+
+1. **`useRenderElement` wraps the outer container** — pass `componentProps`, `state`, `ref`, and `{ children: innerElement }`.
+2. **`useButton` drives the inner element** — spread `getButtonProps` and attach `buttonRef`; do not set `disabled` or `tabIndex` manually.
+3. **State attributes land on the container** — `data-disabled` etc. come from `useRenderElement`; native `disabled` comes from `getButtonProps`.
+4. **Hooks cannot be called inside render loops** — for buttons rendered in a map callback, use native `<button disabled>` instead; a disabled native button is already removed from tab order.
+5. **Non-interactive siblings inherit list text color** — container siblings with no interactive child (e.g. an ellipsis `<li>`) don't receive the button's explicit color. Target them with `:not(:has(button))` in CSS to set the matching color explicitly.
+
+## 16. Fragment-Rendering Parts
+
+Use when a part renders multiple peer elements rather than a single DOM node (no ref to forward).
+
+1. **Plain function, not `forwardRef`** — return type is `React.ReactElement`.
+2. **Wrap output in `<React.Fragment>`**.
+3. **No hooks inside render loops** — map callbacks are not hook-safe; use native attributes directly.
+4. **Keep rendered item count stable** — if the number of visible items can vary (e.g. page buttons with optional ellipses), compensate elsewhere so the total stays constant and layout doesn't shift.
+
+## 17. Fast Agent Checklist
 
 1. Choose shape: single-part or compound.
 2. Follow nearest existing component pattern.

@@ -2,6 +2,7 @@
 import * as React from 'react';
 import { useStableCallback } from '@base-ui/utils/useStableCallback';
 import { useRenderElement } from '../../internals/useRenderElement';
+import { useButton } from '../../internals/use-button/useButton';
 import { usePaginationRootContext } from '../root/PaginationRootContext';
 import type { BaseUIComponentProps } from '../../internals/types';
 
@@ -24,16 +25,12 @@ export const PaginationPrevButton = React.forwardRef(function PaginationPrevButt
     setPage(page - 1, event);
   });
 
+  const { getButtonProps, buttonRef } = useButton({ disabled });
+
   const state: PaginationPrevButton.State = { disabled };
 
   const buttonElement = (
-    <button
-      type="button"
-      disabled={disabled}
-      aria-label="Go to previous page"
-      onClick={handleClick}
-      tabIndex={disabled ? -1 : 0}
-    >
+    <button ref={buttonRef} aria-label="Go to previous page" {...getButtonProps({ onClick: handleClick })}>
       {children ?? '\u2039'}
     </button>
   );

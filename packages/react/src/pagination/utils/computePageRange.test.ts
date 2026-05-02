@@ -21,19 +21,19 @@ describe('computePageRange', () => {
       expect(result.showEndEllipsis).toBe(true);
     });
 
-    it('shows no ellipsis when on the first page', () => {
+    it('shows no start ellipsis and expands window when on the first page', () => {
       const result = computePageRange(1, 11, 1, 1);
       expect(result.startPages).toEqual([1]);
-      expect(result.middlePages).toEqual([2]);
+      expect(result.middlePages).toEqual([2, 3, 4, 5]);
       expect(result.endPages).toEqual([11]);
       expect(result.showStartEllipsis).toBe(false);
       expect(result.showEndEllipsis).toBe(true);
     });
 
-    it('shows no end ellipsis when on the last page', () => {
+    it('shows no end ellipsis and expands window when on the last page', () => {
       const result = computePageRange(11, 11, 1, 1);
       expect(result.startPages).toEqual([1]);
-      expect(result.middlePages).toEqual([10]);
+      expect(result.middlePages).toEqual([7, 8, 9, 10]);
       expect(result.endPages).toEqual([11]);
       expect(result.showStartEllipsis).toBe(true);
       expect(result.showEndEllipsis).toBe(false);
