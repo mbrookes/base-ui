@@ -5,10 +5,17 @@
 1. Use `'use client';` for client component files.
 2. Import React as namespace: `import * as React from 'react';`.
 3. Do not import React hooks directly; use `React.useState`, `React.useMemo`, etc.
-4. Preserve `render` when using `useRenderElement`: pass original `componentProps` as arg 2; do not drop/rename-away `render`; do **not** pass a React component function (`render={MyComponent}`); pass an element (`render={<MyComponent />}`) or a render function (`render={(props) => <MyComponent {...props} />}`). `useRenderElement` emits a dev warning when an uppercase-named function is received.
-5. Do **not** wrap `state` in `React.useMemo`. Compute it as a plain object on every render.
-6. Optional public props should be `?: T | undefined`.
-7. Data attributes are presence-based (`data-disabled`, not `data-disabled="true"`).
+4. Use Base UI wrappers when relevant:
+   - `useIsoLayoutEffect` instead of `React.useLayoutEffect`
+   - `useStableCallback` for handlers used in effects/event systems
+   - `useTimeout` instead of `setTimeout`
+   - `useAnimationFrame` instead of `requestAnimationFrame`
+5. Use shadow DOM-safe DOM utilities in event/DOM logic: use `contains`, `getTarget`, and `activeElement` for traversal/targeting; use `ownerDocument` and `ownerWindow` instead of global `document`/`window` when code is tied to a DOM node.
+6. Preserve `render` when using `useRenderElement`: pass original `componentProps` as arg 2; do not drop/rename-away `render`; do **not** pass a React component function (`render={MyComponent}`); pass an element (`render={<MyComponent />}`) or a render function (`render={(props) => <MyComponent {...props} />}`). `useRenderElement` emits a dev warning when an uppercase-named function is received.
+7. Avoid `as any` unless unavoidable and justified.
+8. Do **not** wrap `state` in `React.useMemo`. Compute it as a plain object on every render.
+9. Optional public props should be `?: T | undefined`.
+10. Data attributes are presence-based (`data-disabled`, not `data-disabled="true"`).
 
 ## 2. Choose Component Shape
 
