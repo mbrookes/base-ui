@@ -10,6 +10,20 @@ This repository contains the source code and documentation for Base UI: a headl
 - Use `.agents/skills/base-ui-component-anatomy/` for Base UI component implementation, refactoring, docs, tests, and demo styling tasks.
 - Start with `.agents/skills/base-ui-component-anatomy/SKILL.md` and load topic references from that skill as needed.
 
+### Fast agent checklist
+
+Before finishing any component work, verify:
+
+1. Choose shape: single-part or compound.
+2. Follow nearest existing component pattern.
+3. Preserve `render` + `useRenderElement` contract.
+4. Keep public types/JSDoc/defaults accurate.
+5. Use presence-based data-attribute selectors/assertions.
+6. Add/adjust tests for behavior + accessibility.
+7. Run quality gates and relevant tests.
+
+See `.agents/skills/base-ui-component-anatomy/references/advanced-composition.md` §17 for detail.
+
 ## Project structure
 
 - Source code for components and private utils is in `packages/react/`.
