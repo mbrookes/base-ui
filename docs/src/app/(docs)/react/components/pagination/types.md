@@ -11,23 +11,16 @@ Renders a `<nav>` element.
 
 **Root Props:**
 
-| Prop             | Type                                                                                              | Default | Description                                                                                                                                                                                   |
-| :--------------- | :------------------------------------------------------------------------------------------------ | :------ | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| boundaryCount    | `number`                                                                                          | `1`     | Number of pages to show at the start and end of the range.                                                                                                                                    |
-| count            | `number`                                                                                          | `1`     | The total number of pages.                                                                                                                                                                    |
-| defaultPage      | `number`                                                                                          | `1`     | The default page when uncontrolled.                                                                                                                                                           |
-| getItemAriaLabel | `((type: UsePaginationItemType, page: number \| null, selected: boolean) => string \| undefined)` | -       | Accepts a function which returns an accessible label for a pagination item.                                                                                                                   |
-| hideNextButton   | `boolean`                                                                                         | `false` | Whether to hide the next page button.                                                                                                                                                         |
-| hidePrevButton   | `boolean`                                                                                         | `false` | Whether to hide the previous page button.                                                                                                                                                     |
-| onPageChange     | `((page: number, details: Pagination.Root.ChangeEventDetails) => void)`                           | -       | Callback fired when the page changes.                                                                                                                                                         |
-| page             | `number`                                                                                          | -       | The current page (controlled).                                                                                                                                                                |
-| showFirstButton  | `boolean`                                                                                         | `false` | Whether to show a button for the first page.                                                                                                                                                  |
-| showLastButton   | `boolean`                                                                                         | `false` | Whether to show a button for the last page.                                                                                                                                                   |
-| siblingCount     | `number`                                                                                          | `1`     | Number of sibling pages around the current page.                                                                                                                                              |
-| disabled         | `boolean`                                                                                         | `false` | Whether all pagination items are disabled.                                                                                                                                                    |
-| className        | `string \| ((state: Pagination.Root.State) => string \| undefined)`                               | -       | CSS class applied to the element, or a function that&#xA;returns a class based on the component's state.                                                                                      |
-| style            | `React.CSSProperties \| ((state: Pagination.Root.State) => React.CSSProperties \| undefined)`     | -       | Style applied to the element, or a function that&#xA;returns a style object based on the component's state.                                                                                   |
-| render           | `ReactElement \| ((props: HTMLProps, state: Pagination.Root.State) => ReactElement)`              | -       | Allows you to replace the component's HTML element&#xA;with a different tag, or compose it with another component. Accepts a `ReactElement` or a function that returns the element to render. |
+| Prop         | Type                                                                                          | Default | Description                                                                                                                                                                                   |
+| :----------- | :-------------------------------------------------------------------------------------------- | :------ | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| count        | `number`                                                                                      | `1`     | The total number of pages.                                                                                                                                                                    |
+| defaultPage  | `number`                                                                                      | `1`     | The default page when uncontrolled.                                                                                                                                                           |
+| onPageChange | `((page: number, details: Pagination.Root.ChangeEventDetails) => void)`                       | -       | Callback fired when the page changes.                                                                                                                                                         |
+| page         | `number`                                                                                      | -       | The current page (controlled).                                                                                                                                                                |
+| disabled     | `boolean`                                                                                     | `false` | Whether all pagination items are disabled.                                                                                                                                                    |
+| className    | `string \| ((state: Pagination.Root.State) => string \| undefined)`                           | -       | CSS class applied to the element, or a function that&#xA;returns a class based on the component's state.                                                                                      |
+| style        | `React.CSSProperties \| ((state: Pagination.Root.State) => React.CSSProperties \| undefined)` | -       | Style applied to the element, or a function that&#xA;returns a style object based on the component's state.                                                                                   |
+| render       | `ReactElement \| ((props: HTMLProps, state: Pagination.Root.State) => ReactElement)`          | -       | Allows you to replace the component's HTML element&#xA;with a different tag, or compose it with another component. Accepts a `ReactElement` or a function that returns the element to render. |
 
 ### Root.Props
 
@@ -75,8 +68,8 @@ type PaginationRootChangeEventDetails = {
 
 ### List
 
-Contains the list of pagination items.
-Renders a `<ul>` element.
+Contains the ordered list of pagination items.
+Renders an `<ol>` element.
 
 **List Props:**
 
@@ -94,41 +87,6 @@ Re-export of [List](#list) props.
 
 ```typescript
 type PaginationListState = {};
-```
-
-### Item
-
-A single pagination item — a page button, or navigation button (first, last, previous, next).
-Renders a `<li>` element containing a `<button>`.
-
-**Item Props:**
-
-| Prop       | Type                                                                                          | Default | Description                                                                                                                                                                                   |
-| :--------- | :-------------------------------------------------------------------------------------------- | :------ | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| onPress    | `((event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void)`                          | -       | Press handler for the inner button, passed from the pagination items list.                                                                                                                    |
-| page\*     | `number \| null`                                                                              | -       | The page number this item represents. `null` for non-page navigation items.                                                                                                                   |
-| selected\* | `boolean`                                                                                     | -       | Whether this item is selected (current page).                                                                                                                                                 |
-| type\*     | `UsePaginationItemType`                                                                       | -       | The type of pagination item.                                                                                                                                                                  |
-| disabled\* | `boolean`                                                                                     | -       | Whether this item is disabled.                                                                                                                                                                |
-| className  | `string \| ((state: Pagination.Item.State) => string \| undefined)`                           | -       | CSS class applied to the element, or a function that&#xA;returns a class based on the component's state.                                                                                      |
-| style      | `React.CSSProperties \| ((state: Pagination.Item.State) => React.CSSProperties \| undefined)` | -       | Style applied to the element, or a function that&#xA;returns a style object based on the component's state.                                                                                   |
-| render     | `ReactElement \| ((props: HTMLProps, state: Pagination.Item.State) => ReactElement)`          | -       | Allows you to replace the component's HTML element&#xA;with a different tag, or compose it with another component. Accepts a `ReactElement` or a function that returns the element to render. |
-
-### Item.Props
-
-Re-export of [Item](#item) props.
-
-### Item.State
-
-```typescript
-type PaginationItemState = {
-  /** Whether this item is the current page. */
-  selected: boolean;
-  /** Whether this item is disabled. */
-  disabled: boolean;
-  /** The type of pagination item. */
-  type: UsePaginationItemType;
-};
 ```
 
 ### Ellipsis
@@ -154,133 +112,190 @@ Re-export of [Ellipsis](#ellipsis) props.
 type PaginationEllipsisState = {};
 ```
 
-### Items
+### FirstButton
 
-Renders the list of pagination item components from the pagination state.
-Renders no element itself — outputs a React fragment of items.
+A button that navigates to the first page.
+Renders a `<li>` element containing a `<button>`.
 
-### Items.Props
+**FirstButton Props:**
+
+| Prop      | Type                                                                                                 | Default | Description                                                                                                                                                                                   |
+| :-------- | :--------------------------------------------------------------------------------------------------- | :------ | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| className | `string \| ((state: Pagination.FirstButton.State) => string \| undefined)`                           | -       | CSS class applied to the element, or a function that&#xA;returns a class based on the component's state.                                                                                      |
+| style     | `React.CSSProperties \| ((state: Pagination.FirstButton.State) => React.CSSProperties \| undefined)` | -       | Style applied to the element, or a function that&#xA;returns a style object based on the component's state.                                                                                   |
+| render    | `ReactElement \| ((props: HTMLProps, state: Pagination.FirstButton.State) => ReactElement)`          | -       | Allows you to replace the component's HTML element&#xA;with a different tag, or compose it with another component. Accepts a `ReactElement` or a function that returns the element to render. |
+
+### FirstButton.Props
+
+Re-export of [FirstButton](#firstbutton) props.
+
+### FirstButton.State
 
 ```typescript
-type PaginationItemsProps = {};
+type PaginationFirstButtonState = {
+  /** Whether the button is disabled. */
+  disabled: boolean;
+};
 ```
 
-### Items.State
+### LastButton
+
+A button that navigates to the last page.
+Renders a `<li>` element containing a `<button>`.
+
+**LastButton Props:**
+
+| Prop      | Type                                                                                                | Default | Description                                                                                                                                                                                   |
+| :-------- | :-------------------------------------------------------------------------------------------------- | :------ | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| className | `string \| ((state: Pagination.LastButton.State) => string \| undefined)`                           | -       | CSS class applied to the element, or a function that&#xA;returns a class based on the component's state.                                                                                      |
+| style     | `React.CSSProperties \| ((state: Pagination.LastButton.State) => React.CSSProperties \| undefined)` | -       | Style applied to the element, or a function that&#xA;returns a style object based on the component's state.                                                                                   |
+| render    | `ReactElement \| ((props: HTMLProps, state: Pagination.LastButton.State) => ReactElement)`          | -       | Allows you to replace the component's HTML element&#xA;with a different tag, or compose it with another component. Accepts a `ReactElement` or a function that returns the element to render. |
+
+### LastButton.Props
+
+Re-export of [LastButton](#lastbutton) props.
+
+### LastButton.State
 
 ```typescript
-type PaginationItemsState = {};
+type PaginationLastButtonState = {
+  /** Whether the button is disabled. */
+  disabled: boolean;
+};
+```
+
+### NextButton
+
+A button that navigates to the next page.
+Renders a `<li>` element containing a `<button>`.
+
+**NextButton Props:**
+
+| Prop      | Type                                                                                                | Default | Description                                                                                                                                                                                   |
+| :-------- | :-------------------------------------------------------------------------------------------------- | :------ | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| className | `string \| ((state: Pagination.NextButton.State) => string \| undefined)`                           | -       | CSS class applied to the element, or a function that&#xA;returns a class based on the component's state.                                                                                      |
+| style     | `React.CSSProperties \| ((state: Pagination.NextButton.State) => React.CSSProperties \| undefined)` | -       | Style applied to the element, or a function that&#xA;returns a style object based on the component's state.                                                                                   |
+| render    | `ReactElement \| ((props: HTMLProps, state: Pagination.NextButton.State) => ReactElement)`          | -       | Allows you to replace the component's HTML element&#xA;with a different tag, or compose it with another component. Accepts a `ReactElement` or a function that returns the element to render. |
+
+### NextButton.Props
+
+Re-export of [NextButton](#nextbutton) props.
+
+### NextButton.State
+
+```typescript
+type PaginationNextButtonState = {
+  /** Whether the button is disabled. */
+  disabled: boolean;
+};
+```
+
+### Pages
+
+Renders the sequence of page buttons and ellipsis elements based on the
+current page, total count, and windowing configuration.
+Renders no element itself — outputs a React fragment.
+
+**Pages Props:**
+
+| Prop          | Type     | Default | Description                                                      |
+| :------------ | :------- | :------ | :--------------------------------------------------------------- |
+| boundaryCount | `number` | `1`     | Number of pages to always show at the start and end of the list. |
+| siblingCount  | `number` | `1`     | Number of pages to show on each side of the current page.        |
+
+### Pages.Props
+
+Re-export of [Pages](#pages) props.
+
+### PrevButton
+
+A button that navigates to the previous page.
+Renders a `<li>` element containing a `<button>`.
+
+**PrevButton Props:**
+
+| Prop      | Type                                                                                                | Default | Description                                                                                                                                                                                   |
+| :-------- | :-------------------------------------------------------------------------------------------------- | :------ | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| className | `string \| ((state: Pagination.PrevButton.State) => string \| undefined)`                           | -       | CSS class applied to the element, or a function that&#xA;returns a class based on the component's state.                                                                                      |
+| style     | `React.CSSProperties \| ((state: Pagination.PrevButton.State) => React.CSSProperties \| undefined)` | -       | Style applied to the element, or a function that&#xA;returns a style object based on the component's state.                                                                                   |
+| render    | `ReactElement \| ((props: HTMLProps, state: Pagination.PrevButton.State) => ReactElement)`          | -       | Allows you to replace the component's HTML element&#xA;with a different tag, or compose it with another component. Accepts a `ReactElement` or a function that returns the element to render. |
+
+### PrevButton.Props
+
+Re-export of [PrevButton](#prevbutton) props.
+
+### PrevButton.State
+
+```typescript
+type PaginationPrevButtonState = {
+  /** Whether the button is disabled. */
+  disabled: boolean;
+};
 ```
 
 ### usePagination
 
+Reads the current pagination state from context and returns page range
+data useful for building custom pagination UIs inside `<Pagination.Root>`.
+
+Must be called inside a component rendered within `<Pagination.Root>`.
+
 **usePagination Parameters:**
 
-| Parameter | Type                 | Default | Description |
-| :-------- | :------------------- | :------ | :---------- |
-| props     | `UsePaginationProps` | -       | -           |
+| Parameter | Type                      | Default | Description |
+| :-------- | :------------------------ | :------ | :---------- |
+| params    | `UsePaginationParameters` | -       | -           |
 
 **usePagination Return Value:**
 
 ```tsx
-type ReturnValue = UsePaginationResult;
+type ReturnValue = UsePaginationReturnValue;
 ```
 
 ## Additional Types
 
-### UsePaginationItem
+### UsePaginationParameters
 
 ```typescript
-type UsePaginationItem = {
-  /** The type of pagination item. */
-  type: UsePaginationItemType;
-  /** The page number this item represents. `null` for non-page items. */
-  page: number | null;
-  /** Whether this item represents the currently selected page. */
-  selected: boolean;
-  /** Whether this item is disabled. */
-  disabled: boolean;
-  /** Click handler for this item. `undefined` for ellipsis items. */
-  onClick: ((event: React.MouseEvent) => void) | undefined;
-};
-```
-
-### UsePaginationItemType
-
-```typescript
-type UsePaginationItemType =
-  | 'page'
-  | 'first'
-  | 'last'
-  | 'next'
-  | 'previous'
-  | 'start-ellipsis'
-  | 'end-ellipsis';
-```
-
-### UsePaginationProps
-
-```typescript
-type UsePaginationProps = {
+type UsePaginationParameters = {
   /**
-   * The total number of pages.
-   * @default 1
-   */
-  count?: number;
-  /** The current page (controlled). */
-  page?: number;
-  /**
-   * The default page when uncontrolled.
-   * @default 1
-   */
-  defaultPage?: number;
-  /** Callback fired when the page changes. */
-  onPageChange?: (page: number, details: UsePagination.ChangeEventDetails) => void;
-  /**
-   * Number of pages to show at the start and end of the range.
+   * Number of pages to always show at the start and end of the list.
    * @default 1
    */
   boundaryCount?: number;
   /**
-   * Number of sibling pages around the current page.
+   * Number of pages to show on each side of the current page.
    * @default 1
    */
   siblingCount?: number;
-  /**
-   * Whether to show a button for the first page.
-   * @default false
-   */
-  showFirstButton?: boolean;
-  /**
-   * Whether to show a button for the last page.
-   * @default false
-   */
-  showLastButton?: boolean;
-  /**
-   * Whether to hide the previous page button.
-   * @default false
-   */
-  hidePrevButton?: boolean;
-  /**
-   * Whether to hide the next page button.
-   * @default false
-   */
-  hideNextButton?: boolean;
-  /**
-   * Whether all pagination items are disabled.
-   * @default false
-   */
-  disabled?: boolean;
 };
 ```
 
-### UsePaginationResult
+### UsePaginationReturnValue
 
 ```typescript
-type UsePaginationResult = {
-  /** The current resolved page. */
+type UsePaginationReturnValue = {
+  /** The current page. */
   page: number;
-  /** The list of pagination items to render. */
-  items: UsePaginationItem[];
+  /** The total number of pages. */
+  count: number;
+  /** Whether the pagination is disabled. */
+  disabled: boolean;
+  /** Navigate to the given page. Must be called from within a React event handler. */
+  setPage: (page: number, event: React.MouseEvent) => void;
+  /** Pages shown at the start of the list (first boundary). */
+  startPages: number[];
+  /**
+   * Pages shown around the current page (sibling window), including any
+   * single-page gap-fills that replace what would otherwise be an ellipsis.
+   */
+  middlePages: number[];
+  /** Pages shown at the end of the list (last boundary). */
+  endPages: number[];
+  /** Whether an ellipsis should appear between startPages and middlePages. */
+  showStartEllipsis: boolean;
+  /** Whether an ellipsis should appear between middlePages and endPages. */
+  showEndEllipsis: boolean;
 };
 ```
 
@@ -288,11 +303,13 @@ type UsePaginationResult = {
 
 - `Pagination.Root`: `Pagination.Root`, `Pagination.Root.State`, `Pagination.Root.Props`, `Pagination.Root.ChangeEventDetails`, `Pagination.Root.ChangeEventReason`
 - `Pagination.List`: `Pagination.List`, `Pagination.List.State`, `Pagination.List.Props`
-- `Pagination.Items`: `Pagination.Items`, `Pagination.Items.State`, `Pagination.Items.Props`
-- `Pagination.Item`: `Pagination.Item`, `Pagination.Item.State`, `Pagination.Item.Props`
+- `Pagination.Pages`: `Pagination.Pages`, `Pagination.Pages.Props`
 - `Pagination.Ellipsis`: `Pagination.Ellipsis`, `Pagination.Ellipsis.State`, `Pagination.Ellipsis.Props`
-- `Pagination.usePagination`
-- `Default`: `usePagination`, `UsePaginationProps`, `UsePaginationItem`, `UsePaginationItemType`, `UsePaginationResult`, `PaginationRootState`, `PaginationRootProps`, `PaginationListState`, `PaginationListProps`, `PaginationItemsState`, `PaginationItemsProps`, `PaginationItemState`, `PaginationItemProps`, `PaginationEllipsisState`, `PaginationEllipsisProps`
+- `Pagination.PrevButton`: `Pagination.PrevButton`, `Pagination.PrevButton.State`, `Pagination.PrevButton.Props`
+- `Pagination.NextButton`: `Pagination.NextButton`, `Pagination.NextButton.State`, `Pagination.NextButton.Props`
+- `Pagination.FirstButton`: `Pagination.FirstButton`, `Pagination.FirstButton.State`, `Pagination.FirstButton.Props`
+- `Pagination.LastButton`: `Pagination.LastButton`, `Pagination.LastButton.State`, `Pagination.LastButton.Props`
+- `Default`: `usePagination`, `UsePaginationParameters`, `UsePaginationReturnValue`, `PaginationRootState`, `PaginationRootProps`, `PaginationListState`, `PaginationListProps`, `PaginationPagesProps`, `PaginationEllipsisState`, `PaginationEllipsisProps`, `PaginationPrevButtonState`, `PaginationPrevButtonProps`, `PaginationNextButtonState`, `PaginationNextButtonProps`, `PaginationFirstButtonState`, `PaginationFirstButtonProps`, `PaginationLastButtonState`, `PaginationLastButtonProps`
 
 ## Canonical Types
 
@@ -302,9 +319,14 @@ Maps `Canonical`: `Alias` — Use Canonical when its namespace is already import
 - `Pagination.Root.Props`: `PaginationRootProps`
 - `Pagination.List.State`: `PaginationListState`
 - `Pagination.List.Props`: `PaginationListProps`
-- `Pagination.Items.State`: `PaginationItemsState`
-- `Pagination.Items.Props`: `PaginationItemsProps`
-- `Pagination.Item.State`: `PaginationItemState`
-- `Pagination.Item.Props`: `PaginationItemProps`
+- `Pagination.Pages.Props`: `PaginationPagesProps`
 - `Pagination.Ellipsis.State`: `PaginationEllipsisState`
 - `Pagination.Ellipsis.Props`: `PaginationEllipsisProps`
+- `Pagination.PrevButton.State`: `PaginationPrevButtonState`
+- `Pagination.PrevButton.Props`: `PaginationPrevButtonProps`
+- `Pagination.NextButton.State`: `PaginationNextButtonState`
+- `Pagination.NextButton.Props`: `PaginationNextButtonProps`
+- `Pagination.FirstButton.State`: `PaginationFirstButtonState`
+- `Pagination.FirstButton.Props`: `PaginationFirstButtonProps`
+- `Pagination.LastButton.State`: `PaginationLastButtonState`
+- `Pagination.LastButton.Props`: `PaginationLastButtonProps`

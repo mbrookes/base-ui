@@ -19,7 +19,11 @@ import { Pagination } from '@base-ui/react/pagination';
 
 <Pagination.Root count={10}>
   <Pagination.List>
-    <Pagination.Items />
+    <Pagination.FirstButton />
+    <Pagination.PrevButton />
+    <Pagination.Pages />
+    <Pagination.NextButton />
+    <Pagination.LastButton />
   </Pagination.List>
 </Pagination.Root>;
 ```
@@ -36,21 +40,33 @@ import { TypesPagination } from './types';
 
 <TypesPagination.List />
 
-### Items
+### Pages
 
-<TypesPagination.Items />
-
-### Item
-
-<TypesPagination.Item />
+<TypesPagination.Pages />
 
 ### Ellipsis
 
 <TypesPagination.Ellipsis />
 
+### PrevButton
+
+<TypesPagination.PrevButton />
+
+### NextButton
+
+<TypesPagination.NextButton />
+
+### FirstButton
+
+<TypesPagination.FirstButton />
+
+### LastButton
+
+<TypesPagination.LastButton />
+
 ## usePagination
 
-Creates pagination items from page state and range settings.
+Returns the pagination state and computed page range. Must be called inside `<Pagination.Root>`.
 
 <TypesPagination.usePagination hideDescription />
 

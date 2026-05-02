@@ -1,32 +1,20 @@
 'use client';
 import * as React from 'react';
+import { useControlled } from '@base-ui/utils/useControlled';
+import { useStableCallback } from '@base-ui/utils/useStableCallback';
 import { useRenderElement } from '../../internals/useRenderElement';
 import { PaginationRootContext } from './PaginationRootContext';
 import type { PaginationRootContextValue } from './PaginationRootContext';
 import type { BaseUIComponentProps } from '../../internals/types';
-import { usePagination } from '../usePagination';
-import type { UsePaginationItem } from '../usePagination';
+import { createChangeEventDetails } from '../../internals/createBaseUIEventDetails';
 import type { BaseUIChangeEventDetails } from '../../internals/createBaseUIEventDetails';
 import { REASONS } from '../../internals/reasons';
-
-function defaultGetItemAriaLabel(
-  type: UsePaginationItem['type'],
-  page: number | null,
-  selected: boolean,
-): string | undefined {
-  if (type === 'page') {
-    return selected ? `page ${page}, current page` : `Go to page ${page}`;
-  }
-  if (type === 'first') return 'Go to first page';
-  if (type === 'last') return 'Go to last page';
-  if (type === 'previous') return 'Go to previous page';
-  if (type === 'next') return 'Go to next page';
-  return undefined;
-}
 
 /**
  * Groups all parts of the pagination component and manages page state.
  * Renders a `<nav>` element.
+ *
+ * Documentation: [Base UI Pagination](https://base-ui.com/react/components/pagination)
  */
 export const PaginationRoot = React.forwardRef(function PaginationRoot(
   componentProps: PaginationRoot.Props,
@@ -38,42 +26,38 @@ export const PaginationRoot = React.forwardRef(function PaginationRoot(
     count = 1,
     disabled = false,
     onPageChange,
-    boundaryCount = 1,
-    siblingCount = 1,
-    showFirstButton = false,
-    showLastButton = false,
-    hidePrevButton = false,
-    hideNextButton = false,
-    getItemAriaLabel = defaultGetItemAriaLabel,
     render,
     className,
     'aria-label': ariaLabel = 'pagination navigation',
     style,
     ...elementProps
   } = componentProps;
-  // `render`, `className`, `style` are intentionally destructured but handled by componentProps in useRenderElement
+
   void render;
   void className;
 
-  const { page, items } = usePagination({
-    count,
-    page: pageProp,
-    defaultPage,
-    onPageChange,
-    boundaryCount,
-    siblingCount,
-    showFirstButton,
-    showLastButton,
-    hidePrevButton,
-    hideNextButton,
-    disabled,
+  const [page, setPageState] = useControlled({
+    controlled: pageProp,
+    default: defaultPage,
+    name: 'Pagination',
+    state: 'page',
   });
 
-  const state: PaginationRoot.State = { page, count, disabled };
+  const resolvedPage = page ?? 1;
+
+  const setPage = useStableCallback((nextPage: number, event: React.MouseEvent) => {
+    const details = createChangeEventDetails(REASONS.itemPress, event.nativeEvent as MouseEvent);
+    onPageChange?.(nextPage, details);
+    if (!details.isCanceled) {
+      setPageState(nextPage);
+    }
+  });
+
+  const state: PaginationRoot.State = { page: resolvedPage, count, disabled };
 
   const contextValue: PaginationRootContextValue = React.useMemo(
-    () => ({ page, count, disabled, items, getItemAriaLabel }),
-    [page, count, disabled, items, getItemAriaLabel],
+    () => ({ page: resolvedPage, count, disabled, setPage }),
+    [resolvedPage, count, disabled, setPage],
   );
 
   const element = useRenderElement('nav', componentProps, {
@@ -122,50 +106,10 @@ export interface PaginationRootProps extends BaseUIComponentProps<'nav', Paginat
    */
   onPageChange?: ((page: number, details: PaginationRoot.ChangeEventDetails) => void) | undefined;
   /**
-   * Number of pages to show at the start and end of the range.
-   * @default 1
-   */
-  boundaryCount?: number | undefined;
-  /**
-   * Number of sibling pages around the current page.
-   * @default 1
-   */
-  siblingCount?: number | undefined;
-  /**
-   * Whether to show a button for the first page.
-   * @default false
-   */
-  showFirstButton?: boolean | undefined;
-  /**
-   * Whether to show a button for the last page.
-   * @default false
-   */
-  showLastButton?: boolean | undefined;
-  /**
-   * Whether to hide the previous page button.
-   * @default false
-   */
-  hidePrevButton?: boolean | undefined;
-  /**
-   * Whether to hide the next page button.
-   * @default false
-   */
-  hideNextButton?: boolean | undefined;
-  /**
    * Whether all pagination items are disabled.
    * @default false
    */
   disabled?: boolean | undefined;
-  /**
-   * Accepts a function which returns an accessible label for a pagination item.
-   */
-  getItemAriaLabel?:
-    | ((
-        type: UsePaginationItem['type'],
-        page: number | null,
-        selected: boolean,
-      ) => string | undefined)
-    | undefined;
 }
 
 export namespace PaginationRoot {

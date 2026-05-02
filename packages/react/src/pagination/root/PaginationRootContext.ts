@@ -1,16 +1,10 @@
 import * as React from 'react';
-import type { UsePaginationItem } from '../usePagination';
 
 export interface PaginationRootContextValue {
   page: number;
   count: number;
   disabled: boolean;
-  items: UsePaginationItem[];
-  getItemAriaLabel: (
-    type: UsePaginationItem['type'],
-    page: number | null,
-    selected: boolean,
-  ) => string | undefined;
+  setPage: (page: number, event: React.MouseEvent) => void;
 }
 
 export const PaginationRootContext = React.createContext<PaginationRootContextValue | undefined>(

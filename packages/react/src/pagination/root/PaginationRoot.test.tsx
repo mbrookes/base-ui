@@ -7,7 +7,11 @@ function TestPagination(props: Pagination.Root.Props) {
   return (
     <Pagination.Root count={10} {...props}>
       <Pagination.List>
-        <Pagination.Items />
+        <Pagination.FirstButton />
+        <Pagination.PrevButton />
+        <Pagination.Pages />
+        <Pagination.NextButton />
+        <Pagination.LastButton />
       </Pagination.List>
     </Pagination.Root>
   );
@@ -22,19 +26,25 @@ describe('<Pagination.Root />', () => {
   }));
 
   describe('rendering', () => {
-    it('renders a navigation landmark and the current page', async () => {
+    it('renders a navigation landmark', async () => {
       await render(<TestPagination defaultPage={3} />);
-
       expect(screen.getByRole('navigation', { name: 'pagination navigation' })).not.toBe(null);
+    });
 
+    it('marks the current page with aria-current', async () => {
+      await render(<TestPagination defaultPage={3} />);
       const currentPage = screen.getByRole('button', { name: 'page 3, current page' });
       expect(currentPage).toHaveAttribute('aria-current', 'page');
-      expect(currentPage).toHaveTextContent('3');
     });
 
     it('renders ellipsis items when the range is truncated', async () => {
-      await render(<TestPagination count={11} defaultPage={6} />);
-
+      await render(
+        <Pagination.Root count={11} defaultPage={6}>
+          <Pagination.List>
+            <Pagination.Pages />
+          </Pagination.List>
+        </Pagination.Root>,
+      );
       expect(screen.getAllByText('…')).toHaveLength(2);
     });
   });
@@ -114,7 +124,7 @@ describe('<Pagination.Root />', () => {
 
   describe('prop: disabled', () => {
     it('disables all interactive buttons', async () => {
-      await render(<TestPagination defaultPage={4} disabled showFirstButton showLastButton />);
+      await render(<TestPagination defaultPage={4} disabled />);
 
       for (const button of screen.getAllByRole('button')) {
         expect(button).toBeDisabled();

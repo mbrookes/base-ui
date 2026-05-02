@@ -7,7 +7,7 @@ describe('<Pagination.List />', () => {
   const { render } = createRenderer();
 
   describeConformance(<Pagination.List />, () => ({
-    refInstanceof: window.HTMLUListElement,
+    refInstanceof: window.HTMLOListElement,
     render(node) {
       return render(<Pagination.Root count={10}>{node}</Pagination.Root>);
     },
@@ -20,6 +20,6 @@ describe('<Pagination.List />', () => {
       </Pagination.Root>,
     );
 
-    expect(screen.getByTestId('list').tagName).toBe('UL');
+    expect(screen.getByTestId('list').tagName).toBe('OL');
   });
 });
