@@ -339,7 +339,76 @@ pnpm docs:api
 pnpm extract-error-codes
 ```
 
-## 13. Quality Gates Before Commit
+## 13. Demo Styling Guidelines
+
+Every component ships two equivalent demo variants: **CSS Modules** (`css-modules/`) and **Tailwind CSS** (`tailwind/`). Both must be kept in sync.
+
+### File structure
+
+```text
+demos/
+  hero/
+    css-modules/
+      index.tsx
+      index.module.css
+    tailwind/
+      index.tsx
+```
+
+### Code conventions
+
+1. The default export is named `ExampleComponentName` (e.g. `ExampleSelect`, `ExampleNumberField`).
+2. No `'use client'` directive unless the demo genuinely needs client-side state.
+3. Import styles as a named object: `import styles from './index.module.css'`.
+4. Only import from the public package path (`@base-ui/react/component-name`), never from internal paths.
+5. Inline SVG icons as local named functions typed `(props: React.ComponentProps<'svg'>) => JSX.Element`. Keep them below the default export.
+6. Static data (option lists, etc.) is defined as module-level constants above the component.
+7. Use `React.useId()` for ID generation; import only the hooks actually needed.
+8. Keep demos minimal — only include the parts required to illustrate the component's primary use case.
+
+### CSS Modules conventions
+
+1. **Class names match component part names** — `.Root`, `.List`, `.Item`, `.Button`, `.Label`, `.Popup`, etc. Use PascalCase.
+2. **Color tokens only** — never hardcode hex/rgb values for gray, blue, or other theme colors. Always use `var(--color-gray-*)`, `var(--color-blue)`, `canvas`, etc.
+3. **Interactive hover states** — always gate hover rules with `@media (hover: hover)` to avoid sticky hover on touch devices:
+   ```css
+   @media (hover: hover) {
+     &:hover {
+       background-color: var(--color-gray-100);
+     }
+   }
+   ```
+4. **Focus visible** — use `outline: 2px solid var(--color-blue)` with `outline-offset: -1px` (inset, for bordered controls) or `outline-offset: 2px` (outset, for controls without a visible border).
+5. **Button resets** — bare interactive elements require: `box-sizing: border-box; border: 0; margin: 0; padding: 0; background-color: transparent; outline: 0; font: inherit; cursor: pointer; user-select: none;`.
+6. **Dark mode** — use `@media (prefers-color-scheme: dark)` only for values that color tokens cannot handle (e.g. shadow colors, gradient stops). Avoid duplicating rules that tokens already cover.
+7. **Popup shadows** — place `box-shadow` inside `@media (prefers-color-scheme: light)` so shadows don't appear on dark backgrounds.
+8. **Data attribute selectors** — use presence-based selectors: `[data-checked]`, `[data-disabled]`, `[data-pressed]`, etc. Never `[data-checked="true"]`.
+9. **CSS nesting** — use native CSS nesting (`& :hover { }`) for pseudo-classes, pseudo-elements, and data attributes within a rule.
+10. **Container pattern** (toolbar, toggle group, panel) — `border: 1px solid var(--color-gray-200); background-color: var(--color-gray-50); border-radius: 0.375rem; padding: 0.125rem; gap: 1px;`.
+11. **No decorative wrapper** — do not add gradients, outer shadows, or a rounded pill container around the demo component itself unless the component genuinely provides that surface (e.g. a card or sheet). Place the component directly.
+
+### Design system values
+
+| Property            | Common values                                                                               |
+| ------------------- | ------------------------------------------------------------------------------------------- |
+| Border radius       | `0.25rem` (xs), `0.375rem` (sm/md), `9999px` (pill/circle)                                  |
+| Control height      | `2rem` (compact), `2.5rem` (standard)                                                       |
+| Control width       | `2rem` / `2.5rem` for icon buttons; explicit widths for inputs                              |
+| Gap between items   | `0.25rem` (`gap-1`) for tight groups; `0.5rem` (`gap-2`) for loose groups                   |
+| Text (label)        | `font-size: 0.875rem; line-height: 1.25rem; font-weight: 700; color: var(--color-gray-900)` |
+| Body text           | `font-size: 1rem; line-height: 1.5rem; font-weight: 400`                                    |
+| Transition duration | `150ms` (default UI); `125ms` for spring-like (switch track)                                |
+
+### Tailwind CSS conventions
+
+1. Mirror the same layout and visual structure as the CSS Modules variant exactly.
+2. Use Tailwind's `data-[state]:utility` variants for data attributes: `data-[checked]:bg-gray-900`, `data-[disabled]:opacity-45`.
+3. For hover, use the standard `hover:` variant — Tailwind's `@media (hover: hover)` wrapping is implicit with `hover:`.
+4. For complex child selectors (lists, buttons inside a list), use arbitrary variants: `[&>li>button]:size-8`.
+5. Focus visible: `focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-blue-800` (inset) or `focus-visible:outline-offset-2` (outset).
+6. Do not add a Root-level container className unless the Root itself is the styled surface.
+
+## 14. Quality Gates Before Commit
 
 Run what applies:
 
@@ -353,7 +422,7 @@ pnpm prettier
 
 Also run relevant component tests (JSDOM and Chromium when needed).
 
-## 14. Fast Agent Checklist
+## 15. Fast Agent Checklist
 
 1. Choose shape: single-part or compound.
 2. Follow nearest existing component pattern.
