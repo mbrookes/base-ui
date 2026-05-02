@@ -5,7 +5,6 @@ export default function ExamplePagination() {
   return (
     <Pagination.Root
       aria-label="Documentation pages"
-      className={styles.Root}
       count={11}
       defaultPage={6}
       showFirstButton

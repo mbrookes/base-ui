@@ -13,13 +13,13 @@ function getDefaultItemContent(type: UsePaginationItemType, page: number | null)
     case 'page':
       return page;
     case 'first':
-      return 'First';
+      return '\u00AB';
     case 'last':
-      return 'Last';
+      return '\u00BB';
     case 'previous':
-      return 'Previous';
+      return '\u2039';
     case 'next':
-      return 'Next';
+      return '\u203A';
     default:
       return null;
   }
