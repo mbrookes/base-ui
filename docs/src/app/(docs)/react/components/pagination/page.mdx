@@ -1,0 +1,68 @@
+# Pagination
+
+<Subtitle>A set of navigation controls for moving between pages.</Subtitle>
+<Meta
+  name="description"
+  content="A high-quality, unstyled React pagination component and hook for moving between pages."
+/>
+
+import { DemoPaginationHero } from './demos/hero';
+
+<DemoPaginationHero />
+
+## Anatomy
+
+Import the component and assemble its parts:
+
+```jsx title="Anatomy"
+import { Pagination } from '@base-ui/react/pagination';
+
+<Pagination.Root count={10}>
+  <Pagination.List>
+    <Pagination.Items />
+  </Pagination.List>
+</Pagination.Root>;
+```
+
+## API reference
+
+import { TypesPagination } from './types';
+
+### Root
+
+<TypesPagination.Root />
+
+### List
+
+<TypesPagination.List />
+
+### Items
+
+<TypesPagination.Items />
+
+### Item
+
+<TypesPagination.Item />
+
+### Ellipsis
+
+<TypesPagination.Ellipsis />
+
+## usePagination
+
+Creates pagination items from page state and range settings.
+
+<TypesPagination.usePagination hideDescription />
+
+export const metadata = {
+  keywords: [
+    'React Pagination',
+    'Pagination Component',
+    'Page Navigation',
+    'Pager',
+    'Pagination Hook',
+    'Accessible Pagination',
+    'Headless React Components',
+    'Base UI',
+  ],
+};

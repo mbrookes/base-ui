@@ -1,0 +1,74 @@
+.Root {
+  display: flex;
+  justify-content: center;
+  padding: 0.75rem;
+  border-radius: 9999px;
+  background:
+    radial-gradient(circle at top left, rgb(255 255 255 / 0.9), transparent 35%),
+    linear-gradient(135deg, #eef2ff, #f8fafc 55%, #ecfeff);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.8),
+    0 18px 40px rgb(15 23 42 / 0.12);
+}
+
+.List {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.List > li {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.5rem;
+  min-height: 2.5rem;
+  color: #475569;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.List > li > button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 9999px;
+  background: rgb(255 255 255 / 0.85);
+  color: #0f172a;
+  font: inherit;
+  cursor: pointer;
+  transition:
+    background-color 150ms ease,
+    border-color 150ms ease,
+    color 150ms ease,
+    transform 150ms ease;
+}
+
+.List > li > button:hover {
+  background: #fff;
+  border-color: #94a3b8;
+  transform: translateY(-1px);
+}
+
+.List > li > button:focus-visible {
+  outline: 2px solid #0f172a;
+  outline-offset: 2px;
+}
+
+.List > li[data-selected] > button {
+  border-color: #0f172a;
+  background: #0f172a;
+  color: #fff;
+}
+
+.List > li[data-disabled] > button {
+  cursor: not-allowed;
+  opacity: 0.45;
+  transform: none;
+}
