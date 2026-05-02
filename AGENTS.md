@@ -12,9 +12,9 @@ This repository contains the source code and documentation for Base UI: a headl
 
 ### Fast agent checklist
 
-Before finishing any component work, verify:
+Before starting any component work, verify:
 
-1. Choose shape: single-part or compound.
+1. Component shape: single-part or compound.
 2. Follow nearest existing component pattern.
 3. Preserve `render` + `useRenderElement` contract.
 4. Keep public types/JSDoc/defaults accurate.
