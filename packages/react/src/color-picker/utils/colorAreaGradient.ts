@@ -119,19 +119,23 @@ function getRgbChannelGradient(
     color.getColorSpace() === 'rgb' ? color.getChannelValue('blue') : toRgbChannel(color, 'blue'),
   ];
 
-  const minColor =
-    channel === 'red'
-      ? `rgb(0, ${g}, ${b})`
-      : channel === 'green'
-        ? `rgb(${r}, 0, ${b})`
-        : `rgb(${r}, ${g}, 0)`;
+  let minColor: string;
+  if (channel === 'red') {
+    minColor = `rgb(0, ${g}, ${b})`;
+  } else if (channel === 'green') {
+    minColor = `rgb(${r}, 0, ${b})`;
+  } else {
+    minColor = `rgb(${r}, ${g}, 0)`;
+  }
 
-  const maxColor =
-    channel === 'red'
-      ? `rgb(255, ${g}, ${b})`
-      : channel === 'green'
-        ? `rgb(${r}, 255, ${b})`
-        : `rgb(${r}, ${g}, 255)`;
+  let maxColor: string;
+  if (channel === 'red') {
+    maxColor = `rgb(255, ${g}, ${b})`;
+  } else if (channel === 'green') {
+    maxColor = `rgb(${r}, 255, ${b})`;
+  } else {
+    maxColor = `rgb(${r}, ${g}, 255)`;
+  }
 
   return `linear-gradient(${to}, ${minColor}, ${maxColor})`;
 }
@@ -140,7 +144,7 @@ function getRgbChannelGradient(
 // Helpers
 // ---------------------------------------------------------------------------
 
-function getHueForArea(color: Color, zChannel: ColorChannel): number {
+function getHueForArea(color: Color, _zChannel: ColorChannel): number {
   try {
     return color.getChannelValue('hue');
   } catch {

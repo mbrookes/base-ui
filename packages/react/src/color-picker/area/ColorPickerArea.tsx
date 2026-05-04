@@ -32,7 +32,7 @@ export const ColorPickerArea = React.forwardRef(function ColorPickerArea(
     render,
     xChannel = 'saturation',
     yChannel = 'brightness',
-    colorSpace: _colorSpace = 'hsb',
+    colorSpace,
     style,
     ...elementProps
   } = componentProps;
@@ -47,7 +47,9 @@ export const ColorPickerArea = React.forwardRef(function ColorPickerArea(
 
   const getColorFromCoords = useStableCallback((clientX: number, clientY: number) => {
     const area = areaRef.current;
-    if (!area) return null;
+    if (!area) {
+      return null;
+    }
     const rect = area.getBoundingClientRect();
     const xPercent = clamp((clientX - rect.left) / rect.width, 0, 1);
     const yPercent = clamp(1 - (clientY - rect.top) / rect.height, 0, 1);
@@ -58,8 +60,9 @@ export const ColorPickerArea = React.forwardRef(function ColorPickerArea(
   });
 
   const handlePointerMove = useStableCallback((event: PointerEvent) => {
-    if (activePointerIdRef.current !== event.pointerId) return;
-    dragCountRef.current += 1;
+    if (activePointerIdRef.current !== event.pointerId) {
+      return;
+    }
     if (dragCountRef.current >= INTENTIONAL_DRAG_COUNT_THRESHOLD) {
       setDragging(true);
     }
@@ -70,7 +73,9 @@ export const ColorPickerArea = React.forwardRef(function ColorPickerArea(
   });
 
   const handlePointerUp = useStableCallback((event: PointerEvent) => {
-    if (activePointerIdRef.current !== event.pointerId) return;
+    if (activePointerIdRef.current !== event.pointerId) {
+      return;
+    }
     activePointerIdRef.current = null;
     dragCountRef.current = 0;
     setDragging(false);
@@ -84,8 +89,12 @@ export const ColorPickerArea = React.forwardRef(function ColorPickerArea(
   });
 
   const handlePointerDown = useStableCallback((event: React.PointerEvent<HTMLDivElement>) => {
-    if (stateRef.current.disabled) return;
-    if (event.button !== 0) return;
+    if (stateRef.current.disabled) {
+      return;
+    }
+    if (event.button !== 0) {
+      return;
+    }
     event.preventDefault();
     activePointerIdRef.current = event.pointerId;
     dragCountRef.current = 0;
@@ -138,8 +147,10 @@ export const ColorPickerArea = React.forwardRef(function ColorPickerArea(
     ],
   });
 
+  const contextValue = React.useMemo(() => ({ xChannel, yChannel }), [xChannel, yChannel]);
+
   return (
-    <ColorPickerAreaContext.Provider value={{ xChannel, yChannel }}>
+    <ColorPickerAreaContext.Provider value={contextValue}>
       {element}
     </ColorPickerAreaContext.Provider>
   );
@@ -148,10 +159,10 @@ export const ColorPickerArea = React.forwardRef(function ColorPickerArea(
 export namespace ColorPickerArea {
   export interface Props extends BaseUIComponentProps<'div', ColorPickerAreaState> {
     /** The x-axis color channel. @default 'saturation' */
-    xChannel?: ColorChannel;
+    xChannel?: ColorChannel | undefined;
     /** The y-axis color channel. @default 'brightness' */
-    yChannel?: ColorChannel;
+    yChannel?: ColorChannel | undefined;
     /** The color space for the area. @default 'hsb' */
-    colorSpace?: ColorSpace;
+    colorSpace?: ColorSpace | undefined;
   }
 }

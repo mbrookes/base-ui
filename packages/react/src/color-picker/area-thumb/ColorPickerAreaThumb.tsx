@@ -89,7 +89,7 @@ export const ColorPickerAreaThumb = React.forwardRef(function ColorPickerAreaThu
   });
 
   return (
-    <>
+    <React.Fragment>
       {element}
       <input
         type="range"
@@ -126,7 +126,7 @@ export const ColorPickerAreaThumb = React.forwardRef(function ColorPickerAreaThu
         tabIndex={-1}
         style={hiddenInputStyle}
       />
-    </>
+    </React.Fragment>
   );
 });
 

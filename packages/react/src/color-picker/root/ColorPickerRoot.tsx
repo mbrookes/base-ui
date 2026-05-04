@@ -147,18 +147,18 @@ export const ColorPickerRoot = React.forwardRef(function ColorPickerRoot(
 export namespace ColorPickerRoot {
   export interface Props extends BaseUIComponentProps<'div', ColorPickerRootState> {
     /** The current color value (controlled). Accepts a CSS color string or Color object. */
-    value?: string | Color;
+    value?: string | Color | undefined;
     /** The default color value (uncontrolled). Accepts a CSS color string or Color object. */
-    defaultValue?: string | Color;
+    defaultValue?: string | Color | undefined;
     /** Callback fired when the color value changes. */
-    onValueChange?: (value: Color, event: React.SyntheticEvent | Event) => void;
+    onValueChange?: ((value: Color, event: React.SyntheticEvent | Event) => void) | undefined;
     /** Callback fired when the color stops changing (drag end, commit). */
-    onValueChangeEnd?: (value: Color, event: React.SyntheticEvent | Event) => void;
+    onValueChangeEnd?: ((value: Color, event: React.SyntheticEvent | Event) => void) | undefined;
     /** The color format to use for output. @default 'hsb' */
-    format?: ColorFormat;
+    format?: ColorFormat | undefined;
     /** Whether the component is disabled. */
-    disabled?: boolean;
+    disabled?: boolean | undefined;
     /** Whether the component is read-only. */
-    readOnly?: boolean;
+    readOnly?: boolean | undefined;
   }
 }

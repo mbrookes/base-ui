@@ -3,8 +3,7 @@ import * as React from 'react';
 import type { BaseUIComponentProps } from '../../internals/types';
 import { useRenderElement } from '../../internals/useRenderElement';
 import { useColorPickerRootContext } from '../root/ColorPickerRootContext';
-import type { ColorChannel, ColorSpace } from '../utils/types';
-import type { Color } from '../utils/types';
+import type { Color, ColorChannel, ColorSpace } from '../utils/types';
 import { parseColor } from '../utils/parseColor';
 
 export interface ColorPickerChannelInputState {
@@ -18,7 +17,9 @@ function formatValue(value: Color, channel: ColorChannel | 'hex'): string {
     return value.toString('hex');
   }
   const v = value.getChannelValue(channel as ColorChannel);
-  if (channel === 'alpha') return String(Math.round(v * 100));
+  if (channel === 'alpha') {
+    return String(Math.round(v * 100));
+  }
   return String(Math.round(v));
 }
 
@@ -34,7 +35,7 @@ export const ColorPickerChannelInput = React.forwardRef(function ColorPickerChan
 ) {
   const {
     channel,
-    colorSpace: _colorSpace = 'hsb',
+    colorSpace,
     className,
     render,
     style,
@@ -142,6 +143,6 @@ export namespace ColorPickerChannelInput {
     /** The channel this input controls. Use 'hex' for hex string input. Required. */
     channel: ColorChannel | 'hex';
     /** The color space for channel resolution. @default 'hsb' */
-    colorSpace?: ColorSpace;
+    colorSpace?: ColorSpace | undefined;
   }
 }

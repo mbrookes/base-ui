@@ -259,16 +259,19 @@ export class HSBColor implements Color {
       case 'rgb':
       case 'rgba': {
         const [r, g, b] = hsbToRgb(this.h, this.s, this.b);
+        // eslint-disable-next-line @typescript-eslint/no-use-before-define
         return new RGBColor(r, g, b, this.a);
       }
       case 'hsl':
       case 'hsla': {
         const [h, s, l] = hsbToHsl(this.h, this.s, this.b);
+        // eslint-disable-next-line @typescript-eslint/no-use-before-define
         return new HSLColor(h, s, l, this.a);
       }
       case 'hex':
       case 'hexa': {
         const [r, g, b] = hsbToRgb(this.h, this.s, this.b);
+        // eslint-disable-next-line @typescript-eslint/no-use-before-define
         return new RGBColor(r, g, b, this.a);
       }
       default:
@@ -430,6 +433,7 @@ export class RGBColor implements Color {
       case 'hsl':
       case 'hsla': {
         const [h, s, l] = rgbToHsl(this.r, this.g, this.b);
+        // eslint-disable-next-line @typescript-eslint/no-use-before-define
         return new HSLColor(h, s, l, this.a);
       }
       default:

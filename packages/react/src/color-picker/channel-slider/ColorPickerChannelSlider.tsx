@@ -80,20 +80,21 @@ export namespace ColorPickerChannelSlider {
     /** The color channel this slider controls. Required. */
     channel: ColorChannel;
     /** The color space for channel resolution. @default 'hsb' */
-    colorSpace?: ColorSpace;
+    colorSpace?: ColorSpace | undefined;
     /** Slider orientation. @default 'horizontal' */
-    orientation?: 'horizontal' | 'vertical';
+    orientation?: 'horizontal' | 'vertical' | undefined;
     /** Whether the slider is disabled. */
-    disabled?: boolean;
-    className?: string;
+    disabled?: boolean | undefined;
+    className?: string | undefined;
     render?:
       | React.ReactElement
-      | ((props: React.ComponentPropsWithRef<'div'>) => React.ReactElement);
+      | ((props: React.ComponentPropsWithRef<'div'>) => React.ReactElement)
+      | undefined;
     children?: React.ReactNode;
-    style?: React.CSSProperties;
-    id?: string;
-    'aria-label'?: string;
-    'aria-labelledby'?: string;
-    'data-testid'?: string;
+    style?: React.CSSProperties | undefined;
+    id?: string | undefined;
+    'aria-label'?: string | undefined;
+    'aria-labelledby'?: string | undefined;
+    'data-testid'?: string | undefined;
   }
 }

@@ -59,7 +59,7 @@ function parseHex(value: string): RGBColor | null {
     const r = parseInt(hex[0] + hex[0], 16);
     const g = parseInt(hex[1] + hex[1], 16);
     const b = parseInt(hex[2] + hex[2], 16);
-    if (isNaN(r) || isNaN(g) || isNaN(b)) {
+    if (Number.isNaN(r) || Number.isNaN(g) || Number.isNaN(b)) {
       return null;
     }
     return new RGBColor(r, g, b, 1);
@@ -70,7 +70,7 @@ function parseHex(value: string): RGBColor | null {
     const g = parseInt(hex[1] + hex[1], 16);
     const b = parseInt(hex[2] + hex[2], 16);
     const a = parseInt(hex[3] + hex[3], 16) / 255;
-    if (isNaN(r) || isNaN(g) || isNaN(b) || isNaN(a)) {
+    if (Number.isNaN(r) || Number.isNaN(g) || Number.isNaN(b) || Number.isNaN(a)) {
       return null;
     }
     return new RGBColor(r, g, b, a);
@@ -80,7 +80,7 @@ function parseHex(value: string): RGBColor | null {
     const r = parseInt(hex.slice(0, 2), 16);
     const g = parseInt(hex.slice(2, 4), 16);
     const b = parseInt(hex.slice(4, 6), 16);
-    if (isNaN(r) || isNaN(g) || isNaN(b)) {
+    if (Number.isNaN(r) || Number.isNaN(g) || Number.isNaN(b)) {
       return null;
     }
     return new RGBColor(r, g, b, 1);
@@ -91,7 +91,7 @@ function parseHex(value: string): RGBColor | null {
     const g = parseInt(hex.slice(2, 4), 16);
     const b = parseInt(hex.slice(4, 6), 16);
     const a = parseInt(hex.slice(6, 8), 16) / 255;
-    if (isNaN(r) || isNaN(g) || isNaN(b) || isNaN(a)) {
+    if (Number.isNaN(r) || Number.isNaN(g) || Number.isNaN(b) || Number.isNaN(a)) {
       return null;
     }
     return new RGBColor(r, g, b, a);
@@ -111,7 +111,7 @@ function parseRgb(value: string): RGBColor | null {
   const g = parseFloat(match[2]);
   const b = parseFloat(match[3]);
   const a = match[4] !== undefined ? parseFloat(match[4]) : 1;
-  if (isNaN(r) || isNaN(g) || isNaN(b) || isNaN(a)) {
+  if (Number.isNaN(r) || Number.isNaN(g) || Number.isNaN(b) || Number.isNaN(a)) {
     return null;
   }
   return new RGBColor(r, g, b, a);
@@ -128,7 +128,7 @@ function parseHsl(value: string): HSLColor | null {
   const s = parseFloat(match[2]);
   const l = parseFloat(match[3]);
   const a = match[4] !== undefined ? parseFloat(match[4]) : 1;
-  if (isNaN(h) || isNaN(s) || isNaN(l) || isNaN(a)) {
+  if (Number.isNaN(h) || Number.isNaN(s) || Number.isNaN(l) || Number.isNaN(a)) {
     return null;
   }
   return new HSLColor(h, s, l, a);
@@ -145,7 +145,7 @@ function parseHsb(value: string): HSBColor | null {
   const s = parseFloat(match[2]);
   const b = parseFloat(match[3]);
   const a = match[4] !== undefined ? parseFloat(match[4]) : 1;
-  if (isNaN(h) || isNaN(s) || isNaN(b) || isNaN(a)) {
+  if (Number.isNaN(h) || Number.isNaN(s) || Number.isNaN(b) || Number.isNaN(a)) {
     return null;
   }
   return new HSBColor(h, s, b, a);
@@ -154,7 +154,7 @@ function parseHsb(value: string): HSBColor | null {
 /** Handle angle units for hue: deg (default), rad, grad, turn. */
 function parseAngle(raw: string, fullValue: string): number {
   const num = parseFloat(raw);
-  if (isNaN(num)) {
+  if (Number.isNaN(num)) {
     return NaN;
   }
   if (fullValue.includes('rad')) {

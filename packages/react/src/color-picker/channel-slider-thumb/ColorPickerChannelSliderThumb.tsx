@@ -8,10 +8,15 @@ function getChannelLabel(channel: string): string {
 }
 
 function formatChannelValue(channel: string, value: number): string {
-  if (channel === 'alpha') return `${Math.round(value * 100)}%`;
-  if (channel === 'hue') return `${Math.round(value)}°`;
-  if (channel === 'red' || channel === 'green' || channel === 'blue')
+  if (channel === 'alpha') {
+    return `${Math.round(value * 100)}%`;
+  }
+  if (channel === 'hue') {
+    return `${Math.round(value)}°`;
+  }
+  if (channel === 'red' || channel === 'green' || channel === 'blue') {
     return String(Math.round(value));
+  }
   return `${Math.round(value)}%`;
 }
 
@@ -43,10 +48,10 @@ export const ColorPickerChannelSliderThumb = React.forwardRef(
 
 export namespace ColorPickerChannelSliderThumb {
   export interface Props {
-    className?: string;
-    style?: React.CSSProperties;
+    className?: string | undefined;
+    style?: React.CSSProperties | undefined;
     children?: React.ReactNode;
-    id?: string;
-    'data-testid'?: string;
+    id?: string | undefined;
+    'data-testid'?: string | undefined;
   }
 }

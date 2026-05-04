@@ -36,10 +36,10 @@ export const ColorPickerChannelSliderTrack = React.forwardRef(
 
 export namespace ColorPickerChannelSliderTrack {
   export interface Props {
-    className?: string;
-    style?: React.CSSProperties;
+    className?: string | undefined;
+    style?: React.CSSProperties | undefined;
     children?: React.ReactNode;
-    id?: string;
-    'data-testid'?: string;
+    id?: string | undefined;
+    'data-testid'?: string | undefined;
   }
 }
