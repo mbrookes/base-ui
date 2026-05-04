@@ -4,11 +4,15 @@ import { Pagination } from '@base-ui/react/pagination';
 import { createRenderer } from '#test-utils';
 
 function TestPagination(props: Pagination.Root.Props & Pagination.Pages.Props) {
-  const { siblingCount, boundaryCount, ...rootProps } = props;
+  const { siblingCount, boundaryCount, getAriaLabel, ...rootProps } = props;
   return (
     <Pagination.Root count={11} defaultPage={6} {...rootProps}>
       <Pagination.List>
-        <Pagination.Pages siblingCount={siblingCount} boundaryCount={boundaryCount} />
+        <Pagination.Pages
+          siblingCount={siblingCount}
+          boundaryCount={boundaryCount}
+          getAriaLabel={getAriaLabel}
+        />
       </Pagination.List>
     </Pagination.Root>
   );
@@ -19,12 +23,12 @@ describe('<Pagination.Pages />', () => {
 
   it('renders page buttons', async () => {
     await render(<TestPagination />);
-    expect(screen.getByRole('button', { name: 'page 6, current page' })).not.toBe(null);
+    expect(screen.getByRole('button', { name: 'page 6' })).not.toBe(null);
   });
 
   it('marks the current page with aria-current', async () => {
     await render(<TestPagination defaultPage={3} />);
-    expect(screen.getByRole('button', { name: 'page 3, current page' })).toHaveAttribute(
+    expect(screen.getByRole('button', { name: 'page 3' })).toHaveAttribute(
       'aria-current',
       'page',
     );
@@ -76,7 +80,20 @@ describe('<Pagination.Pages />', () => {
     await render(<TestPagination count={5} defaultPage={3} disabled />);
     for (const button of screen.getAllByRole('button')) {
       expect(button).toBeDisabled();
+      expect(button).toHaveAttribute('data-disabled');
     }
+  });
+
+  it('uses a custom getAriaLabel for page buttons', async () => {
+    await render(
+      <TestPagination
+        count={5}
+        defaultPage={2}
+        getAriaLabel={(p, isCurrent) => (isCurrent ? `Seite ${p}` : `Zur Seite ${p}`)}
+      />,
+    );
+    expect(screen.getByRole('button', { name: 'Seite 2' })).toHaveAttribute('aria-current', 'page');
+    expect(screen.getByRole('button', { name: 'Zur Seite 3' })).not.toBe(null);
   });
 
   it('throws a descriptive error when rendered outside Pagination.Root', async () => {

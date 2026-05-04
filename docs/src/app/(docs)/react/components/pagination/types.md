@@ -198,10 +198,11 @@ Renders no element itself — outputs a React fragment.
 
 **Pages Props:**
 
-| Prop          | Type     | Default | Description                                                      |
-| :------------ | :------- | :------ | :--------------------------------------------------------------- |
-| boundaryCount | `number` | `1`     | Number of pages to always show at the start and end of the list. |
-| siblingCount  | `number` | `1`     | Number of pages to show on each side of the current page.        |
+| Prop          | Type                                             | Default                                                                      | Description                                                      |
+| :------------ | :----------------------------------------------- | :--------------------------------------------------------------------------- | :--------------------------------------------------------------- |
+| boundaryCount | `number`                                         | `1`                                                                          | Number of pages to always show at the start and end of the list. |
+| getAriaLabel  | `((page: number, isCurrent: boolean) => string)` | `` (page, isCurrent) => isCurrent ? `page ${page}` : `Go to page ${page}` `` | Returns the accessible label for a page button.                  |
+| siblingCount  | `number`                                         | `1`                                                                          | Number of pages to show on each side of the current page.        |
 
 ### Pages.Props
 

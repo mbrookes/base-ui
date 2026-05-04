@@ -5,6 +5,10 @@ import { usePaginationRootContext } from '../root/PaginationRootContext';
 import { PaginationEllipsis } from '../ellipsis/PaginationEllipsis';
 import { computePageRange } from '../utils/computePageRange';
 
+function defaultGetAriaLabel(p: number, isCurrent: boolean): string {
+  return isCurrent ? `page ${p}` : `Go to page ${p}`;
+}
+
 /**
  * Renders the sequence of page buttons and ellipsis elements based on the
  * current page, total count, and windowing configuration.
@@ -13,7 +17,7 @@ import { computePageRange } from '../utils/computePageRange';
  * Documentation: [Base UI Pagination](https://base-ui.com/react/components/pagination)
  */
 export function PaginationPages(componentProps: PaginationPages.Props): React.ReactElement {
-  const { siblingCount = 1, boundaryCount = 1 } = componentProps;
+  const { siblingCount = 1, boundaryCount = 1, getAriaLabel = defaultGetAriaLabel } = componentProps;
 
   const { page, count, disabled, setPage } = usePaginationRootContext();
 
@@ -27,16 +31,14 @@ export function PaginationPages(componentProps: PaginationPages.Props): React.Re
   function renderPageButton(p: number) {
     const selected = p === page;
     return (
-      <li
-        key={`page-${p}`}
-        {...(selected && { 'data-selected': '' })}
-        {...(disabled && { 'data-disabled': '' })}
-      >
+      <li key={`page-${p}`}>
         <button
           type="button"
           disabled={disabled}
           aria-current={selected ? 'page' : undefined}
-          aria-label={selected ? `page ${p}, current page` : `Go to page ${p}`}
+          aria-label={getAriaLabel(p, selected)}
+          {...(selected && { 'data-selected': '' })}
+          {...(disabled && { 'data-disabled': '' })}
           onClick={(event) => handlePageClick(p, event)}
         >
           {p}
@@ -67,6 +69,13 @@ export interface PaginationPagesProps {
    * @default 1
    */
   siblingCount?: number | undefined;
+  /**
+   * Returns the accessible label for a page button.
+   * @param page - The page number.
+   * @param isCurrent - Whether the page is the currently active page.
+   * @default (page, isCurrent) => isCurrent ? `page ${page}` : `Go to page ${page}`
+   */
+  getAriaLabel?: ((page: number, isCurrent: boolean) => string) | undefined;
 }
 
 export namespace PaginationPages {

@@ -16,7 +16,7 @@ export const PaginationLastButton = React.forwardRef(function PaginationLastButt
   componentProps: PaginationLastButton.Props,
   forwardedRef: React.ForwardedRef<HTMLLIElement>,
 ) {
-  const { render, className, children, style, ...elementProps } = componentProps;
+  const { render, className, children, style, 'aria-label': ariaLabel = 'Go to last page', ...elementProps } = componentProps;
 
   const { page, count, disabled: rootDisabled, setPage } = usePaginationRootContext();
   const disabled = rootDisabled || page >= count;
@@ -30,7 +30,7 @@ export const PaginationLastButton = React.forwardRef(function PaginationLastButt
   const state: PaginationLastButton.State = { disabled };
 
   const buttonElement = (
-    <button ref={buttonRef} aria-label="Go to last page" {...getButtonProps({ onClick: handleClick })}>
+    <button ref={buttonRef} aria-label={ariaLabel} {...getButtonProps({ onClick: handleClick })}>
       {children ?? '\u00BB'}
     </button>
   );

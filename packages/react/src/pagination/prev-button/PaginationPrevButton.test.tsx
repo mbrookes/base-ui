@@ -32,6 +32,17 @@ describe('<Pagination.PrevButton />', () => {
     expect(screen.getByRole('button', { name: 'Go to previous page' })).not.toBe(null);
   });
 
+  it('accepts a custom aria-label for the button', async () => {
+    await render(
+      <Pagination.Root count={10} defaultPage={5}>
+        <Pagination.List>
+          <Pagination.PrevButton aria-label="Page précédente" />
+        </Pagination.List>
+      </Pagination.Root>,
+    );
+    expect(screen.getByRole('button', { name: 'Page précédente' })).not.toBe(null);
+  });
+
   it('is disabled and has data-disabled when on the first page', async () => {
     await render(<TestPagination defaultPage={1} />);
     const button = screen.getByRole('button', { name: 'Go to previous page' });

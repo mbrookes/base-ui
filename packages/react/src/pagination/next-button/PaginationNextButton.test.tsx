@@ -32,6 +32,17 @@ describe('<Pagination.NextButton />', () => {
     expect(screen.getByRole('button', { name: 'Go to next page' })).not.toBe(null);
   });
 
+  it('accepts a custom aria-label for the button', async () => {
+    await render(
+      <Pagination.Root count={10} defaultPage={5}>
+        <Pagination.List>
+          <Pagination.NextButton aria-label="Page suivante" />
+        </Pagination.List>
+      </Pagination.Root>,
+    );
+    expect(screen.getByRole('button', { name: 'Page suivante' })).not.toBe(null);
+  });
+
   it('is disabled and has data-disabled when on the last page', async () => {
     await render(<TestPagination defaultPage={10} />);
     const button = screen.getByRole('button', { name: 'Go to next page' });

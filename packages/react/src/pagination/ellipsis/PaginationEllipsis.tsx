@@ -20,7 +20,7 @@ export const PaginationEllipsis = React.forwardRef(function PaginationEllipsis(
   return useRenderElement('li', componentProps, {
     state,
     ref: forwardedRef,
-    props: [{ children: children ?? '…' }, elementProps],
+    props: [{ 'aria-hidden': true, children: children ?? '…' }, elementProps],
   });
 });
 

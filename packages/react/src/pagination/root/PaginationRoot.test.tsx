@@ -33,7 +33,7 @@ describe('<Pagination.Root />', () => {
 
     it('marks the current page with aria-current', async () => {
       await render(<TestPagination defaultPage={3} />);
-      const currentPage = screen.getByRole('button', { name: 'page 3, current page' });
+      const currentPage = screen.getByRole('button', { name: 'page 3' });
       expect(currentPage).toHaveAttribute('aria-current', 'page');
     });
 
@@ -58,7 +58,7 @@ describe('<Pagination.Root />', () => {
         target: screen.getByRole('button', { name: 'Go to page 2' }),
       });
 
-      expect(screen.getByRole('button', { name: 'page 2, current page' })).toHaveAttribute(
+      expect(screen.getByRole('button', { name: 'page 2' })).toHaveAttribute(
         'aria-current',
         'page',
       );
@@ -79,7 +79,7 @@ describe('<Pagination.Root />', () => {
         target: screen.getByRole('button', { name: 'Go to page 2' }),
       });
 
-      expect(screen.getByRole('button', { name: 'page 1, current page' })).toHaveAttribute(
+      expect(screen.getByRole('button', { name: 'page 1' })).toHaveAttribute(
         'aria-current',
         'page',
       );
@@ -90,14 +90,14 @@ describe('<Pagination.Root />', () => {
     it('reflects page prop updates', async () => {
       const { setProps } = await render(<TestPagination page={2} />);
 
-      expect(screen.getByRole('button', { name: 'page 2, current page' })).toHaveAttribute(
+      expect(screen.getByRole('button', { name: 'page 2' })).toHaveAttribute(
         'aria-current',
         'page',
       );
 
       await setProps({ page: 4 });
 
-      expect(screen.getByRole('button', { name: 'page 4, current page' })).toHaveAttribute(
+      expect(screen.getByRole('button', { name: 'page 4' })).toHaveAttribute(
         'aria-current',
         'page',
       );
@@ -115,7 +115,7 @@ describe('<Pagination.Root />', () => {
       expect(handlePageChange).toHaveBeenCalledOnce();
       expect(handlePageChange.mock.calls[0][0]).toBe(4);
       expect(handlePageChange.mock.calls[0][1].reason).toBe('item-press');
-      expect(screen.getByRole('button', { name: 'page 3, current page' })).toHaveAttribute(
+      expect(screen.getByRole('button', { name: 'page 3' })).toHaveAttribute(
         'aria-current',
         'page',
       );
