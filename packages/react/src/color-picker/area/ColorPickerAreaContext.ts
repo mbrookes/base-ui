@@ -6,9 +6,9 @@ export interface ColorPickerAreaContextValue {
   yChannel: ColorChannel;
 }
 
-export const ColorPickerAreaContext = React.createContext<
-  ColorPickerAreaContextValue | undefined
->(undefined);
+export const ColorPickerAreaContext = React.createContext<ColorPickerAreaContextValue | undefined>(
+  undefined,
+);
 
 export function useColorPickerAreaContext() {
   const context = React.useContext(ColorPickerAreaContext);

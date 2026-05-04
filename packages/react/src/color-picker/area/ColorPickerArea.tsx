@@ -35,7 +35,8 @@ export const ColorPickerArea = React.forwardRef(function ColorPickerArea(
     colorSpace: _colorSpace = 'hsb',
     style,
     ...elementProps
-  } = componentProps;  const { value, setValueFromDrag, onValueChangeEnd, dragging, setDragging, disabled } =
+  } = componentProps;
+  const { value, setValueFromDrag, onValueChangeEnd, dragging, setDragging, disabled } =
     useColorPickerRootContext();
 
   const areaRef = React.useRef<HTMLDivElement | null>(null);
@@ -82,33 +83,29 @@ export const ColorPickerArea = React.forwardRef(function ColorPickerArea(
     }
   });
 
-  const handlePointerDown = useStableCallback(
-    (event: React.PointerEvent<HTMLDivElement>) => {
-      if (stateRef.current.disabled) return;
-      if (event.button !== 0) return;
-      event.preventDefault();
-      activePointerIdRef.current = event.pointerId;
-      dragCountRef.current = 0;
-      areaRef.current?.setPointerCapture(event.pointerId);
-      const newColor = getColorFromCoords(event.clientX, event.clientY);
-      if (newColor) {
-        setValueFromDrag(newColor, event.nativeEvent);
-      }
-      const doc = ownerDocument(areaRef.current!);
-      doc.addEventListener('pointermove', handlePointerMove);
-      doc.addEventListener('pointerup', handlePointerUp);
-    },
-  );
+  const handlePointerDown = useStableCallback((event: React.PointerEvent<HTMLDivElement>) => {
+    if (stateRef.current.disabled) return;
+    if (event.button !== 0) return;
+    event.preventDefault();
+    activePointerIdRef.current = event.pointerId;
+    dragCountRef.current = 0;
+    areaRef.current?.setPointerCapture(event.pointerId);
+    const newColor = getColorFromCoords(event.clientX, event.clientY);
+    if (newColor) {
+      setValueFromDrag(newColor, event.nativeEvent);
+    }
+    const doc = ownerDocument(areaRef.current!);
+    doc.addEventListener('pointermove', handlePointerMove);
+    doc.addEventListener('pointerup', handlePointerUp);
+  });
 
   const hue = value.getChannelValue('hue');
   const xVal = value.getChannelValue(xChannel);
   const yVal = value.getChannelValue(yChannel);
   const xRange = value.getChannelRange(xChannel);
   const yRange = value.getChannelRange(yChannel);
-  const xPercent =
-    ((xVal - xRange.minValue) / (xRange.maxValue - xRange.minValue)) * 100;
-  const yPercent =
-    100 - ((yVal - yRange.minValue) / (yRange.maxValue - yRange.minValue)) * 100;
+  const xPercent = ((xVal - xRange.minValue) / (xRange.maxValue - xRange.minValue)) * 100;
+  const yPercent = 100 - ((yVal - yRange.minValue) / (yRange.maxValue - yRange.minValue)) * 100;
 
   const background = getColorAreaBackground(value, xChannel, yChannel);
 

@@ -41,12 +41,9 @@ export const ColorPickerChannelInput = React.forwardRef(function ColorPickerChan
     ...elementProps
   } = componentProps;
 
-  const { value, setValueFromInput, dragging, disabled, readOnly } =
-    useColorPickerRootContext();
+  const { value, setValueFromInput, dragging, disabled, readOnly } = useColorPickerRootContext();
 
-  const [localValue, setLocalValue] = React.useState<string>(() =>
-    formatValue(value, channel),
-  );
+  const [localValue, setLocalValue] = React.useState<string>(() => formatValue(value, channel));
   const committedValueRef = React.useRef(localValue);
 
   React.useEffect(() => {
@@ -123,13 +120,13 @@ export const ColorPickerChannelInput = React.forwardRef(function ColorPickerChan
         disabled,
         readOnly,
         type: 'text' as const,
-        inputMode: (channel === 'hex' ? 'text' : 'numeric') as React.HTMLAttributes<HTMLInputElement>['inputMode'],
+        inputMode: (channel === 'hex'
+          ? 'text'
+          : 'numeric') as React.HTMLAttributes<HTMLInputElement>['inputMode'],
         style: style as React.CSSProperties,
         ['data-channel' as string]: channel,
         'aria-label':
-          channel === 'hex'
-            ? 'Hex color'
-            : `${channel.charAt(0).toUpperCase() + channel.slice(1)}`,
+          channel === 'hex' ? 'Hex color' : `${channel.charAt(0).toUpperCase() + channel.slice(1)}`,
       } as React.InputHTMLAttributes<HTMLInputElement>,
     ],
   });
@@ -138,8 +135,10 @@ export const ColorPickerChannelInput = React.forwardRef(function ColorPickerChan
 });
 
 export namespace ColorPickerChannelInput {
-  export interface Props
-    extends Omit<BaseUIComponentProps<'input', ColorPickerChannelInputState>, 'children'> {
+  export interface Props extends Omit<
+    BaseUIComponentProps<'input', ColorPickerChannelInputState>,
+    'children'
+  > {
     /** The channel this input controls. Use 'hex' for hex string input. Required. */
     channel: ColorChannel | 'hex';
     /** The color space for channel resolution. @default 'hsb' */

@@ -1,5 +1,12 @@
 import { clamp } from '../../internals/clamp';
-import type { Color, ColorAxes, ColorChannel, ColorChannelRange, ColorFormat, ColorSpace } from './types';
+import type {
+  Color,
+  ColorAxes,
+  ColorChannel,
+  ColorChannelRange,
+  ColorFormat,
+  ColorSpace,
+} from './types';
 
 // Channel ranges for HSB color space
 const HSB_CHANNEL_RANGES: Record<ColorChannel, ColorChannelRange> = {
@@ -295,7 +302,9 @@ export class HSBColor implements Color {
   isEqual(color: Color): boolean {
     if (!(color instanceof HSBColor)) {
       // Compare via hex for cross-space equality
-      return this.toString('hex') === color.toString('hex') && this.a === color.getChannelValue('alpha');
+      return (
+        this.toString('hex') === color.toString('hex') && this.a === color.getChannelValue('alpha')
+      );
     }
     return this.h === color.h && this.s === color.s && this.b === color.b && this.a === color.a;
   }
@@ -431,8 +440,7 @@ export class RGBColor implements Color {
   toString(format: ColorFormat | 'css' = 'rgb'): string {
     switch (format) {
       case 'hex': {
-        const hex =
-          `#${toHex(this.r)}${toHex(this.g)}${toHex(this.b)}`;
+        const hex = `#${toHex(this.r)}${toHex(this.g)}${toHex(this.b)}`;
         return hex;
       }
       case 'hexa':
@@ -456,7 +464,9 @@ export class RGBColor implements Color {
 
   isEqual(color: Color): boolean {
     if (!(color instanceof RGBColor)) {
-      return this.toString('hex') === color.toString('hex') && this.a === color.getChannelValue('alpha');
+      return (
+        this.toString('hex') === color.toString('hex') && this.a === color.getChannelValue('alpha')
+      );
     }
     return this.r === color.r && this.g === color.g && this.b === color.b && this.a === color.a;
   }
@@ -614,7 +624,9 @@ export class HSLColor implements Color {
 
   isEqual(color: Color): boolean {
     if (!(color instanceof HSLColor)) {
-      return this.toString('hex') === color.toString('hex') && this.a === color.getChannelValue('alpha');
+      return (
+        this.toString('hex') === color.toString('hex') && this.a === color.getChannelValue('alpha')
+      );
     }
     return this.h === color.h && this.s === color.s && this.l === color.l && this.a === color.a;
   }

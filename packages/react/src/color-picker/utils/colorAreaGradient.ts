@@ -16,7 +16,11 @@ import type { Color, ColorChannel } from './types';
  *
  * Returns a single `background` shorthand value.
  */
-export function getColorAreaBackground(color: Color, xChannel: ColorChannel, yChannel: ColorChannel): string {
+export function getColorAreaBackground(
+  color: Color,
+  xChannel: ColorChannel,
+  yChannel: ColorChannel,
+): string {
   // Determine which channel is the hue (z-channel, constant across the area)
   const axes = color.getColorAxes({ xChannel, yChannel });
   const hue = getHueForArea(color, axes.zChannel);
@@ -35,7 +39,11 @@ export function getColorAreaBackground(color: Color, xChannel: ColorChannel, yCh
 /**
  * Generate the CSS background gradient for a 1D channel slider track.
  */
-export function getChannelSliderBackground(color: Color, channel: ColorChannel, direction: 'ltr' | 'rtl' = 'ltr'): string {
+export function getChannelSliderBackground(
+  color: Color,
+  channel: ColorChannel,
+  direction: 'ltr' | 'rtl' = 'ltr',
+): string {
   const to = direction === 'rtl' ? 'to left' : 'to right';
 
   switch (channel) {
@@ -74,11 +82,8 @@ function getHueGradient(to: string): string {
 
 function getAlphaGradient(color: Color, to: string): string {
   const opaqueColor = getOpaqueColor(color);
-  const checkerboard =
-    `repeating-conic-gradient(#e5e7eb 0% 25%, #fff 0% 50%) 0 0 / 16px 16px`;
-  return (
-    `linear-gradient(${to}, transparent, ${opaqueColor}), ${checkerboard}`
-  );
+  const checkerboard = `repeating-conic-gradient(#e5e7eb 0% 25%, #fff 0% 50%) 0 0 / 16px 16px`;
+  return `linear-gradient(${to}, transparent, ${opaqueColor}), ${checkerboard}`;
 }
 
 function getSaturationGradient(color: Color, to: string): string {
@@ -103,24 +108,30 @@ function getLightnessGradient(color: Color, to: string): string {
   return `linear-gradient(${to}, #000, hsl(${Math.round(hue)}, 100%, 50%), #fff)`;
 }
 
-function getRgbChannelGradient(color: Color, channel: 'red' | 'green' | 'blue', to: string): string {
+function getRgbChannelGradient(
+  color: Color,
+  channel: 'red' | 'green' | 'blue',
+  to: string,
+): string {
   const [r, g, b] = [
     color.getColorSpace() === 'rgb' ? color.getChannelValue('red') : toRgbChannel(color, 'red'),
     color.getColorSpace() === 'rgb' ? color.getChannelValue('green') : toRgbChannel(color, 'green'),
     color.getColorSpace() === 'rgb' ? color.getChannelValue('blue') : toRgbChannel(color, 'blue'),
   ];
 
-  const minColor = channel === 'red'
-    ? `rgb(0, ${g}, ${b})`
-    : channel === 'green'
-      ? `rgb(${r}, 0, ${b})`
-      : `rgb(${r}, ${g}, 0)`;
+  const minColor =
+    channel === 'red'
+      ? `rgb(0, ${g}, ${b})`
+      : channel === 'green'
+        ? `rgb(${r}, 0, ${b})`
+        : `rgb(${r}, ${g}, 0)`;
 
-  const maxColor = channel === 'red'
-    ? `rgb(255, ${g}, ${b})`
-    : channel === 'green'
-      ? `rgb(${r}, 255, ${b})`
-      : `rgb(${r}, ${g}, 255)`;
+  const maxColor =
+    channel === 'red'
+      ? `rgb(255, ${g}, ${b})`
+      : channel === 'green'
+        ? `rgb(${r}, 255, ${b})`
+        : `rgb(${r}, ${g}, 255)`;
 
   return `linear-gradient(${to}, ${minColor}, ${maxColor})`;
 }

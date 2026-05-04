@@ -10,10 +10,7 @@ export default function ColorPickerExperiment() {
     <div style={{ padding: 24, fontFamily: 'sans-serif' }}>
       <h1>Color Picker</h1>
 
-      <ColorPicker.Root
-        value={value}
-        onValueChange={(color) => setValue(color)}
-      >
+      <ColorPicker.Root value={value} onValueChange={(color) => setValue(color)}>
         <div className={styles.layout}>
           {/* 2D Area */}
           <div className={styles.areaWrapper}>
@@ -67,10 +64,7 @@ export default function ColorPickerExperiment() {
           </div>
 
           <p style={{ fontSize: 12, color: '#666' }}>
-            Current value:{' '}
-            <code>
-              {typeof value === 'string' ? value : value.toString('hsba')}
-            </code>
+            Current value: <code>{typeof value === 'string' ? value : value.toString('hsba')}</code>
           </p>
         </div>
       </ColorPicker.Root>

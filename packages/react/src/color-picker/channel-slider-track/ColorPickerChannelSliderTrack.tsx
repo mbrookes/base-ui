@@ -28,9 +28,7 @@ export const ColorPickerChannelSliderTrack = React.forwardRef(
         style={{ background: gradient, ...style }}
         {...rest}
       >
-        <Slider.Track style={{ height: '100%' }}>
-          {children}
-        </Slider.Track>
+        <Slider.Track style={{ height: '100%' }}>{children}</Slider.Track>
       </Slider.Control>
     );
   },

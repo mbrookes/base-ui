@@ -101,7 +101,9 @@ function parseHex(value: string): RGBColor | null {
 }
 
 function parseRgb(value: string): RGBColor | null {
-  const match = value.match(/^rgba?\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)(?:\s*,\s*([\d.]+))?\s*\)$/i);
+  const match = value.match(
+    /^rgba?\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)(?:\s*,\s*([\d.]+))?\s*\)$/i,
+  );
   if (!match) {
     return null;
   }

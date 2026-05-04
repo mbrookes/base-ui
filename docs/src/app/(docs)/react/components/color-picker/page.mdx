@@ -120,6 +120,40 @@ function App() {
 }
 ```
 
+## Accessibility
+
+### Keyboard navigation
+
+The 2D color area (`Area` + `AreaThumb`) is keyboard-accessible. Press Tab to move focus to the area, then use arrow keys to adjust the color:
+
+| Key               | Action                               |
+| :---------------- | :----------------------------------- |
+| `ArrowLeft/Right` | Decrease / increase saturation by 1% |
+| `ArrowUp/Down`    | Increase / decrease brightness by 1% |
+| `Shift` + arrow   | Move by 10% (page step)              |
+
+Channel sliders inherit full keyboard support from the underlying `Slider` component:
+
+| Key                   | Action                         |
+| :-------------------- | :----------------------------- |
+| `ArrowLeft/ArrowDown` | Decrease value by one step     |
+| `ArrowRight/ArrowUp`  | Increase value by one step     |
+| `Shift` + arrow       | Move by one page step          |
+| `Home` / `End`        | Set to minimum / maximum value |
+
+### Labeling inputs
+
+`ChannelInput` generates its own `aria-label` from the channel name (for example `"Hue"`, `"Saturation"`, `"Hex color"`). To associate a visible label instead, wrap the input in a native `<label>`:
+
+```tsx title="Visible label for a channel input"
+<label>
+  Hue
+  <ColorPicker.ChannelInput channel="hue" />
+</label>
+```
+
+Note: the built-in `aria-label` takes precedence over an implicit label. If you need the visible label text to be announced by screen readers, pass your own `aria-labelledby` referencing the label element.
+
 ## API reference
 
 import { TypesColorPicker } from './types';

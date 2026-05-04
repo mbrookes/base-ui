@@ -23,10 +23,7 @@ export const ColorPickerSwatch = React.forwardRef(function ColorPickerSwatch(
 
   const colorString = value.toString('css');
 
-  const state: ColorPickerSwatchState = React.useMemo(
-    () => ({ disabled }),
-    [disabled],
-  );
+  const state: ColorPickerSwatchState = React.useMemo(() => ({ disabled }), [disabled]);
 
   const element = useRenderElement('div', componentProps, {
     ref: forwardedRef,
