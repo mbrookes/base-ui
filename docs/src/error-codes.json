@@ -95,5 +95,16 @@
   "95": "Base UI: SharedCalendarDayGridBodyContext is missing. <Calendar.DayGridRow /> must be placed within <Calendar.DayGridBody /> and <RangeCalendar.DayGridRow /> must be placed within <RangeCalendar.DayGridBody />.",
   "96": "Base UI: SharedCalendarDayGridCellContext is missing. <Calendar.DayButton /> must be placed within <Calendar.DayGridCell /> and <RangeCalendar.DayButton /> must be placed within <RangeCalendar.DayGridCell />.",
   "97": "Base UI: SharedCalendarRootContext is missing. Calendar parts must be placed within <Calendar.Root /> and Range Calendar parts must be placed within <RangeCalendar.Root />.",
-  "98": "Base UI: OTPFieldRootContext is missing. OTPField parts must be placed within <OTPField.Root>."
+  "98": "Base UI: OTPFieldRootContext is missing. OTPField parts must be placed within <OTPField.Root>.",
+  "99": "Base UI: ColorPickerChannelSliderContext is missing. ColorPicker.ChannelSliderTrack and ChannelSliderThumb must be placed within <ColorPicker.ChannelSlider>.",
+  "100": "Base UI: HSBColor does not have a channel named \"%s\".",
+  "101": "Base UI: Cannot resolve z-channel from xChannel=\"%s\" and yChannel=\"%s\" in HSB color space.",
+  "102": "Base UI: Unsupported color format \"%s\".",
+  "103": "Base UI: RGBColor does not have a channel named \"%s\".",
+  "104": "Base UI: Cannot resolve z-channel from xChannel=\"%s\" and yChannel=\"%s\" in RGB color space.",
+  "105": "Base UI: HSLColor does not have a channel named \"%s\".",
+  "106": "Base UI: Cannot resolve z-channel from xChannel=\"%s\" and yChannel=\"%s\" in HSL color space.",
+  "107": "Base UI: ColorPickerRootContext is missing. ColorPicker parts must be placed within <ColorPicker.Root>.",
+  "108": "Base UI: parseColor() expects a string. Pass a color string like \"#ff0000\", \"rgb(255, 0, 0)\", or \"hsl(0, 100%, 50%)\".",
+  "109": "Base UI: Cannot parse color \"%s\". Supported formats: #RGB, #RGBA, #RRGGBB, #RRGGBBAA, rgb(), rgba(), hsl(), hsla(), hsb(), hsba()."
 }

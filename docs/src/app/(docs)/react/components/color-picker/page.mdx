@@ -1,0 +1,176 @@
+# Color Picker
+
+<Subtitle>An unstyled color picker with a 2D area, channel sliders, and inputs.</Subtitle>
+<Meta
+  name="description"
+  content="A high-quality, unstyled React color picker component with a 2D area, channel sliders, swatch, and text inputs."
+/>
+
+import { DemoColorPickerHero } from './demos/hero';
+
+<DemoColorPickerHero />
+
+## Anatomy
+
+Import the component and assemble its parts:
+
+```jsx title="Anatomy"
+import { ColorPicker } from '@base-ui/react/color-picker';
+
+<ColorPicker.Root>
+  <ColorPicker.Area>
+    <ColorPicker.AreaThumb />
+  </ColorPicker.Area>
+
+  <ColorPicker.Swatch />
+
+  <ColorPicker.ChannelSlider channel="hue">
+    <ColorPicker.ChannelSliderTrack>
+      <ColorPicker.ChannelSliderThumb />
+    </ColorPicker.ChannelSliderTrack>
+  </ColorPicker.ChannelSlider>
+
+  <ColorPicker.ChannelSlider channel="alpha">
+    <ColorPicker.ChannelSliderTrack>
+      <ColorPicker.ChannelSliderThumb />
+    </ColorPicker.ChannelSliderTrack>
+  </ColorPicker.ChannelSlider>
+
+  <ColorPicker.ChannelInput channel="hue" />
+  <ColorPicker.ChannelInput channel="hex" />
+</ColorPicker.Root>;
+```
+
+## Examples
+
+### Controlled
+
+Pass `value` and `onValueChange` to control the color programmatically. The value can be a CSS color string (`'#ff0000'`, `'hsl(0, 100%, 50%)'`, `'hsb(0, 100%, 100%)'`) or a `Color` object returned by `onValueChange`.
+
+```tsx title="Controlled color picker"
+function App() {
+  const [color, setColor] = React.useState('hsb(210, 80%, 90%)');
+
+  return (
+    <ColorPicker.Root value={color} onValueChange={(c) => setColor(c.toString('hsb'))}>
+      <ColorPicker.Area>
+        <ColorPicker.AreaThumb />
+      </ColorPicker.Area>
+      <ColorPicker.ChannelSlider channel="hue">
+        <ColorPicker.ChannelSliderTrack>
+          <ColorPicker.ChannelSliderThumb />
+        </ColorPicker.ChannelSliderTrack>
+      </ColorPicker.ChannelSlider>
+    </ColorPicker.Root>
+  );
+}
+```
+
+### Channel sliders
+
+`ChannelSlider` accepts a `channel` prop to control which color channel it adjusts. Supported channels are `'hue'`, `'saturation'`, `'brightness'`, `'lightness'`, `'red'`, `'green'`, `'blue'`, and `'alpha'`.
+
+```tsx title="HSB channel sliders"
+<ColorPicker.ChannelSlider channel="hue">
+  <ColorPicker.ChannelSliderTrack>
+    <ColorPicker.ChannelSliderThumb />
+  </ColorPicker.ChannelSliderTrack>
+</ColorPicker.ChannelSlider>
+
+<ColorPicker.ChannelSlider channel="saturation">
+  <ColorPicker.ChannelSliderTrack>
+    <ColorPicker.ChannelSliderThumb />
+  </ColorPicker.ChannelSliderTrack>
+</ColorPicker.ChannelSlider>
+
+<ColorPicker.ChannelSlider channel="brightness">
+  <ColorPicker.ChannelSliderTrack>
+    <ColorPicker.ChannelSliderThumb />
+  </ColorPicker.ChannelSliderTrack>
+</ColorPicker.ChannelSlider>
+```
+
+### Channel inputs
+
+`ChannelInput` provides a text input for editing a single channel value. Use `channel="hex"` for a hex string input. The input suppresses updates while the user is dragging, and commits the value on blur or Enter.
+
+```tsx title="Channel inputs"
+<ColorPicker.ChannelInput channel="hue" />
+<ColorPicker.ChannelInput channel="saturation" />
+<ColorPicker.ChannelInput channel="brightness" />
+<ColorPicker.ChannelInput channel="alpha" />
+<ColorPicker.ChannelInput channel="hex" />
+```
+
+### Swatch
+
+`Swatch` renders a color preview. It sets a `--color` CSS variable on the element so you can apply the color as a background, border, or any other CSS property:
+
+```tsx title="Swatch with background"
+<ColorPicker.Swatch style={{ background: 'var(--color)', width: 32, height: 32 }} />
+```
+
+### Styling states
+
+`ColorPicker.Root` exposes a `data-dragging` attribute while the user is actively dragging the area or a slider thumb:
+
+```css title="Suppressing transitions during drag"
+.Area:not([data-dragging]) {
+  transition: background 200ms ease;
+}
+```
+
+## API reference
+
+import { TypesColorPicker } from './types';
+
+### Root
+
+<TypesColorPicker.Root />
+
+### Area
+
+<TypesColorPicker.Area />
+
+### AreaThumb
+
+<TypesColorPicker.AreaThumb />
+
+### ChannelSlider
+
+<TypesColorPicker.ChannelSlider />
+
+### ChannelSliderTrack
+
+<TypesColorPicker.ChannelSliderTrack />
+
+### ChannelSliderThumb
+
+<TypesColorPicker.ChannelSliderThumb />
+
+### ChannelInput
+
+<TypesColorPicker.ChannelInput />
+
+### Swatch
+
+<TypesColorPicker.Swatch />
+
+export const metadata = {
+  keywords: [
+    'React Color Picker',
+    'Color Picker Component',
+    'Color Selector',
+    'HSB Color Picker',
+    'HSL Color Picker',
+    'RGB Color Picker',
+    'Color Swatch',
+    'Color Wheel',
+    'Color Slider',
+    'Alpha Channel',
+    'Hue Slider',
+    'Accessible Color Picker',
+    'Headless React Components',
+    'Base UI',
+  ],
+};
