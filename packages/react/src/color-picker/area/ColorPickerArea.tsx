@@ -8,6 +8,7 @@ import { clamp } from '../../internals/clamp';
 import type { ColorChannel, ColorSpace } from '../utils/types';
 import { getColorAreaBackground } from '../utils/colorAreaGradient';
 import { useColorPickerRootContext } from '../root/ColorPickerRootContext';
+import { ColorPickerAreaContext } from './ColorPickerAreaContext';
 
 const INTENTIONAL_DRAG_COUNT_THRESHOLD = 2;
 
@@ -111,10 +112,7 @@ export const ColorPickerArea = React.forwardRef(function ColorPickerArea(
 
   const background = getColorAreaBackground(value, xChannel, yChannel);
 
-  const state: ColorPickerAreaState = React.useMemo(
-    () => ({ dragging, disabled }),
-    [dragging, disabled],
-  );
+  const state: ColorPickerAreaState = { dragging, disabled };
 
   const element = useRenderElement('div', componentProps, {
     ref: (node: HTMLDivElement | null) => {
@@ -129,6 +127,7 @@ export const ColorPickerArea = React.forwardRef(function ColorPickerArea(
     props: [
       elementProps,
       {
+        role: 'group' as const,
         onPointerDown: handlePointerDown,
         style: {
           background,
@@ -142,7 +141,11 @@ export const ColorPickerArea = React.forwardRef(function ColorPickerArea(
     ],
   });
 
-  return element;
+  return (
+    <ColorPickerAreaContext.Provider value={{ xChannel, yChannel }}>
+      {element}
+    </ColorPickerAreaContext.Provider>
+  );
 });
 
 export namespace ColorPickerArea {

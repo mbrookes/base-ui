@@ -123,7 +123,7 @@ export const ColorPickerChannelInput = React.forwardRef(function ColorPickerChan
         disabled,
         readOnly,
         type: 'text' as const,
-        inputMode: 'numeric' as const,
+        inputMode: (channel === 'hex' ? 'text' : 'numeric') as React.HTMLAttributes<HTMLInputElement>['inputMode'],
         style: style as React.CSSProperties,
         ['data-channel' as string]: channel,
         'aria-label':
