@@ -1,3 +1,16 @@
+diff --git a/pipeline/loadServerTypes/extractTypeProps.mjs b/pipeline/loadServerTypes/extractTypeProps.mjs
+index 3b40fc91bad4689b6121cac56e762052a4c3ea99..d17ecdb105d3ecccc30c2773fb75e389868558f7 100644
+--- a/pipeline/loadServerTypes/extractTypeProps.mjs
++++ b/pipeline/loadServerTypes/extractTypeProps.mjs
+@@ -546,7 +546,7 @@ export function extractTypeProps(hast) {
+     frame,
+     code
+   } = result;
+-  const accumulators = {};
++  const accumulators = Object.create(null);
+ 
+   // Track JSDoc comment accumulation
+   let pendingCommentTexts = null;
 diff --git a/pipeline/loadServerTypes/highlightTypes.mjs b/pipeline/loadServerTypes/highlightTypes.mjs
 index 8da145ed96e47241e0decc09f6107a8694ffe3dc..43eab52695d25257f751b8a598798e43e0750e68 100644
 --- a/pipeline/loadServerTypes/highlightTypes.mjs
