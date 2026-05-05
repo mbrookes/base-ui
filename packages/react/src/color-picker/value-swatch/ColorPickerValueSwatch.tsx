@@ -52,5 +52,6 @@ export const ColorPickerValueSwatch = React.forwardRef(function ColorPickerValue
 });
 
 export namespace ColorPickerValueSwatch {
+  export type State = ColorPickerValueSwatchState;
   export interface Props extends BaseUIComponentProps<'span', ColorPickerValueSwatchState> {}
 }
