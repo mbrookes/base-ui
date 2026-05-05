@@ -1,5 +1,10 @@
 export { ColorPickerRoot as Root } from './root/ColorPickerRoot';
 export type { ColorPickerRoot } from './root/ColorPickerRoot';
+export { ColorPickerTrigger as Trigger } from './trigger/ColorPickerTrigger';
+export type { ColorPickerTrigger } from './trigger/ColorPickerTrigger';
+export { ColorPickerValueSwatch as ValueSwatch } from './value-swatch/ColorPickerValueSwatch';
+export { ColorPickerPositioner as Positioner } from './positioner/ColorPickerPositioner';
+export { ColorPickerPopup as Popup } from './popup/ColorPickerPopup';
 export { ColorPickerArea as Area } from './area/ColorPickerArea';
 export type { ColorPickerArea } from './area/ColorPickerArea';
 export { ColorPickerAreaThumb as AreaThumb } from './area-thumb/ColorPickerAreaThumb';

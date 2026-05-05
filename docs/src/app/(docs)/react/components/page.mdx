@@ -1976,8 +1976,15 @@ No description available
 
 - Exports:
   - Color Picker - Root
-    - Props: className, defaultValue, disabled, format, onValueChange, onValueChangeEnd, readOnly, render, style, value
-    - Data Attributes: data-dragging
+    - Props: className, defaultOpen, defaultValue, disabled, format, onOpenChange, onOpenChangeComplete, onValueChange, onValueChangeEnd, open, readOnly, render, style, value
+    - Data Attributes: data-dragging, data-open
+  - Color Picker - Trigger
+    - Props: className, disabled, nativeButton, render, style
+    - Data Attributes: data-disabled, data-open
+  - Color Picker - Positioner
+    - Props: align, alignOffset, anchor, arrowPadding, className, collisionAvoidance, collisionBoundary, collisionPadding, disableAnchorTracking, positionMethod, render, side, sideOffset, sticky, style
+  - Color Picker - Popup
+    - Props: className, finalFocus, initialFocus, render, style
   - Color Picker - Area
     - Props: className, colorSpace, render, style, xChannel, yChannel
     - Data Attributes: data-disabled, data-dragging
@@ -2007,13 +2014,18 @@ No description available
   - Color Picker - ColorPickerChannelSliderTrack
     - Props: children, className, data-testid, id, style
   - Color Picker - ColorPickerRoot
-    - Props: className, defaultValue, disabled, format, onValueChange, onValueChangeEnd, readOnly, render, style, value
-    - Data Attributes: data-dragging
+    - Props: className, defaultOpen, defaultValue, disabled, format, onOpenChange, onOpenChangeComplete, onValueChange, onValueChangeEnd, open, readOnly, render, style, value
+    - Data Attributes: data-dragging, data-open
   - Color Picker - ColorPickerSwatch
     - Props: className, render, style
+  - Color Picker - ColorPickerTrigger
+    - Props: className, disabled, nativeButton, render, style
+    - Data Attributes: data-disabled, data-open
   - Color Picker - Swatch
     - Props: className, render, style
-- Types: ColorPicker.Area.Props, ColorPicker.AreaThumb.Props, ColorPicker.ChannelInput.Props, ColorPicker.ChannelSlider.Props, ColorPicker.ChannelSliderThumb.Props, ColorPicker.ChannelSliderTrack.Props, ColorPicker.ColorPickerArea.Props, ColorPicker.ColorPickerAreaThumb.Props, ColorPicker.ColorPickerChannelInput.Props, ColorPicker.ColorPickerChannelSlider.Props, ColorPicker.ColorPickerChannelSliderThumb.Props, ColorPicker.ColorPickerChannelSliderTrack.Props, ColorPicker.ColorPickerRoot.Props, ColorPicker.ColorPickerSwatch.Props, ColorPicker.Root.Props, ColorPicker.Swatch.Props
+  - Color Picker - ValueSwatch
+    - Props: className, render, style
+- Types: ColorPicker.Area.Props, ColorPicker.AreaThumb.Props, ColorPicker.ChannelInput.Props, ColorPicker.ChannelSlider.Props, ColorPicker.ChannelSliderThumb.Props, ColorPicker.ChannelSliderTrack.Props, ColorPicker.ColorPickerArea.Props, ColorPicker.ColorPickerAreaThumb.Props, ColorPicker.ColorPickerChannelInput.Props, ColorPicker.ColorPickerChannelSlider.Props, ColorPicker.ColorPickerChannelSliderThumb.Props, ColorPicker.ColorPickerChannelSliderTrack.Props, ColorPicker.ColorPickerRoot.Props, ColorPicker.ColorPickerSwatch.Props, ColorPicker.ColorPickerTrigger.Props, ColorPicker.ColorPickerTrigger.State, ColorPicker.Popup.Props, ColorPicker.Popup.State, ColorPicker.Positioner.Props, ColorPicker.Positioner.State, ColorPicker.Root.Props, ColorPicker.Swatch.Props, ColorPicker.Trigger.Props, ColorPicker.Trigger.State, ColorPicker.ValueSwatch.Props
 
 </details>
 

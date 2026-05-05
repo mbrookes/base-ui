@@ -18,11 +18,39 @@ Import the component and assemble its parts:
 import { ColorPicker } from '@base-ui/react/color-picker';
 
 <ColorPicker.Root>
+  {/* Trigger (popup mode) */}
+  <ColorPicker.Trigger>
+    <ColorPicker.ValueSwatch />
+  </ColorPicker.Trigger>
+  <ColorPicker.Positioner>
+    <ColorPicker.Popup>
+      <ColorPicker.Area>
+        <ColorPicker.AreaThumb />
+      </ColorPicker.Area>
+
+      <ColorPicker.Swatch />
+
+      <ColorPicker.ChannelSlider channel="hue">
+        <ColorPicker.ChannelSliderTrack>
+          <ColorPicker.ChannelSliderThumb />
+        </ColorPicker.ChannelSliderTrack>
+      </ColorPicker.ChannelSlider>
+
+      <ColorPicker.ChannelSlider channel="alpha">
+        <ColorPicker.ChannelSliderTrack>
+          <ColorPicker.ChannelSliderThumb />
+        </ColorPicker.ChannelSliderTrack>
+      </ColorPicker.ChannelSlider>
+
+      <ColorPicker.ChannelInput channel="hue" />
+      <ColorPicker.ChannelInput channel="hex" />
+    </ColorPicker.Popup>
+  </ColorPicker.Positioner>
+
+  {/* Inline mode (no trigger) */}
   <ColorPicker.Area>
     <ColorPicker.AreaThumb />
   </ColorPicker.Area>
-
-  <ColorPicker.Swatch />
 
   <ColorPicker.ChannelSlider channel="hue">
     <ColorPicker.ChannelSliderTrack>
@@ -30,13 +58,6 @@ import { ColorPicker } from '@base-ui/react/color-picker';
     </ColorPicker.ChannelSliderTrack>
   </ColorPicker.ChannelSlider>
 
-  <ColorPicker.ChannelSlider channel="alpha">
-    <ColorPicker.ChannelSliderTrack>
-      <ColorPicker.ChannelSliderThumb />
-    </ColorPicker.ChannelSliderTrack>
-  </ColorPicker.ChannelSlider>
-
-  <ColorPicker.ChannelInput channel="hue" />
   <ColorPicker.ChannelInput channel="hex" />
 </ColorPicker.Root>;
 ```

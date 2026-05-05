@@ -5,6 +5,10 @@ import { useStableCallback } from '@base-ui/utils/useStableCallback';
 import type { BaseUIComponentProps } from '../../internals/types';
 import { useRenderElement } from '../../internals/useRenderElement';
 import { useFieldRootContext } from '../../internals/field-root-context/FieldRootContext';
+import type { BaseUIChangeEventDetails } from '../../internals/createBaseUIEventDetails';
+import { useTransitionStatus } from '../../internals/useTransitionStatus';
+import { useOpenChangeComplete } from '../../internals/useOpenChangeComplete';
+import { useFloatingRootContext, useDismiss, useInteractions } from '../../floating-ui-react';
 import { parseColor } from '../utils/parseColor';
 import type { Color, ColorFormat } from '../utils/types';
 import { colorPickerStateAttributesMapping } from './stateAttributesMapping';
@@ -14,6 +18,7 @@ import type { ColorPickerRootContextValue } from './ColorPickerRootContext';
 export interface ColorPickerRootState {
   value: Color;
   format: ColorFormat;
+  open: boolean;
   dragging: boolean;
   disabled: boolean;
   readOnly: boolean;
@@ -48,6 +53,10 @@ export const ColorPickerRoot = React.forwardRef(function ColorPickerRoot(
     format: formatProp = 'hsb',
     disabled: disabledProp = false,
     readOnly = false,
+    open: openProp,
+    defaultOpen = false,
+    onOpenChange,
+    onOpenChangeComplete,
     ...elementProps
   } = componentProps;
 
@@ -64,6 +73,55 @@ export const ColorPickerRoot = React.forwardRef(function ColorPickerRoot(
   const value = React.useMemo(() => toColor(valueRaw), [valueRaw]);
   const [format] = React.useState<ColorFormat>(formatProp);
   const [dragging, setDragging] = React.useState(false);
+
+  // Open state
+  const [openState, setOpenUncontrolled] = useControlled<boolean>({
+    controlled: openProp,
+    default: defaultOpen,
+    name: 'ColorPickerRoot',
+    state: 'open',
+  });
+
+  const onOpenChangeStable = useStableCallback(onOpenChange);
+  const onOpenChangeCompleteStable = useStableCallback(onOpenChangeComplete);
+
+  const handleOpenChange = useStableCallback(
+    (nextOpen: boolean, eventDetails: BaseUIChangeEventDetails<string>) => {
+      setOpenUncontrolled(nextOpen);
+      onOpenChangeStable?.(nextOpen, eventDetails?.event);
+    },
+  );
+
+  // Floating elements state (for positioning)
+  const [triggerElement, setTriggerElement] = React.useState<HTMLElement | null>(null);
+  const [positionerElement, setPositionerElement] = React.useState<HTMLElement | null>(null);
+  const popupRef = React.useRef<HTMLElement | null>(null);
+
+  const floatingRootContext = useFloatingRootContext({
+    open: openState,
+    onOpenChange: handleOpenChange,
+    elements: {
+      reference: triggerElement,
+      floating: positionerElement,
+    },
+  });
+
+  const dismiss = useDismiss(floatingRootContext);
+  const { getFloatingProps } = useInteractions([dismiss]);
+
+  const { transitionStatus, mounted, setMounted } = useTransitionStatus(openState);
+
+  useOpenChangeComplete({
+    open: openState,
+    ref: popupRef,
+    onComplete() {
+      if (!openState) {
+        setMounted(false);
+      } else {
+        onOpenChangeCompleteStable?.(true);
+      }
+    },
+  });
 
   const onValueChangeStable = useStableCallback(onValueChange);
   const onValueChangeEndStable = useStableCallback(onValueChangeEnd);
@@ -86,17 +144,20 @@ export const ColorPickerRoot = React.forwardRef(function ColorPickerRoot(
     },
   );
 
-  const state: ColorPickerRootState = React.useMemo(
-    () => ({
-      value,
-      format,
-      dragging,
-      disabled: disabled ?? false,
-      readOnly,
-      valid: validityData?.state?.valid ?? null,
-    }),
-    [value, format, dragging, disabled, readOnly, validityData],
-  );
+  const state: ColorPickerRootState = {
+    value,
+    format,
+    open: openState,
+    dragging,
+    disabled: disabled ?? false,
+    readOnly,
+    valid: validityData?.state?.valid ?? null,
+  };
+
+  const setOpen = useStableCallback((nextOpen: boolean, event?: Event) => {
+    setOpenUncontrolled(nextOpen);
+    onOpenChangeStable?.(nextOpen, event);
+  });
 
   const contextValue: ColorPickerRootContextValue = React.useMemo(
     () => ({
@@ -109,7 +170,15 @@ export const ColorPickerRoot = React.forwardRef(function ColorPickerRoot(
       setDragging,
       disabled: disabled ?? false,
       readOnly,
-      state,
+      open: openState,
+      setOpen,
+      mounted,
+      transitionStatus,
+      floatingRootContext,
+      getFloatingProps,
+      popupRef,
+      setTriggerElement,
+      setPositionerElement,
     }),
     [
       value,
@@ -120,7 +189,15 @@ export const ColorPickerRoot = React.forwardRef(function ColorPickerRoot(
       dragging,
       disabled,
       readOnly,
-      state,
+      openState,
+      setOpen,
+      mounted,
+      transitionStatus,
+      floatingRootContext,
+      getFloatingProps,
+      popupRef,
+      setTriggerElement,
+      setPositionerElement,
     ],
   );
 
@@ -160,5 +237,13 @@ export namespace ColorPickerRoot {
     disabled?: boolean | undefined;
     /** Whether the component is read-only. */
     readOnly?: boolean | undefined;
+    /** Whether the popup is open (controlled). */
+    open?: boolean | undefined;
+    /** Whether the popup is open by default (uncontrolled). @default false */
+    defaultOpen?: boolean | undefined;
+    /** Callback fired when the popup open state changes. */
+    onOpenChange?: ((open: boolean, event?: Event) => void) | undefined;
+    /** Callback fired when the popup has fully opened or closed (after animations). */
+    onOpenChangeComplete?: ((open: boolean) => void) | undefined;
   }
 }

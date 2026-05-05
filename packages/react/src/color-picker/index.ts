@@ -1,1 +1,13 @@
 export * as ColorPicker from './index.parts';
+export type * from './root/ColorPickerRoot';
+export type * from './trigger/ColorPickerTrigger';
+export type * from './value-swatch/ColorPickerValueSwatch';
+export type * from './positioner/ColorPickerPositioner';
+export type * from './popup/ColorPickerPopup';
+export type * from './area/ColorPickerArea';
+export type * from './area-thumb/ColorPickerAreaThumb';
+export type * from './channel-slider/ColorPickerChannelSlider';
+export type * from './channel-slider-track/ColorPickerChannelSliderTrack';
+export type * from './channel-slider-thumb/ColorPickerChannelSliderThumb';
+export type * from './channel-input/ColorPickerChannelInput';
+export type * from './swatch/ColorPickerSwatch';

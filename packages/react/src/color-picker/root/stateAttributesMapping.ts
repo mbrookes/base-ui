@@ -6,6 +6,9 @@ import { ColorPickerRootDataAttributes } from './ColorPickerRootDataAttributes';
 export const colorPickerStateAttributesMapping: StateAttributesMapping<ColorPickerRootState> = {
   value: () => null,
   format: () => null,
+  open(value: boolean) {
+    return value ? { [ColorPickerRootDataAttributes.open]: '' } : null;
+  },
   dragging(value: boolean) {
     return value ? { [ColorPickerRootDataAttributes.dragging]: '' } : null;
   },

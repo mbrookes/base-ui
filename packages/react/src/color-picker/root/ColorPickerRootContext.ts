@@ -1,7 +1,8 @@
 'use client';
 import * as React from 'react';
+import type { FloatingRootContext } from '../../floating-ui-react';
+import type { TransitionStatus } from '../../internals/useTransitionStatus';
 import type { Color, ColorFormat } from '../utils/types';
-import type { ColorPickerRootState } from './ColorPickerRoot';
 
 export interface ColorPickerRootContextValue {
   value: Color;
@@ -13,7 +14,16 @@ export interface ColorPickerRootContextValue {
   setDragging: React.Dispatch<React.SetStateAction<boolean>>;
   disabled: boolean;
   readOnly: boolean;
-  state: ColorPickerRootState;
+  // Popover / floating state
+  open: boolean;
+  setOpen: (open: boolean, event?: Event) => void;
+  mounted: boolean;
+  transitionStatus: TransitionStatus;
+  floatingRootContext: FloatingRootContext | undefined;
+  getFloatingProps: (props?: React.HTMLProps<HTMLElement>) => Record<string, unknown>;
+  popupRef: React.RefObject<HTMLElement | null>;
+  setTriggerElement: (el: HTMLElement | null) => void;
+  setPositionerElement: (el: HTMLElement | null) => void;
 }
 
 export const ColorPickerRootContext = React.createContext<ColorPickerRootContextValue | undefined>(
