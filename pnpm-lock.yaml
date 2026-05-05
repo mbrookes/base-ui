@@ -4,6 +4,11 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+patchedDependencies:
+  '@mui/internal-docs-infra@0.10.1-canary.3':
+    hash: 12d791d4b2ff9c3c4eaa554a3d29bef6b886b006a086d308b3c7be0c2249fd27
+    path: patches/@mui__internal-docs-infra@0.10.1-canary.3.patch
+
 importers:
 
   .:
@@ -157,7 +162,7 @@ importers:
         version: 3.1.1(@types/react@19.2.14)(react@19.2.5)
       '@mui/internal-docs-infra':
         specifier: 0.10.1-canary.3
-        version: 0.10.1-canary.3(@types/react@19.2.14)(next@16.1.7(@babel/core@7.29.0)(@playwright/test@1.59.1)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(prettier@3.8.3)(react@19.2.5)(typescript@6.0.3)
+        version: 0.10.1-canary.3(patch_hash=12d791d4b2ff9c3c4eaa554a3d29bef6b886b006a086d308b3c7be0c2249fd27)(@types/react@19.2.14)(next@16.1.7(@babel/core@7.29.0)(@playwright/test@1.59.1)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(prettier@3.8.3)(react@19.2.5)(typescript@6.0.3)
       '@next/mdx':
         specifier: ^16.1.6
         version: 16.2.2(@mdx-js/loader@3.1.1(webpack@5.106.2(esbuild@0.27.7)))(@mdx-js/react@3.1.1(@types/react@19.2.14)(react@19.2.5))
@@ -11650,7 +11655,7 @@ snapshots:
       - supports-color
       - vitest
 
-  '@mui/internal-docs-infra@0.10.1-canary.3(@types/react@19.2.14)(next@16.1.7(@babel/core@7.29.0)(@playwright/test@1.59.1)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(prettier@3.8.3)(react@19.2.5)(typescript@6.0.3)':
+  '@mui/internal-docs-infra@0.10.1-canary.3(patch_hash=12d791d4b2ff9c3c4eaa554a3d29bef6b886b006a086d308b3c7be0c2249fd27)(@types/react@19.2.14)(next@16.1.7(@babel/core@7.29.0)(@playwright/test@1.59.1)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(prettier@3.8.3)(react@19.2.5)(typescript@6.0.3)':
     dependencies:
       '@babel/runtime': 7.29.2
       '@babel/standalone': 7.29.2

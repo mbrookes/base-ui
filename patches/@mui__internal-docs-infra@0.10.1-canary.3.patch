@@ -1,0 +1,13 @@
+diff --git a/pipeline/loadServerTypes/highlightTypes.mjs b/pipeline/loadServerTypes/highlightTypes.mjs
+index 8da145ed96e47241e0decc09f6107a8694ffe3dc..43eab52695d25257f751b8a598798e43e0750e68 100644
+--- a/pipeline/loadServerTypes/highlightTypes.mjs
++++ b/pipeline/loadServerTypes/highlightTypes.mjs
+@@ -82,7 +82,7 @@ export async function highlightTypes(types, externalTypes = {}, output = 'hast',
+  * @returns Map of export names (e.g., "Checkbox.Root.Props") to highlighted HAST
+  */
+ async function buildHighlightedExports(types, externalTypes = {}) {
+-  const exports = {};
++  const exports = Object.create(null);
+   if (types.length === 0) {
+     // Still add external types even if no types
+     await Promise.all(Object.entries(externalTypes).map(async ([typeName, definition]) => {

@@ -432,6 +432,96 @@ Renders a `<span>` element that handles drag interactions.
 
 Re-export of [ColorPickerChannelSliderTrack](#colorpickerchannelslidertrack) props.
 
+### ColorPickerPopup
+
+A container for the color picker popup contents.
+Renders a `<div>` element.
+
+**ColorPickerPopup Props:**
+
+| Prop         | Type                                                                                            | Default | Description                                                                                                                                                                                                         |
+| :----------- | :---------------------------------------------------------------------------------------------- | :------ | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| initialFocus | `React.RefObject<HTMLElement \| null> \| boolean`                                               | `true`  | Determines the element to focus when the popup is opened. `false`: Do not move focus.`true`: Move focus based on the default behavior (first tabbable element or popup).`RefObject`: Move focus to the ref element. |
+| finalFocus   | `React.RefObject<HTMLElement \| null> \| boolean`                                               | `true`  | Determines the element to focus when the popup is closed.                                                                                                                                                           |
+| className    | `string \| ((state: ColorPicker.Popup.State) => string \| undefined)`                           | -       | CSS class applied to the element, or a function that&#xA;returns a class based on the component's state.                                                                                                            |
+| style        | `React.CSSProperties \| ((state: ColorPicker.Popup.State) => React.CSSProperties \| undefined)` | -       | Style applied to the element, or a function that&#xA;returns a style object based on the component's state.                                                                                                         |
+| render       | `ReactElement \| ((props: HTMLProps, state: ColorPicker.Popup.State) => ReactElement)`          | -       | Allows you to replace the component's HTML element&#xA;with a different tag, or compose it with another component. Accepts a `ReactElement` or a function that returns the element to render.                       |
+
+### ColorPickerPopup.Props
+
+Re-export of [ColorPickerPopup](#colorpickerpopup) props.
+
+### ColorPickerPopup.State
+
+```typescript
+type ColorPickerColorPickerPopupState = {
+  /** Whether the color picker popup is currently open. */
+  open: boolean;
+  /** The side of the anchor the popup is placed on. */
+  side: Side;
+  /** The alignment of the popup relative to the anchor. */
+  align: Align;
+  /** The transition status of the popup. */
+  transitionStatus: TransitionStatus;
+};
+```
+
+### ColorPickerPositioner
+
+Positions the color picker popup against the trigger.
+Renders a `<div>` element.
+
+**ColorPickerPositioner Props:**
+
+| Prop                  | Type                                                                                                                 | Default                | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| :-------------------- | :------------------------------------------------------------------------------------------------------------------- | :--------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| disableAnchorTracking | `boolean`                                                                                                            | `false`                | Whether to disable the popup from tracking any layout shift of its positioning anchor.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| align                 | `Align`                                                                                                              | `'center'`             | How to align the popup relative to the specified side.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| alignOffset           | `number`                                                                                                             | `0`                    | Additional offset along the alignment axis in pixels.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| side                  | `Side`                                                                                                               | `'bottom'`             | Which side of the anchor element to align the popup against.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| sideOffset            | `number`                                                                                                             | `0`                    | Distance between the anchor and the popup in pixels.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| arrowPadding          | `number`                                                                                                             | `5`                    | Minimum distance to maintain between the arrow and the edges of the popup. Use it to prevent the arrow element from hanging out of the rounded corners of a popup.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| anchor                | `Element \| VirtualElement \| React.RefObject<Element \| null> \| (() => Element \| VirtualElement \| null) \| null` | -                      | An element to position the popup against.&#xA;By default, the popup will be positioned against the trigger.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| collisionAvoidance    | `CollisionAvoidance`                                                                                                 | -                      | Determines how to handle collisions when positioning the popup. `side` controls overflow on the preferred placement axis (`top`/`bottom` or `left`/`right`): `'flip'`: keep the requested side when it fits; otherwise try the opposite side&#xA;(`top` and `bottom`, or `left` and `right`).`'shift'`: never change side; keep the requested side and move the popup within&#xA;the clipping boundary so it stays visible.`'none'`: do not correct side-axis overflow. `align` controls overflow on the alignment axis (`start`/`center`/`end`): `'flip'`: keep side, but swap `start` and `end` when the requested alignment overflows.`'shift'`: keep side and requested alignment, then nudge the popup along the&#xA;alignment axis to fit.`'none'`: do not correct alignment-axis overflow. `fallbackAxisSide` controls fallback behavior on the perpendicular axis when the&#xA;preferred axis cannot fit: `'start'`: allow perpendicular fallback and try the logical start side first&#xA;(`top` before `bottom`, or `left` before `right` in LTR).`'end'`: allow perpendicular fallback and try the logical end side first&#xA;(`bottom` before `top`, or `right` before `left` in LTR).`'none'`: do not fallback to the perpendicular axis. When `side` is `'shift'`, explicitly setting `align` only supports `'shift'` or `'none'`.&#xA;If `align` is omitted, it defaults to `'flip'`. |
+| collisionBoundary     | `Boundary`                                                                                                           | `'clipping-ancestors'` | An element or a rectangle that delimits the area that the popup is confined to.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| collisionPadding      | `Padding`                                                                                                            | `5`                    | Additional space to maintain from the edge of the collision boundary.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| sticky                | `boolean`                                                                                                            | `false`                | Whether to maintain the popup in the viewport after&#xA;the anchor element was scrolled out of view.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| positionMethod        | `'absolute' \| 'fixed'`                                                                                              | `'absolute'`           | Determines which CSS `position` property to use.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| className             | `string \| ((state: ColorPicker.Positioner.State) => string \| undefined)`                                           | -                      | CSS class applied to the element, or a function that&#xA;returns a class based on the component's state.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| style                 | `React.CSSProperties \| ((state: ColorPicker.Positioner.State) => React.CSSProperties \| undefined)`                 | -                      | Style applied to the element, or a function that&#xA;returns a style object based on the component's state.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| render                | `ReactElement \| ((props: HTMLProps, state: ColorPicker.Positioner.State) => ReactElement)`                          | -                      | Allows you to replace the component's HTML element&#xA;with a different tag, or compose it with another component. Accepts a `ReactElement` or a function that returns the element to render.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+
+**`collisionAvoidance` Prop Example:**
+
+```jsx
+<Positioner
+  collisionAvoidance={{
+    side: 'shift',
+    align: 'shift',
+    fallbackAxisSide: 'none',
+  }}
+/>
+```
+
+### ColorPickerPositioner.Props
+
+Re-export of [ColorPickerPositioner](#colorpickerpositioner) props.
+
+### ColorPickerPositioner.State
+
+```typescript
+type ColorPickerColorPickerPositionerState = {
+  /** Whether the color picker popup is currently open. */
+  open: boolean;
+  /** Which side of the anchor the positioner is placed on. */
+  side: Side;
+  /** How the positioner is aligned relative to its anchor. */
+  align: Align;
+  /** Whether the anchor element is hidden. */
+  anchorHidden: boolean;
+};
+```
+
 ### ColorPickerRoot
 
 Groups all parts of the color picker.
@@ -521,6 +611,34 @@ type ColorPickerColorPickerTriggerState = {
 };
 ```
 
+### ColorPickerValueSwatch
+
+A color preview swatch displayed inside the trigger button.
+Renders a `<span>` element with `--color` CSS variable set.
+
+**ColorPickerValueSwatch Props:**
+
+| Prop      | Type                                                                                                  | Default | Description                                                                                                                                                                                   |
+| :-------- | :---------------------------------------------------------------------------------------------------- | :------ | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| className | `string \| ((state: ColorPicker.ValueSwatch.State) => string \| undefined)`                           | -       | CSS class applied to the element, or a function that&#xA;returns a class based on the component's state.                                                                                      |
+| style     | `React.CSSProperties \| ((state: ColorPicker.ValueSwatch.State) => React.CSSProperties \| undefined)` | -       | Style applied to the element, or a function that&#xA;returns a style object based on the component's state.                                                                                   |
+| render    | `ReactElement \| ((props: HTMLProps, state: ColorPicker.ValueSwatch.State) => ReactElement)`          | -       | Allows you to replace the component's HTML element&#xA;with a different tag, or compose it with another component. Accepts a `ReactElement` or a function that returns the element to render. |
+
+### ColorPickerValueSwatch.Props
+
+Re-export of [ColorPickerValueSwatch](#colorpickervalueswatch) props.
+
+### ColorPickerValueSwatch.State
+
+```typescript
+type ColorPickerColorPickerValueSwatchState = {
+  /** Whether the color picker popup is currently open. */
+  open: boolean;
+  /** Whether the color picker is disabled. */
+  disabled: boolean;
+};
+```
+
 ### Swatch
 
 A preview swatch that displays the current color.
@@ -545,15 +663,26 @@ Renders a `<span>` element with `--color` CSS variable set.
 
 **ValueSwatch Props:**
 
-| Prop      | Type                                                                                                | Default | Description                                                                                                                                                                                   |
-| :-------- | :-------------------------------------------------------------------------------------------------- | :------ | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| className | `string \| ((state: ColorPickerValueSwatchState) => string \| undefined)`                           | -       | CSS class applied to the element, or a function that&#xA;returns a class based on the component's state.                                                                                      |
-| style     | `React.CSSProperties \| ((state: ColorPickerValueSwatchState) => React.CSSProperties \| undefined)` | -       | Style applied to the element, or a function that&#xA;returns a style object based on the component's state.                                                                                   |
-| render    | `ReactElement \| ((props: HTMLProps, state: ColorPickerValueSwatchState) => ReactElement)`          | -       | Allows you to replace the component's HTML element&#xA;with a different tag, or compose it with another component. Accepts a `ReactElement` or a function that returns the element to render. |
+| Prop      | Type                                                                                                  | Default | Description                                                                                                                                                                                   |
+| :-------- | :---------------------------------------------------------------------------------------------------- | :------ | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| className | `string \| ((state: ColorPicker.ValueSwatch.State) => string \| undefined)`                           | -       | CSS class applied to the element, or a function that&#xA;returns a class based on the component's state.                                                                                      |
+| style     | `React.CSSProperties \| ((state: ColorPicker.ValueSwatch.State) => React.CSSProperties \| undefined)` | -       | Style applied to the element, or a function that&#xA;returns a style object based on the component's state.                                                                                   |
+| render    | `ReactElement \| ((props: HTMLProps, state: ColorPicker.ValueSwatch.State) => ReactElement)`          | -       | Allows you to replace the component's HTML element&#xA;with a different tag, or compose it with another component. Accepts a `ReactElement` or a function that returns the element to render. |
 
 ### ValueSwatch.Props
 
 Re-export of [ValueSwatch](#valueswatch) props.
+
+### ValueSwatch.State
+
+```typescript
+type ColorPickerValueSwatchState = {
+  /** Whether the color picker popup is currently open. */
+  open: boolean;
+  /** Whether the color picker is disabled. */
+  disabled: boolean;
+};
+```
 
 ## Additional Types
 
@@ -663,17 +792,6 @@ type ColorPickerRootState = {
 
 ```typescript
 type ColorPickerSwatchState = { disabled: boolean };
-```
-
-### ColorPickerValueSwatchState
-
-```typescript
-type ColorPickerValueSwatchState = {
-  /** Whether the color picker popup is currently open. */
-  open: boolean;
-  /** Whether the color picker is disabled. */
-  disabled: boolean;
-};
 ```
 
 ## External Types
@@ -825,9 +943,12 @@ type toJSON = () => Record;
 - `ColorPicker.ColorPickerRoot`: `ColorPicker.ColorPickerRoot`, `ColorPicker.ColorPickerRoot.Props`
 - `ColorPicker.Trigger`: `ColorPicker.Trigger`, `ColorPicker.Trigger.State`, `ColorPicker.Trigger.Props`
 - `ColorPicker.ColorPickerTrigger`: `ColorPicker.ColorPickerTrigger`, `ColorPicker.ColorPickerTrigger.State`, `ColorPicker.ColorPickerTrigger.Props`
-- `ColorPicker.ValueSwatch`: `ColorPicker.ValueSwatch`, `ColorPicker.ValueSwatch.Props`
+- `ColorPicker.ValueSwatch`: `ColorPicker.ValueSwatch`, `ColorPicker.ValueSwatch.State`, `ColorPicker.ValueSwatch.Props`
+- `ColorPicker.ColorPickerValueSwatch`: `ColorPicker.ColorPickerValueSwatch`, `ColorPicker.ColorPickerValueSwatch.State`, `ColorPicker.ColorPickerValueSwatch.Props`
 - `ColorPicker.Positioner`: `ColorPicker.Positioner`, `ColorPicker.Positioner.State`, `ColorPicker.Positioner.Props`
+- `ColorPicker.ColorPickerPositioner`: `ColorPicker.ColorPickerPositioner`, `ColorPicker.ColorPickerPositioner.State`, `ColorPicker.ColorPickerPositioner.Props`
 - `ColorPicker.Popup`: `ColorPicker.Popup`, `ColorPicker.Popup.State`, `ColorPicker.Popup.Props`
+- `ColorPicker.ColorPickerPopup`: `ColorPicker.ColorPickerPopup`, `ColorPicker.ColorPickerPopup.State`, `ColorPicker.ColorPickerPopup.Props`
 - `ColorPicker.Area`: `ColorPicker.Area`, `ColorPicker.Area.Props`
 - `ColorPicker.ColorPickerArea`: `ColorPicker.ColorPickerArea`, `ColorPicker.ColorPickerArea.Props`
 - `ColorPicker.AreaThumb`: `ColorPicker.AreaThumb`, `ColorPicker.AreaThumb.Props`
@@ -850,5 +971,6 @@ Maps `Canonical`: `Alias` — Use Canonical when its namespace is already import
 
 - `ColorPicker.Trigger.State`: `ColorPickerTriggerState`
 - `ColorPicker.Trigger.Props`: `ColorPickerTriggerProps`
+- `ColorPicker.ValueSwatch.State`: `ColorPickerValueSwatchState`
 - `ColorPicker.Popup.State`: `ColorPickerPopupState`
 - `ColorPicker.Popup.Props`: `ColorPickerPopupProps`

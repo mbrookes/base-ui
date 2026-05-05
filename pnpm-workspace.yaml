@@ -7,6 +7,8 @@ packages:
   - examples/*
   - playground/*
 
+engineStrict: true
+
 onlyBuiltDependencies:
   - '@mui/internal-babel-plugin-display-name'
   - '@vvago/vale'
@@ -15,5 +17,5 @@ onlyBuiltDependencies:
   - nx
   - sharp
   - unrs-resolver
-
-engineStrict: true
+patchedDependencies:
+  '@mui/internal-docs-infra@0.10.1-canary.3': patches/@mui__internal-docs-infra@0.10.1-canary.3.patch
