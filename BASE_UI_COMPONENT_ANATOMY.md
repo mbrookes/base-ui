@@ -390,7 +390,7 @@ demos/
 ### Design system values
 
 | Property            | Common values                                                                               |
-| ------------------- | ------------------------------------------------------------------------------------------- |
+| :------------------ | :------------------------------------------------------------------------------------------ |
 | Border radius       | `0.25rem` (xs), `0.375rem` (sm/md), `9999px` (pill/circle)                                  |
 | Control height      | `2rem` (compact), `2.5rem` (standard)                                                       |
 | Control width       | `2rem` / `2.5rem` for icon buttons; explicit widths for inputs                              |

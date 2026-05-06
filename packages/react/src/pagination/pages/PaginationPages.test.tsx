@@ -28,10 +28,7 @@ describe('<Pagination.Pages />', () => {
 
   it('marks the current page with aria-current', async () => {
     await render(<TestPagination defaultPage={3} />);
-    expect(screen.getByRole('button', { name: 'page 3' })).toHaveAttribute(
-      'aria-current',
-      'page',
-    );
+    expect(screen.getByRole('button', { name: 'page 3' })).toHaveAttribute('aria-current', 'page');
   });
 
   it('renders ellipsis elements for large ranges', async () => {

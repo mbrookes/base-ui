@@ -17,7 +17,11 @@ function defaultGetAriaLabel(p: number, isCurrent: boolean): string {
  * Documentation: [Base UI Pagination](https://base-ui.com/react/components/pagination)
  */
 export function PaginationPages(componentProps: PaginationPages.Props): React.ReactElement {
-  const { siblingCount = 1, boundaryCount = 1, getAriaLabel = defaultGetAriaLabel } = componentProps;
+  const {
+    siblingCount = 1,
+    boundaryCount = 1,
+    getAriaLabel = defaultGetAriaLabel,
+  } = componentProps;
 
   const { page, count, disabled, setPage } = usePaginationRootContext();
 

@@ -16,7 +16,14 @@ export const PaginationPrevButton = React.forwardRef(function PaginationPrevButt
   componentProps: PaginationPrevButton.Props,
   forwardedRef: React.ForwardedRef<HTMLLIElement>,
 ) {
-  const { render, className, children, style, 'aria-label': ariaLabel = 'Go to previous page', ...elementProps } = componentProps;
+  const {
+    render,
+    className,
+    children,
+    style,
+    'aria-label': ariaLabel = 'Go to previous page',
+    ...elementProps
+  } = componentProps;
 
   const { page, disabled: rootDisabled, setPage } = usePaginationRootContext();
   const disabled = rootDisabled || page <= 1;
@@ -30,7 +37,12 @@ export const PaginationPrevButton = React.forwardRef(function PaginationPrevButt
   const state: PaginationPrevButton.State = { disabled };
 
   const buttonElement = (
-    <button ref={buttonRef} aria-label={ariaLabel} {...getButtonProps({ onClick: handleClick })}>
+    <button
+      type="button"
+      ref={buttonRef}
+      aria-label={ariaLabel}
+      {...getButtonProps({ onClick: handleClick })}
+    >
       {children ?? '\u2039'}
     </button>
   );
