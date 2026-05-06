@@ -103,10 +103,7 @@ export const ColorPickerChannelInput = React.forwardRef(function ColorPickerChan
     [commit],
   );
 
-  const state: ColorPickerChannelInputState = React.useMemo(
-    () => ({ channel, disabled, readOnly }),
-    [channel, disabled, readOnly],
-  );
+  const state: ColorPickerChannelInputState = { channel, disabled, readOnly };
 
   const element = useRenderElement('input', componentProps, {
     ref: forwardedRef,

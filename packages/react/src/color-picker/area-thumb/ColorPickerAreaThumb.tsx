@@ -5,6 +5,24 @@ import type { BaseUIComponentProps } from '../../internals/types';
 import { useRenderElement } from '../../internals/useRenderElement';
 import { useColorPickerRootContext } from '../root/ColorPickerRootContext';
 import { useColorPickerAreaContext } from '../area/ColorPickerAreaContext';
+import type { ColorChannel } from '../utils/types';
+
+function formatChannelValueText(channel: ColorChannel, value: number): string {
+  if (channel === 'hue') {
+    return `${Math.round(value)}°`;
+  }
+  if (channel === 'alpha') {
+    return `${Math.round(value * 100)}%`;
+  }
+  if (channel === 'red' || channel === 'green' || channel === 'blue') {
+    return String(Math.round(value));
+  }
+  return `${Math.round(value)}%`;
+}
+
+function capitalize(s: string) {
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
 
 export interface ColorPickerAreaThumbState {
   dragging: boolean;
@@ -29,7 +47,7 @@ export const ColorPickerAreaThumb = React.forwardRef(function ColorPickerAreaThu
   const yVal = value.getChannelValue(yChannel);
   const xRange = value.getChannelRange(xChannel);
   const yRange = value.getChannelRange(yChannel);
-  const hueVal = value.getChannelValue('hue');
+  const hueVal = xChannel === 'hue' || yChannel === 'hue' ? null : value.getChannelValue('hue');
 
   const state: ColorPickerAreaThumbState = { dragging, disabled };
 
@@ -77,6 +95,7 @@ export const ColorPickerAreaThumb = React.forwardRef(function ColorPickerAreaThu
     props: [
       elementProps,
       {
+        'aria-hidden': true as const,
         style: {
           position: 'absolute',
           left: 'var(--color-area-thumb-x)',
@@ -88,17 +107,33 @@ export const ColorPickerAreaThumb = React.forwardRef(function ColorPickerAreaThu
     ],
   });
 
+  const xValueText = [
+    `${capitalize(xChannel)}: ${formatChannelValueText(xChannel, xVal)}`,
+    `${capitalize(yChannel)}: ${formatChannelValueText(yChannel, yVal)}`,
+    hueVal != null ? `Hue: ${Math.round(hueVal)}°` : null,
+  ]
+    .filter(Boolean)
+    .join(', ');
+
+  const yValueText = [
+    `${capitalize(yChannel)}: ${formatChannelValueText(yChannel, yVal)}`,
+    `${capitalize(xChannel)}: ${formatChannelValueText(xChannel, xVal)}`,
+    hueVal != null ? `Hue: ${Math.round(hueVal)}°` : null,
+  ]
+    .filter(Boolean)
+    .join(', ');
+
   return (
     <React.Fragment>
       {element}
       <input
         type="range"
-        aria-label={`${xChannel.charAt(0).toUpperCase() + xChannel.slice(1)}, Color`}
+        aria-label={`${capitalize(xChannel)}, Color`}
         aria-roledescription="2D slider"
         aria-valuemin={xRange.minValue}
         aria-valuemax={xRange.maxValue}
         aria-valuenow={xVal}
-        aria-valuetext={`${xChannel.charAt(0).toUpperCase() + xChannel.slice(1)}: ${Math.round(xVal)}%, ${yChannel.charAt(0).toUpperCase() + yChannel.slice(1)}: ${Math.round(yVal)}%, Hue: ${Math.round(hueVal)}°`}
+        aria-valuetext={xValueText}
         min={xRange.minValue}
         max={xRange.maxValue}
         step={xRange.step}
@@ -110,13 +145,13 @@ export const ColorPickerAreaThumb = React.forwardRef(function ColorPickerAreaThu
       />
       <input
         type="range"
-        aria-label={`${yChannel.charAt(0).toUpperCase() + yChannel.slice(1)}, Color`}
+        aria-label={`${capitalize(yChannel)}, Color`}
         aria-roledescription="2D slider"
         aria-hidden
         aria-valuemin={yRange.minValue}
         aria-valuemax={yRange.maxValue}
         aria-valuenow={yVal}
-        aria-valuetext={`${yChannel.charAt(0).toUpperCase() + yChannel.slice(1)}: ${Math.round(yVal)}%, ${xChannel.charAt(0).toUpperCase() + xChannel.slice(1)}: ${Math.round(xVal)}%, Hue: ${Math.round(hueVal)}°`}
+        aria-valuetext={yValueText}
         min={yRange.minValue}
         max={yRange.maxValue}
         step={yRange.step}

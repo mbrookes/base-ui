@@ -23,7 +23,7 @@ export const ColorPickerSwatch = React.forwardRef(function ColorPickerSwatch(
 
   const colorString = value.toString('css');
 
-  const state: ColorPickerSwatchState = React.useMemo(() => ({ disabled }), [disabled]);
+  const state: ColorPickerSwatchState = { disabled };
 
   const element = useRenderElement('div', componentProps, {
     ref: forwardedRef,
@@ -32,7 +32,7 @@ export const ColorPickerSwatch = React.forwardRef(function ColorPickerSwatch(
       elementProps,
       {
         role: 'img' as const,
-        'aria-label': value.toString('hex'),
+        'aria-label': `Selected color: ${value.toString('hex')}`,
         style: {
           '--color': colorString,
           ...(style as React.CSSProperties),
