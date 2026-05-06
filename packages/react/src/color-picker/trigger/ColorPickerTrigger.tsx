@@ -28,8 +28,14 @@ export const ColorPickerTrigger = React.forwardRef(function ColorPickerTrigger(
   componentProps: ColorPickerTrigger.Props,
   forwardedRef: React.ForwardedRef<HTMLButtonElement>,
 ) {
-  const { render, className, style, disabled = false, nativeButton = true, ...elementProps } =
-    componentProps;
+  const {
+    render,
+    className,
+    style,
+    disabled = false,
+    nativeButton = true,
+    ...elementProps
+  } = componentProps;
 
   const { open, floatingRootContext, setTriggerElement } = useColorPickerRootContext();
 
@@ -78,8 +84,7 @@ export interface ColorPickerTriggerState {
 }
 
 export interface ColorPickerTriggerProps
-  extends NativeButtonProps,
-    BaseUIComponentProps<'button', ColorPickerTriggerState> {
+  extends NativeButtonProps, BaseUIComponentProps<'button', ColorPickerTriggerState> {
   /**
    * Whether the trigger is disabled.
    * @default false

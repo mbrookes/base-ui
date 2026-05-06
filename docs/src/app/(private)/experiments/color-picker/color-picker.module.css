@@ -24,7 +24,7 @@
   height: 16px;
   border-radius: 50%;
   border: 2px solid white;
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 0 0 1px rgb(0 0 0 / 0.3);
   box-sizing: border-box;
   background: transparent;
 }
@@ -47,7 +47,7 @@
   height: 16px;
   border-radius: 50%;
   border: 2px solid white;
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 0 0 1px rgb(0 0 0 / 0.3);
   background: white;
   box-sizing: border-box;
 }
@@ -57,7 +57,7 @@
   height: 40px;
   border-radius: 6px;
   background: var(--color);
-  border: 1px solid rgba(0, 0, 0, 0.15);
+  border: 1px solid rgb(0 0 0 / 0.15);
 }
 
 .inputs {

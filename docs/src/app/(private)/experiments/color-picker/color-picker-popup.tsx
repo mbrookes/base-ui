@@ -100,8 +100,7 @@ export default function ColorPickerPopupExperiment() {
               </div>
 
               <p style={{ fontSize: 12, color: '#666', margin: 0 }}>
-                Value:{' '}
-                <code>{typeof value === 'string' ? value : value.toString('hsba')}</code>
+                Value: <code>{typeof value === 'string' ? value : value.toString('hsba')}</code>
               </p>
             </div>
           </ColorPicker.Popup>

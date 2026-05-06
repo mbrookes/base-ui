@@ -70,10 +70,7 @@ export default function ColorPickerSwatchesExperiment() {
           </div>
 
           <p style={{ fontSize: 12, color: '#666' }}>
-            Value:{' '}
-            <code>
-              {typeof value === 'string' ? value : value.toString('hex')}
-            </code>
+            Value: <code>{typeof value === 'string' ? value : value.toString('hex')}</code>
           </p>
         </div>
       </ColorPicker.Root>

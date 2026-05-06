@@ -33,14 +33,7 @@ export const ColorPickerChannelInput = React.forwardRef(function ColorPickerChan
   componentProps: ColorPickerChannelInput.Props,
   forwardedRef: React.ForwardedRef<HTMLInputElement>,
 ) {
-  const {
-    channel,
-    colorSpace,
-    className,
-    render,
-    style,
-    ...elementProps
-  } = componentProps;
+  const { channel, colorSpace, className, render, style, ...elementProps } = componentProps;
 
   const { value, setValueFromInput, dragging, disabled, readOnly } = useColorPickerRootContext();
 

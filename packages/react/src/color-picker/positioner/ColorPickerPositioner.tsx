@@ -114,8 +114,7 @@ export namespace ColorPickerPositioner {
   }
 
   export interface Props
-    extends UseAnchorPositioningSharedParameters,
-      BaseUIComponentProps<'div', State> {
+    extends UseAnchorPositioningSharedParameters, BaseUIComponentProps<'div', State> {
     /**
      * Which side of the anchor element to align the popup against.
      * @default 'bottom'
