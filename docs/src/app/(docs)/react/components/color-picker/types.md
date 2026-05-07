@@ -689,35 +689,37 @@ type ColorPickerValueSwatchState = {
 ### ColorPicker.Color
 
 ```typescript
-type ColorPickerColor = { /** Convert to another color format. */
-toFormat: toFormat;
-/** Serialize to a CSS-compatible string. */
-toString: function toString() { [native code] };
-/** Create a copy of this color. */
-clone: clone;
-/** Check equality with another color (compares all channels). */
-isEqual: isEqual;
-/** Get the numeric value of a channel. */
-getChannelValue: getChannelValue;
-/** Return a new Color with one channel updated. Immutable. */
-withChannelValue: withChannelValue;
-/** Get the min/max/step/pageSize for a channel. */
-getChannelRange: getChannelRange;
-/**
- * Map a [0, 1] fraction to the channel's actual range.
- * Used to convert pointer position to channel value.
- */
-getChannelPercentValue: getChannelPercentValue;
-/** Increment a channel by the given step amount, clamped to range. */
-incrementChannel: incrementChannel;
-/** Decrement a channel by the given step amount, clamped to range. */
-decrementChannel: decrementChannel;
-/** Return which color space this color is in. */
-getColorSpace: getColorSpace;
-/** Given an x/y channel pair for a 2D area, resolve the third (z) channel. */
-getColorAxes: getColorAxes;
-/** Serialize to a plain record for debug/serialization. */
-toJSON: toJSON }
+type ColorPickerColor = {
+  /** Convert to another color format. */
+  toFormat: toFormat;
+  /** Serialize to a CSS-compatible string. */
+  toString: toString;
+  /** Create a copy of this color. */
+  clone: clone;
+  /** Check equality with another color (compares all channels). */
+  isEqual: isEqual;
+  /** Get the numeric value of a channel. */
+  getChannelValue: getChannelValue;
+  /** Return a new Color with one channel updated. Immutable. */
+  withChannelValue: withChannelValue;
+  /** Get the min/max/step/pageSize for a channel. */
+  getChannelRange: getChannelRange;
+  /**
+   * Map a [0, 1] fraction to the channel's actual range.
+   * Used to convert pointer position to channel value.
+   */
+  getChannelPercentValue: getChannelPercentValue;
+  /** Increment a channel by the given step amount, clamped to range. */
+  incrementChannel: incrementChannel;
+  /** Decrement a channel by the given step amount, clamped to range. */
+  decrementChannel: decrementChannel;
+  /** Return which color space this color is in. */
+  getColorSpace: getColorSpace;
+  /** Given an x/y channel pair for a 2D area, resolve the third (z) channel. */
+  getColorAxes: getColorAxes;
+  /** Serialize to a plain record for debug/serialization. */
+  toJSON: toJSON;
+};
 ```
 
 ### ColorPicker.ColorChannel

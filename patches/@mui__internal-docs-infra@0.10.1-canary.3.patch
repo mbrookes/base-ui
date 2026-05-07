@@ -1,3 +1,24 @@
+diff --git a/pipeline/loadServerTypesMeta/formatType.mjs b/pipeline/loadServerTypesMeta/formatType.mjs
+--- a/pipeline/loadServerTypesMeta/formatType.mjs
++++ b/pipeline/loadServerTypesMeta/formatType.mjs
+@@ -426,7 +426,7 @@
+   const flatName = typeName.namespaces && typeName.namespaces.length > 0 ? typeName.namespaces.join('') + typeName.name : typeName.name;
+ 
+   // Check if this type is in our map (exact match)
+-  if (typeNameMap[flatName]) {
++  if (Object.prototype.hasOwnProperty.call(typeNameMap, flatName) && typeNameMap[flatName]) {
+     // This is one of our component types - use the mapped dotted name
+     const typeArgsStart = nameWithTypeArgs.indexOf('<');
+     if (typeArgsStart !== -1) {
+@@ -453,7 +453,7 @@
+   // This check comes BEFORE flat prefix matching to preserve namespace structure
+   if (typeName.namespaces && typeName.namespaces.length > 0) {
+     // Check if any namespace part is in the typeNameMap
+-    const transformedNamespaces = typeName.namespaces.map(ns => typeNameMap[ns] || ns);
++    const transformedNamespaces = typeName.namespaces.map(ns => (Object.prototype.hasOwnProperty.call(typeNameMap, ns) ? typeNameMap[ns] : null) || ns);
+     const hasTransformation = transformedNamespaces.some((ns, i) => ns !== typeName.namespaces[i]);
+     if (hasTransformation) {
+       // Build the transformed name: TransformedNamespace.Member
 diff --git a/pipeline/loadServerTypes/extractTypeProps.mjs b/pipeline/loadServerTypes/extractTypeProps.mjs
 index 3b40fc91bad4689b6121cac56e762052a4c3ea99..d17ecdb105d3ecccc30c2773fb75e389868558f7 100644
 --- a/pipeline/loadServerTypes/extractTypeProps.mjs
