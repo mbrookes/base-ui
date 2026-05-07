@@ -19,7 +19,7 @@ const PRESET_COLORS = [
 ];
 
 export default function ColorPickerSwatchesExperiment() {
-  const [value, setValue] = React.useState<ColorPicker.Color | string>('#3b82f6');
+  const [value, setValue] = React.useState<ColorPicker.Color | string>('hsb(217, 74%, 96%)');
 
   return (
     <div style={{ padding: 24, fontFamily: 'sans-serif' }}>

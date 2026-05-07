@@ -13,7 +13,7 @@ export default function ColorPickerRgbExperiment() {
       <ColorPicker.Root format="rgb" value={value} onValueChange={(color) => setValue(color)}>
         <div className={styles.layout}>
           <div className={styles.areaWrapper}>
-            <ColorPicker.Area className={styles.area}>
+            <ColorPicker.Area xChannel="red" yChannel="green" className={styles.area}>
               <ColorPicker.AreaThumb className={styles.areaThumb} />
             </ColorPicker.Area>
           </div>

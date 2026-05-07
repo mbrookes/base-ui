@@ -4,7 +4,7 @@ import { ColorPicker } from '@base-ui/react/color-picker';
 import styles from './color-picker.module.css';
 
 export default function ColorPickerNoAlphaExperiment() {
-  const [value, setValue] = React.useState<ColorPicker.Color | string>('#5b8def');
+  const [value, setValue] = React.useState<ColorPicker.Color | string>('hsb(222, 58%, 93%)');
 
   return (
     <div style={{ padding: 24, fontFamily: 'sans-serif' }}>
