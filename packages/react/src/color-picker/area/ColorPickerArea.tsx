@@ -108,7 +108,8 @@ export const ColorPickerArea = React.forwardRef(function ColorPickerArea(
     doc.addEventListener('pointerup', handlePointerUp);
   });
 
-  const hue = value.getChannelValue('hue');
+  const currentColorSpace = value.getColorSpace();
+  const hue = currentColorSpace === 'rgb' ? 0 : value.getChannelValue('hue');
   const xVal = value.getChannelValue(xChannel);
   const yVal = value.getChannelValue(yChannel);
   const xRange = value.getChannelRange(xChannel);
