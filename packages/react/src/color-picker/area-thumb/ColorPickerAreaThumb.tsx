@@ -40,38 +40,40 @@ export const ColorPickerAreaThumb = React.forwardRef(function ColorPickerAreaThu
   forwardedRef: React.ForwardedRef<HTMLSpanElement>,
 ) {
   const { className, render, style, ...elementProps } = componentProps;
-  const { value, dragging, disabled, setValueFromInput } = useColorPickerRootContext();
-  const { xChannel, yChannel } = useColorPickerAreaContext();
+  const { dragging, disabled, setValueFromInput } = useColorPickerRootContext();
+  const { xChannel, yChannel, displayValue } = useColorPickerAreaContext();
 
-  const xVal = value.getChannelValue(xChannel);
-  const yVal = value.getChannelValue(yChannel);
-  const xRange = value.getChannelRange(xChannel);
-  const yRange = value.getChannelRange(yChannel);
-  const hasHue = value.getColorSpace() !== 'rgb';
+  const xVal = displayValue.getChannelValue(xChannel);
+  const yVal = displayValue.getChannelValue(yChannel);
+  const xRange = displayValue.getChannelRange(xChannel);
+  const yRange = displayValue.getChannelRange(yChannel);
+  const hasHue = displayValue.getColorSpace() !== 'rgb';
   const hueVal =
-    hasHue && xChannel !== 'hue' && yChannel !== 'hue' ? value.getChannelValue('hue') : null;
+    hasHue && xChannel !== 'hue' && yChannel !== 'hue'
+      ? displayValue.getChannelValue('hue')
+      : null;
 
   const state: ColorPickerAreaThumbState = { dragging, disabled };
 
   const handleKeyDown = useStableCallback((event: React.KeyboardEvent<HTMLInputElement>) => {
     const { key, shiftKey } = event;
-    let newColor = value;
+    let newColor = displayValue;
     if (key === 'ArrowLeft') {
       event.preventDefault();
       const step = shiftKey ? xRange.pageSize : xRange.step;
-      newColor = value.decrementChannel(xChannel, step);
+      newColor = displayValue.decrementChannel(xChannel, step);
     } else if (key === 'ArrowRight') {
       event.preventDefault();
       const step = shiftKey ? xRange.pageSize : xRange.step;
-      newColor = value.incrementChannel(xChannel, step);
+      newColor = displayValue.incrementChannel(xChannel, step);
     } else if (key === 'ArrowUp') {
       event.preventDefault();
       const step = shiftKey ? yRange.pageSize : yRange.step;
-      newColor = value.incrementChannel(yChannel, step);
+      newColor = displayValue.incrementChannel(yChannel, step);
     } else if (key === 'ArrowDown') {
       event.preventDefault();
       const step = shiftKey ? yRange.pageSize : yRange.step;
-      newColor = value.decrementChannel(yChannel, step);
+      newColor = displayValue.decrementChannel(yChannel, step);
     } else {
       return;
     }

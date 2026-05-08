@@ -1,10 +1,11 @@
 'use client';
 import * as React from 'react';
-import type { ColorChannel } from '../utils/types';
+import type { Color, ColorChannel } from '../utils/types';
 
 export interface ColorPickerAreaContextValue {
   xChannel: ColorChannel;
   yChannel: ColorChannel;
+  displayValue: Color;
 }
 
 export const ColorPickerAreaContext = React.createContext<ColorPickerAreaContextValue | undefined>(

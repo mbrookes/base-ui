@@ -5,12 +5,21 @@ import { ownerDocument } from '@base-ui/utils/owner';
 import type { BaseUIComponentProps } from '../../internals/types';
 import { useRenderElement } from '../../internals/useRenderElement';
 import { clamp } from '../../internals/clamp';
-import type { ColorChannel, ColorSpace } from '../utils/types';
+import type { ColorChannel, ColorFormat, ColorSpace } from '../utils/types';
 import { getColorAreaBackground } from '../utils/colorAreaGradient';
 import { useColorPickerRootContext } from '../root/ColorPickerRootContext';
 import { ColorPickerAreaContext } from './ColorPickerAreaContext';
 
 const INTENTIONAL_DRAG_COUNT_THRESHOLD = 2;
+
+function getRequiredColorSpace(xChannel: ColorChannel, yChannel: ColorChannel): ColorFormat {
+  for (const ch of [xChannel, yChannel]) {
+    if (ch === 'brightness') return 'hsb';
+    if (ch === 'lightness') return 'hsl';
+    if (ch === 'red' || ch === 'green' || ch === 'blue') return 'rgb';
+  }
+  return 'hsb';
+}
 
 export interface ColorPickerAreaState {
   dragging: boolean;
@@ -45,6 +54,13 @@ export const ColorPickerArea = React.forwardRef(function ColorPickerArea(
   const stateRef = React.useRef({ value, xChannel, yChannel, disabled });
   stateRef.current = { value, xChannel, yChannel, disabled };
 
+  // Convert value to the color space required by the requested channels for display/interaction.
+  const requiredFormat = getRequiredColorSpace(xChannel, yChannel);
+  const displayValue =
+    value.getColorSpace() === (requiredFormat as ColorSpace) ? value : value.toFormat(requiredFormat);
+  const displayValueRef = React.useRef(displayValue);
+  displayValueRef.current = displayValue;
+
   const getColorFromCoords = useStableCallback((clientX: number, clientY: number) => {
     const area = areaRef.current;
     if (!area) {
@@ -53,7 +69,8 @@ export const ColorPickerArea = React.forwardRef(function ColorPickerArea(
     const rect = area.getBoundingClientRect();
     const xPercent = clamp((clientX - rect.left) / rect.width, 0, 1);
     const yPercent = clamp(1 - (clientY - rect.top) / rect.height, 0, 1);
-    const { value: color, xChannel: xCh, yChannel: yCh } = stateRef.current;
+    const { xChannel: xCh, yChannel: yCh } = stateRef.current;
+    const color = displayValueRef.current;
     return color
       .withChannelValue(xCh, color.getChannelPercentValue(xCh, xPercent))
       .withChannelValue(yCh, color.getChannelPercentValue(yCh, yPercent));
@@ -108,16 +125,16 @@ export const ColorPickerArea = React.forwardRef(function ColorPickerArea(
     doc.addEventListener('pointerup', handlePointerUp);
   });
 
-  const currentColorSpace = value.getColorSpace();
-  const hue = currentColorSpace === 'rgb' ? 0 : value.getChannelValue('hue');
-  const xVal = value.getChannelValue(xChannel);
-  const yVal = value.getChannelValue(yChannel);
-  const xRange = value.getChannelRange(xChannel);
-  const yRange = value.getChannelRange(yChannel);
+  const currentColorSpace = displayValue.getColorSpace();
+  const hue = currentColorSpace === 'rgb' ? 0 : displayValue.getChannelValue('hue');
+  const xVal = displayValue.getChannelValue(xChannel);
+  const yVal = displayValue.getChannelValue(yChannel);
+  const xRange = displayValue.getChannelRange(xChannel);
+  const yRange = displayValue.getChannelRange(yChannel);
   const xPercent = ((xVal - xRange.minValue) / (xRange.maxValue - xRange.minValue)) * 100;
   const yPercent = 100 - ((yVal - yRange.minValue) / (yRange.maxValue - yRange.minValue)) * 100;
 
-  const background = getColorAreaBackground(value, xChannel, yChannel);
+  const background = getColorAreaBackground(displayValue, xChannel, yChannel);
 
   const state: ColorPickerAreaState = { dragging, disabled };
 
@@ -148,7 +165,10 @@ export const ColorPickerArea = React.forwardRef(function ColorPickerArea(
     ],
   });
 
-  const contextValue = React.useMemo(() => ({ xChannel, yChannel }), [xChannel, yChannel]);
+  const contextValue = React.useMemo(
+    () => ({ xChannel, yChannel, displayValue }),
+    [xChannel, yChannel, displayValue],
+  );
 
   return (
     <ColorPickerAreaContext.Provider value={contextValue}>
