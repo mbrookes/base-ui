@@ -22,6 +22,11 @@
   border: 2px solid white;
   box-shadow: 0 0 0 1px color-mix(in srgb, black 30%, transparent);
   box-sizing: border-box;
+
+  &[data-focus-visible] {
+    outline: 2px solid var(--color-blue);
+    outline-offset: 2px;
+  }
 }
 
 .Row {

@@ -1,6 +1,8 @@
 'use client';
 import * as React from 'react';
 import { useStableCallback } from '@base-ui/utils/useStableCallback';
+import { matchesFocusVisible } from '../../floating-ui-react/utils/element';
+import type { StateAttributesMapping } from '../../internals/getStateAttributesProps';
 import type { BaseUIComponentProps } from '../../internals/types';
 import { useRenderElement } from '../../internals/useRenderElement';
 import { useColorPickerRootContext } from '../root/ColorPickerRootContext';
@@ -27,6 +29,7 @@ function capitalize(s: string) {
 export interface ColorPickerAreaThumbState {
   dragging: boolean;
   disabled: boolean;
+  focusVisible: boolean;
 }
 
 /**
@@ -43,6 +46,18 @@ export const ColorPickerAreaThumb = React.forwardRef(function ColorPickerAreaThu
   const { dragging, disabled, setValueFromInput } = useColorPickerRootContext();
   const { xChannel, yChannel, displayValue } = useColorPickerAreaContext();
 
+  const [focusVisible, setFocusVisible] = React.useState(false);
+
+  const handleInputFocus = useStableCallback((event: React.FocusEvent<HTMLInputElement>) => {
+    if (matchesFocusVisible(event.currentTarget)) {
+      setFocusVisible(true);
+    }
+  });
+
+  const handleInputBlur = useStableCallback(() => {
+    setFocusVisible(false);
+  });
+
   const xVal = displayValue.getChannelValue(xChannel);
   const yVal = displayValue.getChannelValue(yChannel);
   const xRange = displayValue.getChannelRange(xChannel);
@@ -51,7 +66,7 @@ export const ColorPickerAreaThumb = React.forwardRef(function ColorPickerAreaThu
   const hueVal =
     hasHue && xChannel !== 'hue' && yChannel !== 'hue' ? displayValue.getChannelValue('hue') : null;
 
-  const state: ColorPickerAreaThumbState = { dragging, disabled };
+  const state: ColorPickerAreaThumbState = { dragging, disabled, focusVisible };
 
   const handleKeyDown = useStableCallback((event: React.KeyboardEvent<HTMLInputElement>) => {
     const { key, shiftKey } = event;
@@ -91,9 +106,16 @@ export const ColorPickerAreaThumb = React.forwardRef(function ColorPickerAreaThu
     whiteSpace: 'nowrap',
   };
 
+  const stateAttributesMapping: StateAttributesMapping<ColorPickerAreaThumbState> = {
+    focusVisible(value: boolean): Record<string, string> | null {
+      return value ? { 'data-focus-visible': '' } : null;
+    },
+  };
+
   const element = useRenderElement('span', componentProps, {
     ref: forwardedRef,
     state,
+    stateAttributesMapping,
     props: [
       elementProps,
       {
@@ -142,6 +164,8 @@ export const ColorPickerAreaThumb = React.forwardRef(function ColorPickerAreaThu
         value={xVal}
         onChange={() => {}}
         onKeyDown={handleKeyDown}
+        onFocus={handleInputFocus}
+        onBlur={handleInputBlur}
         disabled={disabled}
         style={hiddenInputStyle}
       />

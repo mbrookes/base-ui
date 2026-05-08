@@ -27,6 +27,11 @@
   box-shadow: 0 0 0 1px rgb(0 0 0 / 0.3);
   box-sizing: border-box;
   background: transparent;
+
+  &[data-focus-visible] {
+    outline: 2px solid var(--color-blue);
+    outline-offset: 2px;
+  }
 }
 
 .slider {

@@ -6,7 +6,7 @@ export default function ExampleColorPicker() {
   return (
     <ColorPicker.Root defaultValue="hsb(210, 80%, 90%)" className="flex w-56 flex-col gap-2.5">
       <ColorPicker.Area className="relative h-36 w-full cursor-crosshair touch-none select-none rounded">
-        <ColorPicker.AreaThumb className="box-border size-3.5 rounded-full border-2 border-white shadow-[0_0_0_1px_color-mix(in_srgb,black_30%,transparent)]" />
+        <ColorPicker.AreaThumb className="box-border size-3.5 rounded-full border-2 border-white shadow-[0_0_0_1px_color-mix(in_srgb,black_30%,transparent)] data-[focus-visible]:outline-2 data-[focus-visible]:outline-offset-2 data-[focus-visible]:outline-blue-800" />
       </ColorPicker.Area>
 
       <div className="flex items-center gap-2.5">
