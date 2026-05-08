@@ -47,7 +47,9 @@ export const ColorPickerAreaThumb = React.forwardRef(function ColorPickerAreaThu
   const yVal = value.getChannelValue(yChannel);
   const xRange = value.getChannelRange(xChannel);
   const yRange = value.getChannelRange(yChannel);
-  const hueVal = xChannel === 'hue' || yChannel === 'hue' ? null : value.getChannelValue('hue');
+  const hasHue = value.getColorSpace() !== 'rgb';
+  const hueVal =
+    hasHue && xChannel !== 'hue' && yChannel !== 'hue' ? value.getChannelValue('hue') : null;
 
   const state: ColorPickerAreaThumbState = { dragging, disabled };
 
