@@ -5,21 +5,13 @@ import { ownerDocument } from '@base-ui/utils/owner';
 import type { BaseUIComponentProps } from '../../internals/types';
 import { useRenderElement } from '../../internals/useRenderElement';
 import { clamp } from '../../internals/clamp';
-import type { ColorChannel, ColorFormat, ColorSpace } from '../utils/types';
+import type { ColorChannel, ColorSpace } from '../utils/types';
+import { getColorForChannel } from '../utils/getColorForChannel';
 import { getColorAreaBackground } from '../utils/colorAreaGradient';
 import { useColorPickerRootContext } from '../root/ColorPickerRootContext';
 import { ColorPickerAreaContext } from './ColorPickerAreaContext';
 
 const INTENTIONAL_DRAG_COUNT_THRESHOLD = 2;
-
-function getRequiredColorSpace(xChannel: ColorChannel, yChannel: ColorChannel): ColorFormat {
-  for (const ch of [xChannel, yChannel]) {
-    if (ch === 'brightness') return 'hsb';
-    if (ch === 'lightness') return 'hsl';
-    if (ch === 'red' || ch === 'green' || ch === 'blue') return 'rgb';
-  }
-  return 'hsb';
-}
 
 export interface ColorPickerAreaState {
   dragging: boolean;
@@ -55,9 +47,7 @@ export const ColorPickerArea = React.forwardRef(function ColorPickerArea(
   stateRef.current = { value, xChannel, yChannel, disabled };
 
   // Convert value to the color space required by the requested channels for display/interaction.
-  const requiredFormat = getRequiredColorSpace(xChannel, yChannel);
-  const displayValue =
-    value.getColorSpace() === (requiredFormat as ColorSpace) ? value : value.toFormat(requiredFormat);
+  const displayValue = getColorForChannel(value, xChannel);
   const displayValueRef = React.useRef(displayValue);
   displayValueRef.current = displayValue;
 

@@ -2,6 +2,7 @@
 import * as React from 'react';
 import * as Slider from '../../slider/index.parts';
 import type { ColorChannel, ColorSpace } from '../utils/types';
+import { getColorForChannel } from '../utils/getColorForChannel';
 import { useColorPickerRootContext } from '../root/ColorPickerRootContext';
 import {
   ColorPickerChannelSliderContext,
@@ -40,12 +41,13 @@ export const ColorPickerChannelSlider = React.forwardRef(function ColorPickerCha
   } = useColorPickerRootContext();
 
   const disabled = disabledProp ?? rootDisabled;
-  const range = color.getChannelRange(channel);
-  const channelValue = color.getChannelValue(channel);
+  const displayColor = getColorForChannel(color, channel);
+  const range = displayColor.getChannelRange(channel);
+  const channelValue = displayColor.getChannelValue(channel);
 
   const channelContext: ColorPickerChannelSliderContextValue = React.useMemo(
-    () => ({ channel, colorSpace, color }),
-    [channel, colorSpace, color],
+    () => ({ channel, colorSpace, color: displayColor }),
+    [channel, colorSpace, displayColor],
   );
 
   return (
@@ -60,11 +62,11 @@ export const ColorPickerChannelSlider = React.forwardRef(function ColorPickerCha
         orientation={orientation}
         disabled={disabled}
         onValueChange={(newValue) => {
-          const newColor = color.withChannelValue(channel, newValue as number);
+          const newColor = displayColor.withChannelValue(channel, newValue as number);
           setValueFromDrag(newColor, new PointerEvent('pointermove'));
         }}
         onValueCommitted={(newValue) => {
-          const newColor = color.withChannelValue(channel, newValue as number);
+          const newColor = displayColor.withChannelValue(channel, newValue as number);
           onValueChangeEnd(newColor, new Event('base-ui'));
         }}
         {...elementProps}

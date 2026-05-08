@@ -4,6 +4,7 @@ import type { BaseUIComponentProps } from '../../internals/types';
 import { useRenderElement } from '../../internals/useRenderElement';
 import { useColorPickerRootContext } from '../root/ColorPickerRootContext';
 import type { Color, ColorChannel, ColorSpace } from '../utils/types';
+import { getColorForChannel } from '../utils/getColorForChannel';
 import { parseColor } from '../utils/parseColor';
 
 export interface ColorPickerChannelInputState {
@@ -16,7 +17,8 @@ function formatValue(value: Color, channel: ColorChannel | 'hex'): string {
   if (channel === 'hex') {
     return value.toString('hex');
   }
-  const v = value.getChannelValue(channel as ColorChannel);
+  const displayColor = getColorForChannel(value, channel as ColorChannel);
+  const v = displayColor.getChannelValue(channel as ColorChannel);
   if (channel === 'alpha') {
     return String(Math.round(v * 100));
   }
@@ -66,7 +68,8 @@ export const ColorPickerChannelInput = React.forwardRef(function ColorPickerChan
             return;
           }
           const adjusted = channel === 'alpha' ? numValue / 100 : numValue;
-          newColor = value.withChannelValue(channel as ColorChannel, adjusted);
+          const displayColor = getColorForChannel(value, channel as ColorChannel);
+          newColor = displayColor.withChannelValue(channel as ColorChannel, adjusted);
         }
         committedValueRef.current = localValue;
         setValueFromInput(newColor, event.nativeEvent);
