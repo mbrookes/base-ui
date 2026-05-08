@@ -757,7 +757,7 @@ type ColorPickerAreaState = { dragging: boolean; disabled: boolean };
 ### ColorPickerAreaThumbState
 
 ```typescript
-type ColorPickerAreaThumbState = { dragging: boolean; disabled: boolean };
+type ColorPickerAreaThumbState = { dragging: boolean; disabled: boolean; focusVisible: boolean };
 ```
 
 ### ColorPickerChannelInputState
