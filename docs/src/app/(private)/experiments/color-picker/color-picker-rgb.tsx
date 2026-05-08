@@ -12,12 +12,6 @@ export default function ColorPickerRgbExperiment() {
 
       <ColorPicker.Root format="rgb" value={value} onValueChange={(color) => setValue(color)}>
         <div className={styles.layout}>
-          <div className={styles.areaWrapper}>
-            <ColorPicker.Area xChannel="red" yChannel="green" className={styles.area}>
-              <ColorPicker.AreaThumb className={styles.areaThumb} />
-            </ColorPicker.Area>
-          </div>
-
           <ColorPicker.ChannelSlider channel="red" className={styles.slider}>
             <ColorPicker.ChannelSliderTrack className={styles.sliderTrack}>
               <ColorPicker.ChannelSliderThumb className={styles.sliderThumb} />
