@@ -44,9 +44,9 @@ Renders a `<div>` element.
 | streamFlushInterval         | `number`                                                                                                                                                                                                                                                                                                                                                                                                                                                          | `16`                                       | Flush interval in milliseconds for batching rapid streaming deltas before applying them to the store.                                                                                                              |
 | variant                     | `ChatVariant`                                                                                                                                                                                                                                                                                                                                                                                                                                                     | -                                          | -                                                                                                                                                                                                                  |
 | children                    | `React.ReactNode`                                                                                                                                                                                                                                                                                                                                                                                                                                                 | -                                          | -                                                                                                                                                                                                                  |
-| className                   | `string \| ((state: Chat.Root.State) => string \| undefined)`                                                                                                                                                                                                                                                                                                                                                                                                     | -                                          | CSS class applied to the element, or a function that&#xA;returns a class based on the component's state.                                                                                                           |
-| style                       | `React.CSSProperties \| ((state: Chat.Root.State) => React.CSSProperties \| undefined)`                                                                                                                                                                                                                                                                                                                                                                           | -                                          | Style applied to the element, or a function that&#xA;returns a style object based on the component's state.                                                                                                        |
-| render                      | `ReactElement \| ((props: HTMLProps, state: Chat.Root.State) => ReactElement)`                                                                                                                                                                                                                                                                                                                                                                                    | -                                          | Allows you to replace the component's HTML element&#xA;with a different tag, or compose it with another component. Accepts a `ReactElement` or a function that returns the element to render.                      |
+| className                   | `string \| ((state: Root.State) => string \| undefined)`                                                                                                                                                                                                                                                                                                                                                                                                          | -                                          | CSS class applied to the element, or a function that&#xA;returns a class based on the component's state.                                                                                                           |
+| style                       | `React.CSSProperties \| ((state: Root.State) => React.CSSProperties \| undefined)`                                                                                                                                                                                                                                                                                                                                                                                | -                                          | Style applied to the element, or a function that&#xA;returns a style object based on the component's state.                                                                                                        |
+| render                      | `ReactElement \| ((props: HTMLProps, state: Root.State) => ReactElement)`                                                                                                                                                                                                                                                                                                                                                                                         | -                                          | Allows you to replace the component's HTML element&#xA;with a different tag, or compose it with another component. Accepts a `ReactElement` or a function that returns the element to render.                      |
 
 ### Root.Props
 
@@ -55,7 +55,7 @@ Re-export of [Root](#root) props.
 ### Root.State
 
 ```typescript
-type ChatRootState = { variant: ChatVariant | undefined; density: ChatDensity | undefined };
+type RootState = { variant: ChatVariant | undefined; density: ChatDensity | undefined };
 ```
 
 ### Layout
@@ -65,12 +65,12 @@ Renders a `<div>` element.
 
 **Layout Props:**
 
-| Prop      | Type                                                                             | Default | Description                                                                                                                                                                                   |
-| :-------- | :------------------------------------------------------------------------------- | :------ | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| children  | `React.ReactNode`                                                                | -       | -                                                                                                                                                                                             |
-| className | `string \| ((state: Chat.Layout.State) => string \| undefined)`                  | -       | CSS class applied to the element, or a function that&#xA;returns a class based on the component's state.                                                                                      |
-| style     | `React.CSSProperties`                                                            | -       | -                                                                                                                                                                                             |
-| render    | `ReactElement \| ((props: HTMLProps, state: Chat.Layout.State) => ReactElement)` | -       | Allows you to replace the component's HTML element&#xA;with a different tag, or compose it with another component. Accepts a `ReactElement` or a function that returns the element to render. |
+| Prop      | Type                                                                        | Default | Description                                                                                                                                                                                   |
+| :-------- | :-------------------------------------------------------------------------- | :------ | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| children  | `React.ReactNode`                                                           | -       | -                                                                                                                                                                                             |
+| className | `string \| ((state: Layout.State) => string \| undefined)`                  | -       | CSS class applied to the element, or a function that&#xA;returns a class based on the component's state.                                                                                      |
+| style     | `React.CSSProperties`                                                       | -       | -                                                                                                                                                                                             |
+| render    | `ReactElement \| ((props: HTMLProps, state: Layout.State) => ReactElement)` | -       | Allows you to replace the component's HTML element&#xA;with a different tag, or compose it with another component. Accepts a `ReactElement` or a function that returns the element to render. |
 
 ### Layout.Props
 
@@ -79,7 +79,7 @@ Re-export of [Layout](#layout) props.
 ### Layout.State
 
 ```typescript
-type ChatLayoutState = { hasConversationsPane: boolean; hasThreadPane: boolean };
+type LayoutState = { hasConversationsPane: boolean; hasThreadPane: boolean };
 ```
 
 ## External Types
@@ -188,8 +188,3 @@ type ChatOnError = (error: {
   details?: Record | undefined;
 }) => void;
 ```
-
-## Export Groups
-
-- `Chat.Root`: `Chat.Root`, `Chat.Root.State`, `Chat.Root.Props`
-- `Chat.Layout`: `Chat.Layout`, `Chat.Layout.State`, `Chat.Layout.Props`
