@@ -32,7 +32,9 @@ async function processFile(fileName) {
   }
 
   const content = await readFile(filePath, 'utf-8');
-  const typesMetaCall = await parseCreateFactoryCall(content, filePath, { allowExternalVariants: true });
+  const typesMetaCall = await parseCreateFactoryCall(content, filePath, {
+    allowExternalVariants: true,
+  });
 
   if (!typesMetaCall) {
     console.warn(`No factory call found in ${fileName}`);

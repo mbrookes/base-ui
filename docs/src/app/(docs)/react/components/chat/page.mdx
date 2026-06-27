@@ -42,14 +42,16 @@ import { ChatSuggestions } from '@base-ui/react/chat-suggestions';
         <ChatConversation.Title />
       </ChatConversation.Header>
 
-      <ChatMessageList.Root renderItem={({ id, index }) => (
-        <ChatMessageGroup.Root messageId={id} index={index}>
-          <ChatMessage.Root messageId={id}>
-            <ChatMessage.Avatar />
-            <ChatMessage.Content />
-          </ChatMessage.Root>
-        </ChatMessageGroup.Root>
-      )}>
+      <ChatMessageList.Root
+        renderItem={({ id, index }) => (
+          <ChatMessageGroup.Root messageId={id} index={index}>
+            <ChatMessage.Root messageId={id}>
+              <ChatMessage.Avatar />
+              <ChatMessage.Content />
+            </ChatMessage.Root>
+          </ChatMessageGroup.Root>
+        )}
+      >
         <ChatMessageList.Viewport>
           <ChatMessageList.Content />
         </ChatMessageList.Viewport>
@@ -118,13 +120,13 @@ const adapter = createAiSdkAdapter({ model: openai('gpt-4o') });
 
 All parts expose data attributes for styling based on state:
 
-| Component | Data attributes |
-| :--- | :--- |
-| `ChatMessage.Root` | `data-own-message`, `data-grouped`, `data-streaming`, `data-error` |
-| `ChatMessage.Avatar` | `data-show-avatar`, `data-grouped`, `data-own-message` |
-| `ChatMessageGroup.Root` | `data-author-role`, `data-author-id` |
-| `ChatComposer.Root` | `data-has-value` |
-| `ChatComposer.SendButton` | `data-disabled`, `data-loading` |
+| Component                 | Data attributes                                                    |
+| :------------------------ | :----------------------------------------------------------------- |
+| `ChatMessage.Root`        | `data-own-message`, `data-grouped`, `data-streaming`, `data-error` |
+| `ChatMessage.Avatar`      | `data-show-avatar`, `data-grouped`, `data-own-message`             |
+| `ChatMessageGroup.Root`   | `data-author-role`, `data-author-id`                               |
+| `ChatComposer.Root`       | `data-has-value`                                                   |
+| `ChatComposer.SendButton` | `data-disabled`, `data-loading`                                    |
 
 ```css
 /* Style user vs assistant messages */

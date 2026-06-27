@@ -6,7 +6,7 @@
   border: 1px solid oklch(87% 0 0deg);
   border-radius: 12px;
   overflow: hidden;
-  background: oklch(100% 0 0deg);
+  background: oklch(98.5% 0 0deg);
   font-family: sans-serif;
   font-size: 0.875rem;
 }
@@ -61,7 +61,7 @@
 
 .Message[data-own-message] .Content {
   background: oklch(48.8% 0.243 264.376deg);
-  color: oklch(100% 0 0deg);
+  color: oklch(98.5% 0 0deg);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -72,7 +72,7 @@
 
   .Message[data-own-message] .Content {
     background: oklch(48.8% 0.243 264.376deg);
-    color: oklch(100% 0 0deg);
+    color: oklch(98.5% 0 0deg);
   }
 }
 
@@ -120,7 +120,7 @@
   border-radius: 8px;
   border: none;
   background: oklch(14.5% 0 0deg);
-  color: oklch(100% 0 0deg);
+  color: oklch(98.5% 0 0deg);
   font-family: inherit;
   font-size: 0.875rem;
   font-weight: 500;
