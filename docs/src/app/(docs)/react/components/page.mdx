@@ -7,6 +7,7 @@
 - Autocomplete - ([Outline](#autocomplete), [Contents](./autocomplete/page.mdx))
 - Avatar - ([Outline](#avatar), [Contents](./avatar/page.mdx))
 - Button - ([Outline](#button), [Contents](./button/page.mdx))
+- Chat [New] - ([Outline](#chat), [Contents](./chat/page.mdx))
 - Checkbox - ([Outline](#checkbox), [Contents](./checkbox/page.mdx))
 - Checkbox Group - ([Outline](#checkbox-group), [Contents](./checkbox-group/page.mdx))
 - Collapsible - ([Outline](#collapsible), [Contents](./collapsible/page.mdx))
@@ -312,6 +313,93 @@ A button component that can be rendered as another tag or focusable when disable
 </details>
 
 [Read more](./button/page.mdx)
+
+## Chat
+
+A set of headless components for building chat interfaces.
+
+<details>
+
+<summary>Outline</summary>
+
+- Sections:
+  - Anatomy
+  - Adapters
+  - Message rendering
+  - Styling
+  - Suggestions
+  - Two-pane layout
+  - API reference
+    - Chat
+      - Root
+      - Layout
+    - ChatComposer
+      - Root
+      - TextArea
+      - SendButton
+      - AttachButton
+      - AttachmentList
+      - Toolbar
+      - HelperText
+      - Label
+    - ChatConversation
+      - Root
+      - Header
+      - HeaderInfo
+      - HeaderActions
+      - Title
+      - Subtitle
+    - ChatConversationList
+      - Root
+      - Item
+      - ItemAvatar
+      - ItemContent
+      - ItemActions
+      - Title
+      - Preview
+      - Timestamp
+      - UnreadBadge
+    - ChatMessage
+      - Root
+      - Content
+      - Avatar
+      - AuthorLabel
+      - Meta
+      - Actions
+      - Error
+    - ChatMessageGroup
+      - Root
+      - AuthorName
+    - ChatMessageList
+      - Root
+      - Viewport
+      - Content
+      - Overlay
+      - Status
+      - DateDivider
+    - ChatSuggestions
+      - Root
+      - Item
+- Exports:
+  - Root
+    - Props: className, grouped, messageId, render, style
+  - Content
+    - Props: afterContent, className, render, resolveBuiltInPartRenderer, style, textProps
+  - Error
+    - Props: className, render, style
+  - Actions
+    - Props: className, render, style
+  - AuthorLabel
+    - Props: className, render, style
+  - Avatar
+    - Props: className, render, style
+  - Meta
+    - Props: className, render, style
+- Types: Actions.Props, Actions.State, AuthorLabel.Props, AuthorLabel.State, Avatar.Props, Avatar.State, Content.Props, Content.State, Error.Props, Error.State, Meta.Props, Meta.State, Root.Props, Root.State
+
+</details>
+
+[Read more](./chat/page.mdx)
 
 ## Checkbox
 

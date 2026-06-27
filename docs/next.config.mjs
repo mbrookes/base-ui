@@ -97,6 +97,15 @@ const nextConfig = {
           },
         ],
       },
+      './src/app/**/types-*.ts': {
+        as: '*.ts',
+        loaders: [
+          {
+            loader: '@mui/internal-docs-infra/pipeline/loadPrecomputedTypes',
+            options: typesGenerationOptions,
+          },
+        ],
+      },
       './src/app/sitemap/index.ts': {
         as: '*.ts',
         loaders: ['@mui/internal-docs-infra/pipeline/loadPrecomputedSitemap'],
@@ -119,7 +128,7 @@ const nextConfig = {
   webpack: (config, { defaultLoaders }) => {
     // for production builds
     config.module.rules.push({
-      test: /[/\\\\]src[/\\\\]app[/\\\\].*[/\\\\]types\.ts$/,
+      test: /[/\\\\]src[/\\\\]app[/\\\\].*[/\\\\]types(?:-\w+)?\.ts$/,
       use: [
         defaultLoaders.babel,
         {

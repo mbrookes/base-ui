@@ -1,10 +1,10 @@
 export * as ChatComposer from './index.parts';
-export type { ChatComposerRoot } from './root/ChatComposerRoot';
-export type { ChatComposerTextArea } from './textarea/ChatComposerTextArea';
-export type { ChatComposerSendButton } from './send-button/ChatComposerSendButton';
-export type { ChatComposerAttachButton } from './attach-button/ChatComposerAttachButton';
-export type { ChatComposerAttachmentList } from './attachment-list/ChatComposerAttachmentList';
-export type { ChatComposerToolbar } from './toolbar/ChatComposerToolbar';
-export type { ChatComposerHelperText } from './helper-text/ChatComposerHelperText';
-export type { ChatComposerLabel } from './label/ChatComposerLabel';
+export { ChatComposerRoot } from './root/ChatComposerRoot';
+export { ChatComposerTextArea } from './textarea/ChatComposerTextArea';
+export { ChatComposerSendButton } from './send-button/ChatComposerSendButton';
+export { ChatComposerAttachButton } from './attach-button/ChatComposerAttachButton';
+export { ChatComposerAttachmentList } from './attachment-list/ChatComposerAttachmentList';
+export { ChatComposerToolbar } from './toolbar/ChatComposerToolbar';
+export { ChatComposerHelperText } from './helper-text/ChatComposerHelperText';
+export { ChatComposerLabel } from './label/ChatComposerLabel';
 export type { ComposerState, ComposerContextValue } from './internals/ComposerContext';

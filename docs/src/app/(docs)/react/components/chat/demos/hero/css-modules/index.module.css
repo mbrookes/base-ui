@@ -1,0 +1,149 @@
+.Root {
+  display: flex;
+  flex-direction: column;
+  width: 400px;
+  height: 480px;
+  border: 1px solid oklch(87% 0 0deg);
+  border-radius: 12px;
+  overflow: hidden;
+  background: oklch(100% 0 0deg);
+  font-family: sans-serif;
+  font-size: 0.875rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  .Root {
+    border-color: oklch(26.9% 0 0deg);
+    background: oklch(14.5% 0 0deg);
+  }
+}
+
+.MessageList {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+}
+
+.Viewport {
+  height: 100%;
+  padding: 12px;
+}
+
+.ListContent {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.MessageGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.Message {
+  display: flex;
+  max-width: 80%;
+}
+
+.Message[data-own-message] {
+  align-self: flex-end;
+}
+
+.Content {
+  padding: 8px 12px;
+  border-radius: 16px;
+  background: oklch(92.2% 0 0deg);
+  color: oklch(14.5% 0 0deg);
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.Message[data-own-message] .Content {
+  background: oklch(48.8% 0.243 264.376deg);
+  color: oklch(100% 0 0deg);
+}
+
+@media (prefers-color-scheme: dark) {
+  .Content {
+    background: oklch(26.9% 0 0deg);
+    color: oklch(92.2% 0 0deg);
+  }
+
+  .Message[data-own-message] .Content {
+    background: oklch(48.8% 0.243 264.376deg);
+    color: oklch(100% 0 0deg);
+  }
+}
+
+.Composer {
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid oklch(87% 0 0deg);
+  padding: 8px;
+  gap: 8px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .Composer {
+    border-top-color: oklch(26.9% 0 0deg);
+  }
+}
+
+.TextArea {
+  resize: none;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: inherit;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: 1.5;
+  width: 100%;
+  min-height: 40px;
+  max-height: 120px;
+  overflow-y: auto;
+  padding: 4px;
+}
+
+.TextArea::placeholder {
+  color: oklch(55.6% 0 0deg);
+}
+
+.Toolbar {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.SendButton {
+  padding: 6px 16px;
+  border-radius: 8px;
+  border: none;
+  background: oklch(14.5% 0 0deg);
+  color: oklch(100% 0 0deg);
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  line-height: 1.5;
+}
+
+.SendButton:hover {
+  background: oklch(26.9% 0 0deg);
+}
+
+.SendButton:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+@media (prefers-color-scheme: dark) {
+  .SendButton {
+    background: oklch(92.2% 0 0deg);
+    color: oklch(14.5% 0 0deg);
+  }
+
+  .SendButton:hover {
+    background: oklch(87% 0 0deg);
+  }
+}
