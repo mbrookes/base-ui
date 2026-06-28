@@ -37,15 +37,8 @@ const initialMessages: ChatMessageType[] = [
 
 function renderMessage({ id, index }: { id: string; index: number }) {
   return (
-    <ChatMessageGroup.Root
-      messageId={id}
-      index={index}
-      className="flex flex-col gap-0.5"
-    >
-      <ChatMessage.Root
-        messageId={id}
-        className="flex max-w-[80%] data-[own-message]:self-end"
-      >
+    <ChatMessageGroup.Root messageId={id} index={index} className="flex flex-col gap-0.5">
+      <ChatMessage.Root messageId={id} className="flex max-w-[80%] data-[own-message]:self-end">
         <ChatMessage.Content className="rounded-2xl bg-gray-100 px-3 py-2 text-sm leading-relaxed break-words text-gray-950 data-[own-message]:bg-blue-600 data-[own-message]:text-white dark:bg-white/10 dark:text-white dark:data-[own-message]:bg-blue-600" />
       </ChatMessage.Root>
     </ChatMessageGroup.Root>
@@ -59,10 +52,7 @@ export default function ChatHero() {
       initialMessages={initialMessages}
       className="flex h-[480px] w-[400px] flex-col overflow-hidden rounded-xl border border-gray-200 bg-white text-sm font-sans dark:border-white/10 dark:bg-gray-950"
     >
-      <ChatMessageList.Root
-        renderItem={renderMessage}
-        className="relative min-h-0 flex-1"
-      >
+      <ChatMessageList.Root renderItem={renderMessage} className="relative min-h-0 flex-1">
         <ChatMessageList.Viewport className="h-full p-3">
           <ChatMessageList.Content className="flex flex-col gap-1" />
         </ChatMessageList.Viewport>

@@ -55,10 +55,7 @@ export default function ChatHero() {
         </ChatMessageList.Viewport>
       </ChatMessageList.Root>
       <ChatComposer.Root className={styles.Composer}>
-        <ChatComposer.TextArea
-          placeholder="Send a message…"
-          className={styles.TextArea}
-        />
+        <ChatComposer.TextArea placeholder="Send a message…" className={styles.TextArea} />
         <ChatComposer.Toolbar className={styles.Toolbar}>
           <ChatComposer.SendButton className={styles.SendButton}>Send</ChatComposer.SendButton>
         </ChatComposer.Toolbar>
