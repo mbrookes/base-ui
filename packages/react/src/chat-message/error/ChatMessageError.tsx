@@ -29,7 +29,7 @@ export const ChatMessageError = React.forwardRef(function ChatMessageError(
   props: ChatMessageError.Props,
   forwardedRef: React.ForwardedRef<HTMLDivElement>,
 ) {
-  const { children, ...elementProps } = props;
+  const { render, className, style, children, ...elementProps } = props;
   const messageContext = useMessageContext();
   const { messageId } = messageContext;
   const chatError = useMessageError(messageId);

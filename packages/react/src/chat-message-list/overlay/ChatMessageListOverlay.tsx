@@ -14,7 +14,7 @@ export const ChatMessageListOverlay = React.forwardRef(function ChatMessageListO
   props: ChatMessageListOverlay.Props,
   forwardedRef: React.ForwardedRef<HTMLDivElement>,
 ) {
-  const { children, ...elementProps } = props;
+  const { render, className, style, children, ...elementProps } = props;
 
   return useRenderElement('div', props, {
     ref: forwardedRef,
@@ -29,7 +29,7 @@ export const ChatMessageListOverlay = React.forwardRef(function ChatMessageListO
           left: 0,
           right: 0,
           pointerEvents: 'none' as const,
-          ...elementProps.style,
+          ...style,
         },
       },
     ],

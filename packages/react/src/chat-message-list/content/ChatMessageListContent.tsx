@@ -63,7 +63,7 @@ export const ChatMessageListContent = React.forwardRef(function ChatMessageListC
   props: ChatMessageListContent.Props,
   forwardedRef: React.ForwardedRef<HTMLDivElement>,
 ) {
-  const { ...elementProps } = props;
+  const { render, className, style, ...elementProps } = props;
   const { itemIds, renderItem, getItemKey, registerRowElement, scheduleResizeRestore } =
     useMessageListInternalContext();
 

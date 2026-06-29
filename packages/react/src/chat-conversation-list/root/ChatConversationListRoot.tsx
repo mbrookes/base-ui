@@ -27,7 +27,7 @@ export const ChatConversationListRoot = markChatLayoutPane(
     props: ChatConversationListRoot.Props,
     forwardedRef: React.ForwardedRef<HTMLElement>,
   ) {
-    const { children, variant = 'default', ...elementProps } = props;
+    const { render, className, style, children, variant = 'default', ...elementProps } = props;
     const conversations = useConversations();
     const { activeConversationId, setActiveConversation } = useChat();
     const store = useChatStore();

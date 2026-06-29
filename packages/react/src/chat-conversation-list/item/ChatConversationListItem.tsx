@@ -29,7 +29,15 @@ export const ChatConversationListItem = React.forwardRef(function ChatConversati
   props: ChatConversationListItem.Props,
   forwardedRef: React.ForwardedRef<HTMLDivElement>,
 ) {
-  const { children, conversationId, variant = 'default', ...elementProps } = props;
+  const {
+    render,
+    className,
+    style,
+    children,
+    conversationId,
+    variant = 'default',
+    ...elementProps
+  } = props;
   const store = useChatStore();
   const conversation = useStore(store, chatSelectors.conversation, conversationId) ?? null;
   const {

@@ -35,7 +35,16 @@ export const ChatComposerTextArea = React.forwardRef(function ChatComposerTextAr
   props: ChatComposerTextArea.Props,
   forwardedRef: React.ForwardedRef<HTMLTextAreaElement>,
 ) {
-  const { onKeyDown, onCompositionStart, onCompositionEnd, id: idProp, ...elementProps } = props;
+  const {
+    render,
+    className,
+    style,
+    onKeyDown,
+    onCompositionStart,
+    onCompositionEnd,
+    id: idProp,
+    ...elementProps
+  } = props;
 
   const { activeConversationId } = useChat();
   const composer = useComposerContext();

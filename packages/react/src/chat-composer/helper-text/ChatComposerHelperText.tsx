@@ -24,7 +24,7 @@ export const ChatComposerHelperText = React.forwardRef(function ChatComposerHelp
   props: ChatComposerHelperText.Props,
   forwardedRef: React.ForwardedRef<HTMLDivElement>,
 ) {
-  const { children, role, id: idProp, ...elementProps } = props;
+  const { render, className, style, children, role, id: idProp, ...elementProps } = props;
   const composer = useComposerContext();
   const hasError = composer.error != null;
   const { setMessageIds } = useLabelableContext();

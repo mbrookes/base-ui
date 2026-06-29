@@ -24,7 +24,7 @@ export const SourceDocumentPart = React.forwardRef(function SourceDocumentPart(
   props: SourceDocumentPart.Props,
   forwardedRef: React.ForwardedRef<HTMLDivElement>,
 ) {
-  const { index, message, onToolCall, part, ...elementProps } = props;
+  const { render, className, style, index, message, onToolCall, part, ...elementProps } = props;
 
   const state: SourceDocumentPart.State = {
     messageId: message.id,
@@ -58,7 +58,7 @@ export namespace SourceDocumentPart {
   export interface Props
     extends
       ChatPartRendererProps<ChatSourceDocumentMessagePart>,
-      Omit<BaseUIComponentProps<'div', State>, 'children'> {}
+      Omit<BaseUIComponentProps<'div', State>, 'children' | 'part'> {}
 }
 
 export type SourceDocumentPartExternalProps = Omit<

@@ -14,7 +14,7 @@ export const ChatConversationHeader = React.forwardRef(function ChatConversation
   props: ChatConversationHeader.Props,
   forwardedRef: React.ForwardedRef<HTMLElement>,
 ) {
-  const { children, ...elementProps } = props;
+  const { render, className, style, children, ...elementProps } = props;
   const state: ChatConversationHeader.State = useConversationContext();
 
   return useRenderElement('header', props, {

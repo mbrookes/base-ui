@@ -16,7 +16,7 @@ export const ChatConversationListItemAvatar = React.forwardRef(
     props: ChatConversationListItemAvatar.Props,
     forwardedRef: React.ForwardedRef<HTMLDivElement>,
   ) {
-    const { children, ...elementProps } = props;
+    const { render, className, style, children, ...elementProps } = props;
     const { conversation } = useConversationListItemContext();
     const state: ChatConversationListItemAvatar.State = useConversationListItemContext();
 

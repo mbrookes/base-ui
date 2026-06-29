@@ -1,5 +1,5 @@
-import type { ChatMessageStatus, ChatUser } from '../../types/chat-entities';
-import type { ChatToolInvocationState } from '../../types/chat-message-parts';
+import type { ChatMessageStatus, ChatUser } from '../types/chat-entities';
+import type { ChatToolInvocationState } from '../types/chat-message-parts';
 
 export type ChatLocaleTypingUser = Pick<ChatUser, 'id' | 'displayName'>;
 

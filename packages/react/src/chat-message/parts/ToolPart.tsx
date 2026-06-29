@@ -87,7 +87,17 @@ export const ChatMessageToolPart = React.forwardRef(function ChatMessageToolPart
   props: ChatMessageToolPart.Props,
   forwardedRef: React.ForwardedRef<HTMLDivElement>,
 ) {
-  const { index, message, onToolCall, part, defaultExpanded, ...elementProps } = props;
+  const {
+    render,
+    className,
+    style,
+    index,
+    message,
+    onToolCall,
+    part,
+    defaultExpanded,
+    ...elementProps
+  } = props;
 
   const { addToolApprovalResponse } = useChat();
   const localeText = useChatLocaleText();
@@ -263,7 +273,9 @@ export namespace ChatMessageToolPart {
   }
 
   export interface Props
-    extends ChatPartRendererProps<ToolPart>, Omit<BaseUIComponentProps<'div', State>, 'children'> {
+    extends
+      ChatPartRendererProps<ToolPart>,
+      Omit<BaseUIComponentProps<'div', State>, 'children' | 'part'> {
     defaultExpanded?: Record<string, ChatToolExpand | undefined> | undefined;
   }
 }

@@ -31,6 +31,9 @@ export const ChatSuggestionsRoot = React.forwardRef(function ChatSuggestionsRoot
   forwardedRef: React.ForwardedRef<HTMLDivElement>,
 ) {
   const {
+    render,
+    className,
+    style,
     children,
     suggestions,
     autoSubmit = false,

@@ -24,7 +24,7 @@ export const ChatMessageActions = React.forwardRef(function ChatMessageActions(
   props: ChatMessageActions.Props,
   forwardedRef: React.ForwardedRef<HTMLDivElement>,
 ) {
-  const { ...elementProps } = props;
+  const { render, className, style, ...elementProps } = props;
   const state: ChatMessageActions.State = useMessageContext();
   const localeText = useChatLocaleText();
 

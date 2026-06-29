@@ -24,7 +24,7 @@ export const ChatMessageAuthorLabel = React.forwardRef(function ChatMessageAutho
   props: ChatMessageAuthorLabel.Props,
   forwardedRef: React.ForwardedRef<HTMLSpanElement>,
 ) {
-  const { children, ...elementProps } = props;
+  const { render, className, style, children, ...elementProps } = props;
   const ctx = useMessageContext();
   const state: ChatMessageAuthorLabel.State = ctx;
   const authorLabel = ctx.resolvedAuthor?.displayName;

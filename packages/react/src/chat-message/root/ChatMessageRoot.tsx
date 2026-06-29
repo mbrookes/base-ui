@@ -38,7 +38,15 @@ export const ChatMessageRoot = React.forwardRef(function ChatMessageRoot(
   props: ChatMessageRoot.Props,
   forwardedRef: React.ForwardedRef<HTMLDivElement>,
 ) {
-  const { children, messageId, grouped: groupedProp = false, ...elementProps } = props;
+  const {
+    render,
+    className,
+    style,
+    children,
+    messageId,
+    grouped: groupedProp = false,
+    ...elementProps
+  } = props;
 
   const groupCtx = useMessageGroupContext();
   const message = useMessage(messageId);

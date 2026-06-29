@@ -23,7 +23,7 @@ export const ChatComposerAttachmentList = React.forwardRef(function ChatComposer
   props: ChatComposerAttachmentList.Props,
   forwardedRef: React.ForwardedRef<HTMLDivElement>,
 ) {
-  const { ...elementProps } = props;
+  const { render, className, style, ...elementProps } = props;
   const composer = useComposerContext();
   const store = useChatStore();
   const attachments = useStore(store, chatSelectors.composerAttachments);

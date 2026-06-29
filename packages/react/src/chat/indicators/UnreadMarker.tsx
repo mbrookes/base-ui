@@ -36,7 +36,16 @@ export const UnreadMarker = React.forwardRef(function UnreadMarker(
   props: UnreadMarker.Props,
   forwardedRef: React.ForwardedRef<HTMLDivElement>,
 ) {
-  const { messageId, index, items: itemsProp, label: labelProp, ...elementProps } = props;
+  const {
+    render,
+    className,
+    style,
+    messageId,
+    index,
+    items: itemsProp,
+    label: labelProp,
+    ...elementProps
+  } = props;
   const localeText = useChatLocaleText();
   const label = labelProp ?? localeText.unreadMarkerLabel;
   const defaultItems = useMessageIds();

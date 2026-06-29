@@ -66,6 +66,9 @@ export const ChatMessageGroupRoot = React.forwardRef(function ChatMessageGroupRo
   forwardedRef: React.ForwardedRef<HTMLDivElement>,
 ) {
   const {
+    render,
+    className,
+    style,
     children,
     messageId,
     index,

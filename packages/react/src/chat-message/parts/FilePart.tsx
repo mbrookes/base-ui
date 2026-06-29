@@ -42,7 +42,7 @@ export const FilePart = React.forwardRef(function FilePart(
   props: FilePart.Props,
   forwardedRef: React.ForwardedRef<HTMLDivElement>,
 ) {
-  const { index, message, onToolCall, part, ...elementProps } = props;
+  const { render, className, style, index, message, onToolCall, part, ...elementProps } = props;
 
   const isImage = part.mediaType.startsWith('image/');
   const contentTabIndex = useMessageContentTabIndex();
@@ -83,7 +83,7 @@ export namespace FilePart {
   export interface Props
     extends
       ChatPartRendererProps<ChatFileMessagePart>,
-      Omit<BaseUIComponentProps<'div', State>, 'children'> {}
+      Omit<BaseUIComponentProps<'div', State>, 'children' | 'part'> {}
 }
 
 export type FilePartExternalProps = Omit<

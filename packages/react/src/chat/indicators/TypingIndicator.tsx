@@ -39,7 +39,7 @@ export const TypingIndicator = React.forwardRef(function TypingIndicator(
   props: TypingIndicator.Props,
   forwardedRef: React.ForwardedRef<HTMLDivElement>,
 ) {
-  const { ...elementProps } = props;
+  const { render, className, style, ...elementProps } = props;
   const { activeConversationId, conversations, messages } = useChat();
   const { typingUserIds } = useChatStatus();
   const localeText = useChatLocaleText();

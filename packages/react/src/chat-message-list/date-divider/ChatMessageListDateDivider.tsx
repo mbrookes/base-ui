@@ -57,6 +57,9 @@ export const ChatMessageListDateDivider = React.forwardRef(function ChatMessageL
   forwardedRef: React.ForwardedRef<HTMLDivElement>,
 ) {
   const {
+    render,
+    className,
+    style,
     messageId,
     index,
     items: itemsProp,

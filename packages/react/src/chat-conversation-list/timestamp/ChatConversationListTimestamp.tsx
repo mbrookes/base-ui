@@ -18,7 +18,7 @@ export const ChatConversationListTimestamp = React.forwardRef(
     props: ChatConversationListTimestamp.Props,
     forwardedRef: React.ForwardedRef<HTMLDivElement>,
   ) {
-    const { children, ...elementProps } = props;
+    const { render, className, style, children, ...elementProps } = props;
     const state: ChatConversationListTimestamp.State = useConversationListItemContext();
     const localeText = useChatLocaleText();
     const lastMessageAt = state.conversation?.lastMessageAt;

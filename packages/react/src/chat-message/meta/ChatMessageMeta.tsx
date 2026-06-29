@@ -27,7 +27,7 @@ export const ChatMessageMeta = React.forwardRef(function ChatMessageMeta(
   props: ChatMessageMeta.Props,
   forwardedRef: React.ForwardedRef<HTMLDivElement>,
 ) {
-  const { ...elementProps } = props;
+  const { render, className, style, ...elementProps } = props;
   const ctx = useMessageContext();
   const localeText = useChatLocaleText();
   const isHydrated = useIsHydrated();

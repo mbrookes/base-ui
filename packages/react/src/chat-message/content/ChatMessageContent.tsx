@@ -119,7 +119,16 @@ export const ChatMessageContent = React.forwardRef(function ChatMessageContent(
   props: ChatMessageContent.Props,
   forwardedRef: React.ForwardedRef<HTMLDivElement>,
 ) {
-  const { children, textProps, resolveBuiltInPartRenderer, afterContent, ...elementProps } = props;
+  const {
+    render,
+    className,
+    style,
+    children,
+    textProps,
+    resolveBuiltInPartRenderer,
+    afterContent,
+    ...elementProps
+  } = props;
 
   const messageState = useMessageContext();
   const message = messageState.message;

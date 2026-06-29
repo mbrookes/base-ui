@@ -26,7 +26,7 @@ export const ReasoningPart = React.forwardRef(function ReasoningPart(
   props: ReasoningPart.Props,
   forwardedRef: React.ForwardedRef<HTMLDetailsElement>,
 ) {
-  const { index, message, onToolCall, part, ...elementProps } = props;
+  const { render, className, style, index, message, onToolCall, part, ...elementProps } = props;
 
   const localeText = useChatLocaleText();
   const isStreaming = part.state === 'streaming';
@@ -71,7 +71,7 @@ export namespace ReasoningPart {
   export interface Props
     extends
       ChatPartRendererProps<ChatReasoningMessagePart>,
-      Omit<BaseUIComponentProps<'details', State>, 'children'> {}
+      Omit<BaseUIComponentProps<'details', State>, 'children' | 'part'> {}
 }
 
 export type ReasoningPartExternalProps = Omit<

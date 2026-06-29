@@ -25,7 +25,16 @@ export const ChatComposerRoot = React.forwardRef(function ChatComposerRoot(
   props: ChatComposerRoot.Props,
   forwardedRef: React.ForwardedRef<HTMLFormElement>,
 ) {
-  const { children, disabled = false, attachmentConfig, onSubmit, ...elementProps } = props;
+  const {
+    render,
+    className,
+    style,
+    children,
+    disabled = false,
+    attachmentConfig,
+    onSubmit,
+    ...elementProps
+  } = props;
 
   const composer = useChatComposer();
   const status = useChatStatus();

@@ -20,7 +20,7 @@ export const ChatComposerToolbar = React.forwardRef(function ChatComposerToolbar
   props: ChatComposerToolbar.Props,
   forwardedRef: React.ForwardedRef<HTMLDivElement>,
 ) {
-  const { ...elementProps } = props;
+  const { render, className, style, ...elementProps } = props;
   const composer = useComposerContext();
   const localeText = useChatLocaleText();
 

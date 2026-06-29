@@ -41,7 +41,7 @@ export const SourceUrlPart = React.forwardRef(function SourceUrlPart(
   props: SourceUrlPart.Props,
   forwardedRef: React.ForwardedRef<HTMLSpanElement>,
 ) {
-  const { index, message, onToolCall, part, ...elementProps } = props;
+  const { render, className, style, index, message, onToolCall, part, ...elementProps } = props;
 
   const contentTabIndex = useMessageContentTabIndex();
 
@@ -81,7 +81,7 @@ export namespace SourceUrlPart {
   export interface Props
     extends
       ChatPartRendererProps<ChatSourceUrlMessagePart>,
-      Omit<BaseUIComponentProps<'span', State>, 'children'> {}
+      Omit<BaseUIComponentProps<'span', State>, 'children' | 'part'> {}
 }
 
 export type SourceUrlPartExternalProps = Omit<

@@ -4,6 +4,12 @@ import { useRenderElement } from '../../internals/useRenderElement';
 import type { BaseUIComponentProps } from '../../internals/types';
 import { useSuggestionsContext } from '../internals/SuggestionsContext';
 
+const stateAttributesMapping = {
+  value: () => null,
+  label: () => null,
+  index: (v: number) => ({ 'data-index': String(v) }),
+};
+
 /**
  * A single suggestion button that pre-fills the composer when clicked.
  * Renders a `<button>` element.
@@ -14,7 +20,17 @@ export const ChatSuggestionsItem = React.forwardRef(function ChatSuggestionsItem
   props: ChatSuggestionsItem.Props,
   forwardedRef: React.ForwardedRef<HTMLButtonElement>,
 ) {
-  const { children, value, label, index = 0, onClick, ...elementProps } = props;
+  const {
+    render,
+    className,
+    style,
+    children,
+    value,
+    label,
+    index = 0,
+    onClick,
+    ...elementProps
+  } = props;
   const context = useSuggestionsContext();
   const displayLabel = label ?? value;
 
@@ -42,11 +58,11 @@ export const ChatSuggestionsItem = React.forwardRef(function ChatSuggestionsItem
       elementProps,
       {
         type: 'button' as const,
-        'data-index': index,
         onClick: handleClick,
         children: children ?? displayLabel,
       },
     ],
+    stateAttributesMapping,
   });
 });
 

@@ -22,7 +22,7 @@ export const ChatComposerLabel = React.forwardRef(function ChatComposerLabel(
   props: ChatComposerLabel.Props,
   forwardedRef: React.ForwardedRef<HTMLLabelElement>,
 ) {
-  const { children, ...elementProps } = props;
+  const { render, className, style, children, ...elementProps } = props;
   const composer = useComposerContext();
   const localeText = useChatLocaleText();
   const { labelId } = useLabelableContext();

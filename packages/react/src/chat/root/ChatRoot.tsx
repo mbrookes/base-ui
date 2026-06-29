@@ -35,6 +35,7 @@ export const ChatRoot = React.forwardRef(function ChatRoot<Cursor = string>(
   const {
     render,
     className,
+    style,
     adapter,
     localeText,
     variant,
@@ -136,7 +137,7 @@ export namespace ChatRoot {
   }
 
   export interface Props<Cursor = string>
-    extends ChatProviderProps<Cursor>, BaseUIComponentProps<'div', State> {
+    extends ChatProviderProps<Cursor>, Omit<BaseUIComponentProps<'div', State>, 'onError'> {
     localeText?: Partial<ChatLocaleText> | undefined;
     variant?: ChatVariant | undefined;
     density?: ChatDensity | undefined;

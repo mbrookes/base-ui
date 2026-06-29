@@ -22,7 +22,7 @@ export const ChatConversationListUnreadBadge = React.forwardRef(
     props: ChatConversationListUnreadBadge.Props,
     forwardedRef: React.ForwardedRef<HTMLSpanElement>,
   ) {
-    const { children, ...elementProps } = props;
+    const { render, className, style, children, ...elementProps } = props;
     const state: ChatConversationListUnreadBadge.State = useConversationListItemContext();
     const { conversation, unread, variant } = state;
     const localeText = useChatLocaleText();

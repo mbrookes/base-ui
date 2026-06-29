@@ -14,7 +14,7 @@ export const ChatConversationSubtitle = React.forwardRef(function ChatConversati
   props: ChatConversationSubtitle.Props,
   forwardedRef: React.ForwardedRef<HTMLDivElement>,
 ) {
-  const { children, ...elementProps } = props;
+  const { render, className, style, children, ...elementProps } = props;
   const state: ChatConversationSubtitle.State = useConversationContext();
 
   return useRenderElement('div', props, {

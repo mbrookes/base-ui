@@ -29,7 +29,7 @@ export const ChatMessageListStatus = React.forwardRef(function ChatMessageListSt
   props: ChatMessageListStatus.Props,
   forwardedRef: React.ForwardedRef<HTMLDivElement>,
 ) {
-  const { ...elementProps } = props;
+  const { render, className, style, ...elementProps } = props;
   const { statusAnnouncement } = useMessageListInternalContext();
 
   return useRenderElement('div', props, {
@@ -39,7 +39,7 @@ export const ChatMessageListStatus = React.forwardRef(function ChatMessageListSt
       elementProps,
       {
         role: 'status' as const,
-        style: { ...visuallyHiddenStyle, ...elementProps.style },
+        style: { ...visuallyHiddenStyle, ...style },
         children: statusAnnouncement,
       },
     ],

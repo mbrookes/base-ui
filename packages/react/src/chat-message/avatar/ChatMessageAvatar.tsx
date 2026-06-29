@@ -24,7 +24,7 @@ export const ChatMessageAvatar = React.forwardRef(function ChatMessageAvatar(
   props: ChatMessageAvatar.Props,
   forwardedRef: React.ForwardedRef<HTMLDivElement>,
 ) {
-  const { children, ...elementProps } = props;
+  const { render, className, style, children, ...elementProps } = props;
   const ctx = useMessageContext();
   const avatarUrl = ctx.resolvedAuthor?.avatarUrl;
 

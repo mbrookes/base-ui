@@ -48,6 +48,9 @@ export const ChatMessageListRoot = React.forwardRef(function ChatMessageListRoot
   ref: React.ForwardedRef<MessageListRootHandle>,
 ) {
   const {
+    render,
+    className,
+    style,
     items: itemsProp,
     renderItem,
     getItemKey = (id: string) => id,
@@ -177,7 +180,7 @@ export const ChatMessageListRoot = React.forwardRef(function ChatMessageListRoot
               elementProps,
               {
                 children,
-                style: { position: 'relative', minHeight: 0, ...elementProps.style },
+                style: { position: 'relative', minHeight: 0, ...style },
               },
             ],
           })}

@@ -15,7 +15,7 @@ export const ChatMessageGroupAuthorName = React.forwardRef(function ChatMessageG
   props: ChatMessageGroupAuthorName.Props,
   forwardedRef: React.ForwardedRef<HTMLDivElement>,
 ) {
-  const { children, ...elementProps } = props;
+  const { render, className, style, children, ...elementProps } = props;
   const groupCtx = useMessageGroupContext();
 
   const state: ChatMessageGroupAuthorName.State = {
@@ -26,7 +26,7 @@ export const ChatMessageGroupAuthorName = React.forwardRef(function ChatMessageG
     authorId: groupCtx?.authorId,
     ownMessage: groupCtx?.ownMessage ?? false,
     variant: groupCtx?.variant ?? 'default',
-    density: groupCtx?.density ?? 'default',
+    density: groupCtx?.density ?? 'standard',
   };
 
   const label = children ?? groupCtx?.displayName ?? null;

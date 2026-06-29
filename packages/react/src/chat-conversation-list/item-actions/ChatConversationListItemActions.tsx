@@ -16,7 +16,7 @@ export const ChatConversationListItemActions = React.forwardRef(
     props: ChatConversationListItemActions.Props,
     forwardedRef: React.ForwardedRef<HTMLDivElement>,
   ) {
-    const { children, ...elementProps } = props;
+    const { render, className, style, children, ...elementProps } = props;
     const state: ChatConversationListItemActions.State = useConversationListItemContext();
 
     return useRenderElement('div', props, {

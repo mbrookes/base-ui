@@ -33,7 +33,7 @@ export const ChatConversationRoot = markChatLayoutPane(
     props: ChatConversationRoot.Props,
     forwardedRef: React.ForwardedRef<HTMLDivElement>,
   ) {
-    const { children, ...elementProps } = props;
+    const { render, className, style, children, ...elementProps } = props;
     const { activeConversationId } = useChat();
     const localeText = useChatLocaleText();
     const conversations = useConversations();

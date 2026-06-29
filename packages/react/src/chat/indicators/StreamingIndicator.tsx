@@ -32,6 +32,9 @@ export const StreamingIndicator = React.forwardRef(function StreamingIndicator(
   forwardedRef: React.ForwardedRef<HTMLDivElement>,
 ) {
   const {
+    render,
+    className,
+    style,
     mode = 'auto',
     message: messageProp,
     messageId,

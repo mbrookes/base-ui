@@ -16,7 +16,7 @@ export const ChatMessageListViewport = React.forwardRef(function ChatMessageList
   props: ChatMessageListViewport.Props,
   forwardedRef: React.ForwardedRef<HTMLDivElement>,
 ) {
-  const { children, ...elementProps } = props;
+  const { render, className, style, children, ...elementProps } = props;
   const { setRootElement, handleScroll, messageListLabel } = useMessageListInternalContext();
 
   const ref = useMergedRefs(forwardedRef, setRootElement);
@@ -34,7 +34,7 @@ export const ChatMessageListViewport = React.forwardRef(function ChatMessageList
         style: {
           overflowY: 'auto' as const,
           overscrollBehavior: 'contain' as const,
-          ...elementProps.style,
+          ...style,
         },
       },
     ],

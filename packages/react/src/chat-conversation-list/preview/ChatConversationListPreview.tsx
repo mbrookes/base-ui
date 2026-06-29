@@ -16,7 +16,7 @@ export const ChatConversationListPreview = React.forwardRef(function ChatConvers
   props: ChatConversationListPreview.Props,
   forwardedRef: React.ForwardedRef<HTMLDivElement>,
 ) {
-  const { children, ...elementProps } = props;
+  const { render, className, style, children, ...elementProps } = props;
   const state: ChatConversationListPreview.State = useConversationListItemContext();
   const preview = state.conversation?.subtitle;
 

@@ -91,7 +91,7 @@ export const ChatLayout = React.forwardRef(function ChatLayout(
   props: ChatLayout.Props,
   forwardedRef: React.ForwardedRef<HTMLDivElement>,
 ) {
-  const { children, style, ...elementProps } = props;
+  const { render, className, style, children, ...elementProps } = props;
 
   const paneChildren = resolvePaneChildren(children);
   const state: ChatLayout.State = {
