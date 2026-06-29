@@ -2,19 +2,17 @@
   display: flex;
   flex-direction: column;
   width: 400px;
-  height: 480px;
-  border: 1px solid oklch(87% 0 0deg);
-  border-radius: 12px;
-  overflow: hidden;
-  background: oklch(98.5% 0 0deg);
+  height: 520px;
+  border: 1px solid oklch(14.5% 0 0deg);
+  background: white;
   font-family: inherit;
   font-size: 0.875rem;
-}
+  color: oklch(14.5% 0 0deg);
 
-@media (prefers-color-scheme: dark) {
-  .Root {
-    border-color: oklch(26.9% 0 0deg);
+  @media (prefers-color-scheme: dark) {
+    border-color: white;
     background: oklch(14.5% 0 0deg);
+    color: white;
   }
 }
 
@@ -27,12 +25,13 @@
 .Viewport {
   height: 100%;
   padding: 12px;
+  overflow-y: auto;
 }
 
 .ListContent {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 8px;
 }
 
 .MessageGroup {
@@ -41,38 +40,204 @@
   gap: 2px;
 }
 
-.Message {
-  display: flex;
-  max-width: 80%;
+.MessageGroup[data-author-role='user'] {
+  align-items: flex-end;
 }
 
-.Message[data-own-message] {
-  align-self: flex-end;
+.AuthorName {
+  font-size: 0.6875rem;
+  color: oklch(55.6% 0 0deg);
+  padding: 0 2px 2px;
+
+  @media (prefers-color-scheme: dark) {
+    color: oklch(70.8% 0 0deg);
+  }
+}
+
+.MessageGroup[data-author-role='user'] .AuthorName {
+  display: none;
+}
+
+.Message {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  max-width: 85%;
+}
+
+.Avatar {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  overflow: hidden;
+  border: 1px solid oklch(92.2% 0 0deg);
+
+  @media (prefers-color-scheme: dark) {
+    border-color: oklch(26.9% 0 0deg);
+    filter: invert(1);
+  }
+}
+
+.Avatar img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.BubbleArea {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.Message[data-grouped] .BubbleArea {
+  padding-left: 36px;
+}
+
+.Message[data-own-message][data-grouped] .BubbleArea {
+  padding-left: 0;
 }
 
 .Content {
-  padding: 8px 12px;
-  border-radius: 16px;
-  background: oklch(92.2% 0 0deg);
+  padding: 6px 10px;
+  border: 1px solid oklch(87% 0 0deg);
+  background: oklch(97% 0 0deg);
   color: oklch(14.5% 0 0deg);
   line-height: 1.5;
   word-break: break-word;
-}
 
-.Message[data-own-message] .Content {
-  background: oklch(48.8% 0.243 264.376deg);
-  color: oklch(98.5% 0 0deg);
-}
-
-@media (prefers-color-scheme: dark) {
-  .Content {
+  @media (prefers-color-scheme: dark) {
+    border-color: oklch(26.9% 0 0deg);
     background: oklch(26.9% 0 0deg);
     color: oklch(92.2% 0 0deg);
   }
+}
 
-  .Message[data-own-message] .Content {
-    background: oklch(48.8% 0.243 264.376deg);
-    color: oklch(98.5% 0 0deg);
+.Message[data-own-message] .Content {
+  border-color: oklch(14.5% 0 0deg);
+  background: oklch(14.5% 0 0deg);
+  color: white;
+
+  @media (prefers-color-scheme: dark) {
+    border-color: white;
+    background: white;
+    color: oklch(14.5% 0 0deg);
+  }
+}
+
+.Meta {
+  font-size: 0.6875rem;
+  color: oklch(55.6% 0 0deg);
+  display: flex;
+  gap: 4px;
+  align-items: center;
+
+  @media (prefers-color-scheme: dark) {
+    color: oklch(70.8% 0 0deg);
+  }
+}
+
+.Actions {
+  display: none;
+  gap: 4px;
+}
+
+.Message:hover .Actions,
+.Message:focus-within .Actions {
+  display: flex;
+}
+
+.ActionButton {
+  padding: 0 6px;
+  height: 1.5rem;
+  border: 1px solid oklch(87% 0 0deg);
+  background: white;
+  color: oklch(14.5% 0 0deg);
+  font-family: inherit;
+  font-size: 0.75rem;
+  cursor: pointer;
+  -webkit-user-select: none;
+  user-select: none;
+
+  @media (hover: hover) {
+    &:hover {
+      background: oklch(97% 0 0deg);
+    }
+  }
+
+  &:focus-visible {
+    outline: 2px solid oklch(14.5% 0 0deg);
+    outline-offset: -1px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    border-color: oklch(26.9% 0 0deg);
+    background: oklch(14.5% 0 0deg);
+    color: white;
+
+    @media (hover: hover) {
+      &:hover {
+        background: oklch(26.9% 0 0deg);
+      }
+    }
+
+    &:focus-visible {
+      outline-color: white;
+    }
+  }
+}
+
+.Suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 8px 12px;
+  border-top: 1px solid oklch(87% 0 0deg);
+
+  @media (prefers-color-scheme: dark) {
+    border-top-color: oklch(26.9% 0 0deg);
+  }
+}
+
+.SuggestionItem {
+  padding: 0 10px;
+  height: 1.75rem;
+  border: 1px solid oklch(87% 0 0deg);
+  background: white;
+  color: oklch(14.5% 0 0deg);
+  font-family: inherit;
+  font-size: 0.8125rem;
+  cursor: pointer;
+  -webkit-user-select: none;
+  user-select: none;
+
+  @media (hover: hover) {
+    &:hover {
+      background: oklch(97% 0 0deg);
+    }
+  }
+
+  &:focus-visible {
+    outline: 2px solid oklch(14.5% 0 0deg);
+    outline-offset: -1px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    border-color: oklch(26.9% 0 0deg);
+    background: oklch(14.5% 0 0deg);
+    color: white;
+
+    @media (hover: hover) {
+      &:hover {
+        background: oklch(26.9% 0 0deg);
+      }
+    }
+
+    &:focus-visible {
+      outline-color: white;
+    }
   }
 }
 
@@ -82,10 +247,8 @@
   border-top: 1px solid oklch(87% 0 0deg);
   padding: 8px;
   gap: 8px;
-}
 
-@media (prefers-color-scheme: dark) {
-  .Composer {
+  @media (prefers-color-scheme: dark) {
     border-top-color: oklch(26.9% 0 0deg);
   }
 }
@@ -116,34 +279,51 @@
 }
 
 .SendButton {
-  padding: 6px 16px;
-  border-radius: 8px;
-  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 2rem;
+  padding: 0 0.75rem;
+  border: 1px solid oklch(14.5% 0 0deg);
   background: oklch(14.5% 0 0deg);
-  color: oklch(98.5% 0 0deg);
+  color: white;
   font-family: inherit;
   font-size: 0.875rem;
-  font-weight: 500;
   cursor: pointer;
-  line-height: 1.5;
-}
+  -webkit-user-select: none;
+  user-select: none;
 
-.SendButton:hover {
-  background: oklch(26.9% 0 0deg);
-}
-
-.SendButton:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-@media (prefers-color-scheme: dark) {
-  .SendButton {
-    background: oklch(92.2% 0 0deg);
-    color: oklch(14.5% 0 0deg);
+  @media (hover: hover) {
+    &:hover:not(:disabled) {
+      background: oklch(26.9% 0 0deg);
+      border-color: oklch(26.9% 0 0deg);
+    }
   }
 
-  .SendButton:hover {
-    background: oklch(87% 0 0deg);
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  &:focus-visible {
+    outline: 2px solid oklch(14.5% 0 0deg);
+    outline-offset: -1px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    border-color: white;
+    background: white;
+    color: oklch(14.5% 0 0deg);
+
+    @media (hover: hover) {
+      &:hover:not(:disabled) {
+        background: oklch(92.2% 0 0deg);
+        border-color: oklch(92.2% 0 0deg);
+      }
+    }
+
+    &:focus-visible {
+      outline-color: white;
+    }
   }
 }
