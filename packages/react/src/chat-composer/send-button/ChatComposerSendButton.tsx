@@ -1,6 +1,7 @@
 'use client';
 import * as React from 'react';
 import { useRenderElement } from '../../internals/useRenderElement';
+import { useButton } from '../../internals/use-button';
 import type { BaseUIComponentProps } from '../../internals/types';
 import { useChatLocaleText } from '../../chat/locales/ChatLocaleContext';
 import { useComposerContext } from '../internals/ComposerContext';
@@ -24,24 +25,34 @@ export const ChatComposerSendButton = React.forwardRef(function ChatComposerSend
   const composer = useComposerContext();
   const localeText = useChatLocaleText();
 
+  const effectivelyDisabled =
+    (!composer.hasValue && composer.attachmentCount === 0) ||
+    composer.streaming ||
+    composer.disabled;
+
   const state: ChatComposerSendButton.State = {
     submitting: composer.submitting,
     hasValue: composer.hasValue,
     streaming: composer.streaming,
     attachmentCount: composer.attachmentCount,
-    disabled: composer.disabled,
+    disabled: effectivelyDisabled,
   };
 
+  const { getButtonProps, buttonRef } = useButton({
+    disabled: effectivelyDisabled,
+    focusableWhenDisabled: true,
+  });
+
   return useRenderElement('button', props, {
-    ref: forwardedRef,
+    ref: [forwardedRef, buttonRef],
     state,
-    props: {
-      ...elementProps,
-      'aria-label': localeText.composerSendButtonLabel,
-      type: 'submit',
-      disabled:
-        (!state.hasValue && state.attachmentCount === 0) || state.streaming || state.disabled,
-    },
+    props: [
+      elementProps,
+      getButtonProps({
+        'aria-label': localeText.composerSendButtonLabel,
+        type: 'submit' as const,
+      }),
+    ],
     stateAttributesMapping,
   });
 });

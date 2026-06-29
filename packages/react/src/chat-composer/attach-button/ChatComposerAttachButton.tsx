@@ -1,6 +1,8 @@
 'use client';
 import * as React from 'react';
+import { useStableCallback } from '@base-ui/utils/useStableCallback';
 import { useRenderElement } from '../../internals/useRenderElement';
+import { useButton } from '../../internals/use-button';
 import type { BaseUIComponentProps } from '../../internals/types';
 import type { ChatAttachmentRejection } from '../../chat/types/chat-entities';
 import { useChatLocaleText } from '../../chat/locales/ChatLocaleContext';
@@ -27,6 +29,13 @@ export const ChatComposerAttachButton = React.forwardRef(function ChatComposerAt
   const localeText = useChatLocaleText();
   const inputRef = React.useRef<HTMLInputElement | null>(null);
 
+  const handleClick = useStableCallback((event: React.MouseEvent<HTMLButtonElement>) => {
+    (onClick as React.MouseEventHandler<HTMLButtonElement> | undefined)?.(event);
+    if (!event.defaultPrevented) {
+      inputRef.current?.click();
+    }
+  });
+
   const state: ChatComposerAttachButton.State = {
     submitting: composer.submitting,
     hasValue: composer.hasValue,
@@ -37,6 +46,11 @@ export const ChatComposerAttachButton = React.forwardRef(function ChatComposerAt
 
   const { attachmentConfig } = composer;
   const acceptAttr = attachmentConfig?.acceptedMimeTypes?.join(',') || undefined;
+
+  const { getButtonProps, buttonRef } = useButton({
+    disabled: composer.disabled,
+    focusableWhenDisabled: true,
+  });
 
   return (
     <React.Fragment>
@@ -88,21 +102,17 @@ export const ChatComposerAttachButton = React.forwardRef(function ChatComposerAt
         }}
       />
       {useRenderElement('button', props, {
-        ref: forwardedRef,
+        ref: [forwardedRef, buttonRef],
         state,
-        props: {
-          ...elementProps,
-          type: 'button',
-          'aria-label': localeText.composerAttachButtonLabel,
-          disabled: composer.disabled,
-          children,
-          onClick: (event: React.MouseEvent<HTMLButtonElement>) => {
-            onClick?.(event);
-            if (!event.defaultPrevented) {
-              inputRef.current?.click();
-            }
-          },
-        },
+        props: [
+          elementProps,
+          getButtonProps({
+            type: 'button' as const,
+            'aria-label': localeText.composerAttachButtonLabel,
+            children,
+            onClick: handleClick,
+          }),
+        ],
         stateAttributesMapping,
       })}
     </React.Fragment>

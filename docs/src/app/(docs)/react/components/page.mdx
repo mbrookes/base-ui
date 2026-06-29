@@ -383,42 +383,39 @@ A set of headless components for building chat interfaces.
       - Item
 - Exports:
   - Chat - Root
-    - Props: className, render, style, variant
-  - Chat - Item
-    - Props: className, conversationId, render, style, variant
-  - Chat - Title
+    - Props: attachmentConfig, className, disabled, onSubmit, render, style
+  - Chat - Label
+    - Props: className, htmlFor, render, style
+  - Chat - AttachButton
     - Props: className, render, style
-  - Chat - ItemActions
+  - Chat - AttachmentList
     - Props: className, render, style
-  - Chat - ItemAvatar
+  - Chat - HelperText
     - Props: className, render, style
-  - Chat - ItemContent
+  - Chat - SendButton
     - Props: className, render, style
-  - Chat - Preview
+  - Chat - TextArea
+    - Props: className, onCompositionEnd, onCompositionStart, onKeyDown, render, style
+  - Chat - Toolbar
     - Props: className, render, style
-  - Chat - Timestamp
+  - Chat - useComposerContext
+  - ChatComposerAttachButton
     - Props: className, render, style
-  - Chat - UnreadBadge
+  - ChatComposerAttachmentList
     - Props: className, render, style
-  - ChatConversationListItem
-    - Props: className, conversationId, render, style, variant
-  - ChatConversationListItemActions
+  - ChatComposerHelperText
     - Props: className, render, style
-  - ChatConversationListItemAvatar
+  - ChatComposerLabel
+    - Props: className, htmlFor, render, style
+  - ChatComposerRoot
+    - Props: attachmentConfig, className, disabled, onSubmit, render, style
+  - ChatComposerSendButton
     - Props: className, render, style
-  - ChatConversationListItemContent
+  - ChatComposerTextArea
+    - Props: className, onCompositionEnd, onCompositionStart, onKeyDown, render, style
+  - ChatComposerToolbar
     - Props: className, render, style
-  - ChatConversationListPreview
-    - Props: className, render, style
-  - ChatConversationListRoot
-    - Props: className, render, style, variant
-  - ChatConversationListTimestamp
-    - Props: className, render, style
-  - ChatConversationListTitle
-    - Props: className, render, style
-  - ChatConversationListUnreadBadge
-    - Props: className, render, style
-- Types: ChatConversationList.Item.Props, ChatConversationList.Item.State, ChatConversationList.ItemActions.Props, ChatConversationList.ItemActions.State, ChatConversationList.ItemAvatar.Props, ChatConversationList.ItemAvatar.State, ChatConversationList.ItemContent.Props, ChatConversationList.ItemContent.State, ChatConversationList.Preview.Props, ChatConversationList.Preview.State, ChatConversationList.Root.Props, ChatConversationList.Root.State, ChatConversationList.Timestamp.Props, ChatConversationList.Timestamp.State, ChatConversationList.Title.Props, ChatConversationList.Title.State, ChatConversationList.UnreadBadge.Props, ChatConversationList.UnreadBadge.State, ChatConversationListItem.Props, ChatConversationListItem.State, ChatConversationListItemActions.Props, ChatConversationListItemActions.State, ChatConversationListItemAvatar.Props, ChatConversationListItemAvatar.State, ChatConversationListItemContent.Props, ChatConversationListItemContent.State, ChatConversationListPreview.Props, ChatConversationListPreview.State, ChatConversationListRoot.Props, ChatConversationListRoot.State, ChatConversationListTimestamp.Props, ChatConversationListTimestamp.State, ChatConversationListTitle.Props, ChatConversationListTitle.State, ChatConversationListUnreadBadge.Props, ChatConversationListUnreadBadge.State
+- Types: ChatComposer.AttachButton.Props, ChatComposer.AttachButton.State, ChatComposer.AttachmentList.Props, ChatComposer.AttachmentList.State, ChatComposer.HelperText.Props, ChatComposer.HelperText.State, ChatComposer.Label.Props, ChatComposer.Label.State, ChatComposer.Root.Props, ChatComposer.Root.State, ChatComposer.SendButton.Props, ChatComposer.SendButton.State, ChatComposer.TextArea.Props, ChatComposer.TextArea.State, ChatComposer.Toolbar.Props, ChatComposer.Toolbar.State, ChatComposerAttachButton.Props, ChatComposerAttachButton.State, ChatComposerAttachmentList.Props, ChatComposerAttachmentList.State, ChatComposerHelperText.Props, ChatComposerHelperText.State, ChatComposerLabel.Props, ChatComposerLabel.State, ChatComposerRoot.Props, ChatComposerRoot.State, ChatComposerSendButton.Props, ChatComposerSendButton.State, ChatComposerTextArea.Props, ChatComposerTextArea.State, ChatComposerToolbar.Props, ChatComposerToolbar.State
 
 </details>
 
