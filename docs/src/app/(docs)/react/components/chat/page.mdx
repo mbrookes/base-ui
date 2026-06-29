@@ -116,6 +116,34 @@ const adapter = createAiSdkAdapter({ model: openai('gpt-4o') });
 
 `ChatMessageGroup.Root` tracks consecutive messages from the same author. Each `ChatMessage.Root` that is not the first in a group receives `data-grouped`, which you can use to hide the avatar or compact spacing.
 
+## Avatar
+
+By default, `ChatMessage.Avatar` renders an `<img>` using the `avatarUrl` from the `members` configuration. To show a fallback (initials, icon) when the image fails to load, compose it with the Base UI [Avatar](/react/components/avatar) component. When `children` is provided, `ChatMessage.Avatar` renders those instead of the automatic `<img>`.
+
+Access the author's `displayName` and `avatarUrl` via `ChatMessage.useMessageContext()` inside the `ChatMessage.Root` subtree:
+
+```tsx
+import { Avatar } from '@base-ui/react/avatar';
+
+function MessageAvatar() {
+  const { resolvedAuthor } = ChatMessage.useMessageContext();
+  const initial = resolvedAuthor?.displayName?.[0]?.toUpperCase() ?? '';
+  return (
+    <ChatMessage.Avatar>
+      <Avatar.Root>
+        <Avatar.Image
+          src={resolvedAuthor?.avatarUrl ?? ''}
+          alt={resolvedAuthor?.displayName ?? ''}
+        />
+        <Avatar.Fallback>{initial}</Avatar.Fallback>
+      </Avatar.Root>
+    </ChatMessage.Avatar>
+  );
+}
+```
+
+Then use `<MessageAvatar />` inside your `renderItem` function in place of `<ChatMessage.Avatar />`.
+
 ## Styling
 
 All parts expose data attributes for styling based on state:
