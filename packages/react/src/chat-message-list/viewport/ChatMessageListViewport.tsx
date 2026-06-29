@@ -29,7 +29,6 @@ export const ChatMessageListViewport = React.forwardRef(function ChatMessageList
       {
         role: 'log' as const,
         'aria-label': messageListLabel,
-        'aria-live': 'polite' as const,
         onScroll: handleScroll,
         children,
         style: {

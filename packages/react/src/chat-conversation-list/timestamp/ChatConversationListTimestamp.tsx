@@ -33,7 +33,11 @@ export const ChatConversationListTimestamp = React.forwardRef(
             children ??
             (lastMessageAt ? (
               // suppressHydrationWarning: locale-sensitive formatting can differ between server and client.
-              <time dateTime={lastMessageAt} suppressHydrationWarning>
+              <time
+                dateTime={lastMessageAt}
+                aria-label={localeText.conversationTimestampAriaLabel(lastMessageAt)}
+                suppressHydrationWarning
+              >
                 {localeText.conversationTimestampLabel(lastMessageAt)}
               </time>
             ) : null),

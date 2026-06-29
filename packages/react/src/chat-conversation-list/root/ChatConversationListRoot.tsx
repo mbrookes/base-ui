@@ -108,7 +108,6 @@ export const ChatConversationListRoot = markChatLayoutPane(
           props: [
             elementProps,
             {
-              role: 'listbox' as const,
               'aria-label': localeText.conversationListLandmarkLabel,
               children,
             },

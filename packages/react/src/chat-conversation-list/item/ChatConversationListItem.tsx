@@ -80,9 +80,8 @@ export const ChatConversationListItem = React.forwardRef(function ChatConversati
         props: [
           elementProps,
           {
-            role: 'option' as const,
             tabIndex: focused ? 0 : -1,
-            'aria-selected': selected,
+            'aria-current': selected ? (true as const) : undefined,
             children,
             onClick: () => onItemSelect(conversationId),
             onFocus: () => onItemFocus(conversationId),

@@ -58,7 +58,7 @@ export const ScrollToBottomAffordance = React.forwardRef(function ScrollToBottom
         children: children ?? (
           <React.Fragment>
             <span>{localeText.scrollToBottomLabel}</span>
-            {unseenMessageCount > 0 && <span>{unseenMessageCount}</span>}
+            {unseenMessageCount > 0 && <span aria-hidden="true">{unseenMessageCount}</span>}
           </React.Fragment>
         ),
       },

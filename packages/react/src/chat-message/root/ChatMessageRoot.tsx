@@ -101,7 +101,7 @@ export const ChatMessageRoot = React.forwardRef(function ChatMessageRoot(
       ...elementProps,
       role: 'article',
       'aria-label': resolvedAuthor?.displayName
-        ? `Message from ${resolvedAuthor.displayName}`
+        ? localeText.messageFromAuthorLabel(resolvedAuthor.displayName)
         : localeText.messageLabel,
       'aria-busy': state.streaming || undefined,
       ...(rovingItem.enabled && {

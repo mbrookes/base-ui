@@ -2,6 +2,7 @@
 import * as React from 'react';
 import { useRenderElement } from '../../internals/useRenderElement';
 import type { BaseUIComponentProps } from '../../internals/types';
+import { useChatLocaleText } from '../../chat/locales/ChatLocaleContext';
 import { useComposerContext } from '../internals/ComposerContext';
 
 const stateAttributesMapping = {
@@ -21,6 +22,7 @@ export const ChatComposerToolbar = React.forwardRef(function ChatComposerToolbar
 ) {
   const { ...elementProps } = props;
   const composer = useComposerContext();
+  const localeText = useChatLocaleText();
 
   const state: ChatComposerToolbar.State = {
     submitting: composer.submitting,
@@ -33,7 +35,13 @@ export const ChatComposerToolbar = React.forwardRef(function ChatComposerToolbar
   return useRenderElement('div', props, {
     ref: forwardedRef,
     state,
-    props: elementProps,
+    props: [
+      elementProps,
+      {
+        role: 'group' as const,
+        'aria-label': localeText.composerToolbarLabel,
+      },
+    ],
     stateAttributesMapping,
   });
 });

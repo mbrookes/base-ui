@@ -6,6 +6,8 @@ import { ownerDocument } from '@base-ui/utils/owner';
 import { activeElement } from '../../internals/shadowDom';
 import { useRenderElement } from '../../internals/useRenderElement';
 import type { BaseUIComponentProps } from '../../internals/types';
+import { useLabelableContext } from '../../internals/labelable-provider/LabelableContext';
+import { useLabelableId } from '../../internals/labelable-provider/useLabelableId';
 import { useChat } from '../../chat/hooks/useChat';
 import { useChatLocaleText } from '../../chat/locales/ChatLocaleContext';
 import { useComposerContext } from '../internals/ComposerContext';
@@ -33,11 +35,13 @@ export const ChatComposerTextArea = React.forwardRef(function ChatComposerTextAr
   props: ChatComposerTextArea.Props,
   forwardedRef: React.ForwardedRef<HTMLTextAreaElement>,
 ) {
-  const { onKeyDown, onCompositionStart, onCompositionEnd, ...elementProps } = props;
+  const { onKeyDown, onCompositionStart, onCompositionEnd, id: idProp, ...elementProps } = props;
 
   const { activeConversationId } = useChat();
   const composer = useComposerContext();
   const localeText = useChatLocaleText();
+  const { labelId, messageIds } = useLabelableContext();
+  const id = useLabelableId({ id: idProp });
 
   const state: ChatComposerTextArea.State = {
     submitting: composer.submitting,
@@ -78,43 +82,47 @@ export const ChatComposerTextArea = React.forwardRef(function ChatComposerTextAr
   return useRenderElement('textarea', props, {
     ref: handleRef,
     state,
-    props: {
-      ...elementProps,
-      'aria-label': localeText.composerInputAriaLabel,
-      placeholder: localeText.composerInputPlaceholder,
-      value: composer.value,
-      disabled: composer.disabled,
-      onChange: (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-        composer.setValue(event.target.value);
+    props: [
+      elementProps,
+      {
+        id,
+        'aria-label': labelId ? undefined : localeText.composerInputAriaLabel,
+        'aria-describedby': messageIds.length > 0 ? messageIds.join(' ') : undefined,
+        placeholder: localeText.composerInputPlaceholder,
+        value: composer.value,
+        disabled: composer.disabled,
+        onChange: (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+          composer.setValue(event.target.value);
+        },
+        onKeyDown: (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+          onKeyDown?.(event);
+          if (event.defaultPrevented) {
+            return;
+          }
+          if (
+            event.key === 'Enter' &&
+            !event.shiftKey &&
+            !event.nativeEvent.isComposing &&
+            !composer.disabled
+          ) {
+            event.preventDefault();
+            void composer.submit();
+          }
+        },
+        onCompositionStart: (event: React.CompositionEvent<HTMLTextAreaElement>) => {
+          onCompositionStart?.(event);
+          if (!event.defaultPrevented) {
+            composer.setComposerIsComposing(true);
+          }
+        },
+        onCompositionEnd: (event: React.CompositionEvent<HTMLTextAreaElement>) => {
+          onCompositionEnd?.(event);
+          if (!event.defaultPrevented) {
+            composer.setComposerIsComposing(false);
+          }
+        },
       },
-      onKeyDown: (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
-        onKeyDown?.(event);
-        if (event.defaultPrevented) {
-          return;
-        }
-        if (
-          event.key === 'Enter' &&
-          !event.shiftKey &&
-          !event.nativeEvent.isComposing &&
-          !composer.disabled
-        ) {
-          event.preventDefault();
-          void composer.submit();
-        }
-      },
-      onCompositionStart: (event: React.CompositionEvent<HTMLTextAreaElement>) => {
-        onCompositionStart?.(event);
-        if (!event.defaultPrevented) {
-          composer.setComposerIsComposing(true);
-        }
-      },
-      onCompositionEnd: (event: React.CompositionEvent<HTMLTextAreaElement>) => {
-        onCompositionEnd?.(event);
-        if (!event.defaultPrevented) {
-          composer.setComposerIsComposing(false);
-        }
-      },
-    },
+    ],
     stateAttributesMapping,
   });
 });

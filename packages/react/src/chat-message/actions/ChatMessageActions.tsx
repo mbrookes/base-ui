@@ -2,6 +2,7 @@
 import * as React from 'react';
 import { useRenderElement } from '../../internals/useRenderElement';
 import type { BaseUIComponentProps } from '../../internals/types';
+import { useChatLocaleText } from '../../chat/locales/ChatLocaleContext';
 import { useMessageContext, type MessageState } from '../internals/MessageContext';
 
 const stateAttributesMapping = {
@@ -25,11 +26,18 @@ export const ChatMessageActions = React.forwardRef(function ChatMessageActions(
 ) {
   const { ...elementProps } = props;
   const state: ChatMessageActions.State = useMessageContext();
+  const localeText = useChatLocaleText();
 
   return useRenderElement('div', props, {
     ref: forwardedRef,
     state,
-    props: elementProps,
+    props: [
+      elementProps,
+      {
+        role: 'toolbar' as const,
+        'aria-label': localeText.messageActionsLabel,
+      },
+    ],
     stateAttributesMapping,
   });
 });

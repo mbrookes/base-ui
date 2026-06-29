@@ -6,18 +6,18 @@ import { useConversationContext, type ConversationState } from '../internals/Con
 
 /**
  * The header area of the conversation pane.
- * Renders a `<div>` element.
+ * Renders a `<header>` element.
  *
  * Documentation: [Base UI Chat](https://base-ui.com/react/components/chat)
  */
 export const ChatConversationHeader = React.forwardRef(function ChatConversationHeader(
   props: ChatConversationHeader.Props,
-  forwardedRef: React.ForwardedRef<HTMLDivElement>,
+  forwardedRef: React.ForwardedRef<HTMLElement>,
 ) {
   const { children, ...elementProps } = props;
   const state: ChatConversationHeader.State = useConversationContext();
 
-  return useRenderElement('div', props, {
+  return useRenderElement('header', props, {
     ref: forwardedRef,
     state,
     props: [elementProps, { children }],
@@ -26,5 +26,5 @@ export const ChatConversationHeader = React.forwardRef(function ChatConversation
 
 export namespace ChatConversationHeader {
   export interface State extends ConversationState {}
-  export interface Props extends BaseUIComponentProps<'div', State> {}
+  export interface Props extends BaseUIComponentProps<'header', State> {}
 }

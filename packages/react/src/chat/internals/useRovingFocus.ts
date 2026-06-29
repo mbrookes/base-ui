@@ -1,5 +1,6 @@
 'use client';
 import * as React from 'react';
+import { useTimeout } from '@base-ui/utils/useTimeout';
 
 // Module-level persistence of the last focused item id, namespaced per consumer
 // `scope` so multiple lists sharing the same restore key (e.g. the conversation
@@ -200,13 +201,8 @@ export function useRovingFocus(params: UseRovingFocusParameters): UseRovingFocus
     [focusItem, itemIds, setFocusedId],
   );
 
-  const typeAheadRef = React.useRef<{
-    buffer: string;
-    resetTimer: ReturnType<typeof setTimeout> | null;
-  }>({
-    buffer: '',
-    resetTimer: null,
-  });
+  const typeAheadRef = React.useRef({ buffer: '' });
+  const typeAheadTimeout = useTimeout();
 
   const moveFocusToLabelPrefix = React.useCallback(
     (prefix: string, fromIndex: number) => {
@@ -303,13 +299,9 @@ export function useRovingFocus(params: UseRovingFocusParameters): UseRovingFocus
       event.preventDefault();
       typeAheadRef.current.buffer += event.key;
 
-      if (typeAheadRef.current.resetTimer != null) {
-        clearTimeout(typeAheadRef.current.resetTimer);
-      }
-      typeAheadRef.current.resetTimer = setTimeout(() => {
+      typeAheadTimeout.start(800, () => {
         typeAheadRef.current.buffer = '';
-        typeAheadRef.current.resetTimer = null;
-      }, 800);
+      });
 
       moveFocusToLabelPrefix(typeAheadRef.current.buffer, currentIndex);
     },
@@ -321,16 +313,8 @@ export function useRovingFocus(params: UseRovingFocusParameters): UseRovingFocus
       moveFocusToLabelPrefix,
       onActivate,
       pageSizeDivisor,
+      typeAheadTimeout,
     ],
-  );
-
-  React.useEffect(
-    () => () => {
-      if (typeAheadRef.current.resetTimer != null) {
-        clearTimeout(typeAheadRef.current.resetTimer);
-      }
-    },
-    [],
   );
 
   return {

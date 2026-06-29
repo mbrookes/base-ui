@@ -1,6 +1,8 @@
 'use client';
 import * as React from 'react';
 import { useIsoLayoutEffect } from '@base-ui/utils/useIsoLayoutEffect';
+import { ownerDocument } from '@base-ui/utils/owner';
+import { activeElement } from '../../internals/shadowDom';
 import { useOptionalMessageContext } from '../../chat-message/internals/MessageContext';
 import type { UseRovingFocusReturn } from '../../chat/internals/useRovingFocus';
 
@@ -88,7 +90,7 @@ export function focusFirstFocusableDescendant(article: HTMLElement): boolean {
   for (let i = 0; i < candidates.length; i += 1) {
     const candidate = candidates[i];
     candidate.focus();
-    if (document.activeElement === candidate) {
+    if (activeElement(ownerDocument(candidate)) === candidate) {
       return true;
     }
   }

@@ -67,6 +67,14 @@ export interface ChatLocaleText {
   responseStreamingStartedAnnouncement: string;
   /** Announced (politely) when a streaming response completes. */
   responseStreamingCompletedAnnouncement: string;
+  /** Accessible label for the composer toolbar (the action buttons container). */
+  composerToolbarLabel: string;
+  /** Accessible label for an individual message when the author's name is known. */
+  messageFromAuthorLabel(displayName: string): string;
+  /** Accessible label for the unread count badge when the count is known. */
+  unreadMessageCountLabel(count: number): string;
+  /** Full (unabbreviated) accessible label for a conversation timestamp. */
+  conversationTimestampAriaLabel(dateTime: string): string;
 }
 
 function getUserLabel(user: ChatLocaleTypingUser) {
@@ -96,6 +104,21 @@ function formatConversationTimestamp(dateTime: string): string {
     return d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
   }
   return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+}
+
+function formatConversationTimestampForAria(dateTime: string): string {
+  const d = new Date(dateTime);
+  if (Number.isNaN(d.getTime())) {
+    return dateTime;
+  }
+  return d.toLocaleString(undefined, {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
 }
 
 const messageStatusLabels: Record<ChatMessageStatus, string> = {
@@ -178,4 +201,8 @@ export const CHAT_DEFAULT_LOCALE_TEXT: ChatLocaleText = {
   messageActionsLabel: 'Message actions',
   responseStreamingStartedAnnouncement: 'Assistant is responding',
   responseStreamingCompletedAnnouncement: 'Response complete',
+  composerToolbarLabel: 'Composer actions',
+  messageFromAuthorLabel: (displayName) => `Message from ${displayName}`,
+  unreadMessageCountLabel: (count) => `${count > 99 ? '99+' : count} unread messages`,
+  conversationTimestampAriaLabel: (dateTime) => formatConversationTimestampForAria(dateTime),
 };

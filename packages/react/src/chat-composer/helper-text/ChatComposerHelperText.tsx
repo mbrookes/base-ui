@@ -1,7 +1,10 @@
 'use client';
 import * as React from 'react';
+import { useIsoLayoutEffect } from '@base-ui/utils/useIsoLayoutEffect';
 import { useRenderElement } from '../../internals/useRenderElement';
 import type { BaseUIComponentProps } from '../../internals/types';
+import { useBaseUiId } from '../../internals/useBaseUiId';
+import { useLabelableContext } from '../../internals/labelable-provider/LabelableContext';
 import { useComposerContext } from '../internals/ComposerContext';
 
 const stateAttributesMapping = {
@@ -21,9 +24,21 @@ export const ChatComposerHelperText = React.forwardRef(function ChatComposerHelp
   props: ChatComposerHelperText.Props,
   forwardedRef: React.ForwardedRef<HTMLDivElement>,
 ) {
-  const { children, role, ...elementProps } = props;
+  const { children, role, id: idProp, ...elementProps } = props;
   const composer = useComposerContext();
   const hasError = composer.error != null;
+  const { setMessageIds } = useLabelableContext();
+  const id = useBaseUiId(idProp);
+
+  useIsoLayoutEffect(() => {
+    if (!id) {
+      return undefined;
+    }
+    setMessageIds((v) => v.concat(id));
+    return () => {
+      setMessageIds((v) => v.filter((item) => item !== id));
+    };
+  }, [id, setMessageIds]);
 
   const state: ChatComposerHelperText.State = {
     submitting: composer.submitting,
@@ -36,22 +51,18 @@ export const ChatComposerHelperText = React.forwardRef(function ChatComposerHelp
 
   const content = children ?? composer.error?.message ?? null;
 
-  const element = useRenderElement('div', props, {
+  return useRenderElement('div', props, {
     ref: forwardedRef,
     state,
     props: {
       ...elementProps,
-      role: role ?? (hasError ? 'alert' : undefined),
+      id,
+      role: role ?? (hasError ? 'alert' : 'status'),
+      'aria-hidden': content == null ? (true as const) : undefined,
       children: content,
     },
     stateAttributesMapping,
   });
-
-  if (content == null) {
-    return null;
-  }
-
-  return element;
 });
 
 export namespace ChatComposerHelperText {

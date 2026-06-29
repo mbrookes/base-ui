@@ -2,6 +2,8 @@
 import * as React from 'react';
 import { useRenderElement } from '../../internals/useRenderElement';
 import type { BaseUIComponentProps } from '../../internals/types';
+import { useLabelableContext } from '../../internals/labelable-provider/LabelableContext';
+import { useLabel } from '../../internals/labelable-provider/useLabel';
 import { useChatLocaleText } from '../../chat/locales/ChatLocaleContext';
 import { useComposerContext } from '../internals/ComposerContext';
 
@@ -20,9 +22,11 @@ export const ChatComposerLabel = React.forwardRef(function ChatComposerLabel(
   props: ChatComposerLabel.Props,
   forwardedRef: React.ForwardedRef<HTMLLabelElement>,
 ) {
-  const { children, htmlFor, ...elementProps } = props;
+  const { children, ...elementProps } = props;
   const composer = useComposerContext();
   const localeText = useChatLocaleText();
+  const { labelId } = useLabelableContext();
+  const labelProps = useLabel({ id: labelId, native: true });
 
   const state: ChatComposerLabel.State = {
     submitting: composer.submitting,
@@ -35,11 +39,7 @@ export const ChatComposerLabel = React.forwardRef(function ChatComposerLabel(
   return useRenderElement('label', props, {
     ref: forwardedRef,
     state,
-    props: {
-      ...elementProps,
-      htmlFor,
-      children: children ?? localeText.composerInputAriaLabel,
-    },
+    props: [labelProps, elementProps, { children: children ?? localeText.composerInputAriaLabel }],
     stateAttributesMapping,
   });
 });
@@ -53,7 +53,5 @@ export namespace ChatComposerLabel {
     disabled: boolean;
   }
 
-  export interface Props extends BaseUIComponentProps<'label', State> {
-    htmlFor?: string | undefined;
-  }
+  export interface Props extends BaseUIComponentProps<'label', State> {}
 }

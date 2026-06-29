@@ -27,7 +27,6 @@ export const ChatMessageAvatar = React.forwardRef(function ChatMessageAvatar(
   const { children, ...elementProps } = props;
   const ctx = useMessageContext();
   const avatarUrl = ctx.resolvedAuthor?.avatarUrl;
-  const displayName = ctx.resolvedAuthor?.displayName;
 
   const state: ChatMessageAvatar.State = ctx;
 
@@ -36,7 +35,7 @@ export const ChatMessageAvatar = React.forwardRef(function ChatMessageAvatar(
     state,
     props: {
       ...elementProps,
-      children: children ?? (avatarUrl ? <img alt={displayName ?? ''} src={avatarUrl} /> : null),
+      children: children ?? (avatarUrl ? <img alt="" src={avatarUrl} /> : null),
     },
     stateAttributesMapping,
   });

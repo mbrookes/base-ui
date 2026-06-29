@@ -2,6 +2,7 @@
 import * as React from 'react';
 import { useRenderElement } from '../../internals/useRenderElement';
 import type { BaseUIComponentProps } from '../../internals/types';
+import { useChatLocaleText } from '../../chat/locales/ChatLocaleContext';
 import { useConversationListItemContext } from '../internals/ConversationListItemContext';
 import type { ConversationListItemState } from '../internals/ConversationListItemContext';
 
@@ -24,6 +25,7 @@ export const ChatConversationListUnreadBadge = React.forwardRef(
     const { children, ...elementProps } = props;
     const state: ChatConversationListUnreadBadge.State = useConversationListItemContext();
     const { conversation, unread, variant } = state;
+    const localeText = useChatLocaleText();
 
     const unreadCount =
       conversation?.unreadCount != null && conversation.unreadCount > 0
@@ -35,10 +37,17 @@ export const ChatConversationListUnreadBadge = React.forwardRef(
         ? (children ?? (unreadCount != null ? formatUnreadCount(unreadCount) : ''))
         : (children ?? (unreadCount != null ? formatUnreadCount(unreadCount) : null));
 
+    let ariaLabel: string | undefined;
+    if (unreadCount != null) {
+      ariaLabel = localeText.unreadMessageCountLabel(unreadCount);
+    } else if (unread) {
+      ariaLabel = localeText.unreadMarkerLabel;
+    }
+
     const element = useRenderElement('span', props, {
       ref: forwardedRef,
       state,
-      props: [elementProps, { children: badgeChildren }],
+      props: [elementProps, { children: badgeChildren, 'aria-label': ariaLabel }],
     });
 
     if (variant === 'compact') {

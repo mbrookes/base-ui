@@ -2,6 +2,7 @@
 import * as React from 'react';
 import { useRenderElement } from '../../internals/useRenderElement';
 import type { BaseUIComponentProps } from '../../internals/types';
+import { LabelableProvider } from '../../internals/labelable-provider';
 import { useChatComposer } from '../../chat/hooks/useChatComposer';
 import { useChatStatus } from '../../chat/hooks/useChatStatus';
 import { useChatStore } from '../../chat/hooks/useChatStore';
@@ -71,30 +72,32 @@ export const ChatComposerRoot = React.forwardRef(function ChatComposerRoot(
 
   return (
     <ComposerContextProvider value={contextValue}>
-      {useRenderElement('form', props, {
-        ref: forwardedRef,
-        state,
-        props: {
-          ...elementProps,
-          'aria-label': localeText.composerLandmarkLabel,
-          children,
-          onSubmit: (event: React.FormEvent<HTMLFormElement>) => {
-            event.preventDefault();
-            let submitPrevented = false;
-            const originalPreventDefault = event.preventDefault.bind(event);
-            event.preventDefault = () => {
-              submitPrevented = true;
-              originalPreventDefault();
-            };
-            onSubmit?.(event);
-            if (submitPrevented || disabled) {
-              return;
-            }
-            void composer.submit();
+      <LabelableProvider>
+        {useRenderElement('form', props, {
+          ref: forwardedRef,
+          state,
+          props: {
+            ...elementProps,
+            'aria-label': localeText.composerLandmarkLabel,
+            children,
+            onSubmit: (event: React.FormEvent<HTMLFormElement>) => {
+              event.preventDefault();
+              let submitPrevented = false;
+              const originalPreventDefault = event.preventDefault.bind(event);
+              event.preventDefault = () => {
+                submitPrevented = true;
+                originalPreventDefault();
+              };
+              onSubmit?.(event);
+              if (submitPrevented || disabled) {
+                return;
+              }
+              void composer.submit();
+            },
           },
-        },
-        stateAttributesMapping,
-      })}
+          stateAttributesMapping,
+        })}
+      </LabelableProvider>
     </ComposerContextProvider>
   );
 });
