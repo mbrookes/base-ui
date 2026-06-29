@@ -28,13 +28,13 @@ import {
 import { createTextDeltaBuffer } from './streamTextDeltaBuffer';
 
 export interface ProcessStreamOptions {
-  conversationId?: string;
-  messageId?: string;
-  signal?: AbortSignal;
-  flushInterval?: number;
-  onData?: ChatOnData;
-  onToolCall?: ChatOnToolCall;
-  onFinish?: ChatOnFinish;
+  conversationId?: string | undefined;
+  messageId?: string | undefined;
+  signal?: AbortSignal | undefined;
+  flushInterval?: number | undefined;
+  onData?: ChatOnData | undefined;
+  onToolCall?: ChatOnToolCall | undefined;
+  onFinish?: ChatOnFinish | undefined;
   /**
    * Lower-bound sequence value to accept on a reconnected stream.
    *
@@ -44,23 +44,23 @@ export interface ProcessStreamOptions {
    * silently drop those — set this to the sequence you want to resume from
    * so they apply (#5).
    */
-  reconnectFromSequence?: number;
+  reconnectFromSequence?: number | undefined;
   /**
    * Event ids already consumed before this stream attempt.
    * Used when reconnecting so replayed envelopes can be skipped.
    */
-  seenEventIds?: Iterable<string>;
+  seenEventIds?: Iterable<string> | undefined;
 }
 
 export interface ProcessStreamResult {
-  messageId?: string;
+  messageId?: string | undefined;
   status: 'sent' | 'cancelled' | 'error';
-  finishReason?: string;
+  finishReason?: string | undefined;
   isAbort: boolean;
   isDisconnect: boolean;
   isError: boolean;
-  nextSequence?: number;
-  seenEventIds?: string[];
+  nextSequence?: number | undefined;
+  seenEventIds?: string[] | undefined;
 }
 
 const DEFAULT_STREAM_FLUSH_INTERVAL = 16;

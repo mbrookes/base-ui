@@ -54,6 +54,6 @@ export namespace ChatComposerLabel {
   }
 
   export interface Props extends BaseUIComponentProps<'label', State> {
-    htmlFor?: string;
+    htmlFor?: string | undefined;
   }
 }

@@ -7,7 +7,7 @@ export interface ChatPartRendererProps<TPart extends ChatMessagePart = ChatMessa
   part: TPart;
   message: ChatMessage;
   index: number;
-  onToolCall?: ChatOnToolCall;
+  onToolCall?: ChatOnToolCall | undefined;
 }
 
 export type ChatPartRenderer<TPart extends ChatMessagePart = ChatMessagePart> = (

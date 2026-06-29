@@ -36,7 +36,9 @@ export const ChatMessageError = React.forwardRef(function ChatMessageError(
   const runtime = useChatRuntimeContext(true);
 
   const retry = React.useCallback(async () => {
-    if (!runtime || !messageId) return;
+    if (!runtime || !messageId) {
+      return;
+    }
     await runtime.actions.retry(messageId);
   }, [runtime, messageId]);
 
@@ -58,7 +60,9 @@ export const ChatMessageError = React.forwardRef(function ChatMessageError(
     stateAttributesMapping,
   });
 
-  if (!chatError) return null;
+  if (!chatError) {
+    return null;
+  }
 
   return element;
 });

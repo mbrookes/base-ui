@@ -9,8 +9,6 @@
 Groups consecutive messages from the same author.
 Renders a `<div>` element.
 
-Documentation: [Base UI Chat](https://base-ui.com/react/components/chat)
-
 **Root Props:**
 
 | Prop        | Type                                                                                                | Default | Description                                                                                                                                                                                   |
@@ -48,8 +46,6 @@ Displays the author name for the first message in a group.
 Renders nothing when the message is not the first in its group.
 Renders a `<div>` element.
 
-Documentation: [Base UI Chat](https://base-ui.com/react/components/chat)
-
 **AuthorName Props:**
 
 | Prop      | Type                                                                                                      | Default | Description                                                                                                                                                                                   |
@@ -82,8 +78,6 @@ type ChatMessageGroupAuthorNameState = {
 Displays the author name for the first message in a group.
 Renders nothing when the message is not the first in its group.
 Renders a `<div>` element.
-
-Documentation: [Base UI Chat](https://base-ui.com/react/components/chat)
 
 **ChatMessageGroupAuthorName Props:**
 
@@ -140,8 +134,6 @@ type ChatMessageGroupAuthorNameState = {
 
 Groups consecutive messages from the same author.
 Renders a `<div>` element.
-
-Documentation: [Base UI Chat](https://base-ui.com/react/components/chat)
 
 **ChatMessageGroupRoot Props:**
 

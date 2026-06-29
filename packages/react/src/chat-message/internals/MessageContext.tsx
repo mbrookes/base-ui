@@ -8,8 +8,8 @@ import type { ResolvedMessageAuthor } from '../../chat/internals/messageAuthor';
 export interface MessageState {
   messageId: string;
   message: ChatMessage | null;
-  role?: ChatRole;
-  status?: ChatMessageStatus;
+  role?: ChatRole | undefined;
+  status?: ChatMessageStatus | undefined;
   streaming: boolean;
   error: boolean;
   grouped: boolean;

@@ -39,8 +39,12 @@ export const ChatMessageAuthorLabel = React.forwardRef(function ChatMessageAutho
     stateAttributesMapping,
   });
 
-  if (ctx.variant !== 'compact' || ctx.grouped) return null;
-  if (!authorLabel && !children) return null;
+  if (ctx.variant !== 'compact' || ctx.grouped) {
+    return null;
+  }
+  if (!authorLabel && !children) {
+    return null;
+  }
 
   return element;
 });

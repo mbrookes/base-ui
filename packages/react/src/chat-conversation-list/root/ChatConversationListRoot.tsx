@@ -123,7 +123,7 @@ export const ChatConversationListRoot = markChatLayoutPane(
 export namespace ChatConversationListRoot {
   export interface State {
     conversationCount: number;
-    activeConversationId?: string;
+    activeConversationId?: string | undefined;
     variant: ConversationListVariant;
   }
 
@@ -134,6 +134,6 @@ export namespace ChatConversationListRoot {
      * - `'compact'` – shows only an unread indicator, the title, and an actions slot.
      * @default 'default'
      */
-    variant?: ConversationListVariant;
+    variant?: ConversationListVariant | undefined;
   }
 }

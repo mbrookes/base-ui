@@ -1,7 +1,7 @@
 'use client';
 import * as React from 'react';
 import type { ChatAdapter } from '../adapters';
-import { ChatStore, type ChatStoreConstructor, type ChatStoreParameters } from '../store';
+import { type ChatStoreConstructor, type ChatStoreParameters } from '../store';
 import { useChatController } from '../internals/useChatController';
 import { useChatInstance } from '../internals/useChatInstance';
 import {
@@ -22,7 +22,7 @@ export interface ChatFeatures {
    * automatically as the user composes a message.
    * @default false
    */
-  typingSignal?: boolean;
+  typingSignal?: boolean | undefined;
 }
 
 export interface ChatProviderProps<Cursor = string> extends Omit<
@@ -31,25 +31,25 @@ export interface ChatProviderProps<Cursor = string> extends Omit<
 > {
   children?: React.ReactNode;
   adapter: ChatAdapter<Cursor>;
-  onToolCall?: ChatOnToolCall;
-  onFinish?: ChatOnFinish;
-  onData?: ChatOnData;
-  onError?: ChatOnError;
+  onToolCall?: ChatOnToolCall | undefined;
+  onFinish?: ChatOnFinish | undefined;
+  onData?: ChatOnData | undefined;
+  onError?: ChatOnError | undefined;
   /**
    * Flush interval in milliseconds for batching rapid streaming deltas before applying them to the store.
    * @default 16
    */
-  streamFlushInterval?: number;
-  partRenderers?: ChatPartRendererMap;
+  streamFlushInterval?: number | undefined;
+  partRenderers?: ChatPartRendererMap | undefined;
   /**
    * The store class to use for this provider.
    * @default ChatStore
    */
-  storeClass?: ChatStoreConstructor<Cursor>;
+  storeClass?: ChatStoreConstructor<Cursor> | undefined;
   /**
    * Runtime feature flags for the chat controller (e.g. outbound typing signals).
    */
-  features?: ChatFeatures;
+  features?: ChatFeatures | undefined;
 }
 
 export function ChatProvider<Cursor = string>(props: ChatProviderProps<Cursor>) {

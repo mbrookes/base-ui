@@ -42,7 +42,7 @@ export const FilePart = React.forwardRef(function FilePart(
   props: FilePart.Props,
   forwardedRef: React.ForwardedRef<HTMLDivElement>,
 ) {
-  const { index: _index, message, onToolCall: _onToolCall, part, ...elementProps } = props;
+  const { index, message, onToolCall, part, ...elementProps } = props;
 
   const isImage = part.mediaType.startsWith('image/');
   const contentTabIndex = useMessageContentTabIndex();

@@ -2,8 +2,8 @@
 import * as React from 'react';
 import { useMergedRefs } from '@base-ui/utils/useMergedRefs';
 import { useIsoLayoutEffect } from '@base-ui/utils/useIsoLayoutEffect';
-import { activeElement } from '../../internals/shadowDom';
 import { ownerDocument } from '@base-ui/utils/owner';
+import { activeElement } from '../../internals/shadowDom';
 import type { BaseUIComponentProps } from '../../internals/types';
 import { useRenderElement } from '../../internals/useRenderElement';
 import { useMessage } from '../../chat/hooks/useMessage';
@@ -38,13 +38,7 @@ export const ChatMessageRoot = React.forwardRef(function ChatMessageRoot(
   props: ChatMessageRoot.Props,
   forwardedRef: React.ForwardedRef<HTMLDivElement>,
 ) {
-  const {
-    children,
-    messageId,
-    grouped: groupedProp = false,
-    groupAuthorName: _groupAuthorName,
-    ...elementProps
-  } = props;
+  const { children, messageId, grouped: groupedProp = false, ...elementProps } = props;
 
   const groupCtx = useMessageGroupContext();
   const message = useMessage(messageId);
@@ -85,12 +79,18 @@ export const ChatMessageRoot = React.forwardRef(function ChatMessageRoot(
   const handleRef = useMergedRefs(forwardedRef, registerRovingRef as React.Ref<HTMLDivElement>);
 
   useIsoLayoutEffect(() => {
-    if (!rovingItem.actionable) return;
+    if (!rovingItem.actionable) {
+      return;
+    }
     const article = localRootRef.current;
-    if (article == null) return;
+    if (article == null) {
+      return;
+    }
     const doc = ownerDocument(article);
     const active = activeElement(doc);
-    if (active != null && article.contains(active) && active !== article) return;
+    if (active != null && article.contains(active) && active !== article) {
+      return;
+    }
     focusFirstFocusableDescendant(article);
   }, [rovingItem.actionable]);
 
@@ -128,8 +128,6 @@ export namespace ChatMessageRoot {
 
   export interface Props extends BaseUIComponentProps<'div', State> {
     messageId: string;
-    grouped?: boolean;
-    /** @ignore Internal channel from MessageGroup to the message component. */
-    groupAuthorName?: React.ReactNode;
+    grouped?: boolean | undefined;
   }
 }

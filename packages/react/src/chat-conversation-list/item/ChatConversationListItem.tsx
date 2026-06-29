@@ -101,6 +101,6 @@ export namespace ChatConversationListItem {
 
   export interface Props extends BaseUIComponentProps<'div', State> {
     conversationId: string;
-    variant?: ConversationListVariant;
+    variant?: ConversationListVariant | undefined;
   }
 }

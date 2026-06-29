@@ -61,10 +61,10 @@ export namespace ChatSuggestionsItem {
     /** The value to pre-fill into the composer when clicked. */
     value: string;
     /** Display label. Falls back to `value`. */
-    label?: string;
+    label?: string | undefined;
     /** The index of this item within the suggestions list. */
-    index?: number;
+    index?: number | undefined;
     children?: React.ReactNode;
-    onClick?: React.MouseEventHandler<HTMLButtonElement>;
+    onClick?: React.MouseEventHandler<HTMLButtonElement> | undefined;
   }
 }

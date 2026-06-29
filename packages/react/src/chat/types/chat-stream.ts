@@ -10,13 +10,13 @@ import type {
 export interface ChatStartMessageChunk {
   type: 'start';
   messageId: string;
-  author?: import('./chat-entities').ChatUser;
+  author?: import('./chat-entities').ChatUser | undefined;
 }
 
 export interface ChatFinishMessageChunk {
   type: 'finish';
   messageId: string;
-  finishReason?: string;
+  finishReason?: string | undefined;
 }
 
 export interface ChatAbortMessageChunk {
@@ -60,7 +60,7 @@ interface ChatFallbackToolInputStartChunk<TToolName extends string = string> {
   type: 'tool-input-start';
   toolCallId: string;
   toolName: TToolName;
-  dynamic?: boolean;
+  dynamic?: boolean | undefined;
 }
 
 interface ChatRegisteredToolInputStartChunk<
@@ -69,7 +69,7 @@ interface ChatRegisteredToolInputStartChunk<
   type: 'tool-input-start';
   toolCallId: string;
   toolName: TToolName;
-  dynamic?: false;
+  dynamic?: false | undefined;
 }
 
 interface ChatDynamicToolInputStartChunk<TToolName extends string = string> {
@@ -141,7 +141,7 @@ export interface ChatToolInputErrorChunk {
 
 interface ChatFallbackToolApprovalRequestChunk<TToolName extends string = string> {
   type: 'tool-approval-request';
-  approvalId?: string;
+  approvalId?: string | undefined;
   toolCallId: string;
   toolName: TToolName;
   input: ChatToolInput<TToolName>;
@@ -151,7 +151,7 @@ interface ChatRegisteredToolApprovalRequestChunk<
   TToolName extends ChatRegisteredToolName = ChatRegisteredToolName,
 > {
   type: 'tool-approval-request';
-  approvalId?: string;
+  approvalId?: string | undefined;
   toolCallId: string;
   toolName: TToolName;
   input: ChatToolInput<TToolName>;
@@ -159,7 +159,7 @@ interface ChatRegisteredToolApprovalRequestChunk<
 
 interface ChatDynamicToolApprovalRequestChunk<TToolName extends string = string> {
   type: 'tool-approval-request';
-  approvalId?: string;
+  approvalId?: string | undefined;
   toolCallId: string;
   toolName: TToolName;
   input: unknown;
@@ -182,7 +182,7 @@ export interface ChatToolOutputAvailableChunk<TToolName extends string = string>
   type: 'tool-output-available';
   toolCallId: string;
   output: ChatToolOutput<TToolName>;
-  preliminary?: boolean;
+  preliminary?: boolean | undefined;
 }
 
 export interface ChatToolOutputErrorChunk {
@@ -194,50 +194,50 @@ export interface ChatToolOutputErrorChunk {
 export interface ChatToolOutputDeniedChunk {
   type: 'tool-output-denied';
   toolCallId: string;
-  reason?: string;
+  reason?: string | undefined;
 }
 
 export interface ChatSourceUrlChunk {
   type: 'source-url';
   sourceId: string;
   url: string;
-  title?: string;
+  title?: string | undefined;
 }
 
 export interface ChatSourceDocumentChunk {
   type: 'source-document';
   sourceId: string;
-  title?: string;
-  text?: string;
+  title?: string | undefined;
+  text?: string | undefined;
 }
 
 export interface ChatFileChunk {
   type: 'file';
-  id?: string;
+  id?: string | undefined;
   mediaType: string;
   url: string;
-  filename?: string;
+  filename?: string | undefined;
 }
 
 export interface ChatFallbackDataChunk<
   TType extends ChatKnownDataPartType = ChatKnownDataPartType,
 > {
   type: TType;
-  id?: string;
+  id?: string | undefined;
   data: [ChatRegisteredDataPartType] extends [never]
     ? unknown
     : TType extends keyof ChatDataPartMap
       ? ChatDataPartMap[TType]
       : never;
-  transient?: boolean;
+  transient?: boolean | undefined;
 }
 
 type ChatRegisteredDataChunk = {
   [TType in ChatRegisteredDataPartType]: {
     type: TType;
-    id?: string;
+    id?: string | undefined;
     data: ChatDataPartMap[TType];
-    transient?: boolean;
+    transient?: boolean | undefined;
   };
 }[ChatRegisteredDataPartType];
 
@@ -285,7 +285,7 @@ export type ChatMessageChunk =
   | ChatMessageMetadataChunk;
 
 export interface ChatStreamEnvelope {
-  eventId?: string;
-  sequence?: number;
+  eventId?: string | undefined;
+  sequence?: number | undefined;
   chunk: ChatMessageChunk;
 }

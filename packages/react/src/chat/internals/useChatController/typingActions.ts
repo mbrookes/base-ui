@@ -6,7 +6,7 @@ import type { ChatFeatures } from '../../provider/ChatProvider';
 
 export interface TypingActionsRuntimeRef<Cursor = string> {
   adapter: ChatAdapter<Cursor>;
-  features?: ChatFeatures;
+  features?: ChatFeatures | undefined;
 }
 
 function warnSetTypingFailed(): void {

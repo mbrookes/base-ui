@@ -30,7 +30,7 @@ export function createConversationActions<Cursor = string>(params: {
   async function loadConversationMessages(
     conversationId: string | undefined,
     options: {
-      resetWhenUndefined?: boolean;
+      resetWhenUndefined?: boolean | undefined;
     } = {},
   ): Promise<void> {
     conversationLoadRequestIdRef.current += 1;

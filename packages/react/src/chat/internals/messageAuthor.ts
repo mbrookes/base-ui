@@ -7,10 +7,10 @@ import type {
 } from '../types/chat-entities';
 
 export interface ResolvedMessageAuthor {
-  id?: string;
-  displayName?: string;
-  avatarUrl?: string;
-  isOwnMessage?: boolean;
+  id?: string | undefined;
+  displayName?: string | undefined;
+  avatarUrl?: string | undefined;
+  isOwnMessage?: boolean | undefined;
 }
 
 // Final fallback when neither the locale-driven `roleDisplayNames` parameter
@@ -34,15 +34,15 @@ function getRoleDisplayName(
 }
 
 export interface ResolveMessageAuthorParameters extends ChatMessageAuthorGetterProps {
-  currentUser?: ChatUser;
-  members?: ChatUser[];
-  activeConversation?: ChatConversation;
+  currentUser?: ChatUser | undefined;
+  members?: ChatUser[] | undefined;
+  activeConversation?: ChatConversation | undefined;
   /**
    * Optional locale-driven labels used as the last resort when no other author
    * signal resolves a displayName. `useMessageAuthor` populates this from
    * `localeText.messageAuthor{User,Assistant,System}Label`.
    */
-  roleDisplayNames?: Partial<Record<ChatRole, string>>;
+  roleDisplayNames?: Partial<Record<ChatRole, string>> | undefined;
 }
 
 function normalizeOptionalString(value: string | null | undefined): string | undefined {

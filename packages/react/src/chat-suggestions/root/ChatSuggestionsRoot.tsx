@@ -12,7 +12,7 @@ export interface ChatSuggestion {
   /** The value to pre-fill into the composer when the suggestion is clicked. */
   value: string;
   /** Display label. Falls back to `value` if omitted. */
-  label?: string;
+  label?: string | undefined;
 }
 
 function normalizeSuggestion(item: ChatSuggestion | string): ChatSuggestion {
@@ -106,16 +106,16 @@ export namespace ChatSuggestionsRoot {
      * Suggestion items. Strings are normalized to `{ value, label }`.
      * Ignored when `children` are provided.
      */
-    suggestions?: Array<ChatSuggestion | string>;
+    suggestions?: Array<ChatSuggestion | string> | undefined;
     /**
      * Whether to auto-submit when a suggestion is clicked.
      * @default false
      */
-    autoSubmit?: boolean;
+    autoSubmit?: boolean | undefined;
     /**
      * When `true`, renders suggestions even if the conversation has messages.
      * @default false
      */
-    alwaysVisible?: boolean;
+    alwaysVisible?: boolean | undefined;
   }
 }

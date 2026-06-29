@@ -2,8 +2,8 @@
 import * as React from 'react';
 import { useMergedRefs } from '@base-ui/utils/useMergedRefs';
 import { useIsoLayoutEffect } from '@base-ui/utils/useIsoLayoutEffect';
-import { activeElement } from '../../internals/shadowDom';
 import { ownerDocument } from '@base-ui/utils/owner';
+import { activeElement } from '../../internals/shadowDom';
 import { useRenderElement } from '../../internals/useRenderElement';
 import type { BaseUIComponentProps } from '../../internals/types';
 import { useChat } from '../../chat/hooks/useChat';
@@ -16,7 +16,9 @@ const stateAttributesMapping = {
 };
 
 function syncTextareaHeight(textarea: HTMLTextAreaElement | null) {
-  if (!textarea) return;
+  if (!textarea) {
+    return;
+  }
   textarea.style.height = 'auto';
   textarea.style.height = `${textarea.scrollHeight}px`;
 }
@@ -87,7 +89,9 @@ export const ChatComposerTextArea = React.forwardRef(function ChatComposerTextAr
       },
       onKeyDown: (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
         onKeyDown?.(event);
-        if (event.defaultPrevented) return;
+        if (event.defaultPrevented) {
+          return;
+        }
         if (
           event.key === 'Enter' &&
           !event.shiftKey &&
@@ -125,8 +129,8 @@ export namespace ChatComposerTextArea {
   }
 
   export interface Props extends BaseUIComponentProps<'textarea', State> {
-    onKeyDown?: React.KeyboardEventHandler<HTMLTextAreaElement>;
-    onCompositionStart?: React.CompositionEventHandler<HTMLTextAreaElement>;
-    onCompositionEnd?: React.CompositionEventHandler<HTMLTextAreaElement>;
+    onKeyDown?: React.KeyboardEventHandler<HTMLTextAreaElement> | undefined;
+    onCompositionStart?: React.CompositionEventHandler<HTMLTextAreaElement> | undefined;
+    onCompositionEnd?: React.CompositionEventHandler<HTMLTextAreaElement> | undefined;
   }
 }

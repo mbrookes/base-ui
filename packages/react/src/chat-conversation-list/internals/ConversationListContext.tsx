@@ -2,8 +2,8 @@
 import * as React from 'react';
 
 export interface ConversationListRootContextValue {
-  activeConversationId?: string;
-  focusedConversationId?: string;
+  activeConversationId?: string | undefined;
+  focusedConversationId?: string | undefined;
   registerItemRef(id: string, element: HTMLElement | null): void;
   onItemFocus(id: string): void;
   onItemSelect(id: string): void;

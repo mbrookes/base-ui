@@ -22,7 +22,7 @@ export interface ToolPartSectionOwnerState extends ToolPartOwnerState {
  * Return `true`/`false` to control the disclosure, or `undefined` to defer to the built-in default.
  */
 export type ChatToolGetExpanded = (
-  ownerState: ToolPartOwnerState & { section?: 'input' | 'output' },
+  ownerState: ToolPartOwnerState & { section?: 'input' | 'output' | undefined },
 ) => boolean | undefined;
 
 /**

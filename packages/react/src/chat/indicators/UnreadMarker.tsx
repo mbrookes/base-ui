@@ -100,8 +100,8 @@ export namespace UnreadMarker {
 
   export interface Props extends Omit<BaseUIComponentProps<'div', State>, 'children'> {
     messageId: string;
-    index?: number;
-    items?: string[];
+    index?: number | undefined;
+    items?: string[] | undefined;
     label?: React.ReactNode;
   }
 }

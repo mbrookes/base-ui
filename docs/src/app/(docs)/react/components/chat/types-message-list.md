@@ -10,8 +10,6 @@ The root component of the chat message list. Manages scroll behavior,
 auto-scrolling, roving focus, and provides context to child parts.
 Renders a `<div>` element.
 
-Documentation: [Base UI Chat](https://base-ui.com/react/components/chat)
-
 **Root Props:**
 
 | Prop              | Type                                                                                               | Default | Description                                                                                                                                                                                    |
@@ -44,8 +42,6 @@ The content container of the chat message list.
 Renders the list of message rows.
 Renders a `<div>` element.
 
-Documentation: [Base UI Chat](https://base-ui.com/react/components/chat)
-
 **Content Props:**
 
 | Prop      | Type                                                                                                  | Default | Description                                                                                                                                                                                   |
@@ -69,8 +65,6 @@ type ChatMessageListContentState = { [key: string]: never };
 The scrollable viewport of the chat message list.
 Bind your scroll container to this element.
 Renders a `<div>` element.
-
-Documentation: [Base UI Chat](https://base-ui.com/react/components/chat)
 
 **Viewport Props:**
 
@@ -96,8 +90,6 @@ A visually-hidden `role="status"` live region that announces streaming
 transitions ("Assistant is responding" / "Response complete") to screen readers.
 Renders a `<div>` element.
 
-Documentation: [Base UI Chat](https://base-ui.com/react/components/chat)
-
 **Status Props:**
 
 | Prop      | Type                                                                                                 | Default | Description                                                                                                                                                                                   |
@@ -121,8 +113,6 @@ type ChatMessageListStatusState = { [key: string]: never };
 The content container of the chat message list.
 Renders the list of message rows.
 Renders a `<div>` element.
-
-Documentation: [Base UI Chat](https://base-ui.com/react/components/chat)
 
 **ChatMessageListContent Props:**
 
@@ -171,8 +161,6 @@ type ChatMessageListContentState = { [key: string]: never };
 A date separator rendered between messages that span a calendar day boundary.
 Returns `null` when there is no boundary for the current message.
 Renders a `<div>` element.
-
-Documentation: [Base UI Chat](https://base-ui.com/react/components/chat)
 
 **ChatMessageListDateDivider Props:**
 
@@ -242,8 +230,6 @@ A floating layer rendered above the message list, anchored to its bottom edge.
 Pointer events pass through to the list below.
 Renders a `<div>` element.
 
-Documentation: [Base UI Chat](https://base-ui.com/react/components/chat)
-
 **ChatMessageListOverlay Props:**
 
 | Prop      | Type                                                                                                  | Default | Description                                                                                                                                                                                   |
@@ -291,8 +277,6 @@ type ChatMessageListOverlayState = { [key: string]: never };
 The root component of the chat message list. Manages scroll behavior,
 auto-scrolling, roving focus, and provides context to child parts.
 Renders a `<div>` element.
-
-Documentation: [Base UI Chat](https://base-ui.com/react/components/chat)
 
 **ChatMessageListRoot Props:**
 
@@ -369,8 +353,6 @@ A visually-hidden `role="status"` live region that announces streaming
 transitions ("Assistant is responding" / "Response complete") to screen readers.
 Renders a `<div>` element.
 
-Documentation: [Base UI Chat](https://base-ui.com/react/components/chat)
-
 **ChatMessageListStatus Props:**
 
 | Prop      | Type                                                                                                 | Default | Description                                                                                                                                                                                   |
@@ -416,8 +398,6 @@ type ChatMessageListStatusState = { [key: string]: never };
 The scrollable viewport of the chat message list.
 Bind your scroll container to this element.
 Renders a `<div>` element.
-
-Documentation: [Base UI Chat](https://base-ui.com/react/components/chat)
 
 **ChatMessageListViewport Props:**
 
@@ -467,8 +447,6 @@ A date separator rendered between messages that span a calendar day boundary.
 Returns `null` when there is no boundary for the current message.
 Renders a `<div>` element.
 
-Documentation: [Base UI Chat](https://base-ui.com/react/components/chat)
-
 **DateDivider Props:**
 
 | Prop              | Type                                                                                                                                                   | Default | Description                                                                                                                                                                                   |
@@ -501,8 +479,6 @@ type ChatMessageListDateDividerState = {
 A floating layer rendered above the message list, anchored to its bottom edge.
 Pointer events pass through to the list below.
 Renders a `<div>` element.
-
-Documentation: [Base UI Chat](https://base-ui.com/react/components/chat)
 
 **Overlay Props:**
 

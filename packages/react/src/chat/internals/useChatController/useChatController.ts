@@ -42,12 +42,12 @@ export interface ChatRuntimeActions<Cursor = string> {
 interface UseChatControllerParameters<Cursor = string> {
   store: ChatStore<Cursor>;
   adapter: ChatAdapter<Cursor>;
-  onToolCall?: ChatOnToolCall;
-  onFinish?: ChatOnFinish;
-  onData?: ChatOnData;
-  onError?: ChatOnError;
-  streamFlushInterval?: number;
-  features?: ChatFeatures;
+  onToolCall?: ChatOnToolCall | undefined;
+  onFinish?: ChatOnFinish | undefined;
+  onData?: ChatOnData | undefined;
+  onError?: ChatOnError | undefined;
+  streamFlushInterval?: number | undefined;
+  features?: ChatFeatures | undefined;
 }
 
 export function useChatController<Cursor = string>({

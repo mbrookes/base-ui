@@ -3,20 +3,20 @@ import type { ChatError } from './chat-error';
 
 export interface ChatPublicState<Cursor = string> {
   conversations: ChatConversation[];
-  activeConversationId?: string;
+  activeConversationId?: string | undefined;
   messages: ChatMessage[];
   messageCount: number;
   isStreaming: boolean;
   hasMoreHistory: boolean;
   isLoadingHistory: boolean;
-  historyCursor?: Cursor;
+  historyCursor?: Cursor | undefined;
   error: ChatError | null;
 }
 
 export interface ChatInternalState<Cursor = string> {
   conversationsById: Record<string, ChatConversation>;
   conversationIds: string[];
-  activeConversationId?: string;
+  activeConversationId?: string | undefined;
   messageIds: string[];
   messagesById: Record<string, ChatMessage>;
   messageErrorsById: Record<string, ChatError | undefined>;
@@ -25,10 +25,10 @@ export interface ChatInternalState<Cursor = string> {
   activeStreamAbortController: AbortController | null;
   isStreaming: boolean;
   /** The conversation the in-flight response stream belongs to, when known. */
-  streamingConversationId?: string;
+  streamingConversationId?: string | undefined;
   hasMoreHistory: boolean;
   isLoadingHistory: boolean;
-  historyCursor?: Cursor;
+  historyCursor?: Cursor | undefined;
   composerValue: string;
   composerIsComposing: boolean;
   composerAttachments: ChatDraftAttachment[];

@@ -41,7 +41,7 @@ export const SourceUrlPart = React.forwardRef(function SourceUrlPart(
   props: SourceUrlPart.Props,
   forwardedRef: React.ForwardedRef<HTMLSpanElement>,
 ) {
-  const { index: _index, message, onToolCall: _onToolCall, part, ...elementProps } = props;
+  const { index, message, onToolCall, part, ...elementProps } = props;
 
   const contentTabIndex = useMessageContentTabIndex();
 

@@ -26,11 +26,11 @@ import { getFinishMessage } from '../../stream/streamHelpers';
 
 export interface SendMessageActionsRuntimeRef<Cursor = string> {
   adapter: ChatAdapter<Cursor>;
-  streamFlushInterval?: number;
-  onToolCall?: ChatOnToolCall;
-  onFinish?: ChatOnFinish;
-  onData?: ChatOnData;
-  onError?: ChatOnError;
+  streamFlushInterval?: number | undefined;
+  onToolCall?: ChatOnToolCall | undefined;
+  onFinish?: ChatOnFinish | undefined;
+  onData?: ChatOnData | undefined;
+  onError?: ChatOnError | undefined;
 }
 
 export function createSendMessageActions<Cursor = string>(params: {

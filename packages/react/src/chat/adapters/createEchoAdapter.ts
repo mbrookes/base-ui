@@ -3,19 +3,17 @@ import type { ChatMessage } from '../types/chat-entities';
 import type { ChatMessageChunk } from '../types/chat-stream';
 
 export interface CreateEchoAdapterOptions {
-  /* eslint-disable jsdoc/require-param, jsdoc/require-returns */
   /**
    * Build the assistant reply from the user's text.
    * Defaults to a "You said: …" echo with a hint to swap in a real adapter.
    */
-  respond?: (text: string) => string;
-  /* eslint-enable jsdoc/require-param, jsdoc/require-returns */
+  respond?: ((text: string) => string) | undefined;
   /**
    * Milliseconds to wait between receiving the user message and emitting the reply.
    * Simulates network/model latency so the UI doesn't feel jarringly instant.
    * @default 400
    */
-  delayMs?: number;
+  delayMs?: number | undefined;
 }
 
 const defaultRespond = (text: string) =>

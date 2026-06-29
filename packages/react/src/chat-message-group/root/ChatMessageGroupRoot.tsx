@@ -114,7 +114,7 @@ export const ChatMessageGroupRoot = React.forwardRef(function ChatMessageGroupRo
   const isFirst = prevKey === null || prevKey !== currentKey;
   const isFirstInList = messageIndex === 0;
   const isLast = nextKey === null || nextKey !== currentKey;
-  const isOwnMessage = (resolvedAuthor ?? null)?.isOwnMessage ?? message?.role === 'user' ?? false;
+  const isOwnMessage = (resolvedAuthor ?? null)?.isOwnMessage ?? message?.role === 'user';
   const displayName = resolvedAuthor?.displayName ?? null;
 
   const state: ChatMessageGroupRoot.State = {
@@ -166,8 +166,8 @@ export namespace ChatMessageGroupRoot {
 
   export interface Props extends BaseUIComponentProps<'div', State> {
     messageId: string;
-    index?: number;
-    items?: string[];
-    groupKey?: GroupKeyFn;
+    index?: number | undefined;
+    items?: string[] | undefined;
+    groupKey?: GroupKeyFn | undefined;
   }
 }

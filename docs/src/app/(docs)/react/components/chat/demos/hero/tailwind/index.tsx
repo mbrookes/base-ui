@@ -39,7 +39,7 @@ function renderMessage({ id, index }: { id: string; index: number }) {
   return (
     <ChatMessageGroup.Root messageId={id} index={index} className="flex flex-col gap-0.5">
       <ChatMessage.Root messageId={id} className="flex max-w-[80%] data-[own-message]:self-end">
-        <ChatMessage.Content className="rounded-2xl bg-gray-100 px-3 py-2 text-sm leading-relaxed break-words text-gray-950 data-[own-message]:bg-blue-600 data-[own-message]:text-white dark:bg-white/10 dark:text-white dark:data-[own-message]:bg-blue-600" />
+        <ChatMessage.Content className="rounded-2xl bg-neutral-100 px-3 py-2 text-sm leading-relaxed break-words text-neutral-950 data-[own-message]:bg-blue-600 data-[own-message]:text-white dark:bg-white/10 dark:text-white dark:data-[own-message]:bg-blue-600" />
       </ChatMessage.Root>
     </ChatMessageGroup.Root>
   );
@@ -50,20 +50,20 @@ export default function ChatHero() {
     <Chat.Root
       adapter={adapter}
       initialMessages={initialMessages}
-      className="flex h-[480px] w-[400px] flex-col overflow-hidden rounded-xl border border-gray-200 bg-white text-sm font-sans dark:border-white/10 dark:bg-gray-950"
+      className="flex h-[480px] w-[400px] flex-col overflow-hidden rounded-xl border border-neutral-200 bg-white text-sm font-sans dark:border-white/10 dark:bg-neutral-950"
     >
       <ChatMessageList.Root renderItem={renderMessage} className="relative min-h-0 flex-1">
         <ChatMessageList.Viewport className="h-full p-3">
           <ChatMessageList.Content className="flex flex-col gap-1" />
         </ChatMessageList.Viewport>
       </ChatMessageList.Root>
-      <ChatComposer.Root className="flex flex-col gap-2 border-t border-gray-200 p-2 dark:border-white/10">
+      <ChatComposer.Root className="flex flex-col gap-2 border-t border-neutral-200 p-2 dark:border-white/10">
         <ChatComposer.TextArea
           placeholder="Send a message…"
-          className="w-full resize-none border-none bg-transparent p-1 text-sm leading-relaxed outline-none placeholder:text-gray-400 dark:text-white"
+          className="w-full resize-none border-none bg-transparent p-1 text-sm leading-relaxed outline-none placeholder:text-neutral-400 dark:text-white"
         />
         <ChatComposer.Toolbar className="flex justify-end">
-          <ChatComposer.SendButton className="cursor-pointer rounded-lg bg-gray-950 px-4 py-1.5 text-sm font-medium text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-40 dark:bg-white dark:text-gray-950 dark:hover:bg-gray-100">
+          <ChatComposer.SendButton className="cursor-pointer rounded-lg bg-neutral-950 px-4 py-1.5 text-sm font-medium text-white hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-40 dark:bg-white dark:text-neutral-950 dark:hover:bg-neutral-100">
             Send
           </ChatComposer.SendButton>
         </ChatComposer.Toolbar>

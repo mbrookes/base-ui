@@ -137,8 +137,8 @@ export namespace ChatRoot {
 
   export interface Props<Cursor = string>
     extends ChatProviderProps<Cursor>, BaseUIComponentProps<'div', State> {
-    localeText?: Partial<ChatLocaleText>;
-    variant?: ChatVariant;
-    density?: ChatDensity;
+    localeText?: Partial<ChatLocaleText> | undefined;
+    variant?: ChatVariant | undefined;
+    density?: ChatDensity | undefined;
   }
 }

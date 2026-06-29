@@ -82,7 +82,7 @@ export namespace ScrollToBottomAffordance {
   }
 
   export interface Props extends Omit<BaseUIComponentProps<'button', State>, 'children'> {
-    scrollBehavior?: ScrollBehavior;
+    scrollBehavior?: ScrollBehavior | undefined;
     children?: React.ReactNode;
   }
 }

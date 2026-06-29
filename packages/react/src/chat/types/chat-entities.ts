@@ -23,44 +23,44 @@ export type ChatDateTimeString = string;
 
 export interface ChatUser {
   id: string;
-  displayName?: string;
-  avatarUrl?: string;
-  isOnline?: boolean;
+  displayName?: string | undefined;
+  avatarUrl?: string | undefined;
+  isOnline?: boolean | undefined;
   /** The role this user plays in the conversation. Use `'user'` for the local human sender and `'assistant'` for AI participants. */
-  role?: ChatRole;
-  metadata?: ChatUserMetadata;
+  role?: ChatRole | undefined;
+  metadata?: ChatUserMetadata | undefined;
 }
 
 export interface ChatConversation {
   id: string;
-  title?: string;
-  subtitle?: string;
+  title?: string | undefined;
+  subtitle?: string | undefined;
   /** Optional avatar URL for the conversation. When provided, this takes precedence over participant avatars in the conversation list. */
-  avatarUrl?: string;
-  participants?: ChatUser[];
-  unreadCount?: number;
-  readState?: ConversationReadState;
-  lastMessageAt?: ChatDateTimeString;
-  metadata?: ChatConversationMetadata;
+  avatarUrl?: string | undefined;
+  participants?: ChatUser[] | undefined;
+  unreadCount?: number | undefined;
+  readState?: ConversationReadState | undefined;
+  lastMessageAt?: ChatDateTimeString | undefined;
+  metadata?: ChatConversationMetadata | undefined;
 }
 
 export interface ChatMessage {
   id: string;
-  conversationId?: string;
+  conversationId?: string | undefined;
   role: ChatRole;
   parts: ChatMessagePart[];
-  metadata?: ChatMessageMetadata;
-  createdAt?: ChatDateTimeString;
-  updatedAt?: ChatDateTimeString;
-  status?: ChatMessageStatus;
+  metadata?: ChatMessageMetadata | undefined;
+  createdAt?: ChatDateTimeString | undefined;
+  updatedAt?: ChatDateTimeString | undefined;
+  status?: ChatMessageStatus | undefined;
   /**
    * Optional inline author data for the message.
    * `author.id` is the canonical identity key for message rendering; missing display name
    * and avatar fields can be enriched from `currentUser`, `members`, or active conversation
    * participants, or via `getMessageAuthor*` getters on the surrounding provider.
    */
-  author?: ChatUser;
-  editedAt?: ChatDateTimeString;
+  author?: ChatUser | undefined;
+  editedAt?: ChatDateTimeString | undefined;
 }
 
 export type ChatMessageAuthorIdGetter = (message: ChatMessage) => string | undefined;
@@ -76,19 +76,19 @@ export interface ChatMessageAuthorGetterProps {
    * `members`, and active conversation participants.
    * @default (message) => message.author?.id
    */
-  getMessageAuthorId?: ChatMessageAuthorIdGetter;
+  getMessageAuthorId?: ChatMessageAuthorIdGetter | undefined;
   /**
    * Used to determine the display name for a given message author.
    * Falls back to `message.author?.displayName`, then to the matched member's `displayName`.
    * @default (message) => message.author?.displayName
    */
-  getMessageAuthorDisplayName?: ChatMessageAuthorDisplayNameGetter;
+  getMessageAuthorDisplayName?: ChatMessageAuthorDisplayNameGetter | undefined;
   /**
    * Used to determine the avatar URL for a given message author.
    * Falls back to `message.author?.avatarUrl`, then to the matched member's `avatarUrl`.
    * @default (message) => message.author?.avatarUrl
    */
-  getMessageAuthorAvatarUrl?: ChatMessageAuthorAvatarUrlGetter;
+  getMessageAuthorAvatarUrl?: ChatMessageAuthorAvatarUrlGetter | undefined;
 }
 
 export type ChatDraftAttachmentStatus = 'queued' | 'uploading' | 'uploaded' | 'error';
@@ -96,13 +96,13 @@ export type ChatDraftAttachmentStatus = 'queued' | 'uploading' | 'uploaded' | 'e
 export interface ChatDraftAttachment {
   localId: string;
   file: File;
-  previewUrl?: string;
+  previewUrl?: string | undefined;
   status: ChatDraftAttachmentStatus;
   /**
    * Upload progress as a percentage (0 to 100).
    * Only meaningful while `status` is `'uploading'`.
    */
-  progress?: number;
+  progress?: number | undefined;
 }
 
 export type ChatAttachmentRejectionReason = 'mime-type' | 'file-size' | 'file-count';
@@ -120,22 +120,22 @@ export interface ChatAttachmentsConfig {
    * are **not** supported — use MIME types only.
    * @default undefined (all file types accepted)
    */
-  acceptedMimeTypes?: string[];
+  acceptedMimeTypes?: string[] | undefined;
   /**
    * Maximum number of files that can be attached to a single message.
    * @default undefined (unlimited)
    */
-  maxFileCount?: number;
+  maxFileCount?: number | undefined;
   /**
    * Maximum size of each file in bytes.
    * @default undefined (unlimited)
    */
-  maxFileSize?: number;
+  maxFileSize?: number | undefined;
   /**
    * Callback invoked when one or more files are rejected during attachment.
    * Receives an array of rejection objects describing which files failed
    * and why.
    * @param {ChatAttachmentRejection[]} rejections The list of rejected files with reasons.
    */
-  onAttachmentReject?: (rejections: ChatAttachmentRejection[]) => void;
+  onAttachmentReject?: ((rejections: ChatAttachmentRejection[]) => void) | undefined;
 }

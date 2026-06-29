@@ -18,14 +18,14 @@ import { ChatStreamError } from '../stream/ChatStreamError';
  */
 export type AiSdkUIMessageChunk =
   | ChatMessageChunk
-  | { type: 'error'; errorText?: string }
+  | { type: 'error'; errorText?: string | undefined }
   | { type: string; [key: string]: unknown };
 
 export interface CreateAiSdkAdapterRequest {
   message: ChatMessage;
   messages: ChatMessage[];
-  attachments?: ChatSendMessageInput['attachments'];
-  metadata?: ChatSendMessageInput['metadata'];
+  attachments?: ChatSendMessageInput['attachments'] | undefined;
+  metadata?: ChatSendMessageInput['metadata'] | undefined;
   /**
    * AI SDK trigger discriminant: `'submit-message'` for fresh sends,
    * `'regenerate-message'` for regenerations (mirrors AI SDK's
@@ -34,12 +34,11 @@ export interface CreateAiSdkAdapterRequest {
    */
   trigger: 'submit-message' | 'regenerate-message';
   /** Set when `trigger === 'regenerate-message'`: id of the assistant message being regenerated. */
-  regenerateMessageId?: string;
+  regenerateMessageId?: string | undefined;
   signal: AbortSignal;
 }
 
 export interface CreateAiSdkAdapterStreamOptions {
-  /* eslint-disable jsdoc/require-param, jsdoc/require-returns */
   /**
    * Called when the user sends a message. Return the UI Message Stream the
    * AI SDK produces. Two stream shapes are accepted:
@@ -56,8 +55,7 @@ export interface CreateAiSdkAdapterStreamOptions {
   ) =>
     | Promise<ReadableStream<AiSdkUIMessageChunk | Uint8Array>>
     | ReadableStream<AiSdkUIMessageChunk | Uint8Array>;
-  /* eslint-enable jsdoc/require-param, jsdoc/require-returns */
-  chat?: never;
+  chat?: never | undefined;
 }
 
 /**
@@ -67,22 +65,20 @@ export interface CreateAiSdkAdapterStreamOptions {
  */
 export interface AiSdkChatInstance {
   sendMessage: (
-    message: { text?: string; files?: unknown[]; [k: string]: unknown },
+    message: { text?: string | undefined; files?: unknown[] | undefined; [k: string]: unknown },
     options?: unknown,
   ) => Promise<unknown>;
   stop: () => void;
-  /* eslint-disable jsdoc/require-param, jsdoc/require-returns */
   /**
    * AI SDK v5 `useChat().regenerate`. Optional: when absent the adapter omits
    * `regenerate` and the MUI X runtime falls back to re-sending through
    * `sendMessage`.
    */
-  regenerate?: (options?: { messageId?: string }) => Promise<unknown>;
-  /* eslint-enable jsdoc/require-param, jsdoc/require-returns */
+  regenerate?: ((options?: { messageId?: string | undefined }) => Promise<unknown>) | undefined;
   messages: ReadonlyArray<{
     id: string;
     role: string;
-    parts: ReadonlyArray<{ type: string; text?: string; [k: string]: unknown }>;
+    parts: ReadonlyArray<{ type: string; text?: string | undefined; [k: string]: unknown }>;
   }>;
 }
 
@@ -104,7 +100,7 @@ export interface CreateAiSdkAdapterChatOptions {
    * `useMemo(() => createAiSdkAdapter({ chat }), [chat])`.
    */
   chat: AiSdkChatInstance;
-  stream?: never;
+  stream?: never | undefined;
 }
 
 export type CreateAiSdkAdapterOptions =

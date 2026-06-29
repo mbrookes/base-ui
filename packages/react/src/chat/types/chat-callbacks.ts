@@ -29,7 +29,7 @@ export interface ChatOnFinishPayload {
   isAbort: boolean;
   isDisconnect: boolean;
   isError: boolean;
-  finishReason?: string;
+  finishReason?: string | undefined;
 }
 
 export type ChatOnFinish = (payload: ChatOnFinishPayload) => void | Promise<void>;
@@ -37,15 +37,15 @@ export type ChatOnFinish = (payload: ChatOnFinishPayload) => void | Promise<void
 export interface ChatAddToolApproveResponseInput {
   id: string;
   approved: boolean;
-  reason?: string;
+  reason?: string | undefined;
 }
 
 export interface UseChatSendMessageInput {
-  id?: string;
-  conversationId?: string;
+  id?: string | undefined;
+  conversationId?: string | undefined;
   parts: ChatMessagePart[];
-  metadata?: ChatMessageMetadata;
-  author?: ChatUser;
-  createdAt?: ChatDateTimeString;
-  attachments?: ChatDraftAttachment[];
+  metadata?: ChatMessageMetadata | undefined;
+  author?: ChatUser | undefined;
+  createdAt?: ChatDateTimeString | undefined;
+  attachments?: ChatDraftAttachment[] | undefined;
 }

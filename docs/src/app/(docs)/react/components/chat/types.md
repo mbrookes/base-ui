@@ -188,3 +188,105 @@ type ChatOnError = (error: {
   details?: Record | undefined;
 }) => void;
 ```
+
+### ChatMessageAuthorIdGetter
+
+```typescript
+type ChatMessageAuthorIdGetter = (message: {
+  id: string;
+  conversationId?: string | undefined;
+  role: 'system' | 'user' | 'assistant';
+  parts: unknown;
+  metadata?: {} | undefined;
+  createdAt?: string | undefined;
+  updatedAt?: string | undefined;
+  status?:
+    | 'pending'
+    | 'sending'
+    | 'streaming'
+    | 'sent'
+    | 'read'
+    | 'error'
+    | 'cancelled'
+    | undefined;
+  author?:
+    | {
+        id: string;
+        displayName?: string | undefined;
+        avatarUrl?: string | undefined;
+        isOnline?: boolean | undefined;
+        role?: 'system' | 'user' | 'assistant' | undefined;
+        metadata?: {} | undefined;
+      }
+    | undefined;
+  editedAt?: string | undefined;
+}) => string | undefined;
+```
+
+### ChatMessageAuthorDisplayNameGetter
+
+```typescript
+type ChatMessageAuthorDisplayNameGetter = (message: {
+  id: string;
+  conversationId?: string | undefined;
+  role: 'system' | 'user' | 'assistant';
+  parts: unknown;
+  metadata?: {} | undefined;
+  createdAt?: string | undefined;
+  updatedAt?: string | undefined;
+  status?:
+    | 'pending'
+    | 'sending'
+    | 'streaming'
+    | 'sent'
+    | 'read'
+    | 'error'
+    | 'cancelled'
+    | undefined;
+  author?:
+    | {
+        id: string;
+        displayName?: string | undefined;
+        avatarUrl?: string | undefined;
+        isOnline?: boolean | undefined;
+        role?: 'system' | 'user' | 'assistant' | undefined;
+        metadata?: {} | undefined;
+      }
+    | undefined;
+  editedAt?: string | undefined;
+}) => string | undefined;
+```
+
+### ChatMessageAuthorAvatarUrlGetter
+
+```typescript
+type ChatMessageAuthorAvatarUrlGetter = (message: {
+  id: string;
+  conversationId?: string | undefined;
+  role: 'system' | 'user' | 'assistant';
+  parts: unknown;
+  metadata?: {} | undefined;
+  createdAt?: string | undefined;
+  updatedAt?: string | undefined;
+  status?:
+    | 'pending'
+    | 'sending'
+    | 'streaming'
+    | 'sent'
+    | 'read'
+    | 'error'
+    | 'cancelled'
+    | undefined;
+  author?:
+    | {
+        id: string;
+        displayName?: string | undefined;
+        avatarUrl?: string | undefined;
+        isOnline?: boolean | undefined;
+        role?: 'system' | 'user' | 'assistant' | undefined;
+        metadata?: {} | undefined;
+      }
+    | undefined;
+  editedAt?: string | undefined;
+}) => string | undefined;
+```

@@ -381,21 +381,43 @@ A set of headless components for building chat interfaces.
       - Root
       - Item
 - Exports:
-  - Root
-    - Props: className, grouped, messageId, render, style
-  - Content
-    - Props: afterContent, className, render, resolveBuiltInPartRenderer, style, textProps
-  - Error
+  - Chat - Root
+    - Props: className, render, style, variant
+  - Chat - Item
+    - Props: className, conversationId, render, style, variant
+  - Chat - Title
     - Props: className, render, style
-  - Actions
+  - Chat - ItemActions
     - Props: className, render, style
-  - AuthorLabel
+  - Chat - ItemAvatar
     - Props: className, render, style
-  - Avatar
+  - Chat - ItemContent
     - Props: className, render, style
-  - Meta
+  - Chat - Preview
     - Props: className, render, style
-- Types: Actions.Props, Actions.State, AuthorLabel.Props, AuthorLabel.State, Avatar.Props, Avatar.State, Content.Props, Content.State, Error.Props, Error.State, Meta.Props, Meta.State, Root.Props, Root.State
+  - Chat - Timestamp
+    - Props: className, render, style
+  - Chat - UnreadBadge
+    - Props: className, render, style
+  - ChatConversationListItem
+    - Props: className, conversationId, render, style, variant
+  - ChatConversationListItemActions
+    - Props: className, render, style
+  - ChatConversationListItemAvatar
+    - Props: className, render, style
+  - ChatConversationListItemContent
+    - Props: className, render, style
+  - ChatConversationListPreview
+    - Props: className, render, style
+  - ChatConversationListRoot
+    - Props: className, render, style, variant
+  - ChatConversationListTimestamp
+    - Props: className, render, style
+  - ChatConversationListTitle
+    - Props: className, render, style
+  - ChatConversationListUnreadBadge
+    - Props: className, render, style
+- Types: ChatConversationList.Item.Props, ChatConversationList.Item.State, ChatConversationList.ItemActions.Props, ChatConversationList.ItemActions.State, ChatConversationList.ItemAvatar.Props, ChatConversationList.ItemAvatar.State, ChatConversationList.ItemContent.Props, ChatConversationList.ItemContent.State, ChatConversationList.Preview.Props, ChatConversationList.Preview.State, ChatConversationList.Root.Props, ChatConversationList.Root.State, ChatConversationList.Timestamp.Props, ChatConversationList.Timestamp.State, ChatConversationList.Title.Props, ChatConversationList.Title.State, ChatConversationList.UnreadBadge.Props, ChatConversationList.UnreadBadge.State, ChatConversationListItem.Props, ChatConversationListItem.State, ChatConversationListItemActions.Props, ChatConversationListItemActions.State, ChatConversationListItemAvatar.Props, ChatConversationListItemAvatar.State, ChatConversationListItemContent.Props, ChatConversationListItemContent.State, ChatConversationListPreview.Props, ChatConversationListPreview.State, ChatConversationListRoot.Props, ChatConversationListRoot.State, ChatConversationListTimestamp.Props, ChatConversationListTimestamp.State, ChatConversationListTitle.Props, ChatConversationListTitle.State, ChatConversationListUnreadBadge.Props, ChatConversationListUnreadBadge.State
 
 </details>
 

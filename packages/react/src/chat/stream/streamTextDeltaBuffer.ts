@@ -9,7 +9,7 @@ export interface ResolveTextLikePartIndexOptions {
    * in those cases — used for `*-end` chunks that should never instantiate a
    * new part.
    */
-  createIfMissing?: boolean;
+  createIfMissing?: boolean | undefined;
 }
 
 export interface TextDeltaBuffer {

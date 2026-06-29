@@ -94,10 +94,10 @@ export namespace StreamingIndicator {
   }
 
   export interface Props extends BaseUIComponentProps<'div', State> {
-    mode?: StreamingIndicatorMode;
-    message?: ChatMessage | null;
-    messageId?: string;
-    index?: number;
-    items?: string[];
+    mode?: StreamingIndicatorMode | undefined;
+    message?: ChatMessage | null | undefined;
+    messageId?: string | undefined;
+    index?: number | undefined;
+    items?: string[] | undefined;
   }
 }

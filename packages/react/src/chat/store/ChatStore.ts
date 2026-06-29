@@ -17,33 +17,33 @@ export interface ChatStoreParameters<Cursor = string> extends ChatMessageAuthorG
    * Used to derive the local user / assistant user when explicit props are omitted,
    * and to enrich message authors by resolved author id at render time.
    */
-  members?: ChatUser[];
+  members?: ChatUser[] | undefined;
   /**
    * The local user sending messages.
    * If omitted, derived from `members` by finding the entry with `role === 'user'`.
    * Also used to enrich message authors when a rendered message resolves to `currentUser.id`.
    */
-  currentUser?: ChatUser;
+  currentUser?: ChatUser | undefined;
   /** Locale-driven fallback labels for messages without explicit author information. */
-  roleDisplayNames?: Partial<Record<ChatRole, string>>;
-  messages?: ChatMessage[];
+  roleDisplayNames?: Partial<Record<ChatRole, string>> | undefined;
+  messages?: ChatMessage[] | undefined;
   /** The initial messages when uncontrolled. Ignored after initialization and when `messages` is provided. */
-  initialMessages?: ChatMessage[];
-  onMessagesChange?: (messages: ChatMessage[]) => void;
-  conversations?: ChatConversation[];
+  initialMessages?: ChatMessage[] | undefined;
+  onMessagesChange?: ((messages: ChatMessage[]) => void) | undefined;
+  conversations?: ChatConversation[] | undefined;
   /** The initial conversations when uncontrolled. Ignored after initialization and when `conversations` is provided. */
-  initialConversations?: ChatConversation[];
-  onConversationsChange?: (conversations: ChatConversation[]) => void;
-  activeConversationId?: string;
+  initialConversations?: ChatConversation[] | undefined;
+  onConversationsChange?: ((conversations: ChatConversation[]) => void) | undefined;
+  activeConversationId?: string | undefined;
   /** Internal flag used to distinguish a controlled `undefined` active conversation from an uncontrolled model. */
-  activeConversationIdControlled?: boolean;
+  activeConversationIdControlled?: boolean | undefined;
   /** The initial active conversation ID when uncontrolled. Ignored after initialization and when `activeConversationId` is provided. */
-  initialActiveConversationId?: string;
-  onActiveConversationChange?: (conversationId: string | undefined) => void;
-  composerValue?: string;
+  initialActiveConversationId?: string | undefined;
+  onActiveConversationChange?: ((conversationId: string | undefined) => void) | undefined;
+  composerValue?: string | undefined;
   /** The initial composer value when uncontrolled. Ignored after initialization and when `composerValue` is provided. */
-  initialComposerValue?: string;
-  onComposerValueChange?: (value: string) => void;
+  initialComposerValue?: string | undefined;
+  onComposerValueChange?: ((value: string) => void) | undefined;
 }
 
 export type ControlledModel =

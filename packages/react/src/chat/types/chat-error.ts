@@ -12,6 +12,6 @@ export interface ChatError {
   message: string;
   source: ChatErrorSource;
   recoverable: boolean;
-  retryable?: boolean;
-  details?: Record<string, unknown>;
+  retryable?: boolean | undefined;
+  details?: Record<string, unknown> | undefined;
 }

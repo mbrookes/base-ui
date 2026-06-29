@@ -7,10 +7,10 @@ import type { ChatRuntimeActions } from '../useChatController';
 
 export interface ChatRuntimeContextValue<Cursor = string> {
   adapter: ChatAdapter<Cursor>;
-  onToolCall?: ChatOnToolCall;
-  onFinish?: ChatOnFinish;
-  onData?: ChatOnData;
-  onError?: ChatOnError;
+  onToolCall?: ChatOnToolCall | undefined;
+  onFinish?: ChatOnFinish | undefined;
+  onData?: ChatOnData | undefined;
+  onError?: ChatOnError | undefined;
   partRenderers: ChatPartRendererMap;
   actions: ChatRuntimeActions<Cursor>;
 }

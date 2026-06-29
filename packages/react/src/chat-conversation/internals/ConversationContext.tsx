@@ -3,7 +3,7 @@ import * as React from 'react';
 import type { ChatConversation } from '../../chat/types/chat-entities';
 
 export interface ConversationState {
-  conversationId?: string;
+  conversationId?: string | undefined;
   hasConversation: boolean;
   conversation: ChatConversation | null;
 }

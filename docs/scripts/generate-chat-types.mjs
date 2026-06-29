@@ -27,10 +27,6 @@ async function processFile(fileName) {
   const filePath = path.join(chatDir, fileName);
   const mdPath = filePath.replace(/\.ts$/, '.md');
 
-  if (existsSync(mdPath)) {
-    await unlink(mdPath);
-  }
-
   const content = await readFile(filePath, 'utf-8');
   const typesMetaCall = await parseCreateFactoryCall(content, filePath, {
     allowExternalVariants: true,
@@ -39,6 +35,10 @@ async function processFile(fileName) {
   if (!typesMetaCall) {
     console.warn(`No factory call found in ${fileName}`);
     return;
+  }
+
+  if (existsSync(mdPath)) {
+    await unlink(mdPath);
   }
 
   console.warn(`Processing ${fileName}...`);

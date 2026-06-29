@@ -63,15 +63,15 @@ export interface MessageListBehaviorResult {
   };
   registerRowElement(id: string, element: HTMLDivElement | null): void;
   scheduleResizeRestore(): void;
-  scrollToBottom(options?: { behavior?: ScrollBehavior }): void;
+  scrollToBottom(options?: { behavior?: ScrollBehavior | undefined }): void;
   setRootElement(node: HTMLDivElement | null): void;
 }
 
 export function useMessageListBehavior(parameters: {
   itemIds: string[];
   estimatedItemSize: number;
-  onReachTop?: () => void;
-  onReachBottom?: () => void;
+  onReachTop?: (() => void) | undefined;
+  onReachBottom?: (() => void) | undefined;
   messages: ChatMessage[];
   hasMoreHistory: boolean;
   loadMoreHistory(): Promise<void>;
@@ -125,7 +125,7 @@ export function useMessageListBehavior(parameters: {
   onReachBottomRef.current = onReachBottom;
 
   const updateIsAtBottom = React.useCallback(
-    (options?: { silent?: boolean }) => {
+    (options?: { silent?: boolean | undefined }) => {
       const nextIsAtBottom = isScrollableToBottom(rootRef.current, autoScrollBuffer);
       const previousIsAtBottom = isAtBottomRef.current;
 
@@ -185,7 +185,7 @@ export function useMessageListBehavior(parameters: {
   }, []);
 
   const scrollToBottom = React.useCallback(
-    (options?: { behavior?: ScrollBehavior }) => {
+    (options?: { behavior?: ScrollBehavior | undefined }) => {
       const root = rootRef.current;
       if (!root) {
         return;

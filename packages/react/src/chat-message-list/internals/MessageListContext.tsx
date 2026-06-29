@@ -4,7 +4,7 @@ import * as React from 'react';
 export interface MessageListContextValue {
   isAtBottom: boolean;
   unseenMessageCount: number;
-  scrollToBottom(options?: { behavior?: ScrollBehavior }): void;
+  scrollToBottom(options?: { behavior?: ScrollBehavior | undefined }): void;
 }
 
 const MessageListContext = React.createContext<MessageListContextValue | undefined>(undefined);

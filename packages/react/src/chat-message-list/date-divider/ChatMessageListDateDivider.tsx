@@ -19,12 +19,16 @@ const stateAttributesMapping = {
 };
 
 function resolveMessageIndex(messageId: string, index: number | undefined, items: string[]) {
-  if (index != null) return index;
+  if (index != null) {
+    return index;
+  }
   return items.indexOf(messageId);
 }
 
 function parseDate(value: string | undefined) {
-  if (!value) return null;
+  if (!value) {
+    return null;
+  }
   const parsed = new Date(value);
   return Number.isNaN(parsed.getTime()) ? null : parsed;
 }
@@ -111,7 +115,9 @@ export const ChatMessageListDateDivider = React.forwardRef(function ChatMessageL
     stateAttributesMapping,
   });
 
-  if (!hasBoundary) return null;
+  if (!hasBoundary) {
+    return null;
+  }
 
   return element;
 });
@@ -125,15 +131,17 @@ export namespace ChatMessageListDateDivider {
 
   export interface Props extends Omit<BaseUIComponentProps<'div', State>, 'children'> {
     messageId: string;
-    index?: number;
-    items?: string[];
-    formatDate?: (date: Date) => React.ReactNode;
-    shouldShowDivider?: (params: {
-      message: ChatMessage;
-      previousMessage: ChatMessage | null;
-      index: number;
-      date: Date | null;
-      previousDate: Date | null;
-    }) => boolean;
+    index?: number | undefined;
+    items?: string[] | undefined;
+    formatDate?: ((date: Date) => React.ReactNode) | undefined;
+    shouldShowDivider?:
+      | ((params: {
+          message: ChatMessage;
+          previousMessage: ChatMessage | null;
+          index: number;
+          date: Date | null;
+          previousDate: Date | null;
+        }) => boolean)
+      | undefined;
   }
 }

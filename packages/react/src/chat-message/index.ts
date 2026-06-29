@@ -17,8 +17,8 @@ export {
   ChatMessageActionsMenu,
 } from './actions-menu/ChatMessageActionsMenu';
 export type { MessageState } from './internals/MessageContext';
-export type { FilePart } from './parts/FilePart';
-export type { ReasoningPart } from './parts/ReasoningPart';
-export type { SourceDocumentPart } from './parts/SourceDocumentPart';
-export type { SourceUrlPart } from './parts/SourceUrlPart';
-export type { ChatMessageToolPart } from './parts/ToolPart';
+export { FilePart } from './parts/FilePart';
+export { ReasoningPart } from './parts/ReasoningPart';
+export { SourceDocumentPart } from './parts/SourceDocumentPart';
+export { SourceUrlPart } from './parts/SourceUrlPart';
+export { ChatMessageToolPart } from './parts/ToolPart';

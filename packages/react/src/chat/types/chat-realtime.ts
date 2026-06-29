@@ -24,7 +24,7 @@ export type ChatRealtimeEvent =
   | {
       type: 'message-removed';
       messageId: string;
-      conversationId?: string;
+      conversationId?: string | undefined;
     }
   | {
       type: 'typing';
@@ -40,6 +40,6 @@ export type ChatRealtimeEvent =
   | {
       type: 'read';
       conversationId: string;
-      messageId?: string;
-      userId?: string;
+      messageId?: string | undefined;
+      userId?: string | undefined;
     };

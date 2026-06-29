@@ -5,7 +5,7 @@ export type ChatLayoutPaneKind = 'conversations' | 'thread';
 const chatLayoutPaneKind = Symbol.for('base-ui.chat.layout-pane-kind');
 
 type ChatLayoutPaneMarkedType = React.ElementType & {
-  [chatLayoutPaneKind]?: ChatLayoutPaneKind;
+  [chatLayoutPaneKind]?: ChatLayoutPaneKind | undefined;
 };
 
 export function markChatLayoutPane<T extends React.ElementType>(

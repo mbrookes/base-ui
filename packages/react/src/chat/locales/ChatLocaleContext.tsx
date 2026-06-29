@@ -6,7 +6,7 @@ const ChatLocaleContext = React.createContext<ChatLocaleText>(CHAT_DEFAULT_LOCAL
 
 export function ChatLocaleProvider(props: {
   children: React.ReactNode;
-  localeText?: Partial<ChatLocaleText>;
+  localeText?: Partial<ChatLocaleText> | undefined;
 }) {
   const { children, localeText } = props;
   const value = React.useMemo<ChatLocaleText>(

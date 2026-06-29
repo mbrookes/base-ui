@@ -17,11 +17,14 @@ function DefaultPartFallback(props: { part: ChatMessagePart }) {
   return <div data-part-type={props.part.type} />;
 }
 
-function TextPartRenderer(props: { text: string; renderText: (text: string) => React.ReactNode }) {
-  const rendered = React.useMemo(
-    () => props.renderText(props.text),
-    [props.renderText, props.text],
-  );
+function TextPartRenderer({
+  text,
+  renderText,
+}: {
+  text: string;
+  renderText: (text: string) => React.ReactNode;
+}) {
+  const rendered = React.useMemo(() => renderText(text), [renderText, text]);
   return <React.Fragment>{rendered}</React.Fragment>;
 }
 
@@ -38,18 +41,20 @@ const renderDefaultDataPart: ChatPartRenderer<
 > = ({ part }) => <JsonBlock value={part.data} />;
 
 export interface TextPartProps {
-  renderText?: (text: string) => React.ReactNode;
+  renderText?: ((text: string) => React.ReactNode) | undefined;
 }
 
 function MessageRenderedPart(props: {
   part: ChatMessagePart;
   index: number;
   message: NonNullable<MessageState['message']>;
-  textProps?: TextPartProps;
-  resolveBuiltInPartRenderer?: (
-    part: ChatMessagePart,
-    localeText: ChatLocaleText,
-  ) => ChatPartRenderer<ChatMessagePart> | null;
+  textProps?: TextPartProps | undefined;
+  resolveBuiltInPartRenderer?:
+    | ((
+        part: ChatMessagePart,
+        localeText: ChatLocaleText,
+      ) => ChatPartRenderer<ChatMessagePart> | null)
+    | undefined;
 }) {
   const { part, index, message, textProps, resolveBuiltInPartRenderer } = props;
   const customRenderer = useChatPartRenderer(part.type as ChatMessagePart['type']);
@@ -152,12 +157,14 @@ export namespace ChatMessageContent {
   export interface State extends MessageState {}
 
   export interface Props extends BaseUIComponentProps<'div', State> {
-    textProps?: TextPartProps;
+    textProps?: TextPartProps | undefined;
     /** @deprecated Use `partRenderers` on `ChatProvider` instead. */
-    resolveBuiltInPartRenderer?: (
-      part: ChatMessagePart,
-      localeText: ChatLocaleText,
-    ) => ChatPartRenderer<ChatMessagePart> | null;
+    resolveBuiltInPartRenderer?:
+      | ((
+          part: ChatMessagePart,
+          localeText: ChatLocaleText,
+        ) => ChatPartRenderer<ChatMessagePart> | null)
+      | undefined;
     afterContent?: React.ReactNode;
   }
 }

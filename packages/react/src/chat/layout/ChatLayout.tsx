@@ -151,6 +151,6 @@ export namespace ChatLayout {
 
   export interface Props extends BaseUIComponentProps<'div', State> {
     children?: React.ReactNode;
-    style?: React.CSSProperties;
+    style?: React.CSSProperties | undefined;
   }
 }

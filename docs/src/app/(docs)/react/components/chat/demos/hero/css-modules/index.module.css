@@ -7,7 +7,7 @@
   border-radius: 12px;
   overflow: hidden;
   background: oklch(98.5% 0 0deg);
-  font-family: sans-serif;
+  font-family: inherit;
   font-size: 0.875rem;
 }
 

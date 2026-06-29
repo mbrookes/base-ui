@@ -9,8 +9,8 @@ export interface MessageGroupState {
   first: boolean;
   firstInList: boolean;
   last: boolean;
-  authorRole?: ChatRole;
-  authorId?: string;
+  authorRole?: ChatRole | undefined;
+  authorId?: string | undefined;
   ownMessage: boolean;
   variant: ChatVariant;
   density: ChatDensity;

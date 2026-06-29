@@ -41,9 +41,15 @@ export const ChatMessageAvatar = React.forwardRef(function ChatMessageAvatar(
     stateAttributesMapping,
   });
 
-  if (ctx.role === 'system' || ctx.message == null) return null;
-  if (ctx.grouped) return null;
-  if (avatarUrl == null && children == null) return null;
+  if (ctx.role === 'system' || ctx.message == null) {
+    return null;
+  }
+  if (ctx.grouped) {
+    return null;
+  }
+  if (avatarUrl == null && children == null) {
+    return null;
+  }
 
   return element;
 });

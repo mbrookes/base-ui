@@ -6,39 +6,39 @@ import type { ChatAddToolApproveResponseInput } from '../types/chat-callbacks';
 export type PaginationDirection = 'forward' | 'backward';
 
 export interface ChatListConversationsInput<Cursor = string> {
-  cursor?: Cursor;
-  query?: string;
+  cursor?: Cursor | undefined;
+  query?: string | undefined;
 }
 
 export interface ChatListConversationsResult<Cursor = string> {
   conversations: ChatConversation[];
-  cursor?: Cursor;
-  hasMore?: boolean;
+  cursor?: Cursor | undefined;
+  hasMore?: boolean | undefined;
 }
 
 export interface ChatListMessagesInput<Cursor = string> {
   conversationId: string;
-  cursor?: Cursor;
-  direction?: PaginationDirection;
+  cursor?: Cursor | undefined;
+  direction?: PaginationDirection | undefined;
 }
 
 export interface ChatListMessagesResult<Cursor = string> {
   messages: ChatMessage[];
-  cursor?: Cursor;
-  hasMore?: boolean;
+  cursor?: Cursor | undefined;
+  hasMore?: boolean | undefined;
 }
 
 export interface ChatSendMessageInput {
-  conversationId?: string;
+  conversationId?: string | undefined;
   message: ChatMessage;
   messages: ChatMessage[];
-  attachments?: ChatDraftAttachment[];
-  metadata?: Record<string, unknown>;
+  attachments?: ChatDraftAttachment[] | undefined;
+  metadata?: Record<string, unknown> | undefined;
   signal: AbortSignal;
 }
 
 export interface ChatRegenerateInput {
-  conversationId?: string;
+  conversationId?: string | undefined;
   /** Id of the assistant message being regenerated (already removed from `messages`). */
   messageId: string;
   /** The user message that prompted the reply being regenerated. */
@@ -49,8 +49,8 @@ export interface ChatRegenerateInput {
 }
 
 export interface ChatReconnectToStreamInput {
-  conversationId?: string;
-  messageId?: string;
+  conversationId?: string | undefined;
+  messageId?: string | undefined;
   signal: AbortSignal;
 }
 
@@ -61,7 +61,7 @@ export interface ChatSetTypingInput {
 
 export interface ChatMarkReadInput {
   conversationId: string;
-  messageId?: string;
+  messageId?: string | undefined;
 }
 
 export interface ChatSubscribeInput {
@@ -72,8 +72,8 @@ export type ChatSubscriptionCleanup = () => void;
 
 export interface ChatLoadMoreResult<Cursor = string> {
   messages: ChatMessage[];
-  cursor?: Cursor;
-  hasMore?: boolean;
+  cursor?: Cursor | undefined;
+  hasMore?: boolean | undefined;
 }
 
 export interface ChatAdapter<Cursor = string> {

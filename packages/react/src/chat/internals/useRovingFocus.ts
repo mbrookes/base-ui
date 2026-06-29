@@ -38,40 +38,40 @@ export interface UseRovingFocusParameters {
    * active conversation). Consulted per render, after the stored/interactive
    * focus and before `fallback`.
    */
-  preferredId?: string;
+  preferredId?: string | undefined;
   /**
    * Which end of the list receives the tab stop when neither an interactive
    * focus nor `preferredId` resolves. The message list uses `'last'` so the
    * tab stop tracks the newest message until the user interacts.
    * @default 'first'
    */
-  fallback?: 'first' | 'last';
+  fallback?: 'first' | 'last' | undefined;
   /**
    * Invoked on Enter / Space. When omitted those keys are ignored by the hook
    * and fall through to the consumer (the message list uses Enter for
    * drill-in instead of activation).
    * @param {string} id The id of the item the key was pressed on.
    */
-  onActivate?: (id: string) => void;
+  onActivate?: ((id: string) => void) | undefined;
   /**
    * Type-ahead label accessor. When omitted, printable keys are ignored by
    * the hook and fall through to the consumer.
    * @param {string} id The id of the candidate item.
    * @returns {string | undefined} The label to match the type-ahead buffer against.
    */
-  getTypeAheadLabel?: (id: string) => string | undefined;
+  getTypeAheadLabel?: ((id: string) => string | undefined) | undefined;
   /**
    * Whether PageUp/PageDown move focus by a page of items. The message list
    * disables this so the keys keep their native scrolling behavior (the only
    * way to read a message taller than the viewport with the keyboard).
    * @default true
    */
-  enablePageKeys?: boolean;
+  enablePageKeys?: boolean | undefined;
   /**
    * Page-size divisor for PageUp/PageDown: page = max(1, floor(count / divisor)).
    * @default 10
    */
-  pageSizeDivisor?: number;
+  pageSizeDivisor?: number | undefined;
   /**
    * Whether to actively move DOM focus to the stored item when the consumer
    * remounts (the conversation list restores focus when e.g. the drawer
@@ -79,7 +79,7 @@ export interface UseRovingFocusParameters {
    * steal focus.
    * @default false
    */
-  restoreFocusOnMount?: boolean;
+  restoreFocusOnMount?: boolean | undefined;
 }
 
 export interface UseRovingFocusReturn {

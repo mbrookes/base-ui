@@ -24,7 +24,7 @@ export const SourceDocumentPart = React.forwardRef(function SourceDocumentPart(
   props: SourceDocumentPart.Props,
   forwardedRef: React.ForwardedRef<HTMLDivElement>,
 ) {
-  const { index: _index, message, onToolCall: _onToolCall, part, ...elementProps } = props;
+  const { index, message, onToolCall, part, ...elementProps } = props;
 
   const state: SourceDocumentPart.State = {
     messageId: message.id,

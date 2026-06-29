@@ -16,8 +16,13 @@ import { useChat } from '../../chat/hooks/useChat';
 import { useChatLocaleText } from '../../chat/locales/ChatLocaleContext';
 import { useMessageContentTabIndex } from '../../chat-message-list/internals/MessageRovingContext';
 import { formatStructuredValue } from './partUtils';
-import { type ChatToolExpand, ToolDisclosureContext, useToolDisclosure } from './toolDisclosure';
-import type { ToolPartOwnerState, ToolPartSectionOwnerState } from './toolDisclosure';
+import {
+  type ChatToolExpand,
+  ToolDisclosureContext,
+  useToolDisclosure,
+  ToolPartOwnerState,
+  ToolPartSectionOwnerState,
+} from './toolDisclosure';
 
 type ToolPart = ChatToolMessagePart | ChatDynamicToolMessagePart;
 
@@ -56,7 +61,7 @@ function ToolPayloadSection(props: {
   return (
     <details
       open={open || undefined}
-      onToggle={(e) => setOpen((e.currentTarget as HTMLDetailsElement).open)}
+      onToggle={(event) => setOpen((event.currentTarget as HTMLDetailsElement).open)}
     >
       <summary tabIndex={contentTabIndex}>{label}</summary>
       <pre>{formatted}</pre>
@@ -82,14 +87,7 @@ export const ChatMessageToolPart = React.forwardRef(function ChatMessageToolPart
   props: ChatMessageToolPart.Props,
   forwardedRef: React.ForwardedRef<HTMLDivElement>,
 ) {
-  const {
-    index: _index,
-    message,
-    onToolCall: _onToolCall,
-    part,
-    defaultExpanded,
-    ...elementProps
-  } = props;
+  const { index, message, onToolCall, part, defaultExpanded, ...elementProps } = props;
 
   const { addToolApprovalResponse } = useChat();
   const localeText = useChatLocaleText();
@@ -186,7 +184,7 @@ export const ChatMessageToolPart = React.forwardRef(function ChatMessageToolPart
               <details
                 open={cardOpen || undefined}
                 ref={disclosureRef}
-                onToggle={(e) => setCardOpen((e.currentTarget as HTMLDetailsElement).open)}
+                onToggle={(event) => setCardOpen((event.currentTarget as HTMLDetailsElement).open)}
               >
                 <summary tabIndex={contentTabIndex}>
                   <span>{toolTitle}</span>
@@ -266,7 +264,7 @@ export namespace ChatMessageToolPart {
 
   export interface Props
     extends ChatPartRendererProps<ToolPart>, Omit<BaseUIComponentProps<'div', State>, 'children'> {
-    defaultExpanded?: Record<string, ChatToolExpand | undefined>;
+    defaultExpanded?: Record<string, ChatToolExpand | undefined> | undefined;
   }
 }
 

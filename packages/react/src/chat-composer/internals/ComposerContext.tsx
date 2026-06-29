@@ -18,7 +18,7 @@ export interface ComposerContextValue extends ComposerState {
   addAttachment(file: File): void;
   removeAttachment(localId: string): void;
   attachments: ChatDraftAttachment[];
-  attachmentConfig?: ChatAttachmentsConfig;
+  attachmentConfig?: ChatAttachmentsConfig | undefined;
   error: ChatError | null;
   setComposerIsComposing(value: boolean): void;
 }

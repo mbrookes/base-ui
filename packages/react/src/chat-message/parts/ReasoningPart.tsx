@@ -26,7 +26,7 @@ export const ReasoningPart = React.forwardRef(function ReasoningPart(
   props: ReasoningPart.Props,
   forwardedRef: React.ForwardedRef<HTMLDetailsElement>,
 ) {
-  const { index: _index, message, onToolCall: _onToolCall, part, ...elementProps } = props;
+  const { index, message, onToolCall, part, ...elementProps } = props;
 
   const localeText = useChatLocaleText();
   const isStreaming = part.state === 'streaming';

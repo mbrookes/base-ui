@@ -109,8 +109,8 @@ export namespace ChatComposerRoot {
   }
 
   export interface Props extends BaseUIComponentProps<'form', State> {
-    onSubmit?: React.FormEventHandler<HTMLFormElement>;
-    disabled?: boolean;
-    attachmentConfig?: ChatAttachmentsConfig;
+    onSubmit?: React.FormEventHandler<HTMLFormElement> | undefined;
+    disabled?: boolean | undefined;
+    attachmentConfig?: ChatAttachmentsConfig | undefined;
   }
 }

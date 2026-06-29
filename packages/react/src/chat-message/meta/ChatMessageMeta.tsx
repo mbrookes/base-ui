@@ -69,7 +69,9 @@ export const ChatMessageMeta = React.forwardRef(function ChatMessageMeta(
     stateAttributesMapping,
   });
 
-  if (!hasMeta && !ctx.streaming) return null;
+  if (!hasMeta && !ctx.streaming) {
+    return null;
+  }
 
   return element;
 });

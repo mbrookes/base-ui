@@ -19,7 +19,7 @@ const DEFAULT_ESTIMATED_ITEM_SIZE = 84;
 const DEFAULT_AUTO_SCROLL_BUFFER = 150;
 
 export interface MessageListRootHandle {
-  scrollToBottom(options?: { behavior?: ScrollBehavior }): void;
+  scrollToBottom(options?: { behavior?: ScrollBehavior | undefined }): void;
   /**
    * Move the roving focus to the given message (defaults to the newest one)
    * and focus its article element.
@@ -33,7 +33,7 @@ export interface MessageListRootAutoScrollConfig {
    * user is still considered "at the bottom" and auto-scroll will trigger.
    * @default 150
    */
-  buffer?: number;
+  buffer?: number | undefined;
 }
 
 /**
@@ -197,15 +197,15 @@ export namespace ChatMessageListRoot {
     /**
      * Override the list of message IDs to render. Defaults to the IDs from the chat store.
      */
-    items?: string[];
+    items?: string[] | undefined;
     /**
      * Renders each message row. Required.
      */
     renderItem(params: { id: string; index: number }): React.ReactNode;
-    getItemKey?: (id: string, index: number) => React.Key;
-    estimatedItemSize?: number;
-    onReachTop?: () => void;
-    onReachBottom?: () => void;
+    getItemKey?: ((id: string, index: number) => React.Key) | undefined;
+    estimatedItemSize?: number | undefined;
+    onReachTop?: (() => void) | undefined;
+    onReachBottom?: (() => void) | undefined;
     /**
      * Controls automatic scrolling to the bottom when new messages arrive.
      * - `true` – enable with the default buffer (150 px).
@@ -213,11 +213,11 @@ export namespace ChatMessageListRoot {
      * - `false` – disable.
      * @default true
      */
-    autoScroll?: boolean | MessageListRootAutoScrollConfig;
+    autoScroll?: boolean | MessageListRootAutoScrollConfig | undefined;
     /**
      * Whether the message list manages a roving tabindex over its messages.
      * @default true
      */
-    enableRovingFocus?: boolean;
+    enableRovingFocus?: boolean | undefined;
   }
 }
