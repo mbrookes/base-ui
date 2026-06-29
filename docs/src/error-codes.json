@@ -95,5 +95,19 @@
   "95": "Base UI: SharedCalendarDayGridBodyContext is missing. <Calendar.DayGridRow /> must be placed within <Calendar.DayGridBody /> and <RangeCalendar.DayGridRow /> must be placed within <RangeCalendar.DayGridBody />.",
   "96": "Base UI: SharedCalendarDayGridCellContext is missing. <Calendar.DayButton /> must be placed within <Calendar.DayGridCell /> and <RangeCalendar.DayButton /> must be placed within <RangeCalendar.DayGridCell />.",
   "97": "Base UI: SharedCalendarRootContext is missing. Calendar parts must be placed within <Calendar.Root /> and Range Calendar parts must be placed within <RangeCalendar.Root />.",
-  "98": "Base UI: OTPFieldRootContext is missing. OTPField parts must be placed within <OTPField.Root>."
+  "98": "Base UI: OTPFieldRootContext is missing. OTPField parts must be placed within <OTPField.Root>.",
+  "99": "MUI X Chat: reloadConversations is not yet implemented.\nThis method is a planned API stub. Remove the call until it is implemented.",
+  "100": "MUI X Chat: reloadMessages is not yet implemented.\nThis method is a planned API stub. Remove the call until it is implemented.",
+  "101": "MUI X Chat: reconnectRealtime is not yet implemented.\nThis method is a planned API stub. Remove the call until it is implemented.",
+  "102": "Base UI: useChatStore must be used within a <Chat.Root> component.",
+  "103": "Stream processing failed.",
+  "104": "Base UI: useComposerContext must be used within a Chat.Composer component.",
+  "105": "Base UI: useConversationContext must be used within a ChatConversation.Root component.",
+  "106": "Base UI: useMessageContext must be used within a ChatMessage.Root component.",
+  "107": "Base UI: useConversationListRootContext must be used within a ChatConversationList.Root component.",
+  "108": "Base UI: useConversationListItemContext must be used within a ChatConversationList.Item component.",
+  "109": "Base UI: useMessageListContext must be used within a ChatMessageList.Root component.",
+  "110": "Base UI: useMessageListInternalContext must be used within a ChatMessageList.Root component.",
+  "111": "Base UI: useChatRuntimeContext must be used within a <Chat.Root> component.",
+  "112": "Base UI: useChatStoreContext must be used within a <Chat.Root> component."
 }

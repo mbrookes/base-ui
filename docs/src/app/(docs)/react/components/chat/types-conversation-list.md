@@ -9,6 +9,8 @@
 The root of the conversation list.
 Renders a `<nav>` element.
 
+Documentation: [Base UI Chat](https://base-ui.com/react/components/chat)
+
 **Root Props:**
 
 | Prop      | Type                                                                                                    | Default     | Description                                                                                                                                                                                        |
@@ -36,6 +38,8 @@ type ChatConversationListRootState = {
 
 A single conversation item in the conversation list.
 Renders a `<div>` element with `role="option"`.
+
+Documentation: [Base UI Chat](https://base-ui.com/react/components/chat)
 
 **Item Props:**
 
@@ -69,6 +73,8 @@ type ChatConversationListItemState = {
 Displays the conversation title.
 Renders a `<div>` element.
 
+Documentation: [Base UI Chat](https://base-ui.com/react/components/chat)
+
 **Title Props:**
 
 | Prop      | Type                                                                                                     | Default | Description                                                                                                                                                                                   |
@@ -98,6 +104,8 @@ type ChatConversationListTitleState = {
 
 A single conversation item in the conversation list.
 Renders a `<div>` element with `role="option"`.
+
+Documentation: [Base UI Chat](https://base-ui.com/react/components/chat)
 
 **ChatConversationListItem Props:**
 
@@ -157,6 +165,8 @@ type ChatConversationListItemState = {
 Container for action buttons in a conversation list item.
 Renders a `<div>` element.
 
+Documentation: [Base UI Chat](https://base-ui.com/react/components/chat)
+
 **ChatConversationListItemActions Props:**
 
 | Prop      | Type                                                                                                           | Default | Description                                                                                                                                                                                   |
@@ -211,6 +221,8 @@ type ChatConversationListItemActionsState = {
 Displays the conversation's avatar image.
 Renders a `<div>` element.
 
+Documentation: [Base UI Chat](https://base-ui.com/react/components/chat)
+
 **ChatConversationListItemAvatar Props:**
 
 | Prop      | Type                                                                                                          | Default | Description                                                                                                                                                                                   |
@@ -264,6 +276,8 @@ type ChatConversationListItemAvatarState = {
 
 Container for the conversation item's text content (title and preview).
 Renders a `<div>` element.
+
+Documentation: [Base UI Chat](https://base-ui.com/react/components/chat)
 
 **ChatConversationListItemContent Props:**
 
@@ -320,6 +334,8 @@ Displays the conversation's preview text (subtitle of the last message).
 Renders nothing if there is no preview available.
 Renders a `<div>` element.
 
+Documentation: [Base UI Chat](https://base-ui.com/react/components/chat)
+
 **ChatConversationListPreview Props:**
 
 | Prop      | Type                                                                                                       | Default | Description                                                                                                                                                                                   |
@@ -373,6 +389,8 @@ type ChatConversationListPreviewState = {
 
 The root of the conversation list.
 Renders a `<nav>` element.
+
+Documentation: [Base UI Chat](https://base-ui.com/react/components/chat)
 
 **ChatConversationListRoot Props:**
 
@@ -434,6 +452,8 @@ Displays the conversation's last message timestamp.
 Renders nothing if there is no timestamp available.
 Renders a `<div>` element.
 
+Documentation: [Base UI Chat](https://base-ui.com/react/components/chat)
+
 **ChatConversationListTimestamp Props:**
 
 | Prop      | Type                                                                                                         | Default | Description                                                                                                                                                                                   |
@@ -487,6 +507,8 @@ type ChatConversationListTimestampState = {
 
 Displays the conversation title.
 Renders a `<div>` element.
+
+Documentation: [Base UI Chat](https://base-ui.com/react/components/chat)
 
 **ChatConversationListTitle Props:**
 
@@ -543,6 +565,8 @@ Displays the unread message count badge for a conversation.
 In compact variant, renders a dot when there are unread messages.
 Renders a `<span>` element.
 
+Documentation: [Base UI Chat](https://base-ui.com/react/components/chat)
+
 **ChatConversationListUnreadBadge Props:**
 
 | Prop      | Type                                                                                                           | Default | Description                                                                                                                                                                                   |
@@ -597,6 +621,8 @@ type ChatConversationListUnreadBadgeState = {
 Container for action buttons in a conversation list item.
 Renders a `<div>` element.
 
+Documentation: [Base UI Chat](https://base-ui.com/react/components/chat)
+
 **ItemActions Props:**
 
 | Prop      | Type                                                                                                           | Default | Description                                                                                                                                                                                   |
@@ -627,6 +653,8 @@ type ChatConversationListItemActionsState = {
 Displays the conversation's avatar image.
 Renders a `<div>` element.
 
+Documentation: [Base UI Chat](https://base-ui.com/react/components/chat)
+
 **ItemAvatar Props:**
 
 | Prop      | Type                                                                                                          | Default | Description                                                                                                                                                                                   |
@@ -656,6 +684,8 @@ type ChatConversationListItemAvatarState = {
 
 Container for the conversation item's text content (title and preview).
 Renders a `<div>` element.
+
+Documentation: [Base UI Chat](https://base-ui.com/react/components/chat)
 
 **ItemContent Props:**
 
@@ -688,6 +718,8 @@ Displays the conversation's preview text (subtitle of the last message).
 Renders nothing if there is no preview available.
 Renders a `<div>` element.
 
+Documentation: [Base UI Chat](https://base-ui.com/react/components/chat)
+
 **Preview Props:**
 
 | Prop      | Type                                                                                                       | Default | Description                                                                                                                                                                                   |
@@ -719,6 +751,8 @@ Displays the conversation's last message timestamp.
 Renders nothing if there is no timestamp available.
 Renders a `<div>` element.
 
+Documentation: [Base UI Chat](https://base-ui.com/react/components/chat)
+
 **Timestamp Props:**
 
 | Prop      | Type                                                                                                         | Default | Description                                                                                                                                                                                   |
@@ -749,6 +783,8 @@ type ChatConversationListTimestampState = {
 Displays the unread message count badge for a conversation.
 In compact variant, renders a dot when there are unread messages.
 Renders a `<span>` element.
+
+Documentation: [Base UI Chat](https://base-ui.com/react/components/chat)
 
 **UnreadBadge Props:**
 

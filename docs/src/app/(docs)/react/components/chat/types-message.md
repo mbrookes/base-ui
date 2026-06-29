@@ -9,6 +9,8 @@
 The root element for a single chat message.
 Renders a `<div>` element with `role="article"`.
 
+Documentation: [Base UI Chat](https://base-ui.com/react/components/chat)
+
 **Root Props:**
 
 | Prop        | Type                                                                               | Default | Description                                                                                                                                                                                   |
@@ -47,6 +49,8 @@ type RootState = {
 Renders the content of a chat message by dispatching each message part
 to the appropriate renderer.
 Renders a `<div>` element.
+
+Documentation: [Base UI Chat](https://base-ui.com/react/components/chat)
 
 **Content Props:**
 
@@ -88,6 +92,8 @@ Renders an error message for the current message.
 Returns `null` when there is no error.
 Renders a `<div>` element with `role="alert"`.
 
+Documentation: [Base UI Chat](https://base-ui.com/react/components/chat)
+
 **Error Props:**
 
 | Prop      | Type                                                                                | Default | Description                                                                                                                                                                                   |
@@ -127,6 +133,8 @@ type ErrorState = {
 A container for message action buttons.
 Renders a `<div>` element.
 
+Documentation: [Base UI Chat](https://base-ui.com/react/components/chat)
+
 **Actions Props:**
 
 | Prop      | Type                                                                                  | Default | Description                                                                                                                                                                                   |
@@ -163,6 +171,8 @@ type ActionsState = {
 Renders the author's display name for a chat message.
 Only shown in `compact` variant for the first message in a group.
 Renders a `<span>` element.
+
+Documentation: [Base UI Chat](https://base-ui.com/react/components/chat)
 
 **AuthorLabel Props:**
 
@@ -201,6 +211,8 @@ Renders the author's avatar for a chat message.
 Returns `null` for system messages, grouped messages, or when no avatar is available.
 Renders a `<div>` element.
 
+Documentation: [Base UI Chat](https://base-ui.com/react/components/chat)
+
 **Avatar Props:**
 
 | Prop      | Type                                                                                 | Default | Description                                                                                                                                                                                   |
@@ -237,6 +249,8 @@ type AvatarState = {
 Renders metadata for a chat message: timestamp, status, and streaming indicator.
 Returns `null` when there is nothing to display.
 Renders a `<div>` element.
+
+Documentation: [Base UI Chat](https://base-ui.com/react/components/chat)
 
 **Meta Props:**
 
