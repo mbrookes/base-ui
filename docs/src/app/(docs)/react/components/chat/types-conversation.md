@@ -34,7 +34,7 @@ type ChatConversationRootState = {
 ### Header
 
 The header area of the conversation pane.
-Renders a `<div>` element.
+Renders a `<header>` element.
 
 **Header Props:**
 
@@ -88,7 +88,7 @@ type ChatConversationTitleState = {
 ### ChatConversationHeader
 
 The header area of the conversation pane.
-Renders a `<div>` element.
+Renders a `<header>` element.
 
 **ChatConversationHeader Props:**
 

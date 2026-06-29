@@ -45,7 +45,6 @@ Renders a `<label>` element.
 
 | Prop      | Type                                                                                             | Default | Description                                                                                                                                                                                   |
 | :-------- | :----------------------------------------------------------------------------------------------- | :------ | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| htmlFor   | `string`                                                                                         | -       | -                                                                                                                                                                                             |
 | className | `string \| ((state: ChatComposer.Label.State) => string \| undefined)`                           | -       | CSS class applied to the element, or a function that&#xA;returns a class based on the component's state.                                                                                      |
 | style     | `React.CSSProperties \| ((state: ChatComposer.Label.State) => React.CSSProperties \| undefined)` | -       | Style applied to the element, or a function that&#xA;returns a style object based on the component's state.                                                                                   |
 | render    | `ReactElement \| ((props: HTMLProps, state: ChatComposer.Label.State) => ReactElement)`          | -       | Allows you to replace the component's HTML element&#xA;with a different tag, or compose it with another component. Accepts a `ReactElement` or a function that returns the element to render. |
@@ -296,7 +295,6 @@ Renders a `<label>` element.
 
 | Prop      | Type                                                                                             | Default | Description                                                                                                                                                                                   |
 | :-------- | :----------------------------------------------------------------------------------------------- | :------ | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| htmlFor   | `string`                                                                                         | -       | -                                                                                                                                                                                             |
 | className | `string \| ((state: ChatComposer.Label.State) => string \| undefined)`                           | -       | CSS class applied to the element, or a function that&#xA;returns a class based on the component's state.                                                                                      |
 | style     | `React.CSSProperties \| ((state: ChatComposer.Label.State) => React.CSSProperties \| undefined)` | -       | Style applied to the element, or a function that&#xA;returns a style object based on the component's state.                                                                                   |
 | render    | `ReactElement \| ((props: HTMLProps, state: ChatComposer.Label.State) => ReactElement)`          | -       | Allows you to replace the component's HTML element&#xA;with a different tag, or compose it with another component. Accepts a `ReactElement` or a function that returns the element to render. |
@@ -305,7 +303,6 @@ Renders a `<label>` element.
 
 ```typescript
 type ChatComposerLabelProps = {
-  htmlFor?: string;
   /**
    * CSS class applied to the element, or a function that
    * returns a class based on the component's state.
