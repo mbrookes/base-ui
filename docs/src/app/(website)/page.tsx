@@ -20,7 +20,7 @@ export default function Homepage() {
 
       <section className="bui-d-c">
         <h1 className="Text sz-3 bp2:sz-4 bui-gcs-1 bui-gce-9 bp4:bui-gce-5">
-          Headless chat UI components for building AI-powered interfaces
+          Headless chat UI components for conversational AI and messaging interfaces
         </h1>
         <div className="bui-gcs-1 bui-gce-9">
           <Link className="Text sz-2 bui-d-if" href="/react/components/chat" withArrow>
@@ -31,14 +31,15 @@ export default function Homepage() {
       <section className="bui-d-c">
         <div className="bui-d-f bui-fd-c bui-g-4 bui-gcs-1 bui-gce-9 bp2:bui-gcs-3 bp4:bui-gce-7">
           <p className="Text sz-2">
-            Base&nbsp;UI Chat is a headless component library for building AI chat interfaces with
-            React. It provides the structure, state management, and accessibility of a chat UI
-            without imposing any visual design.
+            Base&nbsp;UI Chat is a headless component library for building chat interfaces with
+            React — whether that's an AI assistant, a customer support widget, or a
+            general-purpose messaging UI.
           </p>
           <p className="Text sz-2">
-            Stream responses from any AI provider, render rich message content with Markdown and
-            tool outputs, manage conversation history, and handle errors — all with full control
-            over your markup and styles.
+            Connect to any language model or messaging backend via a simple adapter. Stream
+            responses token by token, render rich message content with Markdown and tool outputs,
+            manage multi-conversation history, and handle errors — all with full control over your
+            markup and styles.
           </p>
           <p className="Text sz-2">
             Built on top of{' '}
@@ -53,7 +54,7 @@ export default function Homepage() {
 }
 
 const description =
-  'Headless chat UI components for building AI-powered interfaces with React.';
+  'Headless chat UI components for conversational AI and messaging interfaces with React.';
 
 export const metadata: Metadata = {
   description,

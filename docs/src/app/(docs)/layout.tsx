@@ -106,7 +106,7 @@ export default function Layout({ children }: React.PropsWithChildren) {
                             GitHub
                           </SideNav.Item>
                           <SideNav.Item
-                            href="https://www.npmjs.com/package/@base-ui/react"
+                            href="https://www.npmjs.com/package/@base-ui/chat"
                             icon={<NpmIcon />}
                             external
                           >
