@@ -32,8 +32,8 @@ export default function Homepage() {
         <div className="bui-d-f bui-fd-c bui-g-4 bui-gcs-1 bui-gce-9 bp2:bui-gcs-3 bp4:bui-gce-7">
           <p className="Text sz-2">
             Base&nbsp;UI Chat is a headless component library for building chat interfaces with
-            React — whether that's an AI assistant, a customer support widget, or a
-            general-purpose messaging UI.
+            React — whether that's an AI assistant, a customer support widget, or a general-purpose
+            messaging UI.
           </p>
           <p className="Text sz-2">
             Connect to any language model or messaging backend via a simple adapter. Stream
@@ -42,10 +42,9 @@ export default function Homepage() {
             markup and styles.
           </p>
           <p className="Text sz-2">
-            Built on top of{' '}
-            <Link href="https://base-ui.com">Base UI</Link>, it follows the same philosophy:
-            composable, accessible, and unstyled by default. Use Tailwind, CSS Modules, plain CSS,
-            or any other styling solution you prefer.
+            Built on top of <Link href="https://base-ui.com">Base UI</Link>, it follows the same
+            philosophy: composable, accessible, and unstyled by default. Use Tailwind, CSS Modules,
+            plain CSS, or any other styling solution you prefer.
           </p>
         </div>
       </section>

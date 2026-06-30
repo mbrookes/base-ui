@@ -4,7 +4,6 @@ import { act, fireEvent, screen } from '@mui/internal-test-utils';
 import { useMergedRefs } from '@base-ui/utils/useMergedRefs';
 import { createRenderer, isJSDOM } from '#test-utils';
 import { useButton } from './useButton';
-import { CompositeRoot } from '../composite/root/CompositeRoot';
 import { mergeProps } from '../../merge-props';
 
 describe('useButton', () => {
@@ -138,17 +137,14 @@ describe('useButton', () => {
         const { getButtonProps, buttonRef } = useButton({
           disabled: true,
           focusableWhenDisabled: true,
+          composite: true,
         });
         return (
           <button ref={buttonRef} key={props.buttonKey} {...getButtonProps({ disabled: true })} />
         );
       }
 
-      const { rerender } = await render(
-        <CompositeRoot>
-          <TestButton />
-        </CompositeRoot>,
-      );
+      const { rerender } = await render(<TestButton />);
 
       async function verify() {
         const button = screen.getByRole('button');
@@ -159,11 +155,7 @@ describe('useButton', () => {
       await verify();
 
       // Ensure it works after ref change
-      await rerender(
-        <CompositeRoot>
-          <TestButton buttonKey="rerender" />
-        </CompositeRoot>,
-      );
+      await rerender(<TestButton buttonKey="rerender" />);
       await verify();
     });
 
@@ -598,26 +590,24 @@ describe('useButton', () => {
       expect(handleClick).toHaveBeenCalledTimes(0);
     });
 
-    it('key: Space fires keydown then click when in composite root context', async () => {
+    it('key: Space fires keydown then click when composite=true', async () => {
       const handleKeyDown = vi.fn();
       const handleKeyUp = vi.fn();
       const handleClick = vi.fn();
 
       function TestButton(props: React.ButtonHTMLAttributes<HTMLButtonElement>) {
-        const { getButtonProps } = useButton({ native: false });
+        const { getButtonProps } = useButton({ native: false, composite: true });
 
         return <span {...getButtonProps(props)} />;
       }
 
       await render(
-        <CompositeRoot>
-          <TestButton
-            tabIndex={0}
-            onKeyDown={handleKeyDown}
-            onKeyUp={handleKeyUp}
-            onClick={handleClick}
-          />
-        </CompositeRoot>,
+        <TestButton
+          tabIndex={0}
+          onKeyDown={handleKeyDown}
+          onKeyUp={handleKeyUp}
+          onClick={handleClick}
+        />,
       );
 
       const button = screen.getByRole('button');
@@ -634,21 +624,19 @@ describe('useButton', () => {
       expect(handleClick).toHaveBeenCalledTimes(1);
     });
 
-    it('key: Space fires keydown then click on native buttons in composite root context', async () => {
+    it('key: Space fires keydown then click on native buttons when composite=true', async () => {
       const handleKeyDown = vi.fn();
       const handleKeyUp = vi.fn();
       const handleClick = vi.fn();
 
       function TestButton(props: React.ButtonHTMLAttributes<HTMLButtonElement>) {
-        const { getButtonProps } = useButton();
+        const { getButtonProps } = useButton({ composite: true });
 
         return <button {...getButtonProps(props)} />;
       }
 
       await render(
-        <CompositeRoot>
-          <TestButton onKeyDown={handleKeyDown} onKeyUp={handleKeyUp} onClick={handleClick} />
-        </CompositeRoot>,
+        <TestButton onKeyDown={handleKeyDown} onKeyUp={handleKeyUp} onClick={handleClick} />,
       );
 
       const button = screen.getByRole('button');
@@ -665,7 +653,7 @@ describe('useButton', () => {
       expect(handleClick).toHaveBeenCalledTimes(1);
     });
 
-    it('`composite=false` keeps keyup activation inside composite root context', async () => {
+    it('`composite=false` keeps keyup activation', async () => {
       const handleKeyDown = vi.fn();
       const handleKeyUp = vi.fn();
       const handleClick = vi.fn();
@@ -677,9 +665,7 @@ describe('useButton', () => {
       }
 
       await render(
-        <CompositeRoot>
-          <TestButton onKeyDown={handleKeyDown} onKeyUp={handleKeyUp} onClick={handleClick} />
-        </CompositeRoot>,
+        <TestButton onKeyDown={handleKeyDown} onKeyUp={handleKeyUp} onClick={handleClick} />,
       );
 
       const button = screen.getByRole('button');

@@ -1,8 +1,8 @@
 'use client';
 import * as React from 'react';
+import { Progress } from '@base-ui/react/progress';
 import { useRenderElement } from '../../internals/useRenderElement';
 import type { BaseUIComponentProps } from '../../internals/types';
-import { Progress } from '@base-ui/react/progress';
 import { useIsHydrated } from '../../chat/internals/useIsHydrated';
 import { useChatLocaleText } from '../../chat/locales/ChatLocaleContext';
 import { useMessageContext, type MessageState } from '../internals/MessageContext';
