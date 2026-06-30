@@ -6,7 +6,6 @@ import { error } from '@base-ui/utils/error';
 import { SafeReact } from '@base-ui/utils/safeReact';
 import { useIsoLayoutEffect } from '@base-ui/utils/useIsoLayoutEffect';
 import { makeEventPreventable, mergeProps } from '../../merge-props';
-import { useCompositeRootContext } from '../composite/root/CompositeRootContext';
 import { BaseUIEvent, HTMLProps } from '../types';
 import { useFocusableWhenDisabled } from '../../utils/useFocusableWhenDisabled';
 
@@ -21,8 +20,7 @@ export function useButton(parameters: UseButtonParameters = {}): UseButtonReturn
 
   const elementRef = React.useRef<HTMLElement | null>(null);
 
-  const compositeRootContext = useCompositeRootContext(true);
-  const isCompositeItem = compositeProp ?? compositeRootContext !== undefined;
+  const isCompositeItem = compositeProp ?? false;
 
   const { props: focusableWhenDisabledProps } = useFocusableWhenDisabled({
     focusableWhenDisabled,
