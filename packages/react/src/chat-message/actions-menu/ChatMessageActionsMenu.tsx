@@ -1,6 +1,6 @@
 'use client';
 import * as React from 'react';
-import { Menu } from '../../menu';
+import { Menu } from '@base-ui/react/menu';
 
 /**
  * The root of a message action menu. Wraps Base UI `Menu.Root`.

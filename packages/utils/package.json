@@ -16,9 +16,6 @@
     "./*.test": null,
     "./*.spec": null
   },
-  "imports": {
-    "#formatErrorMessage": "./src/formatErrorMessage.ts"
-  },
   "scripts": {
     "prebuild": "rimraf --glob build build-tests \"*.tsbuildinfo\"",
     "build": "code-infra build --copy .npmignore --tsgo",

@@ -6,65 +6,29 @@ import { releases } from '../../src/data/releases.ts';
 import { mdxToMarkdown } from './mdxToMarkdown.mjs';
 
 describe('mdxToMarkdown', () => {
-  // A snapshpot test for the Accordion MDX content.
+  // A snapshot test for the Chat MDX content.
   // Serves as an integration test for the markdown generation of component docs.
-  it('should transform Accordion MDX content to markdown with metadata', async () => {
-    // Read the actual Accordion MDX file
-    const accordionMdxPath = path.resolve(
+  it('should transform Chat MDX content to markdown with metadata', async () => {
+    const chatMdxPath = path.resolve(
       import.meta.dirname,
-      '../../src/app/(docs)/react/components/accordion/page.mdx',
+      '../../src/app/(docs)/react/components/chat/page.mdx',
     );
-    const accordionMdxContent = fs.readFileSync(accordionMdxPath, 'utf-8');
+    const chatMdxContent = fs.readFileSync(chatMdxPath, 'utf-8');
 
-    // Transform the MDX content
-    const result = await mdxToMarkdown(accordionMdxContent, accordionMdxPath);
+    const result = await mdxToMarkdown(chatMdxContent, chatMdxPath);
 
-    // Verify the result structure
     expect(result).toBeTypeOf('object');
     expect(result).toHaveProperty('markdown');
     expect(result).toHaveProperty('title');
     expect(result).toHaveProperty('subtitle');
     expect(result).toHaveProperty('description');
 
-    // Verify extracted metadata
-    expect(result.title).toBe('Accordion');
-    expect(result.subtitle).toBe('A set of collapsible panels with headings.');
+    expect(result.title).toBe('Chat');
+    expect(result.subtitle).toBe('A set of headless components for building chat interfaces.');
     expect(result.description).toBe(
-      'A high-quality, unstyled React accordion component that displays a set of collapsible panels with headings.',
+      'High-quality, unstyled React chat components for building conversational AI and messaging interfaces.',
     );
 
-    // Snapshot test the complete result
-    expect(result.markdown).toMatchSnapshot();
-  });
-
-  // A snapshpot test for the useRender MDX content.
-  // Serves as an integration test for the markdown generation of utils docs.
-  it('should transform Direction Provider MDX content to markdown with metadata', async () => {
-    // Read the actual Direcrion Provider MDX file
-    const directionProviderMdxPath = path.resolve(
-      import.meta.dirname,
-      '../../src/app/(docs)/react/utils/direction-provider/page.mdx',
-    );
-    const directionProviderMdxContent = fs.readFileSync(directionProviderMdxPath, 'utf-8');
-
-    // Transform the MDX content
-    const result = await mdxToMarkdown(directionProviderMdxContent, directionProviderMdxPath);
-
-    // Verify the result structure
-    expect(result).toBeTypeOf('object');
-    expect(result).toHaveProperty('markdown');
-    expect(result).toHaveProperty('title');
-    expect(result).toHaveProperty('subtitle');
-    expect(result).toHaveProperty('description');
-
-    // Verify extracted metadata
-    expect(result.title).toBe('Direction Provider');
-    expect(result.subtitle).toBe('Enables RTL behavior for Base UI components.');
-    expect(result.description).toBe(
-      'A direction provider component that enables RTL behavior for Base UI components.',
-    );
-
-    // Snapshot test the complete result
     expect(result.markdown).toMatchSnapshot();
   });
 

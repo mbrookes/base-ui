@@ -6,7 +6,7 @@ import { describe, it, expect } from 'vitest';
 import { isJSDOM } from '#test-utils';
 import * as BaseUI from './index';
 
-describe('@base-ui/react', () => {
+describe('@base-ui/chat', () => {
   it('should have exports', () => {
     expect(typeof BaseUI).toBe('object');
   });
@@ -28,7 +28,7 @@ describe('@base-ui/react', () => {
 
     await Promise.all(
       internalKeys.map(async (subpath) => {
-        const importSpecifier = `@base-ui/react/${subpath.replace('./', '')}`;
+        const importSpecifier = `@base-ui/chat/${subpath.replace('./', '')}`;
         const module = await import(/* @vite-ignore */ importSpecifier);
         expect(module, `${subpath} failed to resolve`).toBeDefined();
       }),
@@ -48,7 +48,7 @@ describe('@base-ui/react', () => {
             !key.startsWith('./internals/'),
         )
         .map(async (subpath) => {
-          const importSpecifier = `@base-ui/react/${subpath.replace('./', '')}`;
+          const importSpecifier = `@base-ui/chat/${subpath.replace('./', '')}`;
           const module = await import(/* @vite-ignore */ importSpecifier);
 
           Object.keys(module).forEach((exportKey) => {

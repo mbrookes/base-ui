@@ -15,11 +15,11 @@ async function getBaseUiExports() {
   const packageJsonContent = await fs.readFile(packageJsonPath, 'utf8');
   const packageJson = JSON.parse(packageJsonContent);
 
-  // Get all export paths from @base-ui/react package.json
+  // Get all export paths from @base-ui/chat package.json
   const exports = packageJson.exports;
   const entrypoints = Object.keys(exports).map((exportKey) => {
-    // Convert from "./accordion" to "@base-ui/react/accordion"
-    const entrypoint = exportKey === '.' ? '@base-ui/react' : `@base-ui/react${exportKey.slice(1)}`;
+    // Convert from "./menu" to "@base-ui/chat/menu"
+    const entrypoint = exportKey === '.' ? '@base-ui/chat' : `@base-ui/chat${exportKey.slice(1)}`;
     return entrypoint;
   });
 
