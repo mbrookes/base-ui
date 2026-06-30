@@ -78,7 +78,7 @@ function renderMessage({ id, index }: { id: string; index: number }) {
         <div className="flex min-w-0 flex-col gap-0.5 group-data-grouped/msg:pl-9">
           <ChatMessage.Content className="wrap-break-word border border-neutral-200 bg-neutral-50 px-2.5 py-1.5 leading-relaxed text-neutral-950 data-own-message:border-neutral-950 data-own-message:bg-neutral-950 data-own-message:text-white dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-50 dark:data-own-message:border-white dark:data-own-message:bg-white dark:data-own-message:text-neutral-950" />
           <ChatMessage.Meta className="flex items-center gap-1 text-[11px] text-neutral-500 dark:text-neutral-400" />
-          <ChatMessage.Actions className="hidden gap-1 group-hover/msg:flex group-focus-within/msg:flex">
+          <ChatMessage.Actions className="flex gap-1 invisible group-hover/msg:visible group-focus-within/msg:visible">
             <CopyButton />
           </ChatMessage.Actions>
         </div>

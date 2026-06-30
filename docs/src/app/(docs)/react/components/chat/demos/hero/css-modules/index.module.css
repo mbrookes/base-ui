@@ -140,13 +140,14 @@
 }
 
 .Actions {
-  display: none;
+  display: flex;
   gap: 4px;
+  visibility: hidden;
 }
 
 .Message:hover .Actions,
 .Message:focus-within .Actions {
-  display: flex;
+  visibility: visible;
 }
 
 .ActionButton {
