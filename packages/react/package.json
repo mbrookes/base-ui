@@ -39,7 +39,6 @@
     "./internals/clamp": "./src/internals/clamp.ts",
 "./internals/constants": "./src/internals/constants.ts",
     "./internals/createBaseUIEventDetails": "./src/internals/createBaseUIEventDetails.ts",
-    "./internals/direction-context": "./src/internals/direction-context/index.ts",
     "./internals/getStateAttributesProps": "./src/internals/getStateAttributesProps.ts",
     "./internals/noop": "./src/internals/noop.ts",
     "./internals/reasons": "./src/internals/reasons.ts",
@@ -48,8 +47,6 @@
     "./internals/types": "./src/internals/types.ts",
     "./internals/use-button": "./src/internals/use-button/index.ts",
     "./internals/useBaseUiId": "./src/internals/useBaseUiId.ts",
-    "./internals/useAnimationsFinished": "./src/internals/useAnimationsFinished.ts",
-    "./internals/useOpenChangeComplete": "./src/internals/useOpenChangeComplete.tsx",
     "./internals/useRenderElement": "./src/internals/useRenderElement.tsx",
     "./internals/useValueChanged": "./src/internals/useValueChanged.ts",
     "./internals/useTransitionStatus": "./src/internals/useTransitionStatus.ts"
