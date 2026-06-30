@@ -1,0 +1,330 @@
+# Chat: Indicators
+
+<Subtitle>Show response generation, typing presence, unread boundaries, and scroll-to-bottom affordances inside the message thread.</Subtitle>
+<Meta
+  name="description"
+  content="Add streaming indicators, typing indicators, unread markers, and scroll-to-bottom affordances to Base UI Chat."
+/>
+
+The indicator components encode thread-specific behaviors that are easy to mishandle when rebuilt from scratch.
+Import them all from `@base-ui/react/chat`:
+
+```tsx
+import {
+  StreamingIndicator,
+  TypingIndicator,
+  UnreadMarker,
+  ScrollToBottomAffordance,
+} from '@base-ui/react/chat';
+```
+
+## StreamingIndicator
+
+`StreamingIndicator` renders while an assistant response is in flight.
+It covers two placements:
+
+- **Trailing row** — placed after the last message row in `renderItem`, it shows during the _waiting_ phase (request sent but no assistant message exists yet).
+- **Inside a message** — placed inside a `ChatMessage.Root`, it shows while that specific assistant message has `status: 'streaming'`.
+
+### Trailing row placement
+
+Pass `index` and `items` so the indicator only renders on the last row:
+
+```tsx
+import { ChatMessageList } from '@base-ui/react/chat-message-list';
+import { StreamingIndicator } from '@base-ui/react/chat';
+
+<ChatMessageList.Root
+  renderItem={({ id, index, items }) => (
+    <React.Fragment key={id}>
+      <ChatMessageGroup.Root messageId={id} index={index}>
+        <ChatMessage.Root messageId={id}>
+          <ChatMessage.Content />
+        </ChatMessage.Root>
+      </ChatMessageGroup.Root>
+      <StreamingIndicator index={index} items={items} />
+    </React.Fragment>
+  )}
+>
+  <ChatMessageList.Viewport>
+    <ChatMessageList.Content />
+  </ChatMessageList.Viewport>
+</ChatMessageList.Root>
+```
+
+When `index !== items.length - 1`, the indicator returns `null` automatically.
+
+### Inside a message
+
+Placed inside `ChatMessage.Root`, the indicator reads the surrounding message context and renders while that message is streaming:
+
+```tsx
+<ChatMessage.Root messageId={id}>
+  <ChatMessage.Content />
+  <StreamingIndicator />
+</ChatMessage.Root>
+```
+
+### Mode
+
+The `mode` prop controls when the indicator renders:
+
+| `mode`   | Behavior                                                         |
+| :------- | :--------------------------------------------------------------- |
+| `'auto'` | (default) Only render in assistant-backed conversations          |
+| `true`   | Always render while a response is in flight                      |
+| `false`  | Never render                                                     |
+
+### Data attributes
+
+`StreamingIndicator` exposes data attributes based on state:
+
+| Attribute          | When present                                             |
+| :----------------- | :------------------------------------------------------- |
+| `data-phase-waiting`   | Request sent, waiting for first assistant message    |
+| `data-phase-streaming` | An assistant message is currently streaming          |
+
+Use these to animate the three `<span>` children:
+
+```css
+.streaming-indicator span {
+  display: inline-block;
+  animation: bounce 1.2s infinite;
+}
+
+.streaming-indicator span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.streaming-indicator span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes bounce {
+  0%, 80%, 100% { transform: translateY(0); }
+  40%           { transform: translateY(-6px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .streaming-indicator span {
+    animation: none;
+  }
+}
+```
+
+The indicator is `aria-hidden` — streaming transitions are announced through the message list's `role="status"` region instead.
+
+### Custom indicator content
+
+Provide `children` to replace the default three `<span>` dots:
+
+```tsx
+<StreamingIndicator>
+  <span className="custom-spinner" />
+</StreamingIndicator>
+```
+
+### Reusing the visibility logic
+
+Read the streaming phase inside a custom component with `useStreamingIndicatorVisibility()`:
+
+```tsx
+import { useStreamingIndicatorVisibility } from '@base-ui/react/chat';
+
+function CustomIndicator() {
+  const { waiting } = useStreamingIndicatorVisibility('auto');
+  if (!waiting) return null;
+  return <div className="custom-waiting-indicator">Thinking…</div>;
+}
+```
+
+## TypingIndicator
+
+`TypingIndicator` shows which users are currently typing in the active conversation.
+It resolves display names from conversation participants, then from message authors, then falls back to the raw user ID.
+
+It renders an `aria-live="polite"` region and produces labels like:
+
+- _Alice is typing_
+- _Alice, Bob are typing_
+
+The indicator returns `null` when no users are typing.
+
+### Placement
+
+Place it in the conversation header or above the composer:
+
+```tsx
+import { ChatConversation } from '@base-ui/react/chat-conversation';
+import { TypingIndicator } from '@base-ui/react/chat';
+
+<ChatConversation.Root pane="thread">
+  <ChatConversation.Header>
+    <ChatConversation.Title />
+    <TypingIndicator />
+  </ChatConversation.Header>
+  {/* ... */}
+</ChatConversation.Root>
+```
+
+### Enabling typing signals
+
+Set `features={{ typingSignal: true }}` on `Chat.Root` to opt into the typing signal feature:
+
+```tsx
+import { Chat } from '@base-ui/react/chat';
+
+<Chat.Root adapter={adapter} features={{ typingSignal: true }}>
+  {/* ... */}
+</Chat.Root>
+```
+
+Your adapter's `sendTypingSignal` method is called as the user types in the composer.
+`useChatStatus().typingUserIds` exposes the resolved list of currently typing user IDs.
+
+### Customizing the label
+
+Override the typing label via `localeText`:
+
+```tsx
+<Chat.Root
+  adapter={adapter}
+  features={{ typingSignal: true }}
+  localeText={{
+    typingIndicatorLabel: (users) => {
+      const names = users.map((u) => u.displayName ?? u.id).join(', ');
+      return `${names} ${users.length === 1 ? 'is' : 'are'} typing…`;
+    },
+  }}
+>
+  {/* ... */}
+</Chat.Root>
+```
+
+### Data attributes
+
+| Attribute      | Value                                        |
+| :------------- | :------------------------------------------- |
+| `data-count`   | Number of typing users (present when > 0)   |
+
+## UnreadMarker
+
+`UnreadMarker` inserts a structural boundary above the first unread message in the thread.
+It reads `conversation.unreadCount` and `conversation.readState` from the active conversation.
+
+The marker renders `role="separator"` and returns `null` for all rows except the one that starts the unread region.
+
+### Placement
+
+```tsx
+import { UnreadMarker } from '@base-ui/react/chat';
+
+<ChatMessageList.Root
+  renderItem={({ id, index }) => (
+    <React.Fragment key={id}>
+      <UnreadMarker index={index} messageId={id} />
+      <ChatMessageGroup.Root messageId={id} index={index}>
+        <ChatMessage.Root messageId={id}>
+          <ChatMessage.Content />
+        </ChatMessage.Root>
+      </ChatMessageGroup.Root>
+    </React.Fragment>
+  )}
+>
+  {/* ... */}
+</ChatMessageList.Root>
+```
+
+Style the separator to create a visible divider:
+
+```css
+.unread-marker {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--color-blue-500);
+  font-size: 0.75rem;
+}
+
+.unread-marker::before,
+.unread-marker::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: currentColor;
+}
+```
+
+## ScrollToBottomAffordance
+
+`ScrollToBottomAffordance` renders a button that scrolls the message list to the bottom.
+It reads scroll state from `ChatMessageList.Root` context and returns `null` when the user is already at the bottom.
+
+It also shows an unseen-message count badge when the user has scrolled away and new messages have arrived.
+
+### Placement
+
+Place it inside the `ChatMessageList.Root` context, typically as a sibling of `ChatMessageList.Viewport`:
+
+```tsx
+import { ChatMessageList } from '@base-ui/react/chat-message-list';
+import { ScrollToBottomAffordance } from '@base-ui/react/chat';
+
+<ChatMessageList.Root renderItem={/* ... */}>
+  <div style={{ position: 'relative' }}>
+    <ChatMessageList.Viewport>
+      <ChatMessageList.Content />
+    </ChatMessageList.Viewport>
+    <ScrollToBottomAffordance className="scroll-to-bottom" />
+  </div>
+</ChatMessageList.Root>
+```
+
+### Scroll behavior
+
+Control whether the scroll animates:
+
+```tsx
+<ScrollToBottomAffordance scrollBehavior="smooth" />
+```
+
+Accepts any value valid for `ScrollBehavior`: `'auto'`, `'smooth'`, or `'instant'`.
+
+### Data attributes
+
+| Attribute                 | When present                                          |
+| :------------------------ | :---------------------------------------------------- |
+| `data-at-bottom`          | The scroll position is at the bottom                 |
+| `data-unseen-message-count` | Unseen count when > 0 (value is the count string)  |
+
+Style the badge with `[data-unseen-message-count]`:
+
+```css
+.scroll-to-bottom {
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+}
+
+.scroll-to-bottom[data-at-bottom] {
+  display: none;
+}
+```
+
+### Custom content
+
+Provide `children` to replace the default label and count elements:
+
+```tsx
+<ScrollToBottomAffordance>
+  <svg aria-hidden>↓</svg>
+</ScrollToBottomAffordance>
+```
+
+The `aria-label` is always set automatically from locale text regardless of `children`.
+
+## See also
+
+- [Accessibility](/react/components/chat/accessibility/) for the keyboard navigation model that governs the message list.
+- [Streaming](/react/components/chat/streaming/) for the chunk protocol that drives `StreamingIndicator`.
+- [Adapters](/react/components/chat/adapters/) for `sendTypingSignal` on the adapter interface.

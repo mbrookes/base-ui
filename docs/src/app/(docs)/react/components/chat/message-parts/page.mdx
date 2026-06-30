@@ -1,0 +1,374 @@
+# Chat: Message parts
+
+<Subtitle>Render text, files, tool calls, reasoning, and custom data payloads from message part arrays.</Subtitle>
+<Meta
+  name="description"
+  content="Render text, files, tool calls, reasoning, and custom data from Base UI Chat message part arrays."
+/>
+
+Every `ChatMessage` stores its content in a `parts` array.
+Each element is a typed `ChatMessagePart` — text, reasoning, tool invocations, files, sources, or custom data.
+`ChatMessage.Content` dispatches each part to the appropriate renderer.
+
+## Text parts
+
+A text part is the most common message part:
+
+```ts
+interface ChatTextMessagePart {
+  type: 'text';
+  text: string;
+  state?: 'streaming' | 'done';
+}
+```
+
+By default, `ChatMessage.Content` renders text parts as plain `<div>{part.text}</div>`.
+Use `textProps.renderText` to supply a custom renderer — for example, a markdown parser:
+
+```tsx
+import { ChatMessage } from '@base-ui/react/chat-message';
+import ReactMarkdown from 'react-markdown';
+
+<ChatMessage.Root messageId={id}>
+  <ChatMessage.Content
+    textProps={{
+      renderText: (text) => <ReactMarkdown>{text}</ReactMarkdown>,
+    }}
+  />
+</ChatMessage.Root>
+```
+
+The `state` field on the text part is `'streaming'` while tokens are arriving and `'done'` once the `text-end` chunk lands.
+Use it to show a cursor while the response streams:
+
+```tsx
+function TextPartDisplay({ part }: { part: ChatTextMessagePart }) {
+  return (
+    <span>
+      {part.text}
+      {part.state === 'streaming' && <span className="cursor" aria-hidden />}
+    </span>
+  );
+}
+```
+
+## Custom part renderers
+
+Register renderers for specific part types through the `partRenderers` prop on `Chat.Root`:
+
+```tsx
+import { Chat } from '@base-ui/react/chat';
+import type { ChatPartRendererMap } from '@base-ui/react/chat';
+
+const partRenderers: ChatPartRendererMap = {
+  text: ({ part }) => <MyMarkdownRenderer content={part.text} />,
+  reasoning: ({ part }) => <details><summary>Thinking</summary>{part.text}</details>,
+  'tool': ({ part }) => <ToolCard invocation={part.toolInvocation} />,
+};
+
+<Chat.Root adapter={adapter} partRenderers={partRenderers}>
+  {/* ... */}
+</Chat.Root>
+```
+
+`partRenderers` is a map from part type to renderer function.
+Each renderer receives `{ part, message, index, onToolCall }`.
+Providing a renderer for a type replaces the default rendering for that type everywhere in the chat.
+
+Read the currently registered renderer for a specific part type in a component with `useChatPartRenderer()`:
+
+```tsx
+import { useChatPartRenderer } from '@base-ui/react/chat';
+
+function CustomContent({ part, message, index }) {
+  const renderer = useChatPartRenderer(part.type);
+  if (renderer) {
+    return renderer({ part, message, index });
+  }
+  // fall through to your own default
+  return <div>{part.text}</div>;
+}
+```
+
+## Reasoning parts
+
+Reasoning parts carry chain-of-thought or thinking traces from the model:
+
+```ts
+interface ChatReasoningMessagePart {
+  type: 'reasoning';
+  text: string;
+  state?: 'streaming' | 'done';
+}
+```
+
+The stream produces reasoning parts with `reasoning-start` / `reasoning-delta` / `reasoning-end` chunks.
+Register a renderer to display them:
+
+```tsx
+const partRenderers: ChatPartRendererMap = {
+  reasoning: ({ part }) => (
+    <details>
+      <summary>View reasoning</summary>
+      <pre>{part.text}</pre>
+    </details>
+  ),
+};
+```
+
+## Tool parts
+
+Tool invocations produce a `'tool'` part (or `'dynamic-tool'` for dynamic tools) that tracks the full lifecycle:
+
+```ts
+import type { ChatToolMessagePart, ChatToolInvocationState } from '@base-ui/react/chat';
+
+// ChatToolInvocationState:
+// 'input-streaming' | 'input-available' | 'approval-requested' |
+// 'approval-responded' | 'output-available' | 'output-error' | 'output-denied'
+
+interface ChatToolMessagePart {
+  type: 'tool';
+  toolInvocation: {
+    toolCallId: string;
+    toolName: string;
+    state: ChatToolInvocationState;
+    input?: unknown;
+    output?: unknown;
+    errorText?: string;
+    approval?: { approved: boolean; reason?: string };
+  };
+}
+```
+
+Register a renderer to show a custom tool card:
+
+```tsx
+const partRenderers: ChatPartRendererMap = {
+  'tool': ({ part, message }) => {
+    const { toolInvocation } = part;
+    return (
+      <div className="tool-card">
+        <strong>{toolInvocation.toolName}</strong>
+        <span>{toolInvocation.state}</span>
+        {toolInvocation.state === 'output-available' && (
+          <pre>{JSON.stringify(toolInvocation.output, null, 2)}</pre>
+        )}
+      </div>
+    );
+  },
+};
+```
+
+### Tool call hook
+
+Use `useChatOnToolCall()` inside a component that handles tool execution on the client side:
+
+```tsx
+import { useChatOnToolCall } from '@base-ui/react/chat';
+
+function ToolCallHandler() {
+  useChatOnToolCall(async ({ toolName, toolCallId, input, addToolResult }) => {
+    if (toolName === 'get_weather') {
+      const result = await fetchWeather(input.location);
+      addToolResult({ toolCallId, result });
+    }
+  });
+  return null;
+}
+```
+
+### Tool approval
+
+When the stream emits a `tool-approval-request` chunk, the invocation enters `'approval-requested'` state.
+Build a React component that renders the approval UI (use hooks inside the component, not directly in the renderer callback):
+
+```tsx
+import { useChatActions } from '@base-ui/react/chat';
+import type { ChatToolMessagePart } from '@base-ui/react/chat';
+
+function ToolApprovalCard({ part }: { part: ChatToolMessagePart }) {
+  const { addToolApprovalResponse } = useChatActions();
+  const { toolInvocation } = part;
+
+  if (toolInvocation.state !== 'approval-requested') return null;
+
+  return (
+    <div className="approval-card">
+      <p>Allow <strong>{toolInvocation.toolName}</strong>?</p>
+      <button
+        onClick={() =>
+          addToolApprovalResponse({ id: toolInvocation.toolCallId, approved: true })
+        }
+      >
+        Allow
+      </button>
+      <button
+        onClick={() =>
+          addToolApprovalResponse({ id: toolInvocation.toolCallId, approved: false })
+        }
+      >
+        Deny
+      </button>
+    </div>
+  );
+}
+
+const partRenderers: ChatPartRendererMap = {
+  'tool': ({ part }) => <ToolApprovalCard part={part} />,
+};
+```
+
+## File parts
+
+File parts carry inline files from the model:
+
+```ts
+interface ChatFileMessagePart {
+  type: 'file';
+  mediaType: string; // e.g. 'image/png', 'application/pdf'
+  url: string;
+  filename?: string;
+}
+```
+
+The built-in `FilePart` component renders images inline and other file types as a download link:
+
+```tsx
+import { FilePart } from '@base-ui/react/chat-message';
+
+const partRenderers: ChatPartRendererMap = {
+  file: ({ part }) => <FilePart part={part} />,
+};
+```
+
+Or build your own renderer:
+
+```tsx
+const partRenderers: ChatPartRendererMap = {
+  file: ({ part }) => {
+    if (part.mediaType.startsWith('image/')) {
+      return <img src={part.url} alt={part.filename} />;
+    }
+    return <a href={part.url} download={part.filename}>{part.filename}</a>;
+  },
+};
+```
+
+## Source parts
+
+Source parts link to references used by the model:
+
+```ts
+// URL-based source
+interface ChatSourceUrlMessagePart {
+  type: 'source-url';
+  sourceId: string;
+  url: string;
+  title?: string;
+}
+
+// Document-based source
+interface ChatSourceDocumentMessagePart {
+  type: 'source-document';
+  sourceId: string;
+  title?: string;
+  text?: string;
+}
+```
+
+Use `SourceUrlPart` and `SourceDocumentPart` built-in components or build your own:
+
+```tsx
+import { SourceUrlPart, SourceDocumentPart } from '@base-ui/react/chat-message';
+
+const partRenderers: ChatPartRendererMap = {
+  'source-url': ({ part }) => <SourceUrlPart part={part} />,
+  'source-document': ({ part }) => <SourceDocumentPart part={part} />,
+};
+```
+
+## Custom data parts
+
+Data parts carry arbitrary structured payloads from the model.
+The type follows the `data-*` pattern:
+
+```ts
+interface ChatDataMessagePart {
+  type: `data-${string}`; // e.g. 'data-citations', 'data-summary'
+  data: unknown;
+  transient?: boolean; // not persisted in message.parts when true
+}
+```
+
+Register a renderer for each custom type you use:
+
+```tsx
+const partRenderers: ChatPartRendererMap = {
+  'data-citations': ({ part }) => (
+    <ul>
+      {(part.data as Citation[]).map((c) => (
+        <li key={c.id}><a href={c.url}>{c.title}</a></li>
+      ))}
+    </ul>
+  ),
+};
+```
+
+Data parts also trigger the `onData` callback on `Chat.Root`:
+
+```tsx
+<Chat.Root
+  adapter={adapter}
+  onData={(part, message) => {
+    if (part.type === 'data-citations') {
+      logCitations(part.data);
+    }
+  }}
+>
+  {/* ... */}
+</Chat.Root>
+```
+
+## Step start parts
+
+Step start parts mark agentic processing boundaries:
+
+```ts
+interface ChatStepStartMessagePart {
+  type: 'step-start';
+}
+```
+
+By default they render as a `<div role="separator" />`.
+Override to show a custom step boundary:
+
+```tsx
+const partRenderers: ChatPartRendererMap = {
+  'step-start': () => (
+    <div role="separator" className="step-divider">
+      New step
+    </div>
+  ),
+};
+```
+
+## Message part type reference
+
+| Type              | Description                            | Stream chunks                           |
+| :---------------- | :------------------------------------- | :-------------------------------------- |
+| `text`            | Plain or markdown text content         | `text-start`, `text-delta`, `text-end`  |
+| `reasoning`       | Model chain-of-thought                 | `reasoning-start`, `reasoning-delta`, `reasoning-end` |
+| `tool`            | Tool invocation lifecycle              | `tool-input-*`, `tool-output-*`         |
+| `dynamic-tool`    | Dynamic tool invocation lifecycle      | `tool-input-*`, `tool-output-*`         |
+| `file`            | Inline file (image, PDF, etc.)         | `file`                                  |
+| `source-url`      | URL-based citation                     | `source-url`                            |
+| `source-document` | Document-based citation                | `source-document`                       |
+| `data-*`          | Custom structured payload              | `data-*`                                |
+| `step-start`      | Agentic step boundary                  | `start-step`, `finish-step`             |
+
+## See also
+
+- [Streaming](/react/components/chat/streaming/) for the chunk type reference.
+- [Error handling](/react/components/chat/error-handling/) for message error states.
+- [Message actions](/react/components/chat/message-actions/) for per-message action buttons.
