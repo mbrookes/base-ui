@@ -44,27 +44,6 @@ const initialMessages: ChatMessageType[] = [
   },
 ];
 
-function CopyButton() {
-  const ctx = ChatMessage.useMessageContext();
-  const text = (ctx.message?.parts ?? [])
-    .filter((p): p is { type: 'text'; text: string } => p.type === 'text')
-    .map((p) => p.text)
-    .join('');
-
-  return (
-    <button
-      type="button"
-      className="h-6 cursor-pointer border border-neutral-200 bg-white px-1.5 text-xs text-neutral-950 select-none hover:bg-neutral-50 focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-neutral-950 dark:border-neutral-700 dark:bg-neutral-950 dark:text-white dark:hover:bg-neutral-800 dark:focus-visible:outline-white"
-      aria-label="Copy message"
-      onClick={() => {
-        void navigator.clipboard.writeText(text);
-      }}
-    >
-      Copy
-    </button>
-  );
-}
-
 function renderMessage({ id, index }: { id: string; index: number }) {
   return (
     <ChatMessageGroup.Root
@@ -73,15 +52,12 @@ function renderMessage({ id, index }: { id: string; index: number }) {
       className="group/grp flex flex-col gap-0.5 data-[author-role=user]:items-end"
     >
       <ChatMessageGroup.AuthorName className="px-0.5 pb-0.5 text-[11px] text-neutral-500 group-data-[author-role=user]/grp:hidden dark:text-neutral-400" />
-      <ChatMessage.Root messageId={id} className="group/msg flex max-w-[85%] items-center gap-2">
-        <ChatMessage.Avatar className="size-7 shrink-0 self-start overflow-hidden border border-neutral-200 dark:border-neutral-700 dark:invert" />
+      <ChatMessage.Root messageId={id} className="flex max-w-[85%] items-start gap-2">
+        <ChatMessage.Avatar className="size-7 shrink-0 overflow-hidden border border-neutral-200 dark:border-neutral-700 dark:invert" />
         <div className="flex min-w-0 flex-col gap-0.5 group-data-grouped/msg:pl-9">
           <ChatMessage.Content className="wrap-break-word border border-neutral-200 bg-neutral-50 px-2.5 py-1.5 leading-relaxed text-neutral-950 data-own-message:border-neutral-950 data-own-message:bg-neutral-950 data-own-message:text-white dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-50 dark:data-own-message:border-white dark:data-own-message:bg-white dark:data-own-message:text-neutral-950" />
           <ChatMessage.Meta className="flex items-center gap-1 text-[11px] text-neutral-500 dark:text-neutral-400" />
         </div>
-        <ChatMessage.Actions className="flex shrink-0 gap-1 invisible group-data-[own-message]/msg:-order-1 group-hover/msg:visible group-focus-within/msg:visible">
-          <CopyButton />
-        </ChatMessage.Actions>
       </ChatMessage.Root>
     </ChatMessageGroup.Root>
   );

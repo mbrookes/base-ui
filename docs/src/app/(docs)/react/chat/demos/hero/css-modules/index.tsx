@@ -45,27 +45,6 @@ const initialMessages: ChatMessageType[] = [
   },
 ];
 
-function CopyButton() {
-  const ctx = ChatMessage.useMessageContext();
-  const text = (ctx.message?.parts ?? [])
-    .filter((p): p is { type: 'text'; text: string } => p.type === 'text')
-    .map((p) => p.text)
-    .join('');
-
-  return (
-    <button
-      type="button"
-      className={styles.ActionButton}
-      aria-label="Copy message"
-      onClick={() => {
-        void navigator.clipboard.writeText(text);
-      }}
-    >
-      Copy
-    </button>
-  );
-}
-
 function renderMessage({ id, index }: { id: string; index: number }) {
   return (
     <ChatMessageGroup.Root messageId={id} index={index} className={styles.MessageGroup}>
@@ -76,9 +55,6 @@ function renderMessage({ id, index }: { id: string; index: number }) {
           <ChatMessage.Content className={styles.Content} />
           <ChatMessage.Meta className={styles.Meta} />
         </div>
-        <ChatMessage.Actions className={styles.Actions}>
-          <CopyButton />
-        </ChatMessage.Actions>
       </ChatMessage.Root>
     </ChatMessageGroup.Root>
   );

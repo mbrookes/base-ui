@@ -61,7 +61,7 @@
 .Message {
   display: flex;
   gap: 8px;
-  align-items: center;
+  align-items: flex-start;
   max-width: 85%;
 }
 
@@ -69,7 +69,6 @@
   width: 28px;
   height: 28px;
   flex-shrink: 0;
-  align-self: flex-start;
   overflow: hidden;
   border: 1px solid oklch(92.2% 0 0deg);
 
@@ -137,63 +136,6 @@
 
   @media (prefers-color-scheme: dark) {
     color: oklch(70.8% 0 0deg);
-  }
-}
-
-.Actions {
-  display: flex;
-  gap: 4px;
-  visibility: hidden;
-  align-self: center;
-  flex-shrink: 0;
-}
-
-.Message[data-own-message] .Actions {
-  order: -1;
-}
-
-.Message:hover .Actions,
-.Message:focus-within .Actions {
-  visibility: visible;
-}
-
-.ActionButton {
-  padding: 0 6px;
-  height: 1.5rem;
-  border: 1px solid oklch(87% 0 0deg);
-  background: white;
-  color: oklch(14.5% 0 0deg);
-  font-family: inherit;
-  font-size: 0.75rem;
-  cursor: pointer;
-  -webkit-user-select: none;
-  user-select: none;
-
-  @media (hover: hover) {
-    &:hover {
-      background: oklch(97% 0 0deg);
-    }
-  }
-
-  &:focus-visible {
-    outline: 2px solid oklch(14.5% 0 0deg);
-    outline-offset: -1px;
-  }
-
-  @media (prefers-color-scheme: dark) {
-    border-color: oklch(26.9% 0 0deg);
-    background: oklch(14.5% 0 0deg);
-    color: white;
-
-    @media (hover: hover) {
-      &:hover {
-        background: oklch(26.9% 0 0deg);
-      }
-    }
-
-    &:focus-visible {
-      outline-color: white;
-    }
   }
 }
 
