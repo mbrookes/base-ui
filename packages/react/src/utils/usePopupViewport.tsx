@@ -8,11 +8,11 @@ import { useIsoLayoutEffect } from '@base-ui/utils/useIsoLayoutEffect';
 import { useStableCallback } from '@base-ui/utils/useStableCallback';
 import { ownerDocument } from '@base-ui/utils/owner';
 import type { ReactStore } from '@base-ui/utils/store';
+import { useDirection } from '@base-ui/react/direction-provider';
 import { useAnimationsFinished } from '../internals/useAnimationsFinished';
 import { usePopupAutoResize } from './usePopupAutoResize';
 import { Dimensions } from '../floating-ui-react/types';
 import { Side } from './useAnchorPositioning';
-import { useDirection } from '../direction-provider';
 
 export type PopupViewportCssVars = {
   /**

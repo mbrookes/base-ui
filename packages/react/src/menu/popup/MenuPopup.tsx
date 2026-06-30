@@ -15,7 +15,6 @@ import { transitionStatusMapping } from '../../internals/stateAttributesMapping'
 import { useOpenChangeComplete } from '../../internals/useOpenChangeComplete';
 import { createChangeEventDetails } from '../../internals/createBaseUIEventDetails';
 import { REASONS } from '../../internals/reasons';
-import { useToolbarRootContext } from '../../toolbar/root/ToolbarRootContext';
 import { COMPOSITE_KEYS } from '../../internals/composite/composite';
 import { getDisabledMountTransitionStyles } from '../../utils/getDisabledMountTransitionStyles';
 
@@ -38,7 +37,7 @@ export const MenuPopup = React.forwardRef(function MenuPopup(
 
   const { store } = useMenuRootContext();
   const { side, align } = useMenuPositionerContext();
-  const insideToolbar = useToolbarRootContext(true) != null;
+  const insideToolbar = false;
 
   const open = store.useState('open');
   const transitionStatus = store.useState('transitionStatus');

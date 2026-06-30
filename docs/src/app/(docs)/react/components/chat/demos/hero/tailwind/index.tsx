@@ -1,12 +1,12 @@
 'use client';
 import * as React from 'react';
-import { Chat, createEchoAdapter } from '@base-ui/react/chat';
-import { ChatMessageList } from '@base-ui/react/chat-message-list';
-import { ChatMessageGroup } from '@base-ui/react/chat-message-group';
-import { ChatMessage } from '@base-ui/react/chat-message';
-import { ChatSuggestions } from '@base-ui/react/chat-suggestions';
-import { ChatComposer } from '@base-ui/react/chat-composer';
-import type { ChatMessage as ChatMessageType, ChatUser } from '@base-ui/react/chat';
+import { Chat, createEchoAdapter } from '@base-ui/chat/chat';
+import { ChatMessageList } from '@base-ui/chat/chat-message-list';
+import { ChatMessageGroup } from '@base-ui/chat/chat-message-group';
+import { ChatMessage } from '@base-ui/chat/chat-message';
+import { ChatSuggestions } from '@base-ui/chat/chat-suggestions';
+import { ChatComposer } from '@base-ui/chat/chat-composer';
+import type { ChatMessage as ChatMessageType, ChatUser } from '@base-ui/chat/chat';
 
 const adapter = createEchoAdapter({ delayMs: 600 });
 

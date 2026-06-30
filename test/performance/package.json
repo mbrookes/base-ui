@@ -5,7 +5,7 @@
     "benchmark": "vitest run"
   },
   "dependencies": {
-    "@base-ui/react": "workspace:*",
+    "@base-ui/chat": "workspace:*",
     "react": "19.2.5",
     "react-dom": "19.2.5"
   },

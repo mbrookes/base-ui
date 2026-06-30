@@ -31,8 +31,8 @@
       }
     ],
     "paths": {
-      "@base-ui/react": ["../packages/react/src"],
-      "@base-ui/react/*": ["../packages/react/src/*"],
+      "@base-ui/chat": ["../packages/react/src"],
+      "@base-ui/chat/*": ["../packages/react/src/*"],
       "@base-ui/utils/*": ["../packages/utils/src/*"]
     },
     "strictNullChecks": true,

@@ -1,4 +1,4 @@
-import { ChatComposer } from '@base-ui/react/chat-composer';
+import { ChatComposer } from '@base-ui/chat/chat-composer';
 import { createMultipleTypes } from 'docs/src/utils/createTypes';
 
 const { types, AdditionalTypes } = createMultipleTypes(import.meta.url, ChatComposer);

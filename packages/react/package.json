@@ -1,6 +1,6 @@
 {
-  "name": "@base-ui/react",
-  "version": "1.6.0",
+  "name": "@base-ui/chat",
+  "version": "0.0.0",
   "author": "MUI Team",
   "description": "Base UI is a library of headless ('unstyled') React components and low-level hooks. You gain complete control over your app's CSS and accessibility features.",
   "license": "MIT",
@@ -35,11 +35,8 @@
     "./chat-message-group": "./src/chat-message-group/index.ts",
     "./chat-message-list": "./src/chat-message-list/index.ts",
     "./chat-suggestions": "./src/chat-suggestions/index.ts",
-    "./context-menu": "./src/context-menu/index.ts",
-    "./direction-provider": "./src/direction-provider/index.ts",
     "./menu": "./src/menu/index.ts",
     "./progress": "./src/progress/index.ts",
-    "./separator": "./src/separator/index.ts",
     "./types": "./src/types/index.ts",
     "./internals/areArraysEqual": "./src/internals/areArraysEqual.ts",
     "./internals/clamp": "./src/internals/clamp.ts",
@@ -86,6 +83,7 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.29.2",
+    "@base-ui/react": "1.6.0",
     "@base-ui/utils": "workspace:*",
     "@floating-ui/react-dom": "^2.1.8",
     "@floating-ui/utils": "^0.2.11",

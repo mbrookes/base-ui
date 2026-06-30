@@ -2,7 +2,7 @@ import { expect, vi } from 'vitest';
 import * as React from 'react';
 import { act, createRenderer, fireEvent, flushMicrotasks, screen } from '@mui/internal-test-utils';
 import { isJSDOM } from '#test-utils';
-import { DirectionProvider } from '../../../direction-provider';
+import { DirectionProvider } from '@base-ui/react/direction-provider';
 import { CompositeItem } from '../item/CompositeItem';
 import { CompositeRoot } from './CompositeRoot';
 import { gridNavigation } from './gridNavigation';

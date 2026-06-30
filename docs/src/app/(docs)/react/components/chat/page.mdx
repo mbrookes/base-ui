@@ -15,14 +15,14 @@ import { DemoChatHero } from './demos/hero';
 Chat is composed of several sub-components, each exported as its own namespace:
 
 ```jsx title="Anatomy"
-import { Chat } from '@base-ui/react/chat';
-import { ChatMessageList } from '@base-ui/react/chat-message-list';
-import { ChatMessageGroup } from '@base-ui/react/chat-message-group';
-import { ChatMessage } from '@base-ui/react/chat-message';
-import { ChatComposer } from '@base-ui/react/chat-composer';
-import { ChatConversationList } from '@base-ui/react/chat-conversation-list';
-import { ChatConversation } from '@base-ui/react/chat-conversation';
-import { ChatSuggestions } from '@base-ui/react/chat-suggestions';
+import { Chat } from '@base-ui/chat/chat';
+import { ChatMessageList } from '@base-ui/chat/chat-message-list';
+import { ChatMessageGroup } from '@base-ui/chat/chat-message-group';
+import { ChatMessage } from '@base-ui/chat/chat-message';
+import { ChatComposer } from '@base-ui/chat/chat-composer';
+import { ChatConversationList } from '@base-ui/chat/chat-conversation-list';
+import { ChatConversation } from '@base-ui/chat/chat-conversation';
+import { ChatSuggestions } from '@base-ui/chat/chat-suggestions';
 
 <Chat.Root adapter={adapter}>
   <Chat.Layout>
@@ -75,7 +75,7 @@ import { ChatSuggestions } from '@base-ui/react/chat-suggestions';
 `Chat.Root` requires an `adapter` that connects it to a language model or messaging backend. Use `createEchoAdapter` for demos and prototyping:
 
 ```tsx
-import { Chat, createEchoAdapter } from '@base-ui/react/chat';
+import { Chat, createEchoAdapter } from '@base-ui/chat/chat';
 
 const adapter = createEchoAdapter();
 
@@ -85,7 +85,7 @@ const adapter = createEchoAdapter();
 For production, use `createAiSdkAdapter` with the [AI SDK](https://sdk.vercel.ai/):
 
 ```tsx
-import { Chat, createAiSdkAdapter } from '@base-ui/react/chat';
+import { Chat, createAiSdkAdapter } from '@base-ui/chat/chat';
 import { openai } from '@ai-sdk/openai';
 
 const adapter = createAiSdkAdapter({ model: openai('gpt-4o') });

@@ -9,8 +9,6 @@
 The root of the conversation (thread) pane.
 Renders a `<div>` element with `role="region"`.
 
-Documentation: [Base UI Chat](https://base-ui.com/react/components/chat)
-
 **Root Props:**
 
 | Prop      | Type                                                                                                | Default | Description                                                                                                                                                                                   |
@@ -37,8 +35,6 @@ type ChatConversationRootState = {
 
 The header area of the conversation pane.
 Renders a `<header>` element.
-
-Documentation: [Base UI Chat](https://base-ui.com/react/components/chat)
 
 **Header Props:**
 
@@ -67,8 +63,6 @@ type ChatConversationHeaderState = {
 Displays the active conversation's title.
 Renders a `<div>` element.
 
-Documentation: [Base UI Chat](https://base-ui.com/react/components/chat)
-
 **Title Props:**
 
 | Prop      | Type                                                                                                 | Default | Description                                                                                                                                                                                   |
@@ -95,8 +89,6 @@ type ChatConversationTitleState = {
 
 The header area of the conversation pane.
 Renders a `<header>` element.
-
-Documentation: [Base UI Chat](https://base-ui.com/react/components/chat)
 
 **ChatConversationHeader Props:**
 
@@ -149,8 +141,6 @@ type ChatConversationHeaderState = {
 Container for action buttons in the conversation header.
 Renders a `<div>` element.
 
-Documentation: [Base UI Chat](https://base-ui.com/react/components/chat)
-
 **ChatConversationHeaderActions Props:**
 
 | Prop      | Type                                                                                                         | Default | Description                                                                                                                                                                                   |
@@ -201,8 +191,6 @@ type ChatConversationHeaderActionsState = {
 
 Container for the conversation header info (title and subtitle).
 Renders a `<div>` element.
-
-Documentation: [Base UI Chat](https://base-ui.com/react/components/chat)
 
 **ChatConversationHeaderInfo Props:**
 
@@ -255,8 +243,6 @@ type ChatConversationHeaderInfoState = {
 The root of the conversation (thread) pane.
 Renders a `<div>` element with `role="region"`.
 
-Documentation: [Base UI Chat](https://base-ui.com/react/components/chat)
-
 **ChatConversationRoot Props:**
 
 | Prop      | Type                                                                                                | Default | Description                                                                                                                                                                                   |
@@ -305,8 +291,6 @@ type ChatConversationRootState = {
 
 Displays the active conversation's subtitle.
 Renders a `<div>` element.
-
-Documentation: [Base UI Chat](https://base-ui.com/react/components/chat)
 
 **ChatConversationSubtitle Props:**
 
@@ -359,8 +343,6 @@ type ChatConversationSubtitleState = {
 Displays the active conversation's title.
 Renders a `<div>` element.
 
-Documentation: [Base UI Chat](https://base-ui.com/react/components/chat)
-
 **ChatConversationTitle Props:**
 
 | Prop      | Type                                                                                                 | Default | Description                                                                                                                                                                                   |
@@ -410,8 +392,6 @@ type ChatConversationTitleState = {
 Container for action buttons in the conversation header.
 Renders a `<div>` element.
 
-Documentation: [Base UI Chat](https://base-ui.com/react/components/chat)
-
 **HeaderActions Props:**
 
 | Prop      | Type                                                                                                         | Default | Description                                                                                                                                                                                   |
@@ -439,8 +419,6 @@ type ChatConversationHeaderActionsState = {
 Container for the conversation header info (title and subtitle).
 Renders a `<div>` element.
 
-Documentation: [Base UI Chat](https://base-ui.com/react/components/chat)
-
 **HeaderInfo Props:**
 
 | Prop      | Type                                                                                                      | Default | Description                                                                                                                                                                                   |
@@ -467,8 +445,6 @@ type ChatConversationHeaderInfoState = {
 
 Displays the active conversation's subtitle.
 Renders a `<div>` element.
-
-Documentation: [Base UI Chat](https://base-ui.com/react/components/chat)
 
 **Subtitle Props:**
 

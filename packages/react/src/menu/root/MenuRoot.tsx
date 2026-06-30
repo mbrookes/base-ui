@@ -16,7 +16,6 @@ import {
   useSyncedFloatingRootContext,
 } from '../../floating-ui-react';
 import { MenuRootContext, useMenuRootContext } from './MenuRootContext';
-import { MenubarContext, useMenubarContext } from '../../menubar/MenubarContext';
 import { TYPEAHEAD_RESET_MS } from '../../internals/constants';
 import { useDirection } from '../../internals/direction-context/DirectionContext';
 import { useOpenInteractionType } from '../../utils/useOpenInteractionType';
@@ -25,10 +24,6 @@ import {
   type BaseUIChangeEventDetails,
 } from '../../internals/createBaseUIEventDetails';
 import { REASONS } from '../../internals/reasons';
-import {
-  ContextMenuRootContext,
-  useContextMenuRootContext,
-} from '../../context-menu/root/ContextMenuRootContext';
 import { mergeProps } from '../../merge-props';
 import { MenuStore, type State as MenuStoreState } from '../store/MenuStore';
 import { MenuHandle } from '../store/MenuHandle';
@@ -43,6 +38,30 @@ import {
   usePopupInteractionProps,
 } from '../../utils/popups';
 import { useMenuSubmenuRootContext } from '../submenu-root/MenuSubmenuRootContext';
+
+interface MenubarContext {
+  modal: boolean;
+  disabled: boolean;
+  contentElement: HTMLElement | null;
+  setContentElement: (element: HTMLElement | null) => void;
+  hasSubmenuOpen: boolean;
+  setHasSubmenuOpen: (open: boolean) => void;
+  orientation: 'horizontal' | 'vertical';
+  allowMouseUpTriggerRef: React.RefObject<boolean>;
+  rootId: string | undefined;
+}
+
+interface ContextMenuRootContext {
+  anchor: { getBoundingClientRect: () => DOMRect };
+  setAnchor: React.Dispatch<React.SetStateAction<{ getBoundingClientRect: () => DOMRect }>>;
+  backdropRef: React.RefObject<HTMLDivElement | null>;
+  internalBackdropRef: React.RefObject<HTMLDivElement | null>;
+  actionsRef: React.RefObject<{ setOpen: (nextOpen: boolean, event: unknown) => void } | null>;
+  positionerRef: React.RefObject<HTMLElement | null>;
+  allowMouseUpTriggerRef: React.RefObject<boolean>;
+  initialCursorPointRef: React.RefObject<{ x: number; y: number } | null>;
+  rootId: string | undefined;
+}
 
 /**
  * Groups all parts of the menu.
@@ -69,9 +88,7 @@ export const MenuRoot = fastComponent(function MenuRoot<Payload>(props: MenuRoot
     highlightItemOnHover = true,
   } = props;
 
-  const contextMenuContext = useContextMenuRootContext(true);
   const parentMenuRootContext = useMenuRootContext(true);
-  const menubarContext = useMenubarContext(true);
   const isSubmenu = useMenuSubmenuRootContext();
 
   const parentFromContext: MenuParent = React.useMemo(() => {
@@ -82,27 +99,10 @@ export const MenuRoot = fastComponent(function MenuRoot<Payload>(props: MenuRoot
       };
     }
 
-    if (menubarContext) {
-      return {
-        type: 'menubar',
-        context: menubarContext,
-      };
-    }
-
-    // Ensure this is not a Menu nested inside ContextMenu.Trigger.
-    // ContextMenu parentContext is always undefined as ContextMenu.Root is instantiated with
-    // <MenuRootContext.Provider value={undefined}>
-    if (contextMenuContext && !parentMenuRootContext) {
-      return {
-        type: 'context-menu',
-        context: contextMenuContext,
-      };
-    }
-
     return {
       type: undefined,
     };
-  }, [contextMenuContext, parentMenuRootContext, menubarContext, isSubmenu]);
+  }, [parentMenuRootContext, isSubmenu]);
 
   const store = MenuStore.useStore(handle?.store, {
     open: defaultOpen,
@@ -127,7 +127,6 @@ export const MenuRoot = fastComponent(function MenuRoot<Payload>(props: MenuRoot
 
   const open = store.useState('open');
   const activeTriggerElement = store.useState('activeTriggerElement');
-  const positionerElement = store.useState('positionerElement');
   const hoverEnabled = store.useState('hoverEnabled');
   const disabled = store.useState('disabled');
   const lastOpenChangeReason = store.useState('lastOpenChangeReason');
@@ -169,30 +168,13 @@ export const MenuRoot = fastComponent(function MenuRoot<Payload>(props: MenuRoot
   });
 
   useIsoLayoutEffect(() => {
-    if (contextMenuContext && !parentMenuRootContext) {
-      // This is a context menu root.
-      // It doesn't support detached triggers yet, so we have to sync the parent context manually.
-      store.update({
-        parent: {
-          type: 'context-menu',
-          context: contextMenuContext,
-        },
-        floatingNodeId: floatingNodeIdFromContext,
-        floatingParentNodeId: floatingParentNodeIdFromContext,
-      });
-    } else if (parentMenuRootContext) {
+    if (parentMenuRootContext) {
       store.update({
         floatingNodeId: floatingNodeIdFromContext,
         floatingParentNodeId: floatingParentNodeIdFromContext,
       });
     }
-  }, [
-    contextMenuContext,
-    parentMenuRootContext,
-    floatingNodeIdFromContext,
-    floatingParentNodeIdFromContext,
-    store,
-  ]);
+  }, [parentMenuRootContext, floatingNodeIdFromContext, floatingParentNodeIdFromContext, store]);
 
   React.useEffect(() => {
     if (!open) {
@@ -351,19 +333,6 @@ export const MenuRoot = fastComponent(function MenuRoot<Payload>(props: MenuRoot
     () => ({ unmount: forceUnmount, close: handleImperativeClose }),
     [forceUnmount, handleImperativeClose],
   );
-
-  let ctx: ContextMenuRootContext | undefined;
-  if (parent.type === 'context-menu') {
-    ctx = parent.context;
-  }
-
-  React.useImperativeHandle<HTMLElement | null, HTMLElement | null>(
-    ctx?.positionerRef,
-    () => positionerElement,
-    [positionerElement],
-  );
-
-  React.useImperativeHandle(ctx?.actionsRef, () => ({ setOpen }), [setOpen]);
 
   const dismiss = useDismiss(floatingRootContext, {
     enabled: !disabled,

@@ -16,6 +16,6 @@ export { MenuRoot as Root } from './root/MenuRoot';
 export { MenuSubmenuRoot as SubmenuRoot } from './submenu-root/MenuSubmenuRoot';
 export { MenuTrigger as Trigger } from './trigger/MenuTrigger';
 export { MenuViewport as Viewport } from './viewport/MenuViewport';
-export { Separator } from '../separator/Separator';
+export { Separator } from '@base-ui/react/separator';
 export { MenuSubmenuTrigger as SubmenuTrigger } from './submenu-trigger/MenuSubmenuTrigger';
 export { MenuHandle as Handle, createMenuHandle as createHandle } from './store/MenuHandle';

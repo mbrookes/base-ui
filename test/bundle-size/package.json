@@ -5,7 +5,7 @@
     "check": "cross-env NODE_OPTIONS=\"--max-old-space-size=4096\" bundle-size-checker --output ../size-snapshot.json"
   },
   "dependencies": {
-    "@base-ui/react": "workspace:*",
+    "@base-ui/chat": "workspace:*",
     "@base-ui/utils": "workspace:*",
     "@mui/internal-bundle-size-checker": "1.0.9-canary.83",
     "radix-ui": "^1.4.3"

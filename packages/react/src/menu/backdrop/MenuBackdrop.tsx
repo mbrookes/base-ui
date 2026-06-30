@@ -7,7 +7,6 @@ import { type StateAttributesMapping } from '../../internals/getStateAttributesP
 import { popupStateMapping as baseMapping } from '../../utils/popupStateMapping';
 import type { TransitionStatus } from '../../internals/useTransitionStatus';
 import { transitionStatusMapping } from '../../internals/stateAttributesMapping';
-import { useContextMenuRootContext } from '../../context-menu/root/ContextMenuRootContext';
 import { REASONS } from '../../internals/reasons';
 
 const stateAttributesMapping: StateAttributesMapping<MenuBackdropState> = {
@@ -33,17 +32,13 @@ export const MenuBackdrop = React.forwardRef(function MenuBackdrop(
   const transitionStatus = store.useState('transitionStatus');
   const lastOpenChangeReason = store.useState('lastOpenChangeReason');
 
-  const contextMenuContext = useContextMenuRootContext();
-
   const state: MenuBackdropState = {
     open,
     transitionStatus,
   };
 
   return useRenderElement('div', componentProps, {
-    ref: contextMenuContext?.backdropRef
-      ? [forwardedRef, contextMenuContext.backdropRef]
-      : forwardedRef,
+    ref: forwardedRef,
     state,
     stateAttributesMapping,
     props: [

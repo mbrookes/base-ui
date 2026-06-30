@@ -32,8 +32,6 @@ import { useBaseUiId } from '../../internals/useBaseUiId';
 import { REASONS } from '../../internals/reasons';
 import { useMixedToggleClickHandler } from '../../utils/useMixedToggleClickHandler';
 import { MenuHandle } from '../store/MenuHandle';
-import { useContextMenuRootContext } from '../../context-menu/root/ContextMenuRootContext';
-import { useMenubarContext } from '../../menubar/MenubarContext';
 import { MenuParent } from '../root/MenuRoot';
 import { PATIENT_CLICK_THRESHOLD } from '../../internals/constants';
 import { FocusGuard } from '../../utils/FocusGuard';
@@ -385,33 +383,6 @@ function useStickIfOpen(open: boolean, openReason: string | null) {
   return stickIfOpen;
 }
 
-function useMenuParent() {
-  const contextMenuContext = useContextMenuRootContext(true);
-  const parentContext = useMenuRootContext(true);
-  const menubarContext = useMenubarContext(true);
-
-  const parent: MenuParent = React.useMemo(() => {
-    if (menubarContext) {
-      return {
-        type: 'menubar',
-        context: menubarContext,
-      };
-    }
-
-    // Ensure this is not a Menu nested inside ContextMenu.Trigger.
-    // ContextMenu parentContext is always undefined as ContextMenu.Root is instantiated with
-    // <MenuRootContext.Provider value={undefined}>
-    if (contextMenuContext && !parentContext) {
-      return {
-        type: 'context-menu',
-        context: contextMenuContext,
-      };
-    }
-
-    return {
-      type: undefined,
-    };
-  }, [contextMenuContext, parentContext, menubarContext]);
-
-  return parent;
+function useMenuParent(): MenuParent {
+  return { type: undefined };
 }

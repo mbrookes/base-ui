@@ -9,8 +9,6 @@
 The root form element for the chat composer.
 Renders a `<form>` element.
 
-Documentation: [Base UI Chat](https://base-ui.com/react/components/chat)
-
 **Root Props:**
 
 | Prop             | Type                                                                                            | Default | Description                                                                                                                                                                                   |
@@ -43,8 +41,6 @@ type ChatComposerRootState = {
 A `<label>` element for the conversation input textarea.
 Renders a `<label>` element.
 
-Documentation: [Base UI Chat](https://base-ui.com/react/components/chat)
-
 **Label Props:**
 
 | Prop      | Type                                                                                             | Default | Description                                                                                                                                                                                   |
@@ -73,8 +69,6 @@ type ChatComposerLabelState = {
 
 A button that opens a file picker to attach files to the message.
 Renders a `<button>` element.
-
-Documentation: [Base UI Chat](https://base-ui.com/react/components/chat)
 
 **AttachButton Props:**
 
@@ -106,8 +100,6 @@ Renders the list of pending file attachments.
 Returns `null` when there are no attachments.
 Renders a `<div>` element.
 
-Documentation: [Base UI Chat](https://base-ui.com/react/components/chat)
-
 **AttachmentList Props:**
 
 | Prop      | Type                                                                                                      | Default | Description                                                                                                                                                                                   |
@@ -136,8 +128,6 @@ type ChatComposerAttachmentListState = {
 
 A button that opens a file picker to attach files to the message.
 Renders a `<button>` element.
-
-Documentation: [Base UI Chat](https://base-ui.com/react/components/chat)
 
 **ChatComposerAttachButton Props:**
 
@@ -193,8 +183,6 @@ Renders the list of pending file attachments.
 Returns `null` when there are no attachments.
 Renders a `<div>` element.
 
-Documentation: [Base UI Chat](https://base-ui.com/react/components/chat)
-
 **ChatComposerAttachmentList Props:**
 
 | Prop      | Type                                                                                                      | Default | Description                                                                                                                                                                                   |
@@ -248,8 +236,6 @@ type ChatComposerAttachmentListState = {
 Renders helper text or error messages for the composer.
 Returns `null` when there is no content to display.
 Renders a `<div>` element.
-
-Documentation: [Base UI Chat](https://base-ui.com/react/components/chat)
 
 **ChatComposerHelperText Props:**
 
@@ -305,8 +291,6 @@ type ChatComposerHelperTextState = {
 A `<label>` element for the conversation input textarea.
 Renders a `<label>` element.
 
-Documentation: [Base UI Chat](https://base-ui.com/react/components/chat)
-
 **ChatComposerLabel Props:**
 
 | Prop      | Type                                                                                             | Default | Description                                                                                                                                                                                   |
@@ -357,8 +341,6 @@ type ChatComposerLabelState = {
 
 The root form element for the chat composer.
 Renders a `<form>` element.
-
-Documentation: [Base UI Chat](https://base-ui.com/react/components/chat)
 
 **ChatComposerRoot Props:**
 
@@ -417,8 +399,6 @@ type ChatComposerRootState = {
 The send button for the chat composer.
 Renders a `<button>` element.
 
-Documentation: [Base UI Chat](https://base-ui.com/react/components/chat)
-
 **ChatComposerSendButton Props:**
 
 | Prop      | Type                                                                                                  | Default | Description                                                                                                                                                                                   |
@@ -471,8 +451,6 @@ type ChatComposerSendButtonState = {
 
 The text input area for the chat composer.
 Renders a `<textarea>` element with auto-resize behavior.
-
-Documentation: [Base UI Chat](https://base-ui.com/react/components/chat)
 
 **ChatComposerTextArea Props:**
 
@@ -531,8 +509,6 @@ type ChatComposerTextAreaState = {
 A container for composer action buttons.
 Renders a `<div>` element.
 
-Documentation: [Base UI Chat](https://base-ui.com/react/components/chat)
-
 **ChatComposerToolbar Props:**
 
 | Prop      | Type                                                                                               | Default | Description                                                                                                                                                                                   |
@@ -585,8 +561,6 @@ Renders helper text or error messages for the composer.
 Returns `null` when there is no content to display.
 Renders a `<div>` element.
 
-Documentation: [Base UI Chat](https://base-ui.com/react/components/chat)
-
 **HelperText Props:**
 
 | Prop      | Type                                                                                                  | Default | Description                                                                                                                                                                                   |
@@ -617,8 +591,6 @@ type ChatComposerHelperTextState = {
 The send button for the chat composer.
 Renders a `<button>` element.
 
-Documentation: [Base UI Chat](https://base-ui.com/react/components/chat)
-
 **SendButton Props:**
 
 | Prop      | Type                                                                                                  | Default | Description                                                                                                                                                                                   |
@@ -647,8 +619,6 @@ type ChatComposerSendButtonState = {
 
 The text input area for the chat composer.
 Renders a `<textarea>` element with auto-resize behavior.
-
-Documentation: [Base UI Chat](https://base-ui.com/react/components/chat)
 
 **TextArea Props:**
 
@@ -681,8 +651,6 @@ type ChatComposerTextAreaState = {
 
 A container for composer action buttons.
 Renders a `<div>` element.
-
-Documentation: [Base UI Chat](https://base-ui.com/react/components/chat)
 
 **Toolbar Props:**
 

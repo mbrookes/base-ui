@@ -10,8 +10,6 @@ Renders a group of suggestion buttons. Hidden when the conversation has messages
 unless `alwaysVisible` is set.
 Renders a `<div>` element with `role="group"`.
 
-Documentation: [Base UI Chat](https://base-ui.com/react/components/chat)
-
 **Root Props:**
 
 | Prop          | Type                                                                                               | Default | Description                                                                                                                                                                                   |
@@ -37,8 +35,6 @@ type ChatSuggestionsRootState = { empty: boolean; suggestionCount: number };
 
 A single suggestion button that pre-fills the composer when clicked.
 Renders a `<button>` element.
-
-Documentation: [Base UI Chat](https://base-ui.com/react/components/chat)
 
 **Item Props:**
 
@@ -67,8 +63,6 @@ type ChatSuggestionsItemState = { value: string; label: string; index: number };
 
 A single suggestion button that pre-fills the composer when clicked.
 Renders a `<button>` element.
-
-Documentation: [Base UI Chat](https://base-ui.com/react/components/chat)
 
 **ChatSuggestionsItem Props:**
 
@@ -128,8 +122,6 @@ type ChatSuggestionsItemState = { value: string; label: string; index: number };
 Renders a group of suggestion buttons. Hidden when the conversation has messages
 unless `alwaysVisible` is set.
 Renders a `<div>` element with `role="group"`.
-
-Documentation: [Base UI Chat](https://base-ui.com/react/components/chat)
 
 **ChatSuggestionsRoot Props:**
 

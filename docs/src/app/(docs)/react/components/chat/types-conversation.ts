@@ -1,4 +1,4 @@
-import { ChatConversation } from '@base-ui/react/chat-conversation';
+import { ChatConversation } from '@base-ui/chat/chat-conversation';
 import { createMultipleTypes } from 'docs/src/utils/createTypes';
 
 const { types, AdditionalTypes } = createMultipleTypes(import.meta.url, ChatConversation);

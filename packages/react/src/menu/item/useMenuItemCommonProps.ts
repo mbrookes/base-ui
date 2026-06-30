@@ -1,10 +1,8 @@
 'use client';
 import * as React from 'react';
-import { platform } from '@base-ui/utils/platform';
 import { HTMLProps } from '../../internals/types';
 import { MenuStore } from '../store/MenuStore';
 import { REASONS } from '../../internals/reasons';
-import { useContextMenuRootContext } from '../../context-menu/root/ContextMenuRootContext';
 import type { UseMenuItemMetadata } from './useMenuItem';
 
 export interface UseMenuItemCommonPropsParameters {
@@ -53,9 +51,6 @@ export function useMenuItemCommonProps(params: UseMenuItemCommonPropsParameters)
 
   const { events: menuEvents } = store.useState('floatingTreeRoot');
   const open = store.useState('open');
-  const contextMenuContext = useContextMenuRootContext(true);
-  const isContextMenu = contextMenuContext !== undefined;
-
   return React.useMemo(
     () => ({
       id,
@@ -83,33 +78,8 @@ export function useMenuItemCommonProps(params: UseMenuItemCommonPropsParameters)
           menuEvents.emit('close', { domEvent: event, reason: REASONS.itemPress });
         }
       },
-      onMouseUp(event: React.MouseEvent) {
-        if (contextMenuContext) {
-          const initialCursorPoint = contextMenuContext.initialCursorPointRef.current;
-          contextMenuContext.initialCursorPointRef.current = null;
-          if (
-            isContextMenu &&
-            initialCursorPoint &&
-            Math.abs(event.clientX - initialCursorPoint.x) <= 1 &&
-            Math.abs(event.clientY - initialCursorPoint.y) <= 1
-          ) {
-            return;
-          }
-
-          // On non-macOS platforms, this mouseup belongs to the right-click gesture
-          // that opened the context menu, so it must not activate an item.
-          if (isContextMenu && !platform.os.mac && event.button === 2) {
-            return;
-          }
-        }
-
-        if (
-          itemRef.current &&
-          store.context.allowMouseUpTriggerRef.current &&
-          (!isContextMenu || event.button === 2)
-        ) {
-          // This fires whenever the user clicks on the trigger, moves the cursor, and releases it over the item.
-          // We trigger the click and override the `closeOnClick` preference to always close the menu.
+      onMouseUp(_event: React.MouseEvent) {
+        if (itemRef.current && store.context.allowMouseUpTriggerRef.current) {
           if (!itemMetadata || itemMetadata.type === 'regular-item') {
             itemRef.current.click();
           }
@@ -126,8 +96,6 @@ export function useMenuItemCommonProps(params: UseMenuItemCommonPropsParameters)
       store,
       typingRef,
       itemRef,
-      contextMenuContext,
-      isContextMenu,
       itemMetadata,
     ],
   );

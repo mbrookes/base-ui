@@ -18,7 +18,6 @@ import { CompositeList } from '../../internals/composite/list/CompositeList';
 import { InternalBackdrop } from '../../utils/InternalBackdrop';
 import { useMenuPortalContext } from '../portal/MenuPortalContext';
 import { DROPDOWN_COLLISION_AVOIDANCE, POPUP_COLLISION_AVOIDANCE } from '../../internals/constants';
-import { useContextMenuRootContext } from '../../context-menu/root/ContextMenuRootContext';
 import { createChangeEventDetails } from '../../internals/createBaseUIEventDetails';
 import { REASONS } from '../../internals/reasons';
 import { MenuOpenEventDetails } from '../utils/types';
@@ -59,8 +58,6 @@ export const MenuPositioner = React.forwardRef(function MenuPositioner(
   const { store } = useMenuRootContext();
 
   const keepMounted = useMenuPortalContext();
-  const contextMenuContext = useContextMenuRootContext(true);
-
   const parent = store.useState('parent');
   const floatingRootContext = store.useState('floatingRootContext');
   const floatingTreeRoot = store.useState('floatingTreeRoot');
@@ -112,7 +109,7 @@ export const MenuPositioner = React.forwardRef(function MenuPositioner(
   const positioner = useAnchorPositioning({
     anchor,
     floatingRootContext,
-    positionMethod: contextMenuContext ? 'fixed' : positionMethodProp,
+    positionMethod: positionMethodProp,
     mounted,
     side: computedSide,
     sideOffset,
