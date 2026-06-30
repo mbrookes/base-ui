@@ -44,7 +44,7 @@ The chat surface exposes labeled landmarks so assistive technology can jump betw
 - The scroller element has `role="log"` and `aria-live="polite"`, so newly arriving complete messages are announced.
 - A streaming message carries `aria-busy="true"` while it streams, hinting assistive technology to defer reading it until it completes.
 - A visually hidden `role="status"` region announces streaming transitions — "Assistant is responding" and "Response complete" — exactly once each, never per streamed token.
-- Each message is a `role="article"` labeled "Message from {author}".
+- Each message is a `role="article"` labeled "Message from &#123;author&#125;".
 - Date dividers use `role="separator"`.
 
 The announcement strings and labels come from the locale text system, so they localize with the rest of the UI.
