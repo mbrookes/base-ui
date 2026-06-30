@@ -1,0 +1,230 @@
+# Error handling
+
+<Subtitle>
+  Handle errors raised by adapters, streams, and history loading through a unified error model.
+</Subtitle>
+<Meta
+  name="description"
+  content="Handle errors raised by adapters, streams, and history loading in Base UI Chat through a unified error model."
+/>
+
+The chat runtime captures errors from adapters, streams, and history loading, and surfaces them through a unified error model.
+You don't need to catch errors inside adapter methods — the runtime handles them for you.
+
+## Error propagation
+
+When an adapter method throws, the runtime:
+
+1. Records a `ChatError` with the appropriate `source` and `code`.
+2. Surfaces it through `useChat().error` and the `onError` callback on `Chat.Root`.
+3. Marks the error `recoverable` when applicable (for example, stream disconnects) and `retryable` when the user can try again.
+
+## Handling errors at the application level
+
+Use the `onError` prop on `Chat.Root` to handle errors at the application level:
+
+```tsx
+import { Chat } from '@base-ui/chat/chat';
+
+<Chat.Root
+  adapter={adapter}
+  onError={(error) => {
+    console.error(`[Chat error] ${error.source}: ${error.message}`);
+    errorTracker.capture(error);
+  }}
+>
+  {/* ... */}
+</Chat.Root>;
+```
+
+## Error object structure
+
+Every error recorded by the runtime is a `ChatError`:
+
+```ts
+interface ChatError {
+  code: ChatErrorCode;
+  message: string;
+  source: ChatErrorSource;
+  recoverable: boolean;
+  retryable?: boolean;
+  details?: Record<string, unknown>;
+}
+```
+
+### Error codes
+
+| Code               | Description                                     |
+| :----------------- | :---------------------------------------------- |
+| `SEND_ERROR`       | The adapter's `sendMessage()` threw an error.   |
+| `STREAM_ERROR`     | The stream failed or disconnected unexpectedly. |
+| `HISTORY_ERROR`    | Loading message history failed.                 |
+| `REALTIME_ERROR`   | The realtime subscription encountered an error. |
+| `REGENERATE_ERROR` | Regenerating an assistant response failed.      |
+
+### Error sources
+
+| Source      | Description                       |
+| :---------- | :-------------------------------- |
+| `'send'`    | Error during message send.        |
+| `'stream'`  | Error during stream processing.   |
+| `'history'` | Error during history loading.     |
+| `'render'`  | Error during component rendering. |
+| `'adapter'` | Generic adapter error.            |
+
+### `recoverable` vs `retryable`
+
+- **`recoverable`**: the runtime can recover from this error automatically (for example, by reconnecting a dropped stream via `reconnectToStream()`).
+- **`retryable`**: the user can try the operation again (for example, by re-sending a failed message).
+
+## Accessing the error state
+
+The `useChat()` hook exposes the current error:
+
+```tsx
+import { useChat } from '@base-ui/chat/chat';
+
+function ErrorBanner() {
+  const { error, setError } = useChat();
+
+  if (!error) return null;
+
+  return (
+    <div role="alert">
+      <p>{error.message}</p>
+      <button onClick={() => setError(null)}>Dismiss</button>
+    </div>
+  );
+}
+```
+
+The `useChatStatus()` hook also exposes the error alongside streaming and history state:
+
+```tsx
+import { useChatStatus } from '@base-ui/chat/chat';
+
+function StatusBar() {
+  const { error, isStreaming, isLoadingHistory } = useChatStatus();
+  if (error) return <div role="alert">{error.message}</div>;
+  if (isStreaming) return <div>Responding…</div>;
+  return null;
+}
+```
+
+## Retrying failed messages
+
+When `sendMessage()` fails, the user's message stays in the thread (optimistic update) and the composer re-enables so the user can try again.
+
+Use the `retry` method from `useChat()` to re-send the message associated with a given message ID:
+
+```tsx
+import { useChat } from '@base-ui/chat/chat';
+
+function RetryButton({ messageId }: { messageId: string }) {
+  const { retry } = useChat();
+  return <button onClick={() => retry(messageId)}>Retry</button>;
+}
+```
+
+`retry(messageId)` looks up the original user message by ID, re-submits it through the adapter's `sendMessage()`, and replaces any previous error state.
+It is a no-op while a send or stream is already in flight.
+
+## Per-message error state
+
+Use `useMessageError(messageId)` to read a single message's error from your own components:
+
+```tsx
+import { useMessageError } from '@base-ui/chat/chat';
+
+function MessageErrorDisplay({ messageId }: { messageId: string }) {
+  const error = useMessageError(messageId);
+  if (!error) return null;
+  return <div className="message-error">{error.message}</div>;
+}
+```
+
+Use `ChatMessage.Error` to render the error in the message row:
+
+```tsx
+import { ChatMessage } from '@base-ui/chat/chat-message';
+
+<ChatMessage.Root messageId={id}>
+  <ChatMessage.Content />
+  <ChatMessage.Error />
+</ChatMessage.Root>;
+```
+
+## Error from adapter methods
+
+You don't need to wrap adapter methods in try/catch to surface errors to the runtime, but you should wrap them to log to your observability platform.
+If you want to transform or enrich an error before the runtime sees it, throw a plain `Error` with a custom message.
+The runtime wraps it in a `ChatError` with source `'adapter'`:
+
+```tsx
+async sendMessage({ message, signal }) {
+  try {
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      body: JSON.stringify({ message }),
+      signal,
+    });
+
+    if (!res.ok) {
+      throw new Error(`Server responded with ${res.status}`);
+    }
+
+    return res.body!;
+  } catch (error) {
+    console.error('Adapter sendMessage failed:', error);
+    throw error; // re-throw so the runtime surfaces the failure
+  }
+},
+```
+
+## Stream disconnect recovery
+
+If a stream closes without a terminal chunk (`finish` or `abort`), the runtime:
+
+1. Records a recoverable stream error.
+2. Sets the message status to `'error'`.
+3. Calls `onFinish` with `isDisconnect: true`.
+4. If `reconnectToStream()` is implemented on the adapter, makes one attempt to resume the stream.
+5. Calls `onError` only when the disconnect remains unrecovered.
+
+See [Reconnecting to streams](/react/chat/streaming/#reconnecting-to-streams) for details.
+
+## Message status and errors
+
+The message `status` field reflects error states:
+
+| Status        | Description                                               |
+| :------------ | :-------------------------------------------------------- |
+| `'pending'`   | Message is queued but not yet dispatched to the adapter.  |
+| `'sending'`   | Message is being sent (optimistic update).                |
+| `'streaming'` | Assistant response is streaming.                          |
+| `'sent'`      | Message was sent and response completed.                  |
+| `'read'`      | Message was delivered and marked as read (read receipts). |
+| `'error'`     | An error occurred during send or streaming.               |
+| `'cancelled'` | The stream was aborted by the user.                       |
+
+Use the `status` field to conditionally render error indicators:
+
+```tsx
+import type { ChatMessage } from '@base-ui/chat/chat';
+
+function MessageBubble({ message }: { message: ChatMessage }) {
+  return (
+    <div>
+      {message.parts.map((part, i) => /* render parts */)}
+      {message.status === 'error' && (
+        <span className="error-badge">Failed to send</span>
+      )}
+    </div>
+  );
+}
+```
+
+## See also
+
+- [Streaming](/react/chat/streaming/) for stream lifecycle and disconnect handling.
+- [Adapters](/react/chat/adapters/) for the adapter interface and error propagation details.

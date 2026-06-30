@@ -1,0 +1,185 @@
+# Localization
+
+<Subtitle>
+  Translate all built-in labels, announcements, and dynamic strings by overriding the locale text
+  object.
+</Subtitle>
+<Meta
+  name="description"
+  content="Translate Base UI Chat labels and announcements by passing a localeText object to Chat.Root."
+/>
+
+All user-visible strings in Base UI Chat are centralized in a `ChatLocaleText` object.
+The defaults are English.
+Pass a partial or full override to `Chat.Root` (or `ChatProvider`) to translate or customize any string.
+
+## Basic usage
+
+Pass `localeText` to `Chat.Root`:
+
+```tsx
+import { Chat } from '@base-ui/chat/chat';
+
+<Chat.Root
+  adapter={adapter}
+  localeText={{
+    composerInputPlaceholder: 'Schreib eine Nachricht…',
+    composerSendButtonLabel: 'Senden',
+    scrollToBottomLabel: 'Nach unten scrollen',
+    threadNoMessagesLabel: 'Noch keine Nachrichten',
+    threadNoMessagesHelperText: 'Schreib eine Nachricht, um zu beginnen',
+  }}
+>
+  {/* … */}
+</Chat.Root>;
+```
+
+`localeText` is merged with the defaults — only the keys you provide are overridden.
+
+## All locale keys
+
+### Composer
+
+| Key                                       | Default                    |
+| :---------------------------------------- | :------------------------- |
+| `composerInputPlaceholder`                | `'Type a message'`         |
+| `composerInputAriaLabel`                  | `'Message'`                |
+| `composerSendButtonLabel`                 | `'Send message'`           |
+| `composerAttachButtonLabel`               | `'Add attachment'`         |
+| `composerAttachInputLabel`                | `'Upload file'`            |
+| `composerAttachmentFallbackLabel`         | `'Attachment'`             |
+| `composerRemoveAttachmentLabel(fileName)` | `` `Remove ${fileName}` `` |
+| `composerToolbarLabel`                    | `'Composer actions'`       |
+| `composerLandmarkLabel`                   | `'Message composer'`       |
+
+### Messages
+
+| Key                                   | Default                             |
+| :------------------------------------ | :---------------------------------- |
+| `messageCopyButtonLabel`              | `'Copy'`                            |
+| `messageCopyCodeButtonLabel`          | `'Copy code'`                       |
+| `messageCopiedCodeButtonLabel`        | `'Copied'`                          |
+| `messageEditedLabel`                  | `'Edited'`                          |
+| `messageDeletedLabel`                 | `'Deleted'`                         |
+| `messageActionsLabel`                 | `'Message actions'`                 |
+| `messageLabel`                        | `'Message'`                         |
+| `messageFromAuthorLabel(displayName)` | `` `Message from ${displayName}` `` |
+| `messageStatusLabel(status)`          | Status-specific string              |
+| `messageTimestampLabel(dateTime)`     | Formatted time string               |
+| `messageAuthorUserLabel`              | `'User'`                            |
+| `messageAuthorAssistantLabel`         | `'Assistant'`                       |
+| `messageAuthorSystemLabel`            | `'System'`                          |
+
+### Reasoning
+
+| Key                              | Default       |
+| :------------------------------- | :------------ |
+| `messageReasoningLabel`          | `'Reasoning'` |
+| `messageReasoningStreamingLabel` | `'Thinking…'` |
+
+### Tool calls
+
+| Key                             | Default              |
+| :------------------------------ | :------------------- |
+| `messageToolInputLabel`         | `'Tool called'`      |
+| `messageToolOutputLabel`        | `'Tool result'`      |
+| `messageToolApproveButtonLabel` | `'Approve'`          |
+| `messageToolDenyButtonLabel`    | `'Deny'`             |
+| `toolStateLabel(state)`         | State-specific label |
+
+### Conversation list
+
+| Key                                        | Default                           |
+| :----------------------------------------- | :-------------------------------- |
+| `conversationListNoConversationsLabel`     | `'No conversations'`              |
+| `conversationListSearchPlaceholder`        | `'Search conversations'`          |
+| `conversationListLandmarkLabel`            | `'Conversations'`                 |
+| `conversationTimestampLabel(dateTime)`     | Formatted date/time string        |
+| `conversationTimestampAriaLabel(dateTime)` | Full date/time for screen readers |
+| `unreadMessageCountLabel(count)`           | `` `${count} unread messages` ``  |
+
+### Conversation header
+
+| Key                               | Default                   |
+| :-------------------------------- | :------------------------ |
+| `conversationHeaderMenuLabel`     | `'Open conversations'`    |
+| `conversationHeaderBackLabel`     | `'Back to conversations'` |
+| `conversationHeaderCloseLabel`    | `'Close conversations'`   |
+| `conversationHeaderNewChatLabel`  | `'New chat'`              |
+| `conversationHeaderSettingsLabel` | `'Settings'`              |
+
+### Thread
+
+| Key                          | Default                           |
+| :--------------------------- | :-------------------------------- |
+| `threadNoMessagesLabel`      | `'No messages yet'`               |
+| `threadNoMessagesHelperText` | `'Type a message to get started'` |
+| `threadLandmarkLabel`        | `'Conversation'`                  |
+| `messageListLabel`           | `'Message log'`                   |
+
+### Indicators and status
+
+| Key                                         | Default                                               |
+| :------------------------------------------ | :---------------------------------------------------- |
+| `unreadMarkerLabel`                         | `'New messages'`                                      |
+| `scrollToBottomLabel`                       | `'Scroll to bottom'`                                  |
+| `scrollToBottomWithCountLabel(unseenCount)` | `` `Scroll to bottom, ${unseenCount} new messages` `` |
+| `typingIndicatorLabel(users)`               | `'${names} is typing'` / `'${names} are typing'`      |
+| `responseStreamingStartedAnnouncement`      | `'Assistant is responding'`                           |
+| `responseStreamingCompletedAnnouncement`    | `'Response complete'`                                 |
+| `retryButtonLabel`                          | `'Retry'`                                             |
+| `reconnectButtonLabel`                      | `'Reconnect'`                                         |
+| `genericErrorLabel`                         | `'Something went wrong'`                              |
+| `loadingLabel`                              | `'Loading…'`                                          |
+
+### Suggestions
+
+| Key                | Default               |
+| :----------------- | :-------------------- |
+| `suggestionsLabel` | `'Suggested prompts'` |
+
+## Dynamic strings
+
+Keys that accept arguments are typed as functions.
+Pass a function that accepts the same arguments and returns a localized string:
+
+```tsx
+<Chat.Root
+  adapter={adapter}
+  localeText={{
+    typingIndicatorLabel: (users) => {
+      const names = users.map((u) => u.displayName ?? u.id).join(', ');
+      return users.length === 1 ? `${names} schreibt…` : `${names} schreiben…`;
+    },
+    conversationTimestampAriaLabel: (dateTime) =>
+      new Date(dateTime).toLocaleString('de-DE', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      }),
+    composerRemoveAttachmentLabel: (fileName) => `${fileName} entfernen`,
+  }}
+>
+  {/* … */}
+</Chat.Root>
+```
+
+## TypeScript
+
+The `ChatLocaleText` type is exported for use in your own locale objects:
+
+```tsx
+import type { ChatLocaleText } from '@base-ui/chat/chat';
+
+const deLocale: Partial<ChatLocaleText> = {
+  composerInputPlaceholder: 'Schreib eine Nachricht…',
+  composerSendButtonLabel: 'Senden',
+};
+
+<Chat.Root adapter={adapter} localeText={deLocale}>
+  {/* … */}
+</Chat.Root>;
+```

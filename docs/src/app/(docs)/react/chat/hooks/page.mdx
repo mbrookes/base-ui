@@ -1,0 +1,267 @@
+# Hooks
+
+<Subtitle>
+  React hooks for reading chat state and invoking actions from any component inside Chat.Root.
+</Subtitle>
+<Meta
+  name="description"
+  content="React hooks for reading Base UI Chat state and invoking actions from any component inside Chat.Root."
+/>
+
+All hooks are exported from `@base-ui/chat/chat` and must be called inside a `<Chat.Root>` (or `<ChatProvider>`).
+
+## useChat
+
+The main hook. Returns the full chat state plus all action methods in one object.
+Use it when you need both state and actions in the same component.
+
+```tsx
+import { useChat } from '@base-ui/chat/chat';
+
+function ChatDebug() {
+  const {
+    messages,
+    conversations,
+    activeConversationId,
+    isStreaming,
+    hasMoreHistory,
+    isLoadingHistory,
+    error,
+    sendMessage,
+    stopStreaming,
+    loadMoreHistory,
+    setActiveConversation,
+    retry,
+    regenerate,
+    setError,
+    addToolApprovalResponse,
+    reloadConversations,
+    reloadMessages,
+    reconnectRealtime,
+  } = useChat();
+
+  return <div>{messages.length} messages</div>;
+}
+```
+
+`useChat` subscribes to `messages` and `conversations`, so it re-renders on every state change, including each streamed token.
+If a component only needs to invoke actions, use `useChatActions` instead.
+
+### Return value
+
+| Field                             | Type                  | Description                                          |
+| :-------------------------------- | :-------------------- | :--------------------------------------------------- |
+| `messages`                        | `ChatMessage[]`       | All messages in the active conversation              |
+| `conversations`                   | `ChatConversation[]`  | All known conversations                              |
+| `activeConversationId`            | `string \| undefined` | ID of the currently active conversation              |
+| `isStreaming`                     | `boolean`             | Whether a response is currently streaming            |
+| `hasMoreHistory`                  | `boolean`             | Whether older messages can be loaded                 |
+| `isLoadingHistory`                | `boolean`             | Whether a history fetch is in flight                 |
+| `error`                           | `ChatError \| null`   | The most recent runtime error                        |
+| `sendMessage(input)`              | `Promise<void>`       | Send a message                                       |
+| `stopStreaming()`                 | `void`                | Cancel the current stream                            |
+| `loadMoreHistory()`               | `Promise<void>`       | Load older messages                                  |
+| `setActiveConversation(id)`       | `Promise<void>`       | Switch to a different conversation                   |
+| `retry(messageId)`                | `Promise<void>`       | Retry a failed message                               |
+| `regenerate(messageId)`           | `Promise<void>`       | Regenerate the assistant reply for a message         |
+| `setError(error)`                 | `void`                | Set or clear the global error                        |
+| `addToolApprovalResponse(input)`  | `Promise<void>`       | Approve or deny a tool invocation                    |
+| `reloadConversations()`           | `Promise<void>`       | Reload the conversation list                         |
+| `reloadMessages(conversationId?)` | `Promise<void>`       | Reload messages for the active or given conversation |
+| `reconnectRealtime()`             | `Promise<void>`       | Reconnect the realtime connection                    |
+
+## useChatActions
+
+Returns only the action methods without subscribing to any state.
+Components that just need to call `sendMessage`, `stopStreaming`, or similar will not re-render on streamed tokens.
+
+```tsx
+import { useChatActions } from '@base-ui/chat/chat';
+
+function StopButton() {
+  const { stopStreaming } = useChatActions();
+  return (
+    <button type="button" onClick={stopStreaming}>
+      Stop
+    </button>
+  );
+}
+```
+
+Pass `true` to return `null` when called outside a provider instead of throwing:
+
+```tsx
+const actions = useChatActions(true); // ChatRuntimeActions | null
+```
+
+## useChatStatus
+
+A lightweight hook that subscribes only to status fields — streaming state, history loading, error, and typing users.
+Prefer this over `useChat` when you don't need the message array:
+
+```tsx
+import { useChatStatus } from '@base-ui/chat/chat';
+
+function StatusBar() {
+  const { isStreaming, isLoadingHistory, error, typingUserIds } = useChatStatus();
+
+  if (isStreaming) return <span>Responding…</span>;
+  if (error) return <span>Error: {error.message}</span>;
+  return null;
+}
+```
+
+### Return value
+
+| Field              | Type                | Description                                              |
+| :----------------- | :------------------ | :------------------------------------------------------- |
+| `isStreaming`      | `boolean`           | Whether a response is streaming                          |
+| `hasMoreHistory`   | `boolean`           | Whether older messages can be loaded                     |
+| `isLoadingHistory` | `boolean`           | Whether a history fetch is in flight                     |
+| `error`            | `ChatError \| null` | Most recent runtime error                                |
+| `typingUserIds`    | `string[]`          | IDs of users currently typing in the active conversation |
+
+## useChatComposer
+
+Returns the composer state and methods for reading and manipulating the draft message.
+
+```tsx
+import { useChatComposer } from '@base-ui/chat/chat';
+
+function CharacterCount() {
+  const { value } = useChatComposer();
+  return <span>{value.length} / 2000</span>;
+}
+```
+
+### Return value
+
+| Field                       | Type                    | Description                          |
+| :-------------------------- | :---------------------- | :----------------------------------- |
+| `value`                     | `string`                | Current draft text                   |
+| `setValue(value)`           | `void`                  | Set the draft text                   |
+| `attachments`               | `ChatDraftAttachment[]` | Files pending attachment             |
+| `addAttachment(file)`       | `void`                  | Add a file attachment                |
+| `removeAttachment(localId)` | `void`                  | Remove a pending attachment          |
+| `clear()`                   | `void`                  | Clear the draft text and attachments |
+| `submit()`                  | `Promise<void>`         | Submit the current draft             |
+| `isSubmitting`              | `boolean`               | Whether a submit is in flight        |
+
+## useChatStore
+
+Returns the raw `ChatStore` instance.
+Use this to call `useStore` with a custom selector, or to access store methods not covered by the other hooks:
+
+```tsx
+import { useChatStore } from '@base-ui/chat/chat';
+import { useStore } from '@base-ui/utils/store';
+import { selectIsStreaming } from '@base-ui/chat/chat';
+
+function StreamingBadge() {
+  const store = useChatStore();
+  const isStreaming = useStore(store, selectIsStreaming);
+  return isStreaming ? <span>Streaming</span> : null;
+}
+```
+
+## useChatOnToolCall
+
+Returns the `onToolCall` handler registered on the runtime, or `undefined` if none was passed:
+
+```tsx
+import { useChatOnToolCall } from '@base-ui/chat/chat';
+
+function ToolCallIndicator() {
+  const onToolCall = useChatOnToolCall();
+  return onToolCall ? <span>Tool calling enabled</span> : null;
+}
+```
+
+## useChatPartRenderer
+
+Returns the part renderer registered for a given part type, or `null` if none is registered:
+
+```tsx
+import { useChatPartRenderer } from '@base-ui/chat/chat';
+
+function CustomContent() {
+  const textRenderer = useChatPartRenderer('text');
+  // use or wrap the registered renderer
+}
+```
+
+## useConversation / useConversations
+
+`useConversation(id)` returns a single conversation by ID (or `null`).
+`useConversations()` returns all conversations.
+
+```tsx
+import { useConversation, useConversations } from '@base-ui/chat/chat';
+
+function ConversationTitle({ id }: { id: string }) {
+  const conversation = useConversation(id);
+  return <span>{conversation?.title ?? 'Untitled'}</span>;
+}
+
+function ConversationCount() {
+  const conversations = useConversations();
+  return <span>{conversations.length} conversations</span>;
+}
+```
+
+## useMessage / useMessageIds
+
+`useMessage(id)` returns a single message by ID (or `null`).
+`useMessageIds()` returns the ordered array of message IDs in the active conversation.
+
+```tsx
+import { useMessage, useMessageIds } from '@base-ui/chat/chat';
+
+function MessageTimestamp({ id }: { id: string }) {
+  const message = useMessage(id);
+  return <time>{message?.createdAt}</time>;
+}
+
+function MessageCount() {
+  const ids = useMessageIds();
+  return <span>{ids.length} messages</span>;
+}
+```
+
+## useMessageError
+
+Returns the `ChatError` for a specific message ID, or `null` when there is no error.
+Message errors are stored independently from the global runtime error — multiple messages can each hold their own error simultaneously:
+
+```tsx
+import { useMessageError } from '@base-ui/chat/chat';
+
+function MessageErrorBadge({ messageId }: { messageId: string }) {
+  const error = useMessageError(messageId);
+  if (!error) return null;
+  return <span>Error: {error.message}</span>;
+}
+```
+
+## useStreamingIndicatorVisibility
+
+Controls whether the streaming indicator should show.
+The built-in `StreamingIndicator` uses this internally; use it for custom streaming indicators:
+
+```tsx
+import { useStreamingIndicatorVisibility } from '@base-ui/chat/chat';
+
+function CustomStreamingIndicator() {
+  const { waiting } = useStreamingIndicatorVisibility('auto');
+  if (!waiting) return null;
+  return <div aria-live="polite">Thinking…</div>;
+}
+```
+
+Accepts a `mode`:
+
+| Mode     | Behavior                                              |
+| :------- | :---------------------------------------------------- |
+| `'auto'` | Show only in assistant-backed conversations (default) |
+| `true`   | Always show while streaming                           |
+| `false`  | Never show                                            |

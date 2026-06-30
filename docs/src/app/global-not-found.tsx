@@ -9,8 +9,8 @@ export default function NotFoundPage() {
         <h1 className="Text sz-3 bp2:sz-4 bui-gcs-1 bui-gce-9 bp4:bui-gce-5">Page not found</h1>
         <div className="bui-gcs-1 bui-gce-9">
           <p className="Text sz-2">
-            This page couldn't be found. Please return to the{' '}
-            <Link href="/react/components/chat">docs</Link> or create a corresponding issue on{' '}
+            This page couldn't be found. Please return to the <Link href="/react/chat">docs</Link>{' '}
+            or create a corresponding issue on{' '}
             <Link href="https://github.com/mui/base-ui">GitHub</Link>.
           </p>
         </div>

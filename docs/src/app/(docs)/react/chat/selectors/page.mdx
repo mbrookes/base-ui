@@ -1,0 +1,154 @@
+# Selectors
+
+<Subtitle>
+  Fine-grained store selectors for subscribing to specific slices of chat state without unnecessary
+  re-renders.
+</Subtitle>
+<Meta
+  name="description"
+  content="Use Base UI Chat selectors with useStore to subscribe to specific state slices and avoid re-renders on unrelated updates."
+/>
+
+Selectors let you subscribe to exactly the slice of state a component needs.
+Instead of `useChat()` — which subscribes to all messages and re-renders on every token — you can subscribe only to `isStreaming`, or only to a single message by ID.
+
+## Using selectors
+
+Import a selector and pass it to `useStore` from `@base-ui/utils/store`:
+
+```tsx
+import { useChatStore, selectIsStreaming } from '@base-ui/chat/chat';
+import { useStore } from '@base-ui/utils/store';
+
+function StreamingBadge() {
+  const store = useChatStore();
+  const isStreaming = useStore(store, selectIsStreaming);
+  return isStreaming ? <span>Responding…</span> : null;
+}
+```
+
+This component re-renders only when `isStreaming` changes — not when new messages arrive or the composer value changes.
+
+## chatSelectors object
+
+The `chatSelectors` object exposes every selector as a method on a single namespace:
+
+```tsx
+import { useChatStore, chatSelectors } from '@base-ui/chat/chat';
+import { useStore } from '@base-ui/utils/store';
+
+const store = useChatStore();
+const messages = useStore(store, chatSelectors.messages);
+const isStreaming = useStore(store, chatSelectors.isStreaming);
+```
+
+## Named selectors
+
+All selectors are also exported individually as `select*` functions for convenience:
+
+```tsx
+import {
+  selectMessages,
+  selectIsStreaming,
+  selectActiveConversationId,
+  selectComposerValue,
+} from '@base-ui/chat/chat';
+```
+
+## Selector reference
+
+### Message selectors
+
+| Selector             | Returns                                    | Notes                                               |
+| :------------------- | :----------------------------------------- | :-------------------------------------------------- |
+| `selectMessageIds`   | `string[]`                                 | Ordered IDs of messages in the active conversation  |
+| `selectMessagesById` | `Record<string, ChatMessage>`              | Raw message map; use `selectMessages` for the array |
+| `selectMessages`     | `ChatMessage[]`                            | All messages as an ordered array (memoized)         |
+| `selectMessage`      | `(id: string) => ChatMessage \| undefined` | A single message by ID                              |
+| `selectMessageError` | `(id: string) => ChatError \| null`        | Per-message error (null when none)                  |
+| `selectMessageCount` | `number`                                   | Total number of messages                            |
+
+### Conversation selectors
+
+| Selector                     | Returns                                         | Notes                                            |
+| :--------------------------- | :---------------------------------------------- | :----------------------------------------------- |
+| `selectConversationIds`      | `string[]`                                      | Ordered conversation IDs                         |
+| `selectConversationsById`    | `Record<string, ChatConversation>`              | Raw conversation map                             |
+| `selectConversations`        | `ChatConversation[]`                            | All conversations as an ordered array (memoized) |
+| `selectConversation`         | `(id: string) => ChatConversation \| undefined` | A single conversation by ID                      |
+| `selectActiveConversationId` | `string \| undefined`                           | Active conversation ID                           |
+| `selectActiveConversation`   | `ChatConversation \| undefined`                 | The active conversation object                   |
+| `selectConversationCount`    | `number`                                        | Total number of conversations                    |
+
+### Status selectors
+
+| Selector                        | Returns               | Notes                                    |
+| :------------------------------ | :-------------------- | :--------------------------------------- |
+| `selectIsStreaming`             | `boolean`             | Whether a response is streaming          |
+| `selectStreamingConversationId` | `string \| undefined` | ID of the conversation that is streaming |
+| `selectHasMoreHistory`          | `boolean`             | Whether older messages can be loaded     |
+| `selectIsLoadingHistory`        | `boolean`             | Whether a history fetch is in flight     |
+| `selectError`                   | `ChatError \| null`   | The global runtime error                 |
+
+### Composer selectors
+
+| Selector                    | Returns                 | Notes                    |
+| :-------------------------- | :---------------------- | :----------------------- |
+| `selectComposerValue`       | `string`                | Current draft text       |
+| `selectComposerAttachments` | `ChatDraftAttachment[]` | Files pending attachment |
+
+### Typing selectors
+
+| Selector                                   | Returns                                 | Notes                                                                                                                  |
+| :----------------------------------------- | :-------------------------------------- | :--------------------------------------------------------------------------------------------------------------------- |
+| `selectTypingUserIds`                      | `(conversationId?: string) => string[]` | IDs of users typing in a given conversation (defaults to active)                                                       |
+| `selectTypingUserIdsForActiveConversation` | `string[]`                              | IDs of users typing in the active conversation; use this over `selectTypingUserIds(undefined)` to preserve memoization |
+
+## Selectors with arguments
+
+Some selectors accept arguments after the state.
+Pass them as additional arguments to `useStore`:
+
+```tsx
+// Subscribe to a single message by ID
+const message = useStore(store, selectMessage, messageId);
+
+// Subscribe to the error for a specific message
+const error = useStore(store, selectMessageError, messageId);
+
+// Subscribe to typing users in a specific conversation
+const typingIds = useStore(store, selectTypingUserIds, conversationId);
+```
+
+## Memoized vs plain selectors
+
+**Memoized selectors** (`createSelectorMemoized`) cache their result and return the same reference when inputs haven't changed.
+Use them when the result is an array or object that would otherwise cause unnecessary re-renders:
+
+- `selectMessages` — returns the same array reference while the message list is unchanged
+- `selectConversations` — same as above for conversations
+- `selectTypingUserIds` and `selectTypingUserIdsForActiveConversation` — memoized over the typing map
+
+**Plain selectors** (`createSelector`) re-derive on every state update but are cheap for primitive values like `selectIsStreaming` or `selectComposerValue`.
+
+When writing a custom memoized selector, import `createSelectorMemoized` from `@base-ui/utils/store`.
+Use `ReturnType<typeof useChatStore>` to infer the store type and derive the state shape from `selectMessages`:
+
+```tsx
+import { createSelectorMemoized, useStore } from '@base-ui/utils/store';
+import { useChatStore, selectMessages } from '@base-ui/chat/chat';
+
+type StoreState = Parameters<typeof selectMessages>[0];
+
+const selectUserMessageCount = createSelectorMemoized(
+  (state: StoreState) => state.messageIds,
+  (state: StoreState) => state.messagesById,
+  (ids, byId) => ids.filter((id) => byId[id]?.role === 'user').length,
+);
+
+function UserMessageCount() {
+  const store = useChatStore();
+  const count = useStore(store, selectUserMessageCount);
+  return <span>{count} user messages</span>;
+}
+```

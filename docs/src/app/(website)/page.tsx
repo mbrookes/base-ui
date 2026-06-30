@@ -23,7 +23,7 @@ export default function Homepage() {
           Headless chat UI components for conversational AI and messaging interfaces
         </h1>
         <div className="bui-gcs-1 bui-gce-9">
-          <Link className="Text sz-2 bui-d-if" href="/react/components/chat" withArrow>
+          <Link className="Text sz-2 bui-d-if" href="/react/chat" withArrow>
             Documentation
           </Link>
         </div>

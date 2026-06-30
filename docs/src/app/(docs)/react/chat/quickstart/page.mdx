@@ -1,0 +1,104 @@
+# Quickstart
+
+<Subtitle>Install Base UI Chat and build a working chat interface in minutes.</Subtitle>
+<Meta
+  name="description"
+  content="Install Base UI Chat and build a working chat interface in minutes."
+/>
+
+## Installation
+
+```bash
+npm install @base-ui/chat
+```
+
+## Minimal working example
+
+The snippet below wires up a chat UI backed by an echo adapter — it repeats whatever you send.
+Replace `createEchoAdapter()` with a real adapter to connect to a language model.
+
+```tsx title="app.tsx"
+import { Chat, createEchoAdapter } from '@base-ui/chat/chat';
+import { ChatMessageList } from '@base-ui/chat/chat-message-list';
+import { ChatMessageGroup } from '@base-ui/chat/chat-message-group';
+import { ChatMessage } from '@base-ui/chat/chat-message';
+import { ChatComposer } from '@base-ui/chat/chat-composer';
+
+const adapter = createEchoAdapter();
+
+export default function App() {
+  return (
+    <Chat.Root
+      adapter={adapter}
+      style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}
+    >
+      <ChatMessageList.Root
+        style={{ flex: 1, overflowY: 'auto' }}
+        renderItem={({ id, index }) => (
+          <ChatMessageGroup.Root messageId={id} index={index}>
+            <ChatMessage.Root messageId={id}>
+              <ChatMessage.Content />
+            </ChatMessage.Root>
+          </ChatMessageGroup.Root>
+        )}
+      >
+        <ChatMessageList.Viewport>
+          <ChatMessageList.Content />
+        </ChatMessageList.Viewport>
+      </ChatMessageList.Root>
+
+      <ChatComposer.Root>
+        <ChatComposer.TextArea placeholder="Type a message…" />
+        <ChatComposer.Toolbar>
+          <ChatComposer.SendButton>Send</ChatComposer.SendButton>
+        </ChatComposer.Toolbar>
+      </ChatComposer.Root>
+    </Chat.Root>
+  );
+}
+```
+
+Press **Enter** (or **Shift+Enter** to add a new line) and the echo adapter streams the response back.
+
+## Connect a real backend
+
+Swap the echo adapter for one that calls your API.
+The AI SDK adapter is a ready-made option for Vercel AI SDK streams:
+
+```tsx
+import { createAiSdkAdapter } from '@base-ui/chat/chat';
+
+const adapter = createAiSdkAdapter({
+  api: '/api/chat',
+});
+```
+
+See the [Adapters](/react/chat/adapters) page for the full adapter interface and instructions for writing your own.
+
+## Add streaming indicators
+
+While the assistant is responding, show a typing indicator and a scroll-to-bottom affordance:
+
+```tsx
+import {
+  StreamingIndicator,
+  ScrollToBottomAffordance,
+} from '@base-ui/chat/chat';
+
+// Inside ChatMessageList.Root's children:
+<ChatMessageList.Viewport>
+  <ChatMessageList.Content />
+  <StreamingIndicator />
+</ChatMessageList.Viewport>
+<ScrollToBottomAffordance />
+```
+
+See [Indicators](/react/chat/indicators) for all built-in indicator components.
+
+## Next steps
+
+- [Adapters](/react/chat/adapters) — connect your backend or language model
+- [Streaming](/react/chat/streaming) — understand how chunks become live UI
+- [Message parts](/react/chat/message-parts) — render markdown, tool calls, files, and reasoning
+- [Styling](/react/chat/styling) — apply Tailwind, CSS Modules, or any CSS solution
+- [Tool calling](/react/chat/tool-calling) — handle AI function calls in the UI

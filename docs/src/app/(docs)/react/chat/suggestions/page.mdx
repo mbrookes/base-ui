@@ -1,0 +1,147 @@
+# Suggestions
+
+<Subtitle>
+  Display clickable prompt suggestions that help users start a conversation or pick their next
+  prompt.
+</Subtitle>
+<Meta
+  name="description"
+  content="Add prompt suggestions to Base UI Chat to help users start or continue conversations."
+/>
+
+`ChatSuggestions.Root` renders a group of clickable prompt chips.
+By default they are hidden once the conversation has messages — show them throughout with `alwaysVisible`.
+
+## Basic usage
+
+Pass an array of strings to the `suggestions` prop:
+
+```tsx
+import { ChatSuggestions } from '@base-ui/chat/chat-suggestions';
+
+<Chat.Root adapter={adapter}>
+  {/* ... message list and composer ... */}
+  <ChatSuggestions.Root
+    suggestions={[
+      'What can you help me with?',
+      'Summarize my latest report',
+      'Write a follow-up email',
+    ]}
+  />
+</Chat.Root>;
+```
+
+Clicking a suggestion pre-fills the composer with the suggestion text so the user can review or edit before sending.
+
+## Auto-submit
+
+Set `autoSubmit` to immediately send the suggestion as a message without pre-filling the composer:
+
+```tsx
+<ChatSuggestions.Root suggestions={['Get started', 'Show an example']} autoSubmit />
+```
+
+## Customizing suggestion labels
+
+Pass `ChatSuggestion` objects to set a display label that differs from the submitted value:
+
+```tsx
+import type { ChatSuggestion } from '@base-ui/chat/chat-suggestions';
+
+const suggestions: ChatSuggestion[] = [
+  { value: 'Tell me about pricing', label: 'Pricing' },
+  { value: 'Show me an example component', label: 'Examples' },
+  { value: 'How do I install Base UI?', label: 'Installation' },
+];
+
+<ChatSuggestions.Root suggestions={suggestions} />;
+```
+
+You can mix plain strings and `ChatSuggestion` objects in the same array.
+Plain strings are normalized to `{ value: string }` internally.
+
+| Property | Type     | Description                                                |
+| :------- | :------- | :--------------------------------------------------------- |
+| `value`  | `string` | The value submitted or pre-filled when the chip is clicked |
+| `label`  | `string` | Optional display text. Falls back to `value` if omitted.   |
+
+## Keeping suggestions visible
+
+Suggestions are automatically hidden once the conversation has messages.
+Set `alwaysVisible` to render them regardless of message count — useful for follow-up prompt banks:
+
+```tsx
+<ChatSuggestions.Root
+  suggestions={['Refine the answer', 'Give an example', 'Explain step by step']}
+  alwaysVisible
+/>
+```
+
+## Dynamic suggestions
+
+Because `suggestions` is a regular React prop, you can compute it from state.
+The example below loads personalized suggestions after sign-in:
+
+```tsx
+function App() {
+  const [suggestions, setSuggestions] = React.useState(['Get started', 'View recent activity']);
+
+  React.useEffect(() => {
+    fetchUserSuggestions().then(setSuggestions);
+  }, []);
+
+  return (
+    <Chat.Root adapter={adapter}>
+      {/* ... */}
+      <ChatSuggestions.Root suggestions={suggestions} />
+    </Chat.Root>
+  );
+}
+```
+
+## Custom item rendering
+
+When `children` is provided, `ChatSuggestions.Root` ignores the `suggestions` prop and renders only the group container and selection context.
+Use `ChatSuggestions.Item` for each custom chip:
+
+```tsx
+import { ChatSuggestions } from '@base-ui/chat/chat-suggestions';
+
+<ChatSuggestions.Root>
+  <ChatSuggestions.Item value="Option A">Option A</ChatSuggestions.Item>
+  <ChatSuggestions.Item value="Option B">Option B</ChatSuggestions.Item>
+</ChatSuggestions.Root>;
+```
+
+`ChatSuggestions.Item` is a `<button>` element that sends the `value` to the composer (or submits it when `autoSubmit` is set on the parent).
+
+## Anatomy
+
+```tsx
+import { ChatSuggestions } from '@base-ui/chat/chat-suggestions';
+
+<ChatSuggestions.Root suggestions={['…']}>
+  {/* automatically rendered from suggestions prop, or supply manually: */}
+  <ChatSuggestions.Item value="…">…</ChatSuggestions.Item>
+</ChatSuggestions.Root>;
+```
+
+The root renders a `role="group"` container with an accessible label.
+The default label comes from the `suggestionsLabel` locale key (`"Suggested prompts"`).
+Override it via `localeText` on `Chat.Root`:
+
+```tsx
+<Chat.Root adapter={adapter} localeText={{ suggestionsLabel: 'Quick prompts' }}>
+  {/* ... */}
+</Chat.Root>
+```
+
+## Accessibility
+
+Each suggestion chip is a standard `<button>` in the tab order — activate it with <kbd>Enter</kbd> or <kbd>Space</kbd>.
+The group is labeled so assistive technology announces it as a distinct region when entering.
+
+## See also
+
+- [Adapters](/react/chat/adapters/) for how submitted messages reach your backend via `sendMessage`.
+- [Error handling](/react/chat/error-handling/) for what happens when a submitted suggestion produces a streaming error.

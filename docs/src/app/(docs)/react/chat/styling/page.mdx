@@ -1,0 +1,264 @@
+# Styling
+
+<Subtitle>Style chat components with Tailwind CSS, CSS Modules, CSS-in-JS, or plain CSS.</Subtitle>
+<Meta
+  name="description"
+  content="Style Base UI Chat components with Tailwind, CSS Modules, CSS-in-JS, or any styling solution you prefer."
+/>
+
+Chat components are completely unstyled and ship no CSS.
+They render semantic HTML elements you target with any styling solution.
+
+## className
+
+Every component that renders an HTML element accepts a `className` prop.
+
+```tsx
+<ChatComposer.TextArea className="composer-textarea" />
+```
+
+Pass a function to vary the class based on component state:
+
+```tsx
+<ChatComposer.Root className={(state) => (state.streaming ? 'composer streaming' : 'composer')} />
+```
+
+## Data attributes
+
+Components expose `data-*` attributes that reflect their current state.
+Target them in CSS without any JavaScript:
+
+```css title="chat.css"
+/* Streaming state on the root */
+.ChatRoot[data-streaming] .ComposerSendButton {
+  display: none;
+}
+
+/* Focus ring on the textarea */
+.ComposerTextArea:focus-visible {
+  outline: 2px solid var(--color-blue-500);
+}
+
+/* Error state on a message */
+.Message[data-status='error'] {
+  opacity: 0.6;
+}
+```
+
+Check the API reference on the [main Chat page](/react/chat) for the full list of data attributes each component exposes.
+
+## CSS variables
+
+Some components publish CSS custom properties to help with dynamic values.
+The `ChatMessageList.Overlay` uses scroll-position values to drive fade effects, for example.
+Consult each component's API entry for the variables it exposes.
+
+```css title="chat.css"
+.MessageListOverlay {
+  /* Fade the overlay out over the last 64 px of scroll */
+  mask-image: linear-gradient(to bottom, transparent, black var(--scroll-bottom, 64px));
+}
+```
+
+## style prop
+
+Pass an object to style a single element:
+
+```tsx
+<ChatComposer.TextArea style={{ minHeight: 80 }} />
+```
+
+Or a function to read component state:
+
+```tsx
+<ChatMessage.Root style={(state) => ({ opacity: state.status === 'error' ? 0.5 : 1 })} />
+```
+
+## Tailwind CSS
+
+Apply Tailwind utility classes directly via `className`:
+
+```tsx title="chat.tsx"
+import { Chat, createEchoAdapter } from '@base-ui/chat/chat';
+import { ChatMessageList } from '@base-ui/chat/chat-message-list';
+import { ChatMessageGroup } from '@base-ui/chat/chat-message-group';
+import { ChatMessage } from '@base-ui/chat/chat-message';
+import { ChatComposer } from '@base-ui/chat/chat-composer';
+
+const adapter = createEchoAdapter();
+
+export default function MyChat() {
+  return (
+    <Chat.Root adapter={adapter} className="flex h-full flex-col">
+      <ChatMessageList.Root
+        className="flex-1 overflow-y-auto px-4"
+        renderItem={({ id, index }) => (
+          <ChatMessageGroup.Root messageId={id} index={index} className="flex gap-3 py-2">
+            <ChatMessage.Root messageId={id} className="flex-1">
+              <ChatMessage.Avatar className="size-8 rounded-full bg-neutral-200" />
+              <ChatMessage.Content className="prose dark:prose-invert" />
+            </ChatMessage.Root>
+          </ChatMessageGroup.Root>
+        )}
+      >
+        <ChatMessageList.Viewport className="h-full">
+          <ChatMessageList.Content />
+        </ChatMessageList.Viewport>
+      </ChatMessageList.Root>
+
+      <ChatComposer.Root className="border-t border-neutral-200 p-4 dark:border-neutral-800">
+        <ChatComposer.TextArea
+          className="w-full resize-none rounded-lg bg-neutral-100 px-3 py-2 text-sm outline-none placeholder:text-neutral-400 dark:bg-neutral-900"
+          rows={1}
+        />
+        <ChatComposer.Toolbar className="mt-2 flex justify-end">
+          <ChatComposer.SendButton className="rounded-md bg-neutral-950 px-3 py-1.5 text-sm text-white hover:bg-neutral-800 disabled:opacity-40 dark:bg-white dark:text-neutral-950 dark:hover:bg-neutral-200">
+            Send
+          </ChatComposer.SendButton>
+        </ChatComposer.Toolbar>
+      </ChatComposer.Root>
+    </Chat.Root>
+  );
+}
+```
+
+## CSS Modules
+
+Pass class names from a CSS Module file via the `className` prop:
+
+```tsx title="chat.tsx"
+import { Chat, createEchoAdapter } from '@base-ui/chat/chat';
+import { ChatMessageList } from '@base-ui/chat/chat-message-list';
+import { ChatMessageGroup } from '@base-ui/chat/chat-message-group';
+import { ChatMessage } from '@base-ui/chat/chat-message';
+import { ChatComposer } from '@base-ui/chat/chat-composer';
+import styles from './chat.module.css';
+
+const adapter = createEchoAdapter();
+
+export default function MyChat() {
+  return (
+    <Chat.Root adapter={adapter} className={styles.Root}>
+      <ChatMessageList.Root
+        className={styles.MessageList}
+        renderItem={({ id, index }) => (
+          <ChatMessageGroup.Root messageId={id} index={index} className={styles.MessageGroup}>
+            <ChatMessage.Root messageId={id} className={styles.Message}>
+              <ChatMessage.Avatar className={styles.Avatar} />
+              <ChatMessage.Content className={styles.Content} />
+            </ChatMessage.Root>
+          </ChatMessageGroup.Root>
+        )}
+      >
+        <ChatMessageList.Viewport className={styles.Viewport}>
+          <ChatMessageList.Content />
+        </ChatMessageList.Viewport>
+      </ChatMessageList.Root>
+
+      <ChatComposer.Root className={styles.Composer}>
+        <ChatComposer.TextArea className={styles.TextArea} />
+        <ChatComposer.Toolbar className={styles.Toolbar}>
+          <ChatComposer.SendButton className={styles.SendButton}>Send</ChatComposer.SendButton>
+        </ChatComposer.Toolbar>
+      </ChatComposer.Root>
+    </Chat.Root>
+  );
+}
+```
+
+```css title="chat.module.css"
+.Root {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.MessageList {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.Composer {
+  border-top: 1px solid oklch(90% 0 0deg);
+  padding: 1rem;
+}
+
+.TextArea {
+  width: 100%;
+  resize: none;
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+}
+
+.SendButton {
+  border-radius: 0.375rem;
+  background: oklch(14.5% 0 0deg);
+  color: white;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+}
+
+.SendButton:disabled {
+  opacity: 0.4;
+}
+```
+
+## CSS-in-JS
+
+Wrap each component part and apply styles with your CSS-in-JS library of choice:
+
+```tsx title="chat.tsx"
+import { Chat, createEchoAdapter } from '@base-ui/chat/chat';
+import { ChatMessage } from '@base-ui/chat/chat-message';
+import { ChatComposer } from '@base-ui/chat/chat-composer';
+import styled from '@emotion/styled';
+
+const StyledComposerRoot = styled(ChatComposer.Root)`
+  border-top: 1px solid #e5e7eb;
+  padding: 1rem;
+`;
+
+const StyledTextArea = styled(ChatComposer.TextArea)`
+  width: 100%;
+  resize: none;
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  background: #f3f4f6;
+  outline: none;
+`;
+
+const StyledSendButton = styled(ChatComposer.SendButton)`
+  border-radius: 0.375rem;
+  background: #111827;
+  color: white;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+
+  &:disabled {
+    opacity: 0.4;
+  }
+`;
+
+const StyledMessageContent = styled(ChatMessage.Content)`
+  font-size: 0.875rem;
+  line-height: 1.5;
+`;
+
+const adapter = createEchoAdapter();
+
+export default function MyChat() {
+  return (
+    <Chat.Root adapter={adapter}>
+      {/* message list … */}
+      <StyledComposerRoot>
+        <StyledTextArea />
+        <ChatComposer.Toolbar>
+          <StyledSendButton>Send</StyledSendButton>
+        </ChatComposer.Toolbar>
+      </StyledComposerRoot>
+    </Chat.Root>
+  );
+}
+```

@@ -1,0 +1,170 @@
+# Tool calling
+
+<Subtitle>
+  Handle AI function calls in the UI — render tool inputs and outputs, approve or deny tool
+  invocations, and register client-side tool handlers.
+</Subtitle>
+<Meta
+  name="description"
+  content="Handle AI tool calls in Base UI Chat: render tool inputs and outputs, approve or deny invocations, and register client-side handlers."
+/>
+
+Tool calling lets an AI model invoke functions — searching the web, reading a file, querying a database — and incorporate the results into its response.
+Base UI Chat renders tool invocations as message parts and provides hooks and callbacks to handle the full lifecycle.
+
+## Tool message parts
+
+Every tool call in a message is represented as a `tool` or `dynamic-tool` part.
+`ChatMessage.Content` renders these automatically.
+The part's `state` field tracks the lifecycle:
+
+| State                  | Meaning                                                  |
+| :--------------------- | :------------------------------------------------------- |
+| `'input-streaming'`    | The model is still generating the tool's input arguments |
+| `'input-available'`    | Input is complete; tool is running                       |
+| `'approval-requested'` | The runtime is waiting for the user to approve the call  |
+| `'approval-responded'` | The user approved or denied; tool is running             |
+| `'output-available'`   | The tool completed successfully                          |
+| `'output-error'`       | The tool returned an error                               |
+| `'output-denied'`      | The user denied the invocation                           |
+
+## Client-side tool handlers
+
+For tools that run in the browser (not on the server), register a handler with `onToolCall` on `Chat.Root`:
+
+```tsx
+import { Chat } from '@base-ui/chat/chat';
+
+<Chat.Root
+  adapter={adapter}
+  onToolCall={async ({ toolCall }) => {
+    if (toolCall.toolName === 'get_weather') {
+      const weather = await fetchWeather(toolCall.input as { city: string });
+      // Return the result — the runtime adds it as tool output in the stream
+      return { temperature: weather.temp, condition: weather.condition };
+    }
+  }}
+>
+  {/* … */}
+</Chat.Root>;
+```
+
+`onToolCall` receives the tool call object and can return a result synchronously or asynchronously.
+If the tool runs on the server (through your adapter), you don't need `onToolCall` — the result arrives in the stream.
+
+## Approve/deny tool calls
+
+When a tool call should require explicit user approval before running, your adapter can set the tool state to `'approval-requested'`.
+`ChatMessage.Content` renders approve and deny buttons automatically when the state is `'approval-requested'`.
+
+To respond programmatically (for example, from a custom button), use `addToolApprovalResponse` from `useChat()`:
+
+```tsx
+import { useChat } from '@base-ui/chat/chat';
+
+function CustomApprovalButton({ toolCallId }: { toolCallId: string }) {
+  const { addToolApprovalResponse } = useChat();
+
+  return (
+    <button
+      type="button"
+      onClick={() => addToolApprovalResponse({ id: toolCallId, approved: true })}
+    >
+      Approve
+    </button>
+  );
+}
+```
+
+Pass `approved: false` and optionally a `reason` to deny:
+
+```tsx
+addToolApprovalResponse({ id: toolCallId, approved: false, reason: 'Not allowed' });
+```
+
+## Custom tool renderers
+
+Override how a specific tool's input or output is displayed by supplying a custom part renderer to `Chat.Root`:
+
+```tsx
+import { Chat } from '@base-ui/chat/chat';
+import type { ChatPartRenderer } from '@base-ui/chat/chat';
+
+const codeInterpreterRenderer: ChatPartRenderer<'tool'> = ({ part }) => {
+  const { toolInvocation } = part;
+
+  if (toolInvocation.toolName !== 'code_interpreter') {
+    return null; // fall back to the default renderer
+  }
+
+  return (
+    <div>
+      <pre>{JSON.stringify(toolInvocation.input, null, 2)}</pre>
+      {toolInvocation.state === 'output-available' && (
+        <pre>{JSON.stringify(toolInvocation.output, null, 2)}</pre>
+      )}
+    </div>
+  );
+};
+
+<Chat.Root adapter={adapter} partRenderers={{ tool: codeInterpreterRenderer }}>
+  {/* … */}
+</Chat.Root>;
+```
+
+The `partRenderers` map accepts a renderer for any part type.
+Return `null` to fall back to the built-in renderer.
+
+## Reading tool state in a hook
+
+Access the `onToolCall` handler registered on the runtime with `useChatOnToolCall`:
+
+```tsx
+import { useChatOnToolCall } from '@base-ui/chat/chat';
+
+function DebugPanel() {
+  const onToolCall = useChatOnToolCall();
+  return <div>onToolCall registered: {onToolCall != null ? 'yes' : 'no'}</div>;
+}
+```
+
+This is mainly useful for introspection.
+To handle tool calls, pass `onToolCall` directly to `Chat.Root`.
+
+## Type-safe tools
+
+Use the type registry to add type safety for known tools.
+Declare your tools in a `.d.ts` file:
+
+```ts title="chat-tools.d.ts"
+import '@base-ui/chat/chat';
+
+declare module '@base-ui/chat/chat' {
+  interface ChatToolRegistry {
+    get_weather: {
+      input: { city: string };
+      output: { temperature: number; condition: string };
+    };
+    search_web: {
+      input: { query: string };
+      output: { results: Array<{ title: string; url: string }> };
+    };
+  }
+}
+```
+
+With the registry in place, `toolInvocation.input` and `toolInvocation.output` are typed for each `toolName`.
+
+## Locale strings
+
+The tool call UI uses these locale keys from `ChatLocaleText`:
+
+| Key                             | Default              |
+| :------------------------------ | :------------------- |
+| `messageToolInputLabel`         | `'Tool called'`      |
+| `messageToolOutputLabel`        | `'Tool result'`      |
+| `messageToolApproveButtonLabel` | `'Approve'`          |
+| `messageToolDenyButtonLabel`    | `'Deny'`             |
+| `toolStateLabel`                | State-specific label |
+
+Override them via `localeText` on `Chat.Root`. See [Localization](/react/chat/localization).

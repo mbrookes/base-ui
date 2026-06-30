@@ -1,0 +1,201 @@
+# Composer
+
+<Subtitle>
+  A form for composing messages, with a text area, send button, file attachments, and a customizable
+  toolbar.
+</Subtitle>
+<Meta
+  name="description"
+  content="Build a message composer with Base UI Chat's ChatComposer components: text area, send button, file attachments, and toolbar."
+/>
+
+`ChatComposer` is the input area users type into and submit messages from.
+Import each sub-component from `@base-ui/chat/chat-composer`:
+
+```tsx
+import { ChatComposer } from '@base-ui/chat/chat-composer';
+```
+
+## Anatomy
+
+```tsx title="Anatomy"
+<ChatComposer.Root>
+  <ChatComposer.Label />
+  <ChatComposer.AttachmentList />
+  <ChatComposer.TextArea />
+  <ChatComposer.HelperText />
+  <ChatComposer.Toolbar>
+    <ChatComposer.AttachButton />
+    <ChatComposer.SendButton />
+  </ChatComposer.Toolbar>
+</ChatComposer.Root>
+```
+
+`ChatComposer.Root` renders a `<form>`.
+Submitting the form (pressing **Enter** in the text area or clicking the send button) calls `sendMessage` on the chat runtime.
+
+## Basic usage
+
+The minimum viable composer needs a text area and a send button:
+
+```tsx
+<ChatComposer.Root>
+  <ChatComposer.TextArea placeholder="Type a message…" />
+  <ChatComposer.Toolbar>
+    <ChatComposer.SendButton>Send</ChatComposer.SendButton>
+  </ChatComposer.Toolbar>
+</ChatComposer.Root>
+```
+
+## Send button behavior
+
+`ChatComposer.SendButton` is disabled while the composer is empty or while the assistant is streaming.
+During streaming it switches to a stop button that calls `stopStreaming()`.
+Override this by rendering your own `<button>` inside `ChatComposer.Toolbar` and using `useChatActions()`.
+
+## Text area
+
+`ChatComposer.TextArea` renders a `<textarea>` that auto-grows with its content.
+Key behaviors built in:
+
+- **Enter** submits; **Shift+Enter** inserts a newline.
+- The textarea tracks IME composition state so CJK input is never submitted mid-composition.
+- `aria-label` defaults to the `composerInputAriaLabel` locale key.
+
+Pass any native `<textarea>` prop — `rows`, `maxLength`, `autoFocus`, and so on:
+
+```tsx
+<ChatComposer.TextArea rows={3} maxLength={2000} placeholder="Ask anything…" />
+```
+
+## Label
+
+`ChatComposer.Label` renders a visually hidden `<label>` that associates with the textarea for screen readers.
+Use it in place of, or alongside, the `aria-label` default from the locale system:
+
+```tsx
+<ChatComposer.Root>
+  <ChatComposer.Label>Ask the assistant</ChatComposer.Label>
+  <ChatComposer.TextArea />
+  <ChatComposer.Toolbar>
+    <ChatComposer.SendButton>Send</ChatComposer.SendButton>
+  </ChatComposer.Toolbar>
+</ChatComposer.Root>
+```
+
+## Helper text
+
+`ChatComposer.HelperText` renders supplemental text below the textarea — useful for character counts or formatting hints:
+
+```tsx
+<ChatComposer.Root>
+  <ChatComposer.TextArea />
+  <ChatComposer.HelperText>Shift+Enter for a new line</ChatComposer.HelperText>
+  <ChatComposer.Toolbar>
+    <ChatComposer.SendButton>Send</ChatComposer.SendButton>
+  </ChatComposer.Toolbar>
+</ChatComposer.Root>
+```
+
+## File attachments
+
+Add `ChatComposer.AttachButton` to the toolbar to open a file picker.
+Use `attachmentConfig` on `ChatComposer.Root` to restrict accepted file types and sizes:
+
+```tsx
+<ChatComposer.Root
+  attachmentConfig={{
+    acceptedMimeTypes: ['image/*', 'application/pdf'],
+    maxFileSizeBytes: 10 * 1024 * 1024, // 10 MB
+  }}
+>
+  <ChatComposer.AttachmentList />
+  <ChatComposer.TextArea />
+  <ChatComposer.Toolbar>
+    <ChatComposer.AttachButton>Attach</ChatComposer.AttachButton>
+    <ChatComposer.SendButton>Send</ChatComposer.SendButton>
+  </ChatComposer.Toolbar>
+</ChatComposer.Root>
+```
+
+`ChatComposer.AttachmentList` renders the list of pending attachments.
+It returns `null` automatically when no files are attached, so no conditional rendering is needed.
+
+Files are transferred to the message payload on submit via `parts` of type `file`.
+Your adapter receives them as part of the `sendMessage` payload.
+
+## Controlled composer value
+
+Control the composer's text value from outside the component with `composerValue` and `onComposerValueChange` on `Chat.Root` (or `ChatProvider`):
+
+```tsx
+const [draft, setDraft] = React.useState('');
+
+<Chat.Root adapter={adapter} composerValue={draft} onComposerValueChange={setDraft}>
+  {/* … */}
+</Chat.Root>;
+```
+
+Or access the composer state directly with the `useChatComposer` hook:
+
+```tsx
+import { useChatComposer } from '@base-ui/chat/chat';
+
+function CharacterCount() {
+  const { value } = useChatComposer();
+  return <span>{value.length} / 2000</span>;
+}
+```
+
+## Disabling the composer
+
+Pass `disabled` to `ChatComposer.Root` to disable all controls at once:
+
+```tsx
+<ChatComposer.Root disabled>
+  <ChatComposer.TextArea />
+  <ChatComposer.Toolbar>
+    <ChatComposer.SendButton>Send</ChatComposer.SendButton>
+  </ChatComposer.Toolbar>
+</ChatComposer.Root>
+```
+
+The `data-disabled` attribute is set on all children, making it straightforward to style the disabled state in CSS.
+
+## Custom submit handling
+
+Intercept the form submission with `onSubmit` on `ChatComposer.Root`:
+
+```tsx
+<ChatComposer.Root
+  onSubmit={(event) => {
+    // event.preventDefault() stops the default sendMessage call
+    console.log('submitting');
+  }}
+>
+  {/* … */}
+</ChatComposer.Root>
+```
+
+## Programmatic control
+
+Access the full composer API with `useChatComposer()`:
+
+```tsx
+import { useChatComposer } from '@base-ui/chat/chat';
+
+function ClearButton() {
+  const { clear } = useChatComposer();
+  return (
+    <button type="button" onClick={clear}>
+      Clear
+    </button>
+  );
+}
+```
+
+See [Hooks](/react/chat/hooks) for the full `useChatComposer` reference.
+
+## API reference
+
+See the [Chat API reference](/react/chat#chatcomposer) for the full props and state for each `ChatComposer` sub-component.

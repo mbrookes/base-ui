@@ -1,0 +1,180 @@
+# Callbacks
+
+<Subtitle>
+  Stream lifecycle callbacks, controlled state props, and change handlers for wiring chat into your
+  application.
+</Subtitle>
+<Meta
+  name="description"
+  content="Use Base UI Chat callbacks and controlled props to handle streaming events, tool calls, and state changes."
+/>
+
+`Chat.Root` (and `ChatProvider`) accept two kinds of event surface: **stream lifecycle callbacks** that fire as the assistant responds, and **controlled model props** that synchronize state with external sources.
+
+## Stream lifecycle callbacks
+
+All four callbacks are optional.
+Pass them to `Chat.Root`:
+
+```tsx
+<Chat.Root
+  adapter={adapter}
+  onData={handleData}
+  onToolCall={handleToolCall}
+  onFinish={handleFinish}
+  onError={handleError}
+>
+  {/* … */}
+</Chat.Root>
+```
+
+### onData
+
+Fires for every custom `data` chunk emitted by the stream.
+Use it to receive side-channel information from your backend — structured metadata, references, or any application-specific payload — without embedding it in the assistant message text.
+
+```tsx
+import type { ChatOnData } from '@base-ui/chat/chat';
+
+const handleData: ChatOnData = (part) => {
+  console.log('data part:', part.data);
+};
+```
+
+### onToolCall
+
+Fires when the model requests a client-side tool call.
+Return a result (or a `Promise` resolving to one) to supply the tool output:
+
+```tsx
+import type { ChatOnToolCall } from '@base-ui/chat/chat';
+
+const handleToolCall: ChatOnToolCall = async ({ toolCall }) => {
+  if (toolCall.toolName === 'get_weather') {
+    const weather = await fetchWeather(toolCall.input as { city: string });
+    return { temperature: weather.temp, condition: weather.condition };
+  }
+};
+```
+
+Server-executed tools don't need `onToolCall` — the adapter handles them and the result arrives in the stream.
+See [Tool calling](/react/chat/tool-calling) for more.
+
+### onFinish
+
+Fires once when the assistant response completes (stream ended, error, or abort):
+
+```tsx
+import type { ChatOnFinish } from '@base-ui/chat/chat';
+
+const handleFinish: ChatOnFinish = ({ message, messages, isAbort, isError, finishReason }) => {
+  if (!isError && !isAbort) {
+    analytics.track('chat_response_complete', {
+      messageId: message.id,
+      messageCount: messages.length,
+      finishReason,
+    });
+  }
+};
+```
+
+### onError
+
+Fires when any runtime operation fails — `sendMessage`, history loading, or realtime:
+
+```tsx
+import type { ChatOnError } from '@base-ui/chat/chat';
+
+const handleError: ChatOnError = (error) => {
+  console.error(`[${error.source}] ${error.message}`);
+  Sentry.captureException(error);
+};
+```
+
+`error.source` distinguishes where the error came from:
+
+| Source       | Meaning                       |
+| :----------- | :---------------------------- |
+| `'send'`     | `adapter.sendMessage()` threw |
+| `'history'`  | `adapter.loadHistory()` threw |
+| `'realtime'` | Realtime connection error     |
+| `'stream'`   | Stream parsing failed         |
+
+`error.recoverable` is `true` for transient errors (stream disconnects).
+`error.retryable` is `true` when the user can safely retry.
+
+## Controlled state props
+
+These follow the uncontrolled/controlled pattern: omit to let the runtime manage state internally; pass to take ownership from outside.
+
+### messages / onMessagesChange
+
+```tsx
+const [messages, setMessages] = React.useState<ChatMessage[]>([]);
+
+<Chat.Root adapter={adapter} messages={messages} onMessagesChange={setMessages}>
+  {/* … */}
+</Chat.Root>;
+```
+
+Useful for persisting the message list to `localStorage` or syncing it to a server.
+The runtime still appends streamed tokens — `onMessagesChange` is called after each flush.
+
+### conversations / onConversationsChange
+
+```tsx
+const [conversations, setConversations] = React.useState<ChatConversation[]>([]);
+
+<Chat.Root adapter={adapter} conversations={conversations} onConversationsChange={setConversations}>
+  {/* … */}
+</Chat.Root>;
+```
+
+### activeConversationId / onActiveConversationChange
+
+Control which conversation is shown:
+
+```tsx
+const [activeId, setActiveId] = React.useState<string | undefined>(undefined);
+
+<Chat.Root
+  adapter={adapter}
+  activeConversationId={activeId}
+  onActiveConversationChange={setActiveId}
+>
+  {/* … */}
+</Chat.Root>;
+```
+
+### composerValue / onComposerValueChange
+
+Control the draft text in the composer:
+
+```tsx
+const [draft, setDraft] = React.useState('');
+
+<Chat.Root adapter={adapter} composerValue={draft} onComposerValueChange={setDraft}>
+  {/* … */}
+</Chat.Root>;
+```
+
+## Initial values (uncontrolled)
+
+When you don't need full control, supply initial values and let the runtime take over:
+
+```tsx
+<Chat.Root
+  adapter={adapter}
+  initialMessages={[
+    { id: 'sys-1', role: 'system', parts: [{ type: 'text', text: 'You are helpful.' }] },
+  ]}
+  initialConversations={[]}
+  initialActiveConversationId={undefined}
+  initialComposerValue=""
+>
+  {/* … */}
+</Chat.Root>
+```
+
+Initial values are applied once on mount and ignored on subsequent renders.
+They are also ignored when the corresponding controlled prop is present.

@@ -1,12 +1,12 @@
 import { createSitemap } from '@mui/internal-docs-infra/createSitemap';
-import Overview from '../(docs)/react/overview/page.mdx';
-import Handbook from '../(docs)/react/handbook/page.mdx';
-import Components from '../(docs)/react/components/page.mdx';
-import Utils from '../(docs)/react/utils/page.mdx';
+import Overview from '../(docs)/react/getting-started/page.mdx';
+import Guides from '../(docs)/react/guides/page.mdx';
+import Customization from '../(docs)/react/customization/page.mdx';
+import Reference from '../(docs)/react/reference/page.mdx';
 
 export const sitemap = createSitemap(import.meta.url, {
   Overview,
-  Handbook,
-  Components,
-  Utils,
+  Guides,
+  Customization,
+  Reference,
 });

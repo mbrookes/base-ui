@@ -1,0 +1,158 @@
+# Performance
+
+<Subtitle>
+  Keep the chat UI fast during token-by-token streaming with fine-grained subscriptions, memoized
+  selectors, and render-scope isolation.
+</Subtitle>
+<Meta
+  name="description"
+  content="Keep Base UI Chat fast during streaming with fine-grained selectors, memoized state, and render-scope isolation."
+/>
+
+A streaming response can produce tens of tokens per second.
+Rendering the full message list on every token would be expensive.
+Base UI Chat's store architecture is designed to make that cheap by default, and gives you the tools to keep custom components fast too.
+
+## How the store limits re-renders
+
+The chat runtime stores all state in a single `ChatStore` (backed by `@base-ui/utils/store`).
+Components subscribe to the store with `useStore(store, selector)`.
+A component only re-renders when the value its selector returns changes — not when anything else in the store changes.
+
+Built-in components are wired to the narrowest selector they need:
+
+- `StreamingIndicator` subscribes only to two boolean-valued selectors (`isStreaming` and whether a streaming assistant message exists). It re-renders twice per stream start/stop — not on every token.
+- `ChatMessage.Content` for a finished message subscribes to that message's content only. It does not re-render while a different message is streaming.
+- `ChatComposer.SendButton` subscribes to `isStreaming` and `composerValue`. It re-renders when either of those changes, not when messages update.
+
+## Choosing the right hook
+
+| Hook                        | Subscribes to                                       | Use when                                     |
+| :-------------------------- | :-------------------------------------------------- | :------------------------------------------- |
+| `useChat()`                 | messages, conversations, all status                 | You need both state and actions in one place |
+| `useChatStatus()`           | isStreaming, isLoadingHistory, error, typingUserIds | You need status only, not the message array  |
+| `useChatActions()`          | nothing (runtime context only)                      | You only call actions — no state needed      |
+| `useMessage(id)`            | a single message                                    | You render or inspect one message            |
+| `useConversation(id)`       | a single conversation                               | You render or inspect one conversation       |
+| `useStore(store, selector)` | exactly what the selector touches                   | Maximum control                              |
+
+Avoid `useChat()` in components that sit outside the message list but near the stream hot path (toolbars, headers, sidebars).
+`useChatStatus()` or `useChatActions()` is almost always enough there.
+
+## Memoized selectors
+
+Selectors that return arrays or objects are memoized with `createSelectorMemoized`.
+They return the same reference when inputs haven't changed, so `React.memo` and stable prop references work correctly:
+
+```tsx
+import { useChatStore, selectMessages } from '@base-ui/chat/chat';
+import { useStore } from '@base-ui/utils/store';
+
+// selectMessages is memoized: same reference when the list doesn't change
+const messages = useStore(store, selectMessages);
+```
+
+When writing custom selectors that derive arrays or objects, use `createSelectorMemoized` from `@base-ui/utils/store`:
+
+```tsx
+import { createSelectorMemoized, useStore } from '@base-ui/utils/store';
+import { useChatStore, selectMessages } from '@base-ui/chat/chat';
+
+type StoreState = Parameters<typeof selectMessages>[0];
+
+const selectUserMessages = createSelectorMemoized(
+  (state: StoreState) => state.messageIds,
+  (state: StoreState) => state.messagesById,
+  (ids, byId) => ids.filter((id) => byId[id]?.role === 'user').map((id) => byId[id]!),
+);
+
+function UserMessageList() {
+  const store = useChatStore();
+  const userMessages = useStore(store, selectUserMessages);
+  // re-renders only when user messages change
+}
+```
+
+## Streaming flush interval
+
+The runtime batches streamed token deltas before applying them to the store.
+The default flush interval is 16 ms (one frame at 60 fps).
+Increase it to reduce re-renders at the cost of slightly choppier text:
+
+```tsx
+<Chat.Root adapter={adapter} streamFlushInterval={50}>
+  {/* … */}
+</Chat.Root>
+```
+
+Lower it (minimum ~4 ms) for smoother animation when the model produces very fast tokens.
+
+## Memoizing the renderItem callback
+
+`ChatMessageList.Root` accepts a `renderItem` prop that is called for every message in the list.
+If this function is created inline, React will see a new reference on every re-render and the virtualized list may remount cells unnecessarily.
+Move it outside the component or memoize it:
+
+```tsx
+const renderItem = React.useCallback(
+  ({ id, index }: { id: string; index: number }) => (
+    <ChatMessageGroup.Root messageId={id} index={index}>
+      <ChatMessage.Root messageId={id}>
+        <ChatMessage.Content />
+      </ChatMessage.Root>
+    </ChatMessageGroup.Root>
+  ),
+  [],
+);
+
+<ChatMessageList.Root renderItem={renderItem}>{/* … */}</ChatMessageList.Root>;
+```
+
+## Avoiding wide subscriptions in action-only components
+
+A common mistake is calling `useChat()` in a button that only needs to call `sendMessage`:
+
+```tsx
+// Expensive: re-renders on every streamed token
+function SendButton() {
+  const { sendMessage, isStreaming } = useChat();
+  // …
+}
+
+// Cheap: subscribes to nothing
+function SendButton() {
+  const { sendMessage } = useChatActions();
+  const { isStreaming } = useChatStatus();
+  // …
+}
+```
+
+`useChatActions()` reads only the runtime context (one `useContext` call) and never subscribes to the store.
+`useChatStatus()` subscribes to five boolean/primitive fields — it re-renders only when those flip, not when a token arrives.
+
+## Stable adapter references
+
+The adapter passed to `Chat.Root` is read when `sendMessage` is called.
+It does not need to be stable across renders.
+However, if you derive the adapter inside the component body and it re-creates on every render, the runtime holds a ref to the latest version so this is safe.
+
+Keep `members`, `currentUser`, `roleDisplayNames`, and the author getter functions stable (via `React.useMemo` or module-level constants) to avoid unnecessary store parameter updates.
+
+## partRenderers stability
+
+Custom part renderers passed to `Chat.Root` via `partRenderers` are merged with the defaults in a `useMemo`.
+Create the `partRenderers` object outside the component or in a `useMemo` to avoid recreating the merged map on every render:
+
+```tsx
+const partRenderers = React.useMemo(
+  () => ({
+    text: MyTextRenderer,
+    tool: MyToolRenderer,
+  }),
+  [],
+);
+
+<Chat.Root adapter={adapter} partRenderers={partRenderers}>
+  {/* … */}
+</Chat.Root>;
+```

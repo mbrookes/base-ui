@@ -1,0 +1,135 @@
+# Layout
+
+<Subtitle>
+  Arrange the message thread and conversation sidebar in a responsive two-pane shell.
+</Subtitle>
+<Meta
+  name="description"
+  content="Build a two-pane chat layout with Base UI Chat's Chat.Layout, ChatConversation, and ChatConversationList components."
+/>
+
+`Chat.Layout` is a structural component that arranges a conversations pane and a thread pane side by side.
+It handles the flex container and minimum-dimension resets so content doesn't overflow.
+
+## Single-pane layout
+
+A basic chat needs only a thread pane — `Chat.Layout` is optional:
+
+```tsx
+import { Chat, createEchoAdapter } from '@base-ui/chat/chat';
+import { ChatConversation } from '@base-ui/chat/chat-conversation';
+
+const adapter = createEchoAdapter();
+
+export default function App() {
+  return (
+    <Chat.Root adapter={adapter}>
+      <ChatConversation.Root>{/* message list, composer */}</ChatConversation.Root>
+    </Chat.Root>
+  );
+}
+```
+
+## Two-pane layout
+
+Add a conversation list sidebar by nesting `ChatConversationList.Root` and `ChatConversation.Root` inside `Chat.Layout`:
+
+```tsx
+import { Chat, createEchoAdapter } from '@base-ui/chat/chat';
+import { ChatConversationList } from '@base-ui/chat/chat-conversation-list';
+import { ChatConversation } from '@base-ui/chat/chat-conversation';
+
+const adapter = createEchoAdapter();
+
+export default function App() {
+  return (
+    <Chat.Root adapter={adapter}>
+      <Chat.Layout>
+        <ChatConversationList.Root pane="conversations">
+          <ChatConversationList.Item conversationId="c1">
+            <ChatConversationList.ItemContent>
+              <ChatConversationList.Title />
+              <ChatConversationList.Preview />
+            </ChatConversationList.ItemContent>
+          </ChatConversationList.Item>
+        </ChatConversationList.Root>
+
+        <ChatConversation.Root pane="thread">{/* message list, composer */}</ChatConversation.Root>
+      </Chat.Layout>
+    </Chat.Root>
+  );
+}
+```
+
+`Chat.Layout` reads the `pane` prop on its direct children to decide which column to place them in.
+`pane="conversations"` goes in the left column; `pane="thread"` gets the remaining space.
+
+## Pane assignment
+
+Children without an explicit `pane` prop are assigned automatically: the first unassigned child goes to the conversations column, the second to the thread column.
+Use the explicit `pane` prop for clarity — it also prevents the dev-mode warning when the heuristic can't determine placement.
+
+## Sizing the layout
+
+`Chat.Layout` renders a `<div>` with `display: flex`.
+Apply dimensions and sizing with `className` or `style`:
+
+```tsx
+<Chat.Root adapter={adapter} style={{ height: '100vh' }}>
+  <Chat.Layout style={{ height: '100%' }}>
+    <ChatConversationList.Root pane="conversations" style={{ width: 280, flexShrink: 0 }}>
+      {/* … */}
+    </ChatConversationList.Root>
+
+    <ChatConversation.Root pane="thread">
+      {/* thread takes the remaining width via flex: 1 */}
+    </ChatConversation.Root>
+  </Chat.Layout>
+</Chat.Root>
+```
+
+The thread pane div has `flex: 1` applied internally, so it fills the remaining space without any extra styling.
+
+## State attributes
+
+`Chat.Layout` sets data attributes based on which panes are present:
+
+| Attribute                     | When set                              |
+| :---------------------------- | :------------------------------------ |
+| `data-has-conversations-pane` | A conversations pane child is mounted |
+| `data-has-thread-pane`        | A thread pane child is mounted        |
+
+Use these to conditionally show dividers or adjust layout in CSS:
+
+```css
+.Layout[data-has-conversations-pane] {
+  border-left: 1px solid oklch(90% 0 0deg);
+}
+```
+
+## Conversation header
+
+`ChatConversation.Root` supports a header slot with title, subtitle, and action buttons:
+
+```tsx
+<ChatConversation.Root pane="thread">
+  <ChatConversation.Header>
+    <ChatConversation.HeaderInfo>
+      <ChatConversation.Title />
+      <ChatConversation.Subtitle />
+    </ChatConversation.HeaderInfo>
+    <ChatConversation.HeaderActions>{/* custom action buttons */}</ChatConversation.HeaderActions>
+  </ChatConversation.Header>
+
+  {/* message list, composer */}
+</ChatConversation.Root>
+```
+
+The `ChatConversation.Title` and `ChatConversation.Subtitle` components render the active conversation's title and subtitle from the store.
+
+## Responsive patterns
+
+On small screens you may want to hide the conversations pane and surface it in a drawer instead.
+Use CSS to toggle visibility based on a breakpoint, or render `ChatConversationList.Root` inside your own drawer and omit `Chat.Layout` entirely.
+
+For further details on building the conversation list see [Conversation list](/react/chat/conversation-list).
