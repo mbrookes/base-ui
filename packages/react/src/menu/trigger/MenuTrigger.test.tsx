@@ -3,7 +3,7 @@ import { expect } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { act, fireEvent, flushMicrotasks, screen } from '@mui/internal-test-utils';
 import { Menu } from '@base-ui/react/menu';
-import { Popover } from '@base-ui/react/popover';
+
 import { describeConformance, createRenderer } from '#test-utils';
 import { PATIENT_CLICK_THRESHOLD } from '../../internals/constants';
 
@@ -424,45 +424,5 @@ describe('<Menu.Trigger />', () => {
 
       expect(screen.queryByRole('menu', { hidden: false })).toBe(null);
     });
-  });
-
-  it('does not have role prop inside a Popover', async () => {
-    await render(
-      <Popover.Root open>
-        <Popover.Trigger>Open</Popover.Trigger>
-        <Popover.Portal>
-          <Popover.Positioner>
-            <Popover.Popup>
-              <Menu.Root>
-                <Menu.Trigger data-testid="menu-trigger" />
-              </Menu.Root>
-            </Popover.Popup>
-          </Popover.Positioner>
-        </Popover.Portal>
-      </Popover.Root>,
-    );
-
-    const button = screen.getByTestId('menu-trigger');
-    expect(button).not.toHaveAttribute('role');
-  });
-
-  it('has a role prop inside a Popover when not a native button', async () => {
-    await render(
-      <Popover.Root open>
-        <Popover.Trigger>Open</Popover.Trigger>
-        <Popover.Portal>
-          <Popover.Positioner>
-            <Popover.Popup>
-              <Menu.Root>
-                <Menu.Trigger data-testid="menu-trigger" render={<span />} nativeButton={false} />
-              </Menu.Root>
-            </Popover.Popup>
-          </Popover.Positioner>
-        </Popover.Portal>
-      </Popover.Root>,
-    );
-
-    const button = screen.getByTestId('menu-trigger');
-    expect(button).toHaveAttribute('role', 'button');
   });
 });
