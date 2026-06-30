@@ -14,7 +14,7 @@ By default they are hidden once the conversation has messages — show them thro
 Pass an array of strings to the `suggestions` prop:
 
 ```tsx
-import { ChatSuggestions } from '@base-ui/react/chat-suggestions';
+import { ChatSuggestions } from '@base-ui/chat/chat-suggestions';
 
 <Chat.Root adapter={adapter}>
   {/* ... message list and composer ... */}
@@ -46,7 +46,7 @@ Set `autoSubmit` to immediately send the suggestion as a message without pre-fil
 Pass `ChatSuggestion` objects to set a display label that differs from the submitted value:
 
 ```tsx
-import type { ChatSuggestion } from '@base-ui/react/chat-suggestions';
+import type { ChatSuggestion } from '@base-ui/chat/chat-suggestions';
 
 const suggestions: ChatSuggestion[] = [
   { value: 'Tell me about pricing', label: 'Pricing' },
@@ -108,7 +108,7 @@ When `children` is provided, `ChatSuggestions.Root` ignores the `suggestions` pr
 Use `ChatSuggestions.Item` for each custom chip:
 
 ```tsx
-import { ChatSuggestions } from '@base-ui/react/chat-suggestions';
+import { ChatSuggestions } from '@base-ui/chat/chat-suggestions';
 
 <ChatSuggestions.Root>
   <ChatSuggestions.Item value="Option A">Option A</ChatSuggestions.Item>
@@ -121,7 +121,7 @@ import { ChatSuggestions } from '@base-ui/react/chat-suggestions';
 ## Anatomy
 
 ```tsx
-import { ChatSuggestions } from '@base-ui/react/chat-suggestions';
+import { ChatSuggestions } from '@base-ui/chat/chat-suggestions';
 
 <ChatSuggestions.Root suggestions={['…']}>
   {/* automatically rendered from suggestions prop, or supply manually: */}

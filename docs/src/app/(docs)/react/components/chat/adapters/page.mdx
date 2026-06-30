@@ -16,7 +16,7 @@ The full interface is generic over your pagination cursor type.
 The default cursor type is `string`, which covers the majority of REST and cursor-based APIs:
 
 ```ts
-import type { ChatAdapter } from '@base-ui/react/chat';
+import type { ChatAdapter } from '@base-ui/chat/chat';
 
 interface ChatAdapter<Cursor = string> {
   // Required
@@ -66,8 +66,8 @@ It receives the user's message and must return a `ReadableStream` of typed chunk
 The `message` argument is a `ChatMessage` — its content lives in a `parts` array, not a plain string.
 
 ```tsx
-import { Chat } from '@base-ui/react/chat';
-import type { ChatAdapter } from '@base-ui/react/chat';
+import { Chat } from '@base-ui/chat/chat';
+import type { ChatAdapter } from '@base-ui/chat/chat';
 
 const adapter: ChatAdapter = {
   async sendMessage({ message, signal }) {
@@ -242,7 +242,7 @@ Return `null` if the interrupted message cannot be resumed.
 ## Complete adapter example
 
 ```tsx
-import type { ChatAdapter } from '@base-ui/react/chat';
+import type { ChatAdapter } from '@base-ui/chat/chat';
 
 const adapter: ChatAdapter = {
   async sendMessage({ message, signal }) {
@@ -293,7 +293,7 @@ Use `createEchoAdapter` for prototyping and testing.
 It echoes the user's message back with a configurable delay:
 
 ```tsx
-import { Chat, createEchoAdapter } from '@base-ui/react/chat';
+import { Chat, createEchoAdapter } from '@base-ui/chat/chat';
 
 const adapter = createEchoAdapter({
   respond: (text) => `You said: "${text}"`,
@@ -310,7 +310,7 @@ const adapter = createEchoAdapter({
 Use `createAiSdkAdapter` to connect to any model supported by the [Vercel AI SDK](https://sdk.vercel.ai/):
 
 ```tsx
-import { Chat, createAiSdkAdapter } from '@base-ui/react/chat';
+import { Chat, createAiSdkAdapter } from '@base-ui/chat/chat';
 import { openai } from '@ai-sdk/openai';
 
 const adapter = createAiSdkAdapter({ model: openai('gpt-4o') });

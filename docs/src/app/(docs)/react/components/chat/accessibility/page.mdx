@@ -51,7 +51,7 @@ The announcement strings and labels come from the locale text system, so they lo
 Pass a `localeText` prop to `Chat.Root` to override the default English strings:
 
 ```tsx
-import { Chat } from '@base-ui/react/chat';
+import { Chat } from '@base-ui/chat/chat';
 
 <Chat.Root
   adapter={adapter}
@@ -77,7 +77,7 @@ The streaming indicator's animation pauses automatically when the user requests 
 Set `enableRovingFocus={false}` on `ChatMessageList.Root` to opt out of the roving tabindex entirely, for example when rendering fully custom rows that manage focus themselves:
 
 ```tsx
-import { ChatMessageList } from '@base-ui/react/chat-message-list';
+import { ChatMessageList } from '@base-ui/chat/chat-message-list';
 
 <ChatMessageList.Root enableRovingFocus={false} renderItem={/* ... */}>
   <ChatMessageList.Viewport>
@@ -86,10 +86,10 @@ import { ChatMessageList } from '@base-ui/react/chat-message-list';
 </ChatMessageList.Root>
 ```
 
-Custom interactive content rendered inside a message can participate in the drill-in model with the `useMessageContentTabIndex()` hook, exported from `@base-ui/react/chat-message-list`:
+Custom interactive content rendered inside a message can participate in the drill-in model with the `useMessageContentTabIndex()` hook, exported from `@base-ui/chat/chat-message-list`:
 
 ```tsx
-import { useMessageContentTabIndex } from '@base-ui/react/chat-message-list';
+import { useMessageContentTabIndex } from '@base-ui/chat/chat-message-list';
 
 function CustomControl() {
   const tabIndex = useMessageContentTabIndex();
@@ -104,7 +104,7 @@ function CustomControl() {
 For full control over when a message is considered actionable (drillable), use `useMessageActionable()`:
 
 ```tsx
-import { useMessageActionable } from '@base-ui/react/chat-message-list';
+import { useMessageActionable } from '@base-ui/chat/chat-message-list';
 
 function CustomMessage() {
   const isActionable = useMessageActionable();

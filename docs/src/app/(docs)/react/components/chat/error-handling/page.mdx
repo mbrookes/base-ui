@@ -22,7 +22,7 @@ When an adapter method throws, the runtime:
 Use the `onError` prop on `Chat.Root` to handle errors at the application level:
 
 ```tsx
-import { Chat } from '@base-ui/react/chat';
+import { Chat } from '@base-ui/chat/chat';
 
 <Chat.Root
   adapter={adapter}
@@ -80,7 +80,7 @@ interface ChatError {
 The `useChat()` hook exposes the current error:
 
 ```tsx
-import { useChat } from '@base-ui/react/chat';
+import { useChat } from '@base-ui/chat/chat';
 
 function ErrorBanner() {
   const { error, setError } = useChat();
@@ -99,7 +99,7 @@ function ErrorBanner() {
 The `useChatStatus()` hook also exposes the error alongside streaming and history state:
 
 ```tsx
-import { useChatStatus } from '@base-ui/react/chat';
+import { useChatStatus } from '@base-ui/chat/chat';
 
 function StatusBar() {
   const { error, isStreaming, isLoadingHistory } = useChatStatus();
@@ -116,7 +116,7 @@ When `sendMessage()` fails, the user's message stays in the thread (optimistic u
 Use the `retry` method from `useChat()` to re-send the message associated with a given message ID:
 
 ```tsx
-import { useChat } from '@base-ui/react/chat';
+import { useChat } from '@base-ui/chat/chat';
 
 function RetryButton({ messageId }: { messageId: string }) {
   const { retry } = useChat();
@@ -132,7 +132,7 @@ It is a no-op while a send or stream is already in flight.
 Use `useMessageError(messageId)` to read a single message's error from your own components:
 
 ```tsx
-import { useMessageError } from '@base-ui/react/chat';
+import { useMessageError } from '@base-ui/chat/chat';
 
 function MessageErrorDisplay({ messageId }: { messageId: string }) {
   const error = useMessageError(messageId);
@@ -144,7 +144,7 @@ function MessageErrorDisplay({ messageId }: { messageId: string }) {
 Use `ChatMessage.Error` to render the error in the message row:
 
 ```tsx
-import { ChatMessage } from '@base-ui/react/chat-message';
+import { ChatMessage } from '@base-ui/chat/chat-message';
 
 <ChatMessage.Root messageId={id}>
   <ChatMessage.Content />
@@ -208,7 +208,7 @@ The message `status` field reflects error states:
 Use the `status` field to conditionally render error indicators:
 
 ```tsx
-import type { ChatMessage } from '@base-ui/react/chat';
+import type { ChatMessage } from '@base-ui/chat/chat';
 
 function MessageBubble({ message }: { message: ChatMessage }) {
   return (

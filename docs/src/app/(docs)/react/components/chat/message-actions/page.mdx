@@ -14,7 +14,7 @@ Pair it with CSS to reveal the bar on hover or keyboard drill-in.
 Add `ChatMessage.Actions` inside `ChatMessage.Root`:
 
 ```tsx
-import { ChatMessage } from '@base-ui/react/chat-message';
+import { ChatMessage } from '@base-ui/chat/chat-message';
 
 <ChatMessage.Root messageId={id}>
   <ChatMessage.Avatar />
@@ -68,7 +68,7 @@ Using `visibility: hidden` removes the action buttons from the tab order when no
 Use `useMessage(id)` to read the current message and conditionally render actions per role:
 
 ```tsx
-import { useMessage, useChatActions } from '@base-ui/react/chat';
+import { useMessage, useChatActions } from '@base-ui/chat/chat';
 
 function MessageActionBar({ messageId }: { messageId: string }) {
   const message = useMessage(messageId);
@@ -97,7 +97,7 @@ function MessageActionBar({ messageId }: { messageId: string }) {
 `useChatActions()` returns all runtime actions without triggering re-renders on state changes:
 
 ```ts
-import { useChatActions } from '@base-ui/react/chat';
+import { useChatActions } from '@base-ui/chat/chat';
 
 const actions = useChatActions();
 ```
@@ -126,7 +126,7 @@ import {
   ChatMessageActionsMenuGroup,
   ChatMessageActionsMenuGroupLabel,
   ChatMessageActionsMenuItem,
-} from '@base-ui/react/chat-message';
+} from '@base-ui/chat/chat-message';
 
 function MessageDropdownMenu({ messageId }: { messageId: string }) {
   const { retry, regenerate } = useChatActions();
@@ -159,7 +159,7 @@ function MessageDropdownMenu({ messageId }: { messageId: string }) {
 A common action is copying the message text. Read the text parts from the message and write them to the clipboard:
 
 ```tsx
-import { useMessage } from '@base-ui/react/chat';
+import { useMessage } from '@base-ui/chat/chat';
 
 function CopyButton({ messageId }: { messageId: string }) {
   const message = useMessage(messageId);

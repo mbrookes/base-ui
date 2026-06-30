@@ -7,7 +7,7 @@
 />
 
 The indicator components encode thread-specific behaviors that are easy to mishandle when rebuilt from scratch.
-Import them all from `@base-ui/react/chat`:
+Import them all from `@base-ui/chat/chat`:
 
 ```tsx
 import {
@@ -15,7 +15,7 @@ import {
   TypingIndicator,
   UnreadMarker,
   ScrollToBottomAffordance,
-} from '@base-ui/react/chat';
+} from '@base-ui/chat/chat';
 ```
 
 ## StreamingIndicator
@@ -31,8 +31,8 @@ It covers two placements:
 Pass `index` and `items` so the indicator only renders on the last row:
 
 ```tsx
-import { ChatMessageList } from '@base-ui/react/chat-message-list';
-import { StreamingIndicator } from '@base-ui/react/chat';
+import { ChatMessageList } from '@base-ui/chat/chat-message-list';
+import { StreamingIndicator } from '@base-ui/chat/chat';
 
 <ChatMessageList.Root
   renderItem={({ id, index, items }) => (
@@ -129,7 +129,7 @@ Provide `children` to replace the default three `<span>` dots:
 Read the streaming phase inside a custom component with `useStreamingIndicatorVisibility()`:
 
 ```tsx
-import { useStreamingIndicatorVisibility } from '@base-ui/react/chat';
+import { useStreamingIndicatorVisibility } from '@base-ui/chat/chat';
 
 function CustomIndicator() {
   const { waiting } = useStreamingIndicatorVisibility('auto');
@@ -155,8 +155,8 @@ The indicator returns `null` when no users are typing.
 Place it in the conversation header or above the composer:
 
 ```tsx
-import { ChatConversation } from '@base-ui/react/chat-conversation';
-import { TypingIndicator } from '@base-ui/react/chat';
+import { ChatConversation } from '@base-ui/chat/chat-conversation';
+import { TypingIndicator } from '@base-ui/chat/chat';
 
 <ChatConversation.Root pane="thread">
   <ChatConversation.Header>
@@ -172,7 +172,7 @@ import { TypingIndicator } from '@base-ui/react/chat';
 Set `features={{ typingSignal: true }}` on `Chat.Root` to opt into the typing signal feature:
 
 ```tsx
-import { Chat } from '@base-ui/react/chat';
+import { Chat } from '@base-ui/chat/chat';
 
 <Chat.Root adapter={adapter} features={{ typingSignal: true }}>
   {/* ... */}
@@ -217,7 +217,7 @@ The marker renders `role="separator"` and returns `null` for all rows except the
 ### Placement
 
 ```tsx
-import { UnreadMarker } from '@base-ui/react/chat';
+import { UnreadMarker } from '@base-ui/chat/chat';
 
 <ChatMessageList.Root
   renderItem={({ id, index }) => (
@@ -267,8 +267,8 @@ It also shows an unseen-message count badge when the user has scrolled away and 
 Place it inside the `ChatMessageList.Root` context, typically as a sibling of `ChatMessageList.Viewport`:
 
 ```tsx
-import { ChatMessageList } from '@base-ui/react/chat-message-list';
-import { ScrollToBottomAffordance } from '@base-ui/react/chat';
+import { ChatMessageList } from '@base-ui/chat/chat-message-list';
+import { ScrollToBottomAffordance } from '@base-ui/chat/chat';
 
 <ChatMessageList.Root renderItem={/* ... */}>
   <div style={{ position: 'relative' }}>

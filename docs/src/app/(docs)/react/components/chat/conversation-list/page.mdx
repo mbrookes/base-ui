@@ -11,9 +11,9 @@ Use `ChatConversationList` together with `ChatConversation` inside `Chat.Layout`
 ## Anatomy
 
 ```tsx
-import { Chat } from '@base-ui/react/chat';
-import { ChatConversationList } from '@base-ui/react/chat-conversation-list';
-import { ChatConversation } from '@base-ui/react/chat-conversation';
+import { Chat } from '@base-ui/chat/chat';
+import { ChatConversationList } from '@base-ui/chat/chat-conversation-list';
+import { ChatConversation } from '@base-ui/chat/chat-conversation';
 
 <Chat.Root
   adapter={adapter}
@@ -218,7 +218,7 @@ const adapter: ChatAdapter<MyCursor> = {
 Read history loading state from `useChatStatus()`:
 
 ```tsx
-import { useChatStatus } from '@base-ui/react/chat';
+import { useChatStatus } from '@base-ui/chat/chat';
 
 function HistoryOverlay() {
   const { hasMoreHistory, isLoadingHistory } = useChatStatus();
@@ -240,7 +240,7 @@ function HistoryOverlay() {
 Trigger a manual history load with `loadMoreHistory()` from `useChatActions()`:
 
 ```tsx
-import { useChatActions } from '@base-ui/react/chat';
+import { useChatActions } from '@base-ui/chat/chat';
 
 function LoadMoreButton() {
   const { loadMoreHistory } = useChatActions();

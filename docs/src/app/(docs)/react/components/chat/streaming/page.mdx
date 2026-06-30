@@ -28,7 +28,7 @@ If the stream closes without a terminal chunk, the runtime treats it as a discon
 When writing an adapter, construct a `ReadableStream` from an array of chunks:
 
 ```tsx
-import type { ChatAdapter } from '@base-ui/react/chat';
+import type { ChatAdapter } from '@base-ui/chat/chat';
 
 const adapter: ChatAdapter = {
   async sendMessage({ message }) {
@@ -86,7 +86,7 @@ async function fromSSE(
 For deduplication and ordering, wrap chunks in a `ChatStreamEnvelope`:
 
 ```ts
-import type { ChatStreamEnvelope } from '@base-ui/react/chat';
+import type { ChatStreamEnvelope } from '@base-ui/chat/chat';
 
 interface ChatStreamEnvelope {
   eventId?: string; // unique event identifier for deduplication
@@ -107,7 +107,7 @@ The default is **16 ms** (approximately one frame at 60 fps).
 Override the default by passing a custom interval:
 
 ```tsx
-import { Chat } from '@base-ui/react/chat';
+import { Chat } from '@base-ui/chat/chat';
 
 <Chat.Root adapter={adapter} streamFlushInterval={32}>
   {/* ... */}
@@ -128,10 +128,10 @@ It covers two phases:
 Place `StreamingIndicator` outside a `ChatMessage.Root` for the waiting phase, or inside one for the streaming phase:
 
 ```tsx
-import { Chat, StreamingIndicator } from '@base-ui/react/chat';
-import { ChatMessageList } from '@base-ui/react/chat-message-list';
-import { ChatMessageGroup } from '@base-ui/react/chat-message-group';
-import { ChatMessage } from '@base-ui/react/chat-message';
+import { Chat, StreamingIndicator } from '@base-ui/chat/chat';
+import { ChatMessageList } from '@base-ui/chat/chat-message-list';
+import { ChatMessageGroup } from '@base-ui/chat/chat-message-group';
+import { ChatMessage } from '@base-ui/chat/chat-message';
 
 <ChatMessageList.Root
   renderItem={({ id, index }) => (
@@ -157,7 +157,7 @@ import { ChatMessage } from '@base-ui/react/chat-message';
 Use `useStreamingIndicatorVisibility()` when building a custom indicator:
 
 ```tsx
-import { useStreamingIndicatorVisibility } from '@base-ui/react/chat';
+import { useStreamingIndicatorVisibility } from '@base-ui/chat/chat';
 
 function MyIndicator() {
   const { waiting } = useStreamingIndicatorVisibility('auto');
@@ -198,7 +198,7 @@ stop() {
 You can also stop streaming programmatically using `useChat()`:
 
 ```tsx
-import { useChat } from '@base-ui/react/chat';
+import { useChat } from '@base-ui/chat/chat';
 
 function StopButton() {
   const { stopStreaming } = useChat();

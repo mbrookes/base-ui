@@ -26,7 +26,7 @@ By default, `ChatMessage.Content` renders text parts as plain `<div>{part.text}<
 Use `textProps.renderText` to supply a custom renderer — for example, a markdown parser:
 
 ```tsx
-import { ChatMessage } from '@base-ui/react/chat-message';
+import { ChatMessage } from '@base-ui/chat/chat-message';
 import ReactMarkdown from 'react-markdown';
 
 <ChatMessage.Root messageId={id}>
@@ -57,8 +57,8 @@ function TextPartDisplay({ part }: { part: ChatTextMessagePart }) {
 Register renderers for specific part types through the `partRenderers` prop on `Chat.Root`:
 
 ```tsx
-import { Chat } from '@base-ui/react/chat';
-import type { ChatPartRendererMap } from '@base-ui/react/chat';
+import { Chat } from '@base-ui/chat/chat';
+import type { ChatPartRendererMap } from '@base-ui/chat/chat';
 
 const partRenderers: ChatPartRendererMap = {
   text: ({ part }) => <MyMarkdownRenderer content={part.text} />,
@@ -78,7 +78,7 @@ Providing a renderer for a type replaces the default rendering for that type eve
 Read the currently registered renderer for a specific part type in a component with `useChatPartRenderer()`:
 
 ```tsx
-import { useChatPartRenderer } from '@base-ui/react/chat';
+import { useChatPartRenderer } from '@base-ui/chat/chat';
 
 function CustomContent({ part, message, index }) {
   const renderer = useChatPartRenderer(part.type);
@@ -121,7 +121,7 @@ const partRenderers: ChatPartRendererMap = {
 Tool invocations produce a `'tool'` part (or `'dynamic-tool'` for dynamic tools) that tracks the full lifecycle:
 
 ```ts
-import type { ChatToolMessagePart, ChatToolInvocationState } from '@base-ui/react/chat';
+import type { ChatToolMessagePart, ChatToolInvocationState } from '@base-ui/chat/chat';
 
 // ChatToolInvocationState:
 // 'input-streaming' | 'input-available' | 'approval-requested' |
@@ -165,7 +165,7 @@ const partRenderers: ChatPartRendererMap = {
 Use `useChatOnToolCall()` inside a component that handles tool execution on the client side:
 
 ```tsx
-import { useChatOnToolCall } from '@base-ui/react/chat';
+import { useChatOnToolCall } from '@base-ui/chat/chat';
 
 function ToolCallHandler() {
   useChatOnToolCall(async ({ toolName, toolCallId, input, addToolResult }) => {
@@ -184,8 +184,8 @@ When the stream emits a `tool-approval-request` chunk, the invocation enters `'a
 Build a React component that renders the approval UI (use hooks inside the component, not directly in the renderer callback):
 
 ```tsx
-import { useChatActions } from '@base-ui/react/chat';
-import type { ChatToolMessagePart } from '@base-ui/react/chat';
+import { useChatActions } from '@base-ui/chat/chat';
+import type { ChatToolMessagePart } from '@base-ui/chat/chat';
 
 function ToolApprovalCard({ part }: { part: ChatToolMessagePart }) {
   const { addToolApprovalResponse } = useChatActions();
@@ -235,7 +235,7 @@ interface ChatFileMessagePart {
 The built-in `FilePart` component renders images inline and other file types as a download link:
 
 ```tsx
-import { FilePart } from '@base-ui/react/chat-message';
+import { FilePart } from '@base-ui/chat/chat-message';
 
 const partRenderers: ChatPartRendererMap = {
   file: ({ part }) => <FilePart part={part} />,
@@ -280,7 +280,7 @@ interface ChatSourceDocumentMessagePart {
 Use `SourceUrlPart` and `SourceDocumentPart` built-in components or build your own:
 
 ```tsx
-import { SourceUrlPart, SourceDocumentPart } from '@base-ui/react/chat-message';
+import { SourceUrlPart, SourceDocumentPart } from '@base-ui/chat/chat-message';
 
 const partRenderers: ChatPartRendererMap = {
   'source-url': ({ part }) => <SourceUrlPart part={part} />,
